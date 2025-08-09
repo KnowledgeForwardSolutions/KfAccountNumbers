@@ -35,4 +35,52 @@ public class ExtensionMethodsTests
       => ch.IsAsciiDigit().Should().BeFalse();
 
    #endregion
+
+   #region RequiresNotNullOrWhiteSpace Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ExtensionMethods_RequiresNotNullOrWhiteSpace_ShouldReturnStringValue_WhenStringIsNotEmpty()
+   {
+      // Arrange.
+      var str = "This is a test";
+      var message = "String must not be empty";
+
+      // Act/assert
+      str.RequiresNotNullOrWhiteSpace(message).Should().BeSameAs(str);
+   }
+
+   [Fact]
+   public void ExtensionMethods_RequiresNotNullOrWhiteSpace_ShouldThrowArgumentNullException_WhenStringIsNull()
+   {
+      // Arrange.
+      String str = null!;
+      var message = "String must not be empty";
+      var expectedMessage = message + "*";
+      var act = () => str.RequiresNotNullOrWhiteSpace(message);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(str))
+         .WithMessage(expectedMessage);
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void ExtensionMethods_RequiresNotNullOrWhiteSpace_ShouldThrowArgumentException_WhenStringIsEmptyOrWhiteSpace(String str)
+   {
+      // Arrange.
+      var message = "String must not be empty";
+      var expectedMessage = message + "*";
+      var act = () => str.RequiresNotNullOrWhiteSpace(message);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(str))
+         .WithMessage(expectedMessage);
+   }
+
+   #endregion
 }
