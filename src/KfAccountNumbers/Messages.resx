@@ -117,19 +117,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="UsSsnAllIdenticalDigits" xml:space="preserve">
+    <value>US Social Security Number may not have 9 consecutive identical digits</value>
+  </data>
   <data name="UsSsnEmpty" xml:space="preserve">
     <value>US Social Security Number may not be null, empty or all whitespace characters</value>
   </data>
   <data name="UsSsnInvalidAreaNumber" xml:space="preserve">
     <value>US Social Security Number area number segment (AAA-xx-xxxx) must not be 000, 666 or 900-999</value>
   </data>
-  <data name="UsSsnInvalidCharacter" xml:space="preserve">
+  <data name="UsSsnInvalidCharacterEncountered" xml:space="preserve">
     <value>US Social Security Number contains an invalid character at location {0}; expected digit (0-9), found '{1}'</value>
+  </data>
+  <data name="UsSsnInvalidGroupNumber" xml:space="preserve">
+    <value>US Social Security Number group number segment (xxx-GG-xxxx) must not be 00</value>
   </data>
   <data name="UsSsnInvalidLength" xml:space="preserve">
     <value>US Social Security Number must have length 9 (digits only) or 11 (9 digits with two separator characters)</value>
   </data>
-  <data name="UsSsnInvalidSeparator" xml:space="preserve">
+  <data name="UsSsnInvalidRun" xml:space="preserve">
+    <value>US Social Security Number may not have sequence 123456789</value>
+  </data>
+  <data name="UsSsnInvalidSeparatorCharacter" xml:space="preserve">
+    <value>US Social Security Number may not use a decimal digits (0-9) as a separator character</value>
+  </data>
+  <data name="UsSsnInvalidSeparatorEncountered" xml:space="preserve">
     <value>US Social Security Number contains an invalid separator character at location {0}; expected '{1}', found '{2}'</value>
+  </data>
+  <data name="UsSsnInvalidSerialNumber" xml:space="preserve">
+    <value>US Social Security Number serial number segment (xxx-xx-SSSS) must not be 0000</value>
   </data>
 </root>

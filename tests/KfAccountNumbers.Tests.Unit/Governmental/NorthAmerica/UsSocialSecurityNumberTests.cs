@@ -91,6 +91,31 @@ public class UsSocialSecurityNumberTests
    }
 
    [Theory]
+   [InlineData('0')]
+   [InlineData('1')]
+   [InlineData('2')]
+   [InlineData('3')]
+   [InlineData('4')]
+   [InlineData('5')]
+   [InlineData('6')]
+   [InlineData('7')]
+   [InlineData('8')]
+   [InlineData('9')]
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentOutOfRangeException_WhenSeparatorIsDigit(Char separator)
+   {
+      // Arrange.
+      var ssn = $"012{separator}34{separator}5678";
+      var expectedMessage = Messages.UsSsnInvalidSeparatorCharacter + "*";
+      var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentOutOfRangeException>()
+         .WithParameterName(nameof(separator))
+         .WithMessage(expectedMessage)
+         .And.ActualValue.Should().Be(separator);
+   }
+
+   [Theory]
    [InlineData("012 34-5678", 3)]
    [InlineData("012-34 5678", 6)]
    public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentException_When11CharacterStringOnlyFindsInvalidSeparator(
@@ -98,7 +123,7 @@ public class UsSocialSecurityNumberTests
       Int32 offset)
    {
       // Arrange.
-      var expectedMessage = String.Format(Messages.UsSsnInvalidSeparator, offset, '-', ssn[offset]) + "*";
+      var expectedMessage = String.Format(Messages.UsSsnInvalidSeparatorEncountered, offset, '-', ssn[offset]) + "*";
       var act = () => _ = new UsSocialSecurityNumber(ssn);
 
       // Act/assert.
@@ -116,7 +141,7 @@ public class UsSocialSecurityNumberTests
       Int32 offset)
    {
       // Arrange.
-      var expectedMessage = String.Format(Messages.UsSsnInvalidSeparator, offset, separator, ssn[offset]) + "*";
+      var expectedMessage = String.Format(Messages.UsSsnInvalidSeparatorEncountered, offset, separator, ssn[offset]) + "*";
       var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
 
       // Act/assert.
@@ -141,7 +166,7 @@ public class UsSocialSecurityNumberTests
       Int32 offset)
    {
       // Arrange.
-      var expectedMessage = String.Format(Messages.UsSsnInvalidCharacter, offset, ssn[offset]) + "*";
+      var expectedMessage = String.Format(Messages.UsSsnInvalidCharacterEncountered, offset, ssn[offset]) + "*";
       var act = () => _ = new UsSocialSecurityNumber(ssn);
 
       // Act/assert.
@@ -162,7 +187,7 @@ public class UsSocialSecurityNumberTests
       Int32 offset)
    {
       // Arrange.
-      var expectedMessage = String.Format(Messages.UsSsnInvalidCharacter, offset, ssn[offset]) + "*";
+      var expectedMessage = String.Format(Messages.UsSsnInvalidCharacterEncountered, offset, ssn[offset]) + "*";
       var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
 
       // Act/assert.
@@ -203,6 +228,145 @@ public class UsSocialSecurityNumberTests
    {
       // Arrange.
       var expectedMessage = Messages.UsSsnInvalidAreaNumber + "*";
+      var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(ssn))
+         .WithMessage(expectedMessage);
+   }
+
+   [Theory]
+   [InlineData("012005678")]
+   [InlineData("012-00-5678")]
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentException_WhenStringValueOnlyHasInvalidGroupNumber(String ssn)
+   {
+      // Arrange.
+      var expectedMessage = Messages.UsSsnInvalidGroupNumber + "*";
+      var act = () => _ = new UsSocialSecurityNumber(ssn);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(ssn))
+         .WithMessage(expectedMessage);
+   }
+
+   [Fact]
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentException_WhenStringValueAndSeparatorHasInvalidGroupNumber()
+   {
+      // Arrange.
+      var ssn = "012 00 5678";
+      var separator = ' ';
+      var expectedMessage = Messages.UsSsnInvalidGroupNumber + "*";
+      var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(ssn))
+         .WithMessage(expectedMessage);
+   }
+
+   [Theory]
+   [InlineData("012340000")]
+   [InlineData("012-34-0000")]
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentException_WhenStringValueOnlyHasInvalidSerialNumber(String ssn)
+   {
+      // Arrange.
+      var expectedMessage = Messages.UsSsnInvalidSerialNumber + "*";
+      var act = () => _ = new UsSocialSecurityNumber(ssn);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(ssn))
+         .WithMessage(expectedMessage);
+   }
+
+   [Fact]
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentException_WhenStringValueAndSeparatorHasInvalidSerialNumber()
+   {
+      // Arrange.
+      var ssn = "012 34 0000";
+      var separator = ' ';
+      var expectedMessage = Messages.UsSsnInvalidSerialNumber + "*";
+      var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(ssn))
+         .WithMessage(expectedMessage);
+   }
+
+   [Theory]
+   [InlineData("111111111")]        // Note that missing cases ("000000000", "666666666" and "999999999"
+   [InlineData("222222222")]        // will fail the validation for area number before reaching the
+   [InlineData("333333333")]        // validation for identical digits
+   [InlineData("444444444")]
+   [InlineData("555555555")]
+   [InlineData("777777777")]
+   [InlineData("888888888")]
+   [InlineData("111-11-1111")]
+   [InlineData("222-22-2222")]
+   [InlineData("333-33-3333")]
+   [InlineData("444-44-4444")]
+   [InlineData("555-55-5555")]
+   [InlineData("777-77-7777")]
+   [InlineData("888-88-8888")]
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentException_WhenStringValueOnlyHas9IdenticalDigits(String ssn)
+   {
+      // Arrange.
+      var expectedMessage = Messages.UsSsnAllIdenticalDigits + "*";
+      var act = () => _ = new UsSocialSecurityNumber(ssn);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(ssn))
+         .WithMessage(expectedMessage);
+   }
+
+   [Theory]
+   [InlineData("111 11 1111", ' ')]    // Note that missing cases ("000 00 0000", "666 66 6666" and "999 99 9999"
+   [InlineData("222 22 2222", ' ')]    // will fail the validation for area number before reaching the
+   [InlineData("333 33 3333", ' ')]    // validation for identical digits
+   [InlineData("444 44 4444", ' ')]
+   [InlineData("555 55 5555", ' ')]
+   [InlineData("777 77 7777", ' ')]
+   [InlineData("888 88 8888", ' ')]
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentException_WhenStringValueAndSeparatorHas9IdenticalDigits(
+      String ssn,
+      Char separator)
+   {
+      // Arrange.
+      var expectedMessage = Messages.UsSsnAllIdenticalDigits + "*";
+      var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(ssn))
+         .WithMessage(expectedMessage);
+   }
+
+   [Fact]
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentException_WhenStringValueOnlyHasConsecutiveRun()
+   {
+      // Arrange.
+      var ssn = "123456789";
+      var expectedMessage = Messages.UsSsnInvalidRun + "*";
+      var act = () => _ = new UsSocialSecurityNumber(ssn);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(ssn))
+         .WithMessage(expectedMessage);
+   }
+
+
+   [Fact]
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentException_WhenStringValueAndSeparatorHasConsecutiveRun()
+   {
+      // Arrange.
+      var ssn = "123 45 6789";
+      var separator = ' ';
+      var expectedMessage = Messages.UsSsnInvalidRun + "*";
       var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
 
       // Act/assert.

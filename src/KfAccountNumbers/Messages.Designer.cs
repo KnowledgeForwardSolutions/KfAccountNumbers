@@ -61,6 +61,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to US Social Security Number may not have 9 consecutive identical digits.
+        /// </summary>
+        internal static string UsSsnAllIdenticalDigits {
+            get {
+                return ResourceManager.GetString("UsSsnAllIdenticalDigits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to US Social Security Number may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string UsSsnEmpty {
@@ -81,9 +90,18 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to US Social Security Number contains an invalid character at location {0}; expected digit (0-9), found &apos;{1}&apos;.
         /// </summary>
-        internal static string UsSsnInvalidCharacter {
+        internal static string UsSsnInvalidCharacterEncountered {
             get {
-                return ResourceManager.GetString("UsSsnInvalidCharacter", resourceCulture);
+                return ResourceManager.GetString("UsSsnInvalidCharacterEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to US Social Security Number group number segment (xxx-GG-xxxx) must not be 00.
+        /// </summary>
+        internal static string UsSsnInvalidGroupNumber {
+            get {
+                return ResourceManager.GetString("UsSsnInvalidGroupNumber", resourceCulture);
             }
         }
         
@@ -97,11 +115,38 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to US Social Security Number may not have sequence 123456789.
+        /// </summary>
+        internal static string UsSsnInvalidRun {
+            get {
+                return ResourceManager.GetString("UsSsnInvalidRun", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to US Social Security Number may not use a decimal digits (0-9) as a separator character.
+        /// </summary>
+        internal static string UsSsnInvalidSeparatorCharacter {
+            get {
+                return ResourceManager.GetString("UsSsnInvalidSeparatorCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to US Social Security Number contains an invalid separator character at location {0}; expected &apos;{1}&apos;, found &apos;{2}&apos;.
         /// </summary>
-        internal static string UsSsnInvalidSeparator {
+        internal static string UsSsnInvalidSeparatorEncountered {
             get {
-                return ResourceManager.GetString("UsSsnInvalidSeparator", resourceCulture);
+                return ResourceManager.GetString("UsSsnInvalidSeparatorEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to US Social Security Number serial number segment (xxx-xx-SSSS) must not be 0000.
+        /// </summary>
+        internal static string UsSsnInvalidSerialNumber {
+            get {
+                return ResourceManager.GetString("UsSsnInvalidSerialNumber", resourceCulture);
             }
         }
     }
