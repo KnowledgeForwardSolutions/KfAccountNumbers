@@ -2,7 +2,73 @@
 
 public class ExtensionMethodsTests
 {
-   #region IsAsciiDigit Tests
+   #region FormatWithMask Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData("012345678", "___-__-____", "012-34-5678")]
+   [InlineData("8005551212", "(___) ___-____", "(800) 555-1212")]
+   [InlineData("abcdef", @"___ \_ ___", "abc _ def")]
+   [InlineData("abcdef", @"___\\___", @"abc\def")]
+   [InlineData("abc", "__.__.__", "ab.c.")]
+   [InlineData("", "__.__.__", "..")]
+   [InlineData("   ", "_._._", " . . ")]
+   public void ExtensionMethods_FormatWithMask_ShouldReturnExpectedValue(
+      String str,
+      String mask,
+      String expected)
+      => str.FormatWithMask(mask).Should().Be(expected); 
+
+   [Fact]
+   public void ExtensionMethods_FormatWithMask_ShouldThrowArgumentNullException_WhenStrIsNull()
+   {
+      // Arrange.
+      String str = null!;
+      var mask = "___-__-____";
+      var expectedMessage = Messages.FormatWithMaskStrNull + "*";
+      var act = () => _ = str.FormatWithMask(mask);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(str))
+         .WithMessage(expectedMessage);
+   }
+
+   [Fact]
+   public void ExtensionMethods_FormatWithMask_ShouldThrowArgumentNullException_WhenMaskIsNull()
+   {
+      // Arrange.
+      var str = "012345678";
+      String mask = null!;
+      var expectedMessage = Messages.FormatWithMaskMaskEmpty + "*";
+      var act = () => _ = str.FormatWithMask(mask);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void ExtensionMethods_FormatWithMask_ShouldThrowArgumentNullException_WhenMaskIsEmtpy(String mask)
+   {
+      // Arrange.
+      var str = "012345678";
+      var expectedMessage = Messages.FormatWithMaskMaskEmpty + "*";
+      var act = () => _ = str.FormatWithMask(mask);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   # endregion
+
+   #region IsAsciiDigit Method Tests
    // ==========================================================================
    // ==========================================================================
 
@@ -36,7 +102,7 @@ public class ExtensionMethodsTests
 
    #endregion
 
-   #region RequiresNotNullOrWhiteSpace Tests
+   #region RequiresNotNullOrWhiteSpace Method Tests
    // ==========================================================================
    // ==========================================================================
 

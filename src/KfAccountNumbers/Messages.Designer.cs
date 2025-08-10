@@ -61,6 +61,24 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to String formatting mask may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string FormatWithMaskMaskEmpty {
+            get {
+                return ResourceManager.GetString("FormatWithMaskMaskEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to String to format with a mask may not be null.
+        /// </summary>
+        internal static string FormatWithMaskStrNull {
+            get {
+                return ResourceManager.GetString("FormatWithMaskStrNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to US Social Security Number may not have 9 consecutive identical digits.
         /// </summary>
         internal static string UsSsnAllIdenticalDigits {
