@@ -175,6 +175,13 @@ public record UsSocialSecurityNumber
 
    public static implicit operator String(UsSocialSecurityNumber ssn) => ssn._ssn;
 
+   public static implicit operator UsSocialSecurityNumber(String ssn) => new(ssn);
+
+   /// <summary>
+   ///   Get a string representation of the SSN.
+   /// </summary>
+   public override String ToString() => _ssn;
+
    private static Boolean IsFormattedSsn(String ssn) => ssn.Length == FormattedLength;
 
    private static Boolean IsSeparatorPosition(Int32 position)
