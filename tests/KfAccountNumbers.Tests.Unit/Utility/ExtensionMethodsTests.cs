@@ -14,6 +14,7 @@ public class ExtensionMethodsTests
    [InlineData("abc", "__.__.__", "ab.c.")]
    [InlineData("", "__.__.__", "..")]
    [InlineData("   ", "_._._", " . . ")]
+   [InlineData("abc", "_", "a")]
    public void ExtensionMethods_FormatWithMask_ShouldReturnExpectedValue(
       String str,
       String mask,
