@@ -596,6 +596,71 @@ public class UsSocialSecurityNumberTests
 
    # endregion
 
+   #region Format Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void UsSocialSecurityNumber_Format_ShouldReturn11CharacterSsn_WhenDefaultMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new UsSocialSecurityNumber(ValidNineCharSsn);
+
+      // Act.
+      var formatted = sut.Format();
+
+      // Assert.
+      formatted.Should().Be(ValidElevenCharSsn);
+   }
+
+   [Fact]
+   public void UsSocialSecurityNumber_Format_ShouldReturnFormattedSsn_WhenNonDefaultMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new UsSocialSecurityNumber(ValidNineCharSsn);
+      var mask = "SSN: ___ __ ____";
+      var expected = "SSN: 078 05 1120";
+
+      // Act.
+      var formatted = sut.Format(mask);
+
+      // Assert.
+      formatted.Should().Be(expected);
+   }
+
+   [Fact]
+   public void UsSocialSecurityNumber_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
+   {
+      // Arrange.
+      var sut = new UsSocialSecurityNumber(ValidNineCharSsn);
+      String mask = null!;
+      var act = () => _ = sut.Format(mask);
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void UsSocialSecurityNumber_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
+   {
+      // Arrange.
+      var sut = new UsSocialSecurityNumber(ValidNineCharSsn);
+      var act = () => _ = sut.Format(mask);
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   # endregion
+
    #region ToString Method Tests
    // ==========================================================================
    // ==========================================================================

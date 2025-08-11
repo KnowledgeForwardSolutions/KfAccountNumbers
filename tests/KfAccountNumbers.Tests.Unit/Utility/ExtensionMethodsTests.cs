@@ -26,7 +26,7 @@ public class ExtensionMethodsTests
       // Arrange.
       String str = null!;
       var mask = "___-__-____";
-      var expectedMessage = Messages.FormatWithMaskStrNull + "*";
+      var expectedMessage = Messages.FormatStrNull + "*";
       var act = () => _ = str.FormatWithMask(mask);
 
       // Act/assert.
@@ -41,7 +41,7 @@ public class ExtensionMethodsTests
       // Arrange.
       var str = "012345678";
       String mask = null!;
-      var expectedMessage = Messages.FormatWithMaskMaskEmpty + "*";
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
       var act = () => _ = str.FormatWithMask(mask);
 
       // Act/assert.
@@ -57,7 +57,7 @@ public class ExtensionMethodsTests
    {
       // Arrange.
       var str = "012345678";
-      var expectedMessage = Messages.FormatWithMaskMaskEmpty + "*";
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
       var act = () => _ = str.FormatWithMask(mask);
 
       // Act/assert.

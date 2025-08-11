@@ -55,9 +55,9 @@ public static class ExtensionMethods
    {
       if (str is null)
       {
-         throw new ArgumentNullException(nameof(str), Messages.FormatWithMaskStrNull);
+         throw new ArgumentNullException(nameof(str), Messages.FormatStrNull);
       }
-      _ = mask.RequiresNotNullOrWhiteSpace(Messages.FormatWithMaskMaskEmpty);
+      _ = mask.RequiresNotNullOrWhiteSpace(Messages.FormatMaskEmpty);
 
       var outputChars = new Char[mask.Length];
       var strIndex = 0;

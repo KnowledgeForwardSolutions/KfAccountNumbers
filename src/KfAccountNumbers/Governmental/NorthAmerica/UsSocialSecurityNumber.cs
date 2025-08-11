@@ -178,6 +178,28 @@ public record UsSocialSecurityNumber
    public static implicit operator UsSocialSecurityNumber(String ssn) => new(ssn);
 
    /// <summary>
+   ///   Format the SSN using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   The mask that specified the final output.
+   /// </param>
+   /// <returns>
+   ///   A formatted Social Security Number.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the SSN.
+   /// </remarks>
+   public String Format(String mask = "___-__-____") => _ssn.FormatWithMask(mask);
+
+   /// <summary>
    ///   Get a string representation of the SSN.
    /// </summary>
    public override String ToString() => _ssn;

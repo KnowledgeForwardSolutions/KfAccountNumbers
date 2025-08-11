@@ -63,18 +63,18 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to String formatting mask may not be null, empty or all whitespace characters.
         /// </summary>
-        internal static string FormatWithMaskMaskEmpty {
+        internal static string FormatMaskEmpty {
             get {
-                return ResourceManager.GetString("FormatWithMaskMaskEmpty", resourceCulture);
+                return ResourceManager.GetString("FormatMaskEmpty", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to String to format with a mask may not be null.
         /// </summary>
-        internal static string FormatWithMaskStrNull {
+        internal static string FormatStrNull {
             get {
-                return ResourceManager.GetString("FormatWithMaskStrNull", resourceCulture);
+                return ResourceManager.GetString("FormatStrNull", resourceCulture);
             }
         }
         
