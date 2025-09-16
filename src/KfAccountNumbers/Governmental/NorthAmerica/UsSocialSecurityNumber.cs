@@ -87,6 +87,17 @@ public record UsSocialSecurityNumber
    private const Int32 FormattedLength = 11;
    private const Int32 NonFormattedLength = 9;
 
+   private const Int32 AreaRangeEnd = 3;                          // End indices are exclusive for use in range operator
+   private const Int32 UnformattedGroupRangeStart = 3;
+   private const Int32 UnformattedGroupRangeEnd = 5;
+   private const Int32 UnformattedSerialNumberRangeStart = 5;
+   private const Int32 FormattedGroupRangeStart = 4;
+   private const Int32 FormattedGroupRangeEnd = 6;
+   private const Int32 FormattedSerialNumberRangeStart = 7;
+
+   private const Int32 GroupSeparatorOffset = 3;   // Offset of separator between area and group sections in formatted SSN
+   private const Int32 SerialSeparatorOffset = 6;  // Offset of separator between group and serial number sections in formatted SSN
+
    /// <summary>
    ///   Initialize a new <see cref="UsSocialSecurityNumber"/>.
    /// </summary>
@@ -129,48 +140,55 @@ public record UsSocialSecurityNumber
    /// </exception>
    public UsSocialSecurityNumber(String ssn, Char separator = '-')
    {
-      _ = ssn.RequiresNotNullOrWhiteSpace(Messages.UsSsnEmpty);
-      if (!ValidateLength(ssn, out var message))
+      // Preliminary checks for obviously incorrect values.
+      ssn.ValidateNotNullOrWhiteSpace(Messages.UsSsnEmpty);
+      if (!ValidateLength(ssn))
       {
-         throw new ArgumentException(message, nameof(ssn));
+         throw new ArgumentException(Messages.UsSsnInvalidLength, nameof(ssn));
       }
-      if (separator.IsAsciiDigit())
+      if (IsFormattedSsn(ssn))
       {
-         throw new ArgumentOutOfRangeException(
-            nameof(separator), 
-            separator,
-            Messages.UsSsnInvalidSeparatorCharacter);
+         if (!ValidateSeparatorCharacter(separator))
+         {
+            throw new ArgumentOutOfRangeException(nameof(separator), separator, Messages.UsSsnInvalidSeparatorCharacter);
+         }
+         if (!ValidateEmbeddedSeparatorCharacters(ssn, separator, out var message))
+         {
+            throw new ArgumentException(message, nameof(ssn));
+         }
       }
-
-      if (!TryGetSsnValue(ssn, separator, out var candidateValue, out message))
+      if (!ValidateAllDigits(ssn, out var msg))
       {
-         throw new ArgumentException(message, nameof(ssn));
+         throw new ArgumentException(msg, nameof(ssn));
       }
 
       // Perform final checks to confirm that the candidate value confirms to SSN
       // rules.
-      if (!ValidateAreaNumber(candidateValue, out  message))
+      var areaNumber = GetAreaNumber(ssn);
+      if (!ValidateAreaNumber(areaNumber))
       {
-         throw new ArgumentException(message, nameof(ssn));
+         throw new ArgumentException(Messages.UsSsnInvalidAreaNumber, nameof(ssn));
       }
-      if (!ValidateGroupNumber(candidateValue, out message))
+      var groupNumber = GetGroupNumber(ssn);
+      if (!ValidateGroupNumber(groupNumber))
       {
-         throw new ArgumentException(message, nameof(ssn));
+         throw new ArgumentException(Messages.UsSsnInvalidGroupNumber, nameof(ssn));
       }
-      if (!ValidateSerialNumber(candidateValue, out message))
+      var serialNumber = GetSerialNumber(ssn);
+      if (!ValidateSerialNumber(serialNumber))
       {
-         throw new ArgumentException(message, nameof(ssn));
+         throw new ArgumentException(Messages.UsSsnInvalidSerialNumber, nameof(ssn));
       }
-      if (!ValidateNotAllIdenticalDigits(candidateValue, out message))
+      if (!ValidateNotAllIdenticalDigits(areaNumber, groupNumber, serialNumber))
       {
-         throw new ArgumentException(message, nameof(ssn));
+         throw new ArgumentException(Messages.UsSsnAllIdenticalDigits, nameof(ssn));
       }
-      if (!ValidateNotConsecutiveRun(candidateValue, out message))
+      if (!ValidateNotConsecutiveRun(areaNumber, groupNumber, serialNumber))
       {
-         throw new ArgumentException(message, nameof(ssn));
+         throw new ArgumentException(Messages.UsSsnInvalidRun, nameof(ssn));
       }
 
-      _ssn = candidateValue;
+      _ssn = GetValidatedSsn(areaNumber, groupNumber, serialNumber);
    }
 
    public static implicit operator String(UsSocialSecurityNumber ssn) => ssn._ssn;
@@ -204,165 +222,163 @@ public record UsSocialSecurityNumber
    /// </summary>
    public override String ToString() => _ssn;
 
-   private static Boolean IsFormattedSsn(String ssn) => ssn.Length == FormattedLength;
+   private static ReadOnlySpan<Char> GetAreaNumber(ReadOnlySpan<Char> ssn)
+      => ssn[..AreaRangeEnd];
 
-   private static Boolean IsSeparatorPosition(Int32 position)
+   private static ReadOnlySpan<Char> GetGroupNumber(ReadOnlySpan<Char> ssn)
+      => IsFormattedSsn(ssn)
+         ? ssn[FormattedGroupRangeStart..FormattedGroupRangeEnd]
+         : ssn[UnformattedGroupRangeStart..UnformattedGroupRangeEnd];
+
+   private static ReadOnlySpan<Char> GetSerialNumber(ReadOnlySpan<Char> ssn)
+      => IsFormattedSsn(ssn)
+         ? ssn[FormattedSerialNumberRangeStart..]
+         : ssn[UnformattedSerialNumberRangeStart..];
+
+   /// <summary>
+   ///   Merge all three SSN sections together without allocating intermediate
+   ///   Strings.
+   /// </summary>
+   private static String GetValidatedSsn(
+      ReadOnlySpan<Char> areaNumber,
+      ReadOnlySpan<Char> groupNumber,
+      ReadOnlySpan<Char> serialNumber)
    {
-      const Int32 AreaSeparatorOffset = 3;
-      const Int32 GroupSeparatorOffset = 6;
+      var buffer = ArrayPool<Char>.Shared.Rent(NonFormattedLength);
+      try
+      {
+         var span = new Span<Char>(buffer);
+         areaNumber.CopyTo(span[..AreaRangeEnd]);
+         groupNumber.CopyTo(span[UnformattedGroupRangeStart..UnformattedGroupRangeEnd]);
+         serialNumber.CopyTo(span[UnformattedSerialNumberRangeStart..]);
 
-      return position == AreaSeparatorOffset || position == GroupSeparatorOffset;
+         return span[..NonFormattedLength].ToString();
+      }
+      finally
+      {
+         ArrayPool<Char>.Shared.Return(buffer);
+      }
    }
 
-   private static Boolean TryGetSsnValue(
-      String ssn, 
-      Char separator,
-      out String value,
-      out String errorMessage)
+   private static Boolean IsFormattedSsn(ReadOnlySpan<Char> ssn) => ssn.Length == FormattedLength;
+
+   private static Boolean ValidateAllDigits(String ssn, out String? message)
    {
-
-      value = String.Empty;
-      errorMessage = String.Empty;
-
-      var digits = new Char[NonFormattedLength];
-      var inputOffset = 0;
-      var resultOffset = 0;
-
-      while(inputOffset < ssn.Length)
+      var index = 0;
+      while (index < ssn.Length)
       {
-         var currentChar = ssn[inputOffset];
-         if (IsFormattedSsn(ssn) && IsSeparatorPosition(inputOffset))
+         if (IsFormattedSsn(ssn) && (index == GroupSeparatorOffset || index == SerialSeparatorOffset))
          {
-            // Validate that the separator is expected character, but do not
-            // include separator in array of valid digits.
-            if (currentChar != separator)
-            {
-               errorMessage = String.Format(
-                  Messages.UsSsnInvalidSeparatorEncountered,
-                  inputOffset,
-                  separator,
-                  currentChar);
-               return false;
-            }
+            index++;
          }
-         else
-         {
-            if (!currentChar.IsAsciiDigit())
-            {
-               errorMessage = String.Format(
-                  Messages.UsSsnInvalidCharacterEncountered,
-                  inputOffset,
-                  currentChar);
-               return false;
-            }
 
-            digits[resultOffset] = currentChar;
-            resultOffset++;
+         if (!ssn[index].IsAsciiDigit())
+         {
+            message = String.Format(
+              Messages.UsSsnInvalidCharacterEncountered,
+              index,
+              ssn[index]);
+            return false;
          }
-         inputOffset++;
+
+         index++;
       }
 
-      value = new String(digits);
+      message = default!;
       return true;
    }
 
-   private static Boolean ValidateAreaNumber(
-      ReadOnlySpan<Char> span,
-      out String errorMessage)
+   private static Boolean ValidateAreaNumber(ReadOnlySpan<Char> areaNumber)
    {
-      const Int32 AreaLength = 3;
       const String InvalidArea000 = "000";
       const String InvalidArea666 = "666";
 
-      if (span[0] == Chars.DigitNine
-         || MemoryExtensions.Equals(span[..AreaLength], InvalidArea000.AsSpan(), StringComparison.Ordinal)
-         || MemoryExtensions.Equals(span[..AreaLength], InvalidArea666.AsSpan(), StringComparison.Ordinal))
+      return areaNumber[0] != Chars.DigitNine
+         && !MemoryExtensions.Equals(areaNumber, InvalidArea000, StringComparison.Ordinal)
+         && !MemoryExtensions.Equals(areaNumber, InvalidArea666, StringComparison.Ordinal);
+   }
+
+   private static Boolean ValidateEmbeddedSeparatorCharacters(
+      String ssn,
+      Char separator,
+      out String? message)
+   {
+      if (IsFormattedSsn(ssn)
+         && (ssn[GroupSeparatorOffset] != separator || ssn[SerialSeparatorOffset] != separator))
       {
-         errorMessage = Messages.UsSsnInvalidAreaNumber;
+         var offset = ssn[GroupSeparatorOffset] != separator
+            ? GroupSeparatorOffset
+            : SerialSeparatorOffset;
+         message = String.Format(
+            Messages.UsSsnInvalidSeparatorEncountered,
+            offset,
+            separator,
+            ssn[offset]);
          return false;
       }
 
-      errorMessage = String.Empty;
+      message = default;
       return true;
    }
 
-   private static Boolean ValidateGroupNumber(
-      ReadOnlySpan<Char> span,
-      out String errorMessage)
+   private static Boolean ValidateGroupNumber(ReadOnlySpan<Char> groupNumber)
    {
-      const Int32 GroupStart = 3;
-      const Int32 GroupEnd = 5;     // Last char in group number is actually index position 4, but ranges are exclusive of end index
       const String InvalidGroup00 = "00";
 
-      if (MemoryExtensions.Equals(span[GroupStart..GroupEnd], InvalidGroup00.AsSpan(), StringComparison.Ordinal))
-      {
-         errorMessage = Messages.UsSsnInvalidGroupNumber;
-         return false;
-      }
-
-      errorMessage = String.Empty;
-      return true;
+      return !MemoryExtensions.Equals(groupNumber, InvalidGroup00, StringComparison.Ordinal);
    }
 
-   private static Boolean ValidateLength(String ssn, out String errorMessage)
+   private static Boolean ValidateLength(String ssn)
+      => ssn.Length == NonFormattedLength || ssn.Length == FormattedLength;
+
+   private static Boolean ValidateNotAllIdenticalDigits(
+      ReadOnlySpan<Char> areaNumber,
+      ReadOnlySpan<Char> groupNumber,
+      ReadOnlySpan<Char> serialNumber)
    {
-      if (ssn?.Length == NonFormattedLength || ssn?.Length == FormattedLength)
+      var initialChar = areaNumber[0];
+
+      return !CheckSectionIdenticalDigits(areaNumber, initialChar)
+         && !CheckSectionIdenticalDigits(groupNumber, initialChar)
+         && !CheckSectionIdenticalDigits(serialNumber, initialChar);
+
+      static Boolean CheckSectionIdenticalDigits(ReadOnlySpan<Char> span, Char initialChar)
       {
-         errorMessage = String.Empty;
+         for (var index = 0; index < span.Length; index++)
+         {
+            if (span[index] != initialChar)
+            {
+               return false;
+            }
+         }
+
          return true;
       }
-
-      errorMessage = Messages.UsSsnInvalidLength;
-      return false;
-   }
-
-   private static Boolean ValidateNotAllIdenticalDigits(String ssn, out String errorMessage)
-   {
-      var firstChar = ssn[0];
-      for (var index = 1; index < ssn.Length; index++)
-      {
-         if (ssn[index] != firstChar)
-         {
-            errorMessage = String.Empty;
-            return true;
-         }
-      }
-
-      errorMessage = Messages.UsSsnAllIdenticalDigits;
-      return false;
    }
 
    private static Boolean ValidateNotConsecutiveRun(
-      String ssn,
-      out String errorMessage)
+      ReadOnlySpan<Char> areaNumber,
+      ReadOnlySpan<Char> groupNumber,
+      ReadOnlySpan<Char> serialNumber)
    {
-      const String InvalidConsecutiveRun = "123456789";
+      const String AreaRun = "123";
+      const String GroupRun = "45";
+      const String SerialRun = "6789";
 
-      if (String.Equals(ssn, InvalidConsecutiveRun, StringComparison.Ordinal))
-      {
-         errorMessage = Messages.UsSsnInvalidRun;
-         return false;
-      }
-
-      errorMessage = String.Empty;
-      return true;
+      return !MemoryExtensions.Equals(areaNumber, AreaRun, StringComparison.Ordinal)
+         && !MemoryExtensions.Equals(groupNumber, GroupRun, StringComparison.Ordinal)
+         && !MemoryExtensions.Equals(serialNumber, SerialRun, StringComparison.Ordinal);
    }
 
-   private static Boolean ValidateSerialNumber(
-      ReadOnlySpan<Char> span,
-      out String errorMessage)
+   // A separator character may be any character except ASCII digits (which are
+   // valid SSN characters).
+   private static Boolean ValidateSeparatorCharacter(Char separator)
+      => !separator.IsAsciiDigit();
+
+   private static Boolean ValidateSerialNumber(ReadOnlySpan<Char> serialNumber)
    {
-      const Int32 SerialStart = 5;
       const String InvalidSerial0000 = "0000";
 
-      if (MemoryExtensions.Equals(span[SerialStart..], InvalidSerial0000.AsSpan(), StringComparison.Ordinal))
-      {
-         errorMessage = Messages.UsSsnInvalidSerialNumber;
-         return false;
-      }
-
-      errorMessage = String.Empty;
-      return true;
+      return !MemoryExtensions.Equals(serialNumber, InvalidSerial0000, StringComparison.Ordinal);
    }
-
 }

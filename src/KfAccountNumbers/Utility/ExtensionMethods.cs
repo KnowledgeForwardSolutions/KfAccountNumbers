@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace KfAccountNumbers.Utility;
+﻿namespace KfAccountNumbers.Utility;
 
 public static class ExtensionMethods
 {
@@ -146,4 +144,36 @@ public static class ExtensionMethods
          : String.IsNullOrWhiteSpace(str) 
             ? throw new ArgumentException(message, callerArgumentName) 
             : str;
+
+   /// <summary>
+   ///   Validate that String value is not <see langword="null"/>, 
+   ///   <see cref="String.Empty"/> or all whitespace characters.
+   /// </summary>
+   /// <param name="str">
+   ///   The String to check.
+   /// </param>
+   /// <param name="message">
+   ///   The message to include if an exception is thrown.
+   /// </param>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="str"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="str"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters
+   /// </exception>
+   public static void ValidateNotNullOrWhiteSpace(
+      this String str,
+      String message,
+      [CallerArgumentExpression(nameof(str))] String callerArgumentName = null!)
+   {
+      if (str is null)
+      {
+         throw new ArgumentNullException(callerArgumentName, message);
+      }
+      if (String.IsNullOrWhiteSpace(str))
+      {
+         throw new ArgumentException(message, callerArgumentName);
+      }
+   }
 }

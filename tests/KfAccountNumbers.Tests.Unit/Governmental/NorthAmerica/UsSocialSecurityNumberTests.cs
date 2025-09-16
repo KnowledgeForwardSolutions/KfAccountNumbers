@@ -151,16 +151,32 @@ public class UsSocialSecurityNumberTests
    }
 
    [Theory]
+   [InlineData("A12345678", 0)]
+   [InlineData("0A2345678", 1)]
+   [InlineData("01A345678", 2)]
+   [InlineData("012A45678", 3)]
+   [InlineData("0123A5678", 4)]
+   [InlineData("01234A678", 5)]
    [InlineData("012345A78", 6)]
-   [InlineData("012345;78", 6)]
-   [InlineData("012345\u215378", 6)]      // Unicode fraction 1/3
-   [InlineData("012345\u216778", 6)]      // Unicode Roman numeral VII
-   [InlineData("012345\u0BEF78", 6)]      // Unicode Tamil number 9
+   [InlineData("0123456A8", 7)]
+   [InlineData("01234567A", 8)]
+   [InlineData("0;2345678", 1)]
+   [InlineData("0\u21532345678", 1)]      // Unicode fraction 1/3
+   [InlineData("0\u21672345678", 1)]      // Unicode Roman numeral VII
+   [InlineData("0\u0BEF2345678", 1)]      // Unicode Tamil number 9
+   [InlineData("A12-34-5678", 0)]
+   [InlineData("0A2-34-5678", 1)]
+   [InlineData("01A-34-5678", 2)]
+   [InlineData("012-A4-5678", 4)]
+   [InlineData("012-3A-5678", 5)]
+   [InlineData("012-34-A678", 7)]
    [InlineData("012-34-5A78", 8)]
-   [InlineData("012-34-5;78", 8)]
-   [InlineData("012-34-5\u215378", 8)]      // Unicode fraction 1/3
-   [InlineData("012-34-5\u216778", 8)]      // Unicode Roman numeral VII
-   [InlineData("012-34-5\u0BEF78", 8)]      // Unicode Tamil number 9
+   [InlineData("012-34-56A8", 9)]
+   [InlineData("012-34-567A", 10)]
+   [InlineData("0;2-34-5678", 1)]
+   [InlineData("0\u21532-34-5678", 1)]      // Unicode fraction 1/3
+   [InlineData("0\u21672-34-5678", 1)]      // Unicode Roman numeral VII
+   [InlineData("0\u0BEF2-34-5678", 1)]      // Unicode Tamil number 9
    public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentException_WhenStringValueOnlyContainsNonAsciiDigit(
       String ssn,
       Int32 offset)
@@ -176,11 +192,19 @@ public class UsSocialSecurityNumberTests
    }
 
    [Theory]
+   [InlineData("A12 34 5678", ' ', 0)]
+   [InlineData("0A2 34 5678", ' ', 1)]
+   [InlineData("01A 34 5678", ' ', 2)]
+   [InlineData("012 A4 5678", ' ', 4)]
+   [InlineData("012 3A 5678", ' ', 5)]
+   [InlineData("012 34 A678", ' ', 7)]
    [InlineData("012 34 5A78", ' ', 8)]
-   [InlineData("012 34 5;78", ' ', 8)]
-   [InlineData("012 34 5\u215378", ' ', 8)]      // Unicode fraction 1/3
-   [InlineData("012 34 5\u216778", ' ', 8)]      // Unicode Roman numeral VII
-   [InlineData("012 34 5\u0BEF78", ' ', 8)]      // Unicode Tamil number 9
+   [InlineData("012 34 56A8", ' ', 9)]
+   [InlineData("012 34 567A", ' ', 10)]
+   [InlineData("0;2 34 5678", ' ', 1)]
+   [InlineData("0\u21532 34 5678", ' ', 1)]      // Unicode fraction 1/3
+   [InlineData("0\u21672 34 5678", ' ', 1)]      // Unicode Roman numeral VII
+   [InlineData("0\u0BEF2 34 5678", ' ', 1)]      // Unicode Tamil number 9
    public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentException_WhenStringValueAndSeparatorContainsNonAsciiDigit(
       String ssn,
       Char separator,

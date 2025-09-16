@@ -54,7 +54,7 @@ public class ExtensionMethodsTests
    [Theory]
    [InlineData("")]
    [InlineData("\t")]
-   public void ExtensionMethods_FormatWithMask_ShouldThrowArgumentNullException_WhenMaskIsEmtpy(String mask)
+   public void ExtensionMethods_FormatWithMask_ShouldThrowArgumentNullException_WhenMaskIsEmpty(String mask)
    {
       // Arrange.
       var str = "012345678";
@@ -142,6 +142,55 @@ public class ExtensionMethodsTests
       var message = "String must not be empty";
       var expectedMessage = message + "*";
       var act = () => str.RequiresNotNullOrWhiteSpace(message);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(str))
+         .WithMessage(expectedMessage);
+   }
+
+   #endregion
+
+   #region ValidateNotNullOrWhiteSpace Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ExtensionMethods_ValidateNotNullOrWhiteSpace_ShouldNotThrow_WhenStringIsNotNullOrWhiteSpace()
+   {
+      // Arrange.
+      var str = "This is a test";
+      var message = "String must not be empty";
+      var act = () => str.ValidateNotNullOrWhiteSpace(message);
+
+      // Act/assert.
+      act.Should().NotThrow();
+   }
+
+   [Fact]
+   public void ExtensionMethods_ValidateNotNullOrWhiteSpace_ShouldThrowArgumentNullException_WhenStringIsNull()
+   {
+      // Arrange.
+      String str = null!;
+      var message = "String must not be empty";
+      var expectedMessage = message + "*";
+      var act = () => str.ValidateNotNullOrWhiteSpace(message);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(str))
+         .WithMessage(expectedMessage);
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void ExtensionMethods_ValidateNotNullOrWhiteSpace_ShouldThrowArgumentException_WhenStringIsEmptyOrWhiteSpace(String str)
+   {
+      // Arrange.
+      var message = "String must not be empty";
+      var expectedMessage = message + "*";
+      var act = () => str.ValidateNotNullOrWhiteSpace(message);
 
       // Act/assert.
       act.Should().ThrowExactly<ArgumentException>()
