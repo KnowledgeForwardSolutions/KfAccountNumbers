@@ -61,6 +61,42 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ErrorType may not be an enum default value (0 or None).
+        /// </summary>
+        internal static string CreateErrorDefaultErrorType {
+            get {
+                return ResourceManager.GetString("CreateErrorDefaultErrorType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error description may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string CreateErrorDescriptionEmpty {
+            get {
+                return ResourceManager.GetString("CreateErrorDescriptionEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CreateResult Failure error may not be null.
+        /// </summary>
+        internal static string CreateResultErrorNull {
+            get {
+                return ResourceManager.GetString("CreateResultErrorNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CreateResult Success value may not be null.
+        /// </summary>
+        internal static string CreateResultValueNull {
+            get {
+                return ResourceManager.GetString("CreateResultValueNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to String formatting mask may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string FormatMaskEmpty {

@@ -117,6 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CreateErrorDefaultErrorType" xml:space="preserve">
+    <value>ErrorType may not be an enum default value (0 or None)</value>
+  </data>
+  <data name="CreateErrorDescriptionEmpty" xml:space="preserve">
+    <value>Error description may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="CreateResultErrorNull" xml:space="preserve">
+    <value>CreateResult Failure error may not be null</value>
+  </data>
+  <data name="CreateResultValueNull" xml:space="preserve">
+    <value>CreateResult Success value may not be null</value>
+  </data>
   <data name="FormatMaskEmpty" xml:space="preserve">
     <value>String formatting mask may not be null, empty or all whitespace characters</value>
   </data>
