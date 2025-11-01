@@ -1,28 +1,82 @@
 ﻿// Ignore Spelling: Ssn
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
+#pragma warning disable CA1822 // Mark members as static
 
 namespace KfAccountNumbers.Tests.Benchmarks.Governmental.NorthAmerica;
 
 [MemoryDiagnoser]
 public class UsSocialSecurityNumberBenchmarks
 {
-   [Params("012345678", "012-34-5678")]
-   public String Ssn { get; set; } = default!;
-
-   [Benchmark(Baseline = true)]
-   public void UsSocialSecurityNumberConstructor()
+   [Benchmark()]
+   [Arguments("012345678")]
+   [Arguments("012-34-5678")]
+   public void UsSsnConstructor(String ssn)
    {
-      var validatedSsn = new UsSocialSecurityNumber(Ssn);
+      var validatedSsn = new UsSocialSecurityNumber(ssn);
+   }
+
+
+   [Benchmark]
+   [Arguments("012345678", '-')]
+   [Arguments("012 34 5678", ' ')]
+   public void UsSsnConstructorWithSeparator(
+      String ssn,
+      Char separator)
+   {
+      var validatedSsn = new UsSocialSecurityNumber(ssn, separator);
+   }
+
+   [Benchmark]
+   [Arguments("012345678")]
+   [Arguments("012-34-5678")]
+   public void UsSsnCreateMethod(String ssn)
+   {
+      var validatedSsn = UsSocialSecurityNumber.Create(ssn);
+   }
+
+   [Benchmark]
+   [Arguments("012345678", '-')]
+   [Arguments("012 34 5678", ' ')]
+   public void UsSsnCreateMethodWithCustomSeparator(
+      String ssn,
+      Char separator)
+   {
+      var validatedSsn = UsSocialSecurityNumber.Create(ssn, separator);
    }
 
    //[Benchmark]
-   //public void UsSsn2Constructor()
+   //[Arguments("012345678")]
+   //[Arguments("012-34-5678")]
+   //public void UsSsnCreateFromStringMethod(String ssn)
    //{
-   //   var validatedSsn = new UsSsn2(Ssn);
+   //   var validatedSsn = UsSocialSecurityNumber.CreateFromString(ssn);
    //}
 
    //[Benchmark]
-   //public void UsSsn3Constructor()
+   //[Arguments("012345678", '-')]
+   //[Arguments("012 34 5678", ' ')]
+   //public void UsSsnCreateFromStringMethodWithCustomSeparator(
+   //   String ssn,
+   //   Char separator)
    //{
-   //   var validatedSsn = new UsSsn3(Ssn);
+   //   var validatedSsn = UsSocialSecurityNumber.CreateFromString(ssn, separator);
    //}
+
+   [Benchmark]
+   [Arguments("012345678")]
+   [Arguments("012-34-5678")]
+   public void UsSsnValidateMethod(String ssn)
+   {
+      var isValid = UsSocialSecurityNumber.Validate(ssn);
+   }
+
+   [Benchmark]
+   [Arguments("012345678", '-')]
+   [Arguments("012 34 5678", ' ')]
+   public void UsSsnValidateMethodWithCustomSeparator(
+      String ssn,
+      Char separator)
+   {
+      var isValid = UsSocialSecurityNumber.Validate(ssn, separator);
+   }
 }

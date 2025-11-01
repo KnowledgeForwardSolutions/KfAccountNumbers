@@ -61,24 +61,6 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ErrorType may not be an enum default value (0 or None).
-        /// </summary>
-        internal static string CreateErrorDefaultErrorType {
-            get {
-                return ResourceManager.GetString("CreateErrorDefaultErrorType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Error description may not be null, empty or all whitespace characters.
-        /// </summary>
-        internal static string CreateErrorDescriptionEmpty {
-            get {
-                return ResourceManager.GetString("CreateErrorDescriptionEmpty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to CreateResult Failure error may not be null.
         /// </summary>
         internal static string CreateResultErrorNull {
@@ -93,6 +75,15 @@ namespace KfAccountNumbers {
         internal static string CreateResultValueNull {
             get {
                 return ResourceManager.GetString("CreateResultValueNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Description may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string DescriptionEmpty {
+            get {
+                return ResourceManager.GetString("DescriptionEmpty", resourceCulture);
             }
         }
         
@@ -151,6 +142,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to US Social Security Number may not use a decimal digit (0-9) as a custom separator character.
+        /// </summary>
+        internal static string UsSsnInvalidCustomSeparatorCharacter {
+            get {
+                return ResourceManager.GetString("UsSsnInvalidCustomSeparatorCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to US Social Security Number group number segment (xxx-GG-xxxx) must not be 00.
         /// </summary>
         internal static string UsSsnInvalidGroupNumber {
@@ -178,16 +178,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to US Social Security Number may not use a decimal digits (0-9) as a separator character.
-        /// </summary>
-        internal static string UsSsnInvalidSeparatorCharacter {
-            get {
-                return ResourceManager.GetString("UsSsnInvalidSeparatorCharacter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to US Social Security Number contains an invalid separator character at location {0}; expected &apos;{1}&apos;, found &apos;{2}&apos;.
+        ///   Looks up a localized string similar to US Social Security Number with length 11 contains an unexpected character at a separator position.
         /// </summary>
         internal static string UsSsnInvalidSeparatorEncountered {
             get {
@@ -201,6 +192,15 @@ namespace KfAccountNumbers {
         internal static string UsSsnInvalidSerialNumber {
             get {
                 return ResourceManager.GetString("UsSsnInvalidSerialNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value does not contain any validation errors.
+        /// </summary>
+        internal static string ValidationPassed {
+            get {
+                return ResourceManager.GetString("ValidationPassed", resourceCulture);
             }
         }
     }

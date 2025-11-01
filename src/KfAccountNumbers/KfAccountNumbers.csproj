@@ -25,4 +25,8 @@
 		<InternalsVisibleTo Include="KfAccountNumbers.Tests.Unit" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Include="Governmental\NorthAmerica\UsSocialSecurityNumber.cs" />
+	</ItemGroup>
+
 </Project>

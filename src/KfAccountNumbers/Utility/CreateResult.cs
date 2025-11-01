@@ -6,11 +6,11 @@
 /// <typeparam name="T">
 ///   The business object type.
 /// </typeparam>
-/// <typeparam name="E">
-///   Enumerates the possible error that could be encountered when creating a
-///   KfAccountNumbers business object.
+/// <typeparam name="V">
+///   Enumerates the possible validation rules that could be failed when 
+///   creating a KfAccountNumbers business object.
 /// </typeparam>
-public record CreateResult<T, E> where E : Enum
+public record CreateResult<T, V> where V : Enum
 {
    private CreateResult(T value)
    {
@@ -18,18 +18,18 @@ public record CreateResult<T, E> where E : Enum
       IsSuccess = true;
    }
 
-   private CreateResult(CreateError<E> error)
+   private CreateResult(V validationFailure)
    {
-      Error = error ?? throw new ArgumentNullException(nameof(error), Messages.CreateResultErrorNull);
+      ValidationFailure = validationFailure;
       IsSuccess = false;
    }
 
    /// <summary>
-   ///   The error encountered when creating the business object. Will be 
-   ///   <see langword="null"/> when <see cref="IsSuccess"/> is 
-   ///   <see langword="false"/>.
+   ///   The validation rule that was failed when attempting to create the
+   ///   business object. Will be <see langword="null"/> when 
+   ///   <see cref="IsSuccess"/> is <see langword="true"/>.
    /// </summary>
-   public CreateError<E>? Error { get; private init; } = default!;
+   public V? ValidationFailure { get; private init; } = default!;
 
    /// <summary>
    ///   <see langword="true"/> if the business object was created successfully;
@@ -43,7 +43,8 @@ public record CreateResult<T, E> where E : Enum
    /// </summary>
    public T? Value { get; private init; } = default!;
 
-   public static implicit operator CreateResult<T, E>(T value) => new(value);
+   public static implicit operator CreateResult<T, V>(T value) => new(value);
 
-   public static implicit operator CreateResult<T, E>(CreateError<E> error) => new(error);
+   public static implicit operator CreateResult<T, V>(V validationFailure) => new(validationFailure);
 }
+

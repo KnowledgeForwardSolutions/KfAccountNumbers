@@ -17,7 +17,7 @@ public class CreateResultTests
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Error.Should().BeNull();
+      sut.ValidationFailure.Should().Be(default);
       sut.IsSuccess.Should().BeTrue();
       sut.Value.Should().Be(foo);
    }
@@ -40,14 +40,14 @@ public class CreateResultTests
    public void CreateResult_FailureImplicitOperator_ShouldReturnExpectedResult_WhenErrorIsNotNull()
    {
       // Arrange.
-      var error = FooErrors.BarError;
+      var error = FooErrorType.Bar;
 
       // Act.
       CreateResult<Foo, FooErrorType> sut = error;
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Error.Should().Be(error);
+      sut.ValidationFailure.Should().Be(error);
       sut.IsSuccess.Should().BeFalse();
       sut.Value.Should().BeNull();
    }
@@ -56,7 +56,7 @@ public class CreateResultTests
    public void CreateResult_FailureImplicitOperator_ShouldThrowArgumentNullException_WhenErrorIsNull()
    {
       // Arrange.
-      CreateError<FooErrorType> error = null!;
+      FooErrorType error = default;
       var act = () => _ = (CreateResult<Foo, FooErrorType>)error;
       var expectedError = Messages.CreateResultErrorNull + "*";
 

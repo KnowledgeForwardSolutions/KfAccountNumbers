@@ -117,17 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CreateErrorDefaultErrorType" xml:space="preserve">
-    <value>ErrorType may not be an enum default value (0 or None)</value>
-  </data>
-  <data name="CreateErrorDescriptionEmpty" xml:space="preserve">
-    <value>Error description may not be null, empty or all whitespace characters</value>
-  </data>
   <data name="CreateResultErrorNull" xml:space="preserve">
     <value>CreateResult Failure error may not be null</value>
   </data>
   <data name="CreateResultValueNull" xml:space="preserve">
     <value>CreateResult Success value may not be null</value>
+  </data>
+  <data name="DescriptionEmpty" xml:space="preserve">
+    <value>Description may not be null, empty or all whitespace characters</value>
   </data>
   <data name="FormatMaskEmpty" xml:space="preserve">
     <value>String formatting mask may not be null, empty or all whitespace characters</value>
@@ -147,6 +144,9 @@
   <data name="UsSsnInvalidCharacterEncountered" xml:space="preserve">
     <value>US Social Security Number contains an invalid character at location {0}; expected digit (0-9), found '{1}'</value>
   </data>
+  <data name="UsSsnInvalidCustomSeparatorCharacter" xml:space="preserve">
+    <value>US Social Security Number may not use a decimal digit (0-9) as a custom separator character</value>
+  </data>
   <data name="UsSsnInvalidGroupNumber" xml:space="preserve">
     <value>US Social Security Number group number segment (xxx-GG-xxxx) must not be 00</value>
   </data>
@@ -156,13 +156,13 @@
   <data name="UsSsnInvalidRun" xml:space="preserve">
     <value>US Social Security Number may not have sequence 123456789</value>
   </data>
-  <data name="UsSsnInvalidSeparatorCharacter" xml:space="preserve">
-    <value>US Social Security Number may not use a decimal digits (0-9) as a separator character</value>
-  </data>
   <data name="UsSsnInvalidSeparatorEncountered" xml:space="preserve">
-    <value>US Social Security Number contains an invalid separator character at location {0}; expected '{1}', found '{2}'</value>
+    <value>US Social Security Number with length 11 contains an unexpected character at a separator position</value>
   </data>
   <data name="UsSsnInvalidSerialNumber" xml:space="preserve">
     <value>US Social Security Number serial number segment (xxx-xx-SSSS) must not be 0000</value>
+  </data>
+  <data name="ValidationPassed" xml:space="preserve">
+    <value>Value does not contain any validation errors</value>
   </data>
 </root>
