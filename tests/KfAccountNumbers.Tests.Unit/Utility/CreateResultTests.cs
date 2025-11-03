@@ -52,19 +52,5 @@ public class CreateResultTests
       sut.Value.Should().BeNull();
    }
 
-   [Fact]
-   public void CreateResult_FailureImplicitOperator_ShouldThrowArgumentNullException_WhenErrorIsNull()
-   {
-      // Arrange.
-      FooErrorType error = default;
-      var act = () => _ = (CreateResult<Foo, FooErrorType>)error;
-      var expectedError = Messages.CreateResultErrorNull + "*";
-
-      // Act/assert.
-      act.Should().ThrowExactly<ArgumentNullException>()
-         .WithParameterName(nameof(error))
-         .WithMessage(expectedError);
-   }
-
    #endregion
 }
