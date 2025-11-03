@@ -30,11 +30,24 @@ public class UsSocialSecurityNumberTests
       str.Should().Be(expected);
    }
 
+   [Fact]
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentNullException_WhenValueIsNull()
+   {
+      // Arrange.
+      String ssn = null!;
+      var expectedMessage = Messages.UsSsnEmpty + "*";
+      var act = () => _ = new UsSocialSecurityNumber(ssn);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(ssn))
+         .WithMessage(expectedMessage);
+   }
+
    [Theory]
-   [InlineData(null)]
    [InlineData("")]
    [InlineData("\t")]
-   public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentException_WhenValueIsEmpty(String? ssn)
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowArgumentException_WhenValueIsEmpty(String ssn)
    {
       // Arrange.
       var expectedMessage = Messages.UsSsnEmpty + "*";
@@ -223,7 +236,7 @@ public class UsSocialSecurityNumberTests
       String expected)
    {
       // Arrange.
-      var separator = ' ';
+      var separator = CustomSeparator;
 
       // Act.
       var sut = new UsSocialSecurityNumber(ssn, separator);
@@ -259,16 +272,30 @@ public class UsSocialSecurityNumberTests
          .And.ActualValue.Should().Be(separator);
    }
 
+   [Fact]
+   public void UsSocialSecurityNumber_ConstructorWithCustomSeparator_ShouldThrowArgumentNullException_WhenValueIsNull()
+   {
+      // Arrange.
+      String ssn = null!;
+      var separator = CustomSeparator;
+      var expectedMessage = Messages.UsSsnEmpty + "*";
+      var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(ssn))
+         .WithMessage(expectedMessage);
+   }
+
    [Theory]
-   [InlineData(null)]
    [InlineData("")]
    [InlineData("\t")]
    public void UsSocialSecurityNumber_ConstructorWithCustomSeparator_ShouldThrowArgumentException_WhenValueIsEmpty(String? ssn)
    {
       // Arrange.
-      var separator = ' ';
+      var separator = CustomSeparator;
       var expectedMessage = Messages.UsSsnEmpty + "*";
-      var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
+      var act = () => _ = new UsSocialSecurityNumber(ssn!, separator);
 
       // Act/assert.
       act.Should().ThrowExactly<ArgumentException>()
@@ -283,7 +310,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ConstructorWithCustomSeparator_ShouldThrowArgumentException_WhenValueHasInvalidLength(String ssn)
    {
       // Arrange.
-      var separator = ' ';
+      var separator = CustomSeparator;
       var expectedMessage = Messages.UsSsnInvalidLength + "*";
       var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
 
@@ -299,7 +326,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ConstructorWithCustomSeparator_ShouldThrowArgumentException_When11CharacterValueContainsInvalidSeparator(String ssn)
    {
       // Arrange.
-      var separator = ' ';
+      var separator = CustomSeparator;
       var expectedMessage = Messages.UsSsnInvalidSeparatorEncountered + "*";
       var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
 
@@ -339,7 +366,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ConstructorWithCustomSeparator_ShouldThrowArgumentException_WhenValueContainsNonAsciiDigit(String ssn)
    {
       // Arrange.
-      var separator = ' ';
+      var separator = CustomSeparator;
       var expectedMessage = Messages.UsSsnInvalidCharacterEncountered + "*";
       var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
 
@@ -361,7 +388,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ConstructorWithCustomSeparator_ShouldThrowArgumentException_WhenValueHasInvalidAreaNumber(String ssn)
    {
       // Arrange.
-      var separator = ' ';
+      var separator = CustomSeparator;
       var expectedMessage = Messages.UsSsnInvalidAreaNumber + "*";
       var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
 
@@ -377,7 +404,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ConstructorWithCustomSeparator_ShouldThrowArgumentException_WhenValueHasInvalidGroupNumber(String ssn)
    {
       // Arrange.
-      var separator = ' ';
+      var separator = CustomSeparator;
       var expectedMessage = Messages.UsSsnInvalidGroupNumber + "*";
       var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
 
@@ -393,7 +420,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ConstructorWithCustomSeparator_ShouldThrowArgumentException_WhenValueHasInvalidSerialNumber(String ssn)
    {
       // Arrange.
-      var separator = ' ';
+      var separator = CustomSeparator;
       var expectedMessage = Messages.UsSsnInvalidSerialNumber + "*";
       var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
 
@@ -421,7 +448,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ConstructorWithCustomSeparator_ShouldThrowArgumentException_WhenValueHas9IdenticalDigits(String ssn)
    {
       // Arrange.
-      var separator = ' ';
+      var separator = CustomSeparator;
       var expectedMessage = Messages.UsSsnAllIdenticalDigits + "*";
       var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
 
@@ -437,7 +464,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ConstructorWithCustomSeparator_ShouldThrowArgumentException_WhenValueHasConsecutiveRun(String ssn)
    {
       // Arrange.
-      var separator = ' ';
+      var separator = CustomSeparator;
       var expectedMessage = Messages.UsSsnInvalidRun + "*";
       var act = () => _ = new UsSocialSecurityNumber(ssn, separator);
 
@@ -483,7 +510,7 @@ public class UsSocialSecurityNumberTests
       var expected = UsSocialSecurityNumberValidationResult.Empty;
 
       // Act.
-      var result = UsSocialSecurityNumber.Create(ssn);
+      var result = UsSocialSecurityNumber.Create(ssn!);
 
       // Assert.
       result.Should().NotBeNull();
@@ -742,7 +769,7 @@ public class UsSocialSecurityNumberTests
       var expected = UsSocialSecurityNumberValidationResult.Empty;
 
       // Act.
-      var result = UsSocialSecurityNumber.Create(ssn, separator);
+      var result = UsSocialSecurityNumber.Create(ssn!, separator);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1104,7 +1131,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnEmpty_WhenValueIsEmpty(String? ssn)
    {
       // Arrange.
-      var separator = ' ';
+      var separator = CustomSeparator;
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(ssn, separator);
@@ -1120,7 +1147,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String ssn)
    {
       // Arrange.
-      var separator = ' ';
+      var separator = CustomSeparator;
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(ssn, separator);
@@ -1130,102 +1157,130 @@ public class UsSocialSecurityNumberTests
    }
 
    [Theory]
-   [InlineData("012 34.5678", '.')]
-   [InlineData("012.34 5678", '.')]
-   public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnInvalidSeparatorEncountered_When11CharacterValueContainsAnInvalidSeparator(
-      String ssn,
-      Char separator)
-      => UsSocialSecurityNumber.Validate(ssn, separator).Should().Be(UsSocialSecurityNumberValidationResult.InvalidSeparatorEncountered);
+   [InlineData("012.34 5678")]
+   [InlineData("012 34.5678")]
+   public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnInvalidSeparatorEncountered_When11CharacterValueContainsAnInvalidSeparator(String ssn)
+   {
+      // Arrange.
+      var separator = CustomSeparator;
+
+      // Act/assert.
+      UsSocialSecurityNumber.Validate(ssn, separator).Should().Be(UsSocialSecurityNumberValidationResult.InvalidSeparatorEncountered);
+   }
 
    [Theory]
-   [InlineData("A12345678", ' ')]
-   [InlineData("0A2345678", ' ')]
-   [InlineData("01A345678", ' ')]
-   [InlineData("012A45678", ' ')]
-   [InlineData("0123A5678", ' ')]
-   [InlineData("01234A678", ' ')]
-   [InlineData("012345A78", ' ')]
-   [InlineData("0123456A8", ' ')]
-   [InlineData("01234567A", ' ')]
-   [InlineData("0;2345678", ' ')]
-   [InlineData("0\u21532345678", ' ')]       // Unicode fraction 1/3
-   [InlineData("0\u21672345678", ' ')]       // Unicode Roman numeral VII
-   [InlineData("0\u0BEF2345678", ' ')]       // Unicode Tamil number 9
-   [InlineData("A12 34 5678", ' ')]
-   [InlineData("0A2 34 5678", ' ')]
-   [InlineData("01A 34 5678", ' ')]
-   [InlineData("012 A4 5678", ' ')]
-   [InlineData("012 3A 5678", ' ')]
-   [InlineData("012 34 A678", ' ')]
-   [InlineData("012 34 5A78", ' ')]
-   [InlineData("012 34 56A8", ' ')]
-   [InlineData("012 34 567A", ' ')]
-   [InlineData("0;2 34 5678", ' ')]
-   [InlineData("0\u21532 34 5678", ' ')]     // Unicode fraction 1/3
-   [InlineData("0\u21672 34 5678", ' ')]     // Unicode Roman numeral VII
-   [InlineData("0\u0BEF2 34 5678", ' ')]     // Unicode Tamil number 9
-   public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnInvalidCharacterEncountered_WhenValueContainsNonAsciiDigit(
-      String ssn,
-      Char separator)
-      => UsSocialSecurityNumber.Validate(ssn, separator).Should().Be(UsSocialSecurityNumberValidationResult.InvalidCharacterEncountered);
+   [InlineData("A12345678")]
+   [InlineData("0A2345678")]
+   [InlineData("01A345678")]
+   [InlineData("012A45678")]
+   [InlineData("0123A5678")]
+   [InlineData("01234A678")]
+   [InlineData("012345A78")]
+   [InlineData("0123456A8")]
+   [InlineData("01234567A")]
+   [InlineData("0;2345678")]
+   [InlineData("0\u21532345678")]      // Unicode fraction 1/3
+   [InlineData("0\u21672345678")]      // Unicode Roman numeral VII
+   [InlineData("0\u0BEF2345678")]      // Unicode Tamil number 9
+   [InlineData("A12 34 5678")]
+   [InlineData("0A2 34 5678")]
+   [InlineData("01A 34 5678")]
+   [InlineData("012 A4 5678")]
+   [InlineData("012 3A 5678")]
+   [InlineData("012 34 A678")]
+   [InlineData("012 34 5A78")]
+   [InlineData("012 34 56A8")]
+   [InlineData("012 34 567A")]
+   [InlineData("0;2 34 5678")]
+   [InlineData("0\u21532 34 5678")]    // Unicode fraction 1/3
+   [InlineData("0\u21672 34 5678")]    // Unicode Roman numeral VII
+   [InlineData("0\u0BEF2 34 5678")]    // Unicode Tamil number 9
+   public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnInvalidCharacterEncountered_WhenValueContainsNonAsciiDigit(String ssn)
+   {
+      // Arrange.
+      var separator = CustomSeparator;
+
+      // Act/assert.
+      UsSocialSecurityNumber.Validate(ssn, separator).Should().Be(UsSocialSecurityNumberValidationResult.InvalidCharacterEncountered);
+   }
 
    [Theory]
-   [InlineData("000123456", ' ')]
-   [InlineData("666123456", ' ')]
-   [InlineData("900123456", ' ')]
-   [InlineData("999123456", ' ')]
-   [InlineData("000 12 3456", ' ')]
-   [InlineData("666 12 3456", ' ')]
-   [InlineData("900 12 3456", ' ')]
-   [InlineData("999 12 3456", ' ')]
-   public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnInvalidAreaNumber_WhenValueHasInvalidAreaNumber(
-      String ssn,
-      Char separator)
-      => UsSocialSecurityNumber.Validate(ssn, separator).Should().Be(UsSocialSecurityNumberValidationResult.InvalidAreaNumber);
+   [InlineData("000123456")]
+   [InlineData("666123456")]
+   [InlineData("900123456")]
+   [InlineData("999123456")]
+   [InlineData("000 12 3456")]
+   [InlineData("666 12 3456")]
+   [InlineData("900 12 3456")]
+   [InlineData("999 12 3456")]
+   public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnInvalidAreaNumber_WhenValueHasInvalidAreaNumber(String ssn)
+   {
+      // Arrange.
+      var separator = CustomSeparator;
+
+      // Act/assert.
+      UsSocialSecurityNumber.Validate(ssn, separator).Should().Be(UsSocialSecurityNumberValidationResult.InvalidAreaNumber);
+   }
 
    [Theory]
-   [InlineData("012005678", ' ')]
-   [InlineData("012 00 5678", ' ')]
-   public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnInvalidGroupNumber_WhenValueHasInvalidGroupNumber(
-      String ssn,
-      Char separator)
-      => UsSocialSecurityNumber.Validate(ssn, separator).Should().Be(UsSocialSecurityNumberValidationResult.InvalidGroupNumber);
+   [InlineData("012005678")]
+   [InlineData("012 00 5678")]
+   public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnInvalidGroupNumber_WhenValueHasInvalidGroupNumber(String ssn)
+   {
+      // Arrange.
+      var separator = CustomSeparator;
+
+      // Act/assert.
+      UsSocialSecurityNumber.Validate(ssn, separator).Should().Be(UsSocialSecurityNumberValidationResult.InvalidGroupNumber);
+   }
 
    [Theory]
-   [InlineData("012340000", ' ')]
-   [InlineData("012 34 0000", ' ')]
-   public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnInvalidSerialNumber_WhenValueHasInvalidSerialNumber(
-      String ssn,
-      Char separator)
-      => UsSocialSecurityNumber.Validate(ssn, separator).Should().Be(UsSocialSecurityNumberValidationResult.InvalidSerialNumber);
+   [InlineData("012340000")]
+   [InlineData("012 34 0000")]
+   public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnInvalidSerialNumber_WhenValueHasInvalidSerialNumber(String ssn)
+   {
+      // Arrange.
+      var separator = CustomSeparator;
+
+      // Act/assert.
+      UsSocialSecurityNumber.Validate(ssn, separator).Should().Be(UsSocialSecurityNumberValidationResult.InvalidSerialNumber);
+   }
 
    [Theory]
-   [InlineData("111111111", ' ')]      // Note that missing cases ("000000000", "666666666" and "999999999"
-   [InlineData("222222222", ' ')]      // will fail the validation for area number before reaching the
-   [InlineData("333333333", ' ')]      // validation for identical digits
-   [InlineData("444444444", ' ')]
-   [InlineData("555555555", ' ')]
-   [InlineData("777777777", ' ')]
-   [InlineData("888888888", ' ')]
-   [InlineData("111 11 1111", ' ')]
-   [InlineData("222 22 2222", ' ')]
-   [InlineData("333 33 3333", ' ')]
-   [InlineData("444 44 4444", ' ')]
-   [InlineData("555 55 5555", ' ')]
-   [InlineData("777 77 7777", ' ')]
-   [InlineData("888 88 8888", ' ')]
-   public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnAllIdenticalDigits_WhenValueHas9IdenticalDigits(
-      String ssn,
-      Char separator)
-      => UsSocialSecurityNumber.Validate(ssn, separator).Should().Be(UsSocialSecurityNumberValidationResult.AllIdenticalDigits);
+   [InlineData("111111111")]        // Note that missing cases ("000000000", "666666666" and "999999999"
+   [InlineData("222222222")]        // will fail the validation for area number before reaching the
+   [InlineData("333333333")]        // validation for identical digits
+   [InlineData("444444444")]
+   [InlineData("555555555")]
+   [InlineData("777777777")]
+   [InlineData("888888888")]
+   [InlineData("111 11 1111")]
+   [InlineData("222 22 2222")]
+   [InlineData("333 33 3333")]
+   [InlineData("444 44 4444")]
+   [InlineData("555 55 5555")]
+   [InlineData("777 77 7777")]
+   [InlineData("888 88 8888")]
+   public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnAllIdenticalDigits_WhenValueHas9IdenticalDigits(String ssn)
+   {
+      // Arrange.
+      var separator = CustomSeparator;
+
+      // Act/assert.
+      UsSocialSecurityNumber.Validate(ssn, separator).Should().Be(UsSocialSecurityNumberValidationResult.AllIdenticalDigits);
+   }
 
    [Theory]
-   [InlineData("123456789", ' ')]
-   [InlineData("123 45 6789", ' ')]
-   public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnInvalidRun_WhenValueHasConsecutiveRun(
-      String ssn,
-      Char separator)
-      => UsSocialSecurityNumber.Validate(ssn, separator).Should().Be(UsSocialSecurityNumberValidationResult.InvalidRun);
+   [InlineData("123456789")]
+   [InlineData("123 45 6789")]
+   public void UsSocialSecurityNumber_ValidateWithCustomSeparator_ShouldReturnInvalidRun_WhenValueHasConsecutiveRun(String ssn)
+   {
+      // Arrange.
+      var separator = CustomSeparator;
+
+      // Act/assert.
+      UsSocialSecurityNumber.Validate(ssn, separator).Should().Be(UsSocialSecurityNumberValidationResult.InvalidRun);
+   }
 
    #endregion
 }

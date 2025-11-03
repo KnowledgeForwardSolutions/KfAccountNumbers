@@ -113,10 +113,11 @@ public record UsSocialSecurityNumber
    ///   separate the different sections of the SSN. This parameter is ignored 
    ///   if the <paramref name="ssn"/> is 9 characters in length. Defaults to '-'.
    /// </param>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="ssn"/> is <see langword="null"/>.
+   /// </exception>
    /// <exception cref="ArgumentException">
-   ///   <paramref name="ssn"/> is empty or all whitespace characters.  NOTE
-   ///   that a <see langword="null"/> <see cref="String"/> automatically 
-   ///   converted to a <see cref="ReadOnlyspan{Char}"/> will be an empty span.
+   ///   <paramref name="ssn"/> is empty or all whitespace characters.
    ///   - or -
    ///   <paramref name="ssn"/> does not have length of 9 or 11.
    ///   - or -
@@ -149,7 +150,9 @@ public record UsSocialSecurityNumber
       var validationResult = ValidateSsn(ssn, separator);
       if (validationResult != UsSocialSecurityNumberValidationResult.ValidationPassed)
       {
-         throw new ArgumentException(validationResult.ToErrorDescription(), nameof(ssn));
+         throw ssn is null
+            ? new ArgumentNullException(nameof(ssn), validationResult.ToErrorDescription())
+            : new ArgumentException(validationResult.ToErrorDescription(), nameof(ssn));
       }
 
       _ssn = GetValidatedSsn(ssn);
