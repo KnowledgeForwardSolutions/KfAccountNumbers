@@ -169,6 +169,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Null UsSocialSecurityNumber can not be converted to String.
+        /// </summary>
+        internal static string UsSsnInvalidNullConversionToString {
+            get {
+                return ResourceManager.GetString("UsSsnInvalidNullConversionToString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to US Social Security Number may not have sequence 123456789.
         /// </summary>
         internal static string UsSsnInvalidRun {

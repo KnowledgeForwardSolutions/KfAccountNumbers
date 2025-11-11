@@ -476,6 +476,95 @@ public class UsSocialSecurityNumberTests
 
    #endregion
 
+   #region Implicit Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(ValidNineCharSsn, ValidNineCharSsn)]
+   [InlineData(ValidElevenCharSsn, ValidNineCharSsn)]
+   public void UsSocialSecurityNumber_ImplicitUsSsnToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull(
+      String ssn,
+      String expected)
+   {
+      // Arrange.
+      var sut = new UsSocialSecurityNumber(ssn);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData(ValidNineCharSsn, ValidNineCharSsn)]
+   [InlineData(ValidElevenCharSsn, ValidNineCharSsn)]
+   public void UsSocialSecurityNumber_CastUsSsnToString_ShouldReturnExpectedValue_WhenValueIsNotNull(
+      String ssn,
+      String expected)
+   {
+      // Arrange.
+      var sut = new UsSocialSecurityNumber(ssn);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void UsSocialSecurityNumber_ImplicitUsSsnToStringConversion_ShouldThrowArgumentNullException_WhenValueIsNull()
+   {
+      // Arrange.
+      UsSocialSecurityNumber ssn = null!;
+      String str;
+      var expectedMessage = Messages.UsSsnInvalidNullConversionToString + "*";
+      var act = () => str = ssn;
+
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(ssn))
+         .WithMessage(expectedMessage);
+   }
+
+   [Fact]
+   public void UsSocialSecurityNumber_CastUsSsnToString_ShouldThrowArgumentNullException_WhenValueIsNull()
+   {
+      // Arrange.
+      UsSocialSecurityNumber ssn = null!;
+      var expectedMessage = Messages.UsSsnInvalidNullConversionToString + "*";
+      var act = () => _ = (String)ssn;
+
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(ssn))
+         .WithMessage(expectedMessage);
+   }
+
+   [Theory]
+   [InlineData(ValidNineCharSsn, ValidNineCharSsn)]
+   [InlineData(ValidElevenCharSsn, ValidNineCharSsn)]
+   public void UsSocialSecurityNumber_ImplicitStringToUsSsnConversion_ShouldCreateObject_WhenValueContainsValidSsn(
+      String ssn,
+      String expected)
+   {
+      // Act.
+      UsSocialSecurityNumber sut = ssn;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      String str = sut;
+      str.Should().Be(expected);
+   }
+
+   #endregion
+
    #region Create Method Tests
    // ==========================================================================
    // ==========================================================================

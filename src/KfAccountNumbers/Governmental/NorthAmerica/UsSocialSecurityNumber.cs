@@ -140,7 +140,7 @@ public record UsSocialSecurityNumber
    /// <exception cref="ArgumentOutOfRangeException">
    ///   <paramref name="separator"/> is an ASCII digit (0-9).
    /// </exception>
-   public UsSocialSecurityNumber(String ssn, Char separator = DefaultSeparator)
+   public UsSocialSecurityNumber(String? ssn, Char separator = DefaultSeparator)
    {
       if (!ValidateSeparatorCharacter(separator))
       {
@@ -155,7 +155,7 @@ public record UsSocialSecurityNumber
             : new ArgumentException(validationResult.ToErrorDescription(), nameof(ssn));
       }
 
-      _ssn = GetValidatedSsn(ssn);
+      _ssn = GetValidatedSsn(ssn!);
    }
 
    /// <summary>
@@ -165,11 +165,10 @@ public record UsSocialSecurityNumber
    private UsSocialSecurityNumber(String validatedSsn)
       => _ssn = validatedSsn;
 
-   public static implicit operator String(UsSocialSecurityNumber ssn) => ssn._ssn;
+   public static implicit operator String(UsSocialSecurityNumber ssn) 
+      => ssn?._ssn ?? throw new ArgumentNullException(nameof(ssn), Messages.UsSsnInvalidNullConversionToString);
 
-   public static implicit operator UsSocialSecurityNumber(String ssn) => new(ssn);
-
-   public static implicit operator UsSocialSecurityNumber(ReadOnlySpan<Char> ssn) => new(ssn);
+   public static implicit operator UsSocialSecurityNumber(String? ssn) => new(ssn!);
 
    /// <summary>
    ///   Create a new <see cref="UsSocialSecurityNumber"/>.
@@ -195,7 +194,7 @@ public record UsSocialSecurityNumber
    ///   <paramref name="separator"/> is an ASCII digit (0-9).
    /// </exception>
    public static CreateResult<UsSocialSecurityNumber, UsSocialSecurityNumberValidationResult> Create(
-      String ssn,
+      String? ssn,
       Char separator = DefaultSeparator)
    {
       if (!ValidateSeparatorCharacter(separator))
@@ -261,7 +260,7 @@ public record UsSocialSecurityNumber
    ///   <paramref name="separator"/> is an ASCII digit (0-9).
    /// </exception>
    public static UsSocialSecurityNumberValidationResult Validate(
-      ReadOnlySpan<Char> ssn,
+      String? ssn,
       Char separator = DefaultSeparator)
       => !ValidateSeparatorCharacter(separator)
          ? throw new ArgumentOutOfRangeException(nameof(separator), separator, Messages.UsSsnInvalidCustomSeparatorCharacter)

@@ -153,6 +153,9 @@
   <data name="UsSsnInvalidLength" xml:space="preserve">
     <value>US Social Security Number must have length 9 (digits only) or 11 (9 digits with two separator characters)</value>
   </data>
+  <data name="UsSsnInvalidNullConversionToString" xml:space="preserve">
+    <value>Null UsSocialSecurityNumber can not be converted to String</value>
+  </data>
   <data name="UsSsnInvalidRun" xml:space="preserve">
     <value>US Social Security Number may not have sequence 123456789</value>
   </data>
