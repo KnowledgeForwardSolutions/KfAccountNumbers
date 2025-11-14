@@ -15,10 +15,9 @@ public class UsSocialSecurityNumberBenchmarks
       var validatedSsn = new UsSocialSecurityNumber(ssn);
    }
 
-
    [Benchmark]
-   [Arguments("012345678", '-')]
-   [Arguments("012 34 5678", ' ')]
+   [Arguments("012345678", '.')]
+   [Arguments("012.34.5678", '.')]
    public void UsSsnConstructorWithSeparator(
       String ssn,
       Char separator)
@@ -35,32 +34,14 @@ public class UsSocialSecurityNumberBenchmarks
    }
 
    [Benchmark]
-   [Arguments("012345678", '-')]
-   [Arguments("012 34 5678", ' ')]
+   [Arguments("012345678", '.')]
+   [Arguments("012.34.5678", '.')]
    public void UsSsnCreateMethodWithCustomSeparator(
       String ssn,
       Char separator)
    {
       var validatedSsn = UsSocialSecurityNumber.Create(ssn, separator);
    }
-
-   //[Benchmark]
-   //[Arguments("012345678")]
-   //[Arguments("012-34-5678")]
-   //public void UsSsnCreateFromStringMethod(String ssn)
-   //{
-   //   var validatedSsn = UsSocialSecurityNumber.CreateFromString(ssn);
-   //}
-
-   //[Benchmark]
-   //[Arguments("012345678", '-')]
-   //[Arguments("012 34 5678", ' ')]
-   //public void UsSsnCreateFromStringMethodWithCustomSeparator(
-   //   String ssn,
-   //   Char separator)
-   //{
-   //   var validatedSsn = UsSocialSecurityNumber.CreateFromString(ssn, separator);
-   //}
 
    [Benchmark]
    [Arguments("012345678")]
@@ -71,8 +52,8 @@ public class UsSocialSecurityNumberBenchmarks
    }
 
    [Benchmark]
-   [Arguments("012345678", '-')]
-   [Arguments("012 34 5678", ' ')]
+   [Arguments("012345678", '.')]
+   [Arguments("012.34.5678", '.')]
    public void UsSsnValidateMethodWithCustomSeparator(
       String ssn,
       Char separator)

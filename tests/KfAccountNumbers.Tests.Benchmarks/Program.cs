@@ -1,2 +1,4 @@
 ﻿
-BenchmarkRunner.Run<UsSocialSecurityNumberBenchmarks>();
+BenchmarkRunner.Run<UsSocialSecurityNumberBenchmarks>(); 
+
+//BenchmarkRunner.Run<FooBenchmarks>();

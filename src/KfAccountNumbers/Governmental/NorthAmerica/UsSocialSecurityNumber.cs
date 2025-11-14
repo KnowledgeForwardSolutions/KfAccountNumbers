@@ -36,7 +36,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///      digit (0-9).
 ///   </para>
 ///   <para>
-///      Not all 9 digit numbers are valid Social Security Numbers. When 
+///      Not all 9-digit numbers are valid Social Security Numbers. When 
 ///      creating a new  <see cref="UsSocialSecurityNumber"/>, after determining
 ///      that a value consists of 9 decimal digits, the following validation 
 ///      rules are applied:
@@ -83,8 +83,6 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 /// </remarks>
 public record UsSocialSecurityNumber
 {
-   private readonly String _ssn;
-
    public const Char DefaultSeparator = Chars.Dash;
 
    private const Int32 FormattedLength = 11;
@@ -113,11 +111,12 @@ public record UsSocialSecurityNumber
    ///   separate the different sections of the SSN. This parameter is ignored 
    ///   if the <paramref name="ssn"/> is 9 characters in length. Defaults to '-'.
    /// </param>
-   /// <exception cref="ArgumentNullException">
-   ///   <paramref name="ssn"/> is <see langword="null"/>.
+   /// <exception cref="ArgumentOutOfRangeException">
+   ///   <paramref name="separator"/> is an ASCII digit (0-9).
    /// </exception>
-   /// <exception cref="ArgumentException">
-   ///   <paramref name="ssn"/> is empty or all whitespace characters.
+   /// <exception cref="InvalidUsSocialSecurityNumberException">
+   ///   <paramref name="ssn"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
    ///   - or -
    ///   <paramref name="ssn"/> does not have length of 9 or 11.
    ///   - or -
@@ -137,38 +136,47 @@ public record UsSocialSecurityNumber
    ///   - or -
    ///   <paramref name="ssn"/> contains a run of consecutive digits from 1 to 9.
    /// </exception>
-   /// <exception cref="ArgumentOutOfRangeException">
-   ///   <paramref name="separator"/> is an ASCII digit (0-9).
-   /// </exception>
    public UsSocialSecurityNumber(String? ssn, Char separator = DefaultSeparator)
+      : this(ssn, separator, validationRequired: true)
    {
-      if (!ValidateSeparatorCharacter(separator))
-      {
-         throw new ArgumentOutOfRangeException(nameof(separator), separator, Messages.UsSsnInvalidCustomSeparatorCharacter);
-      }
-
-      var validationResult = ValidateSsn(ssn, separator);
-      if (validationResult != UsSocialSecurityNumberValidationResult.ValidationPassed)
-      {
-         throw ssn is null
-            ? new ArgumentNullException(nameof(ssn), validationResult.ToErrorDescription())
-            : new ArgumentException(validationResult.ToErrorDescription(), nameof(ssn));
-      }
-
-      _ssn = GetValidatedSsn(ssn!);
+      // NOP - all work done in private constructor.
    }
 
    /// <summary>
-   ///   Private constructor for use by <see cref="Create(String, Char)"/>
-   ///   method.
+   ///   Private constructor that performs the actual work. Supports bypassing
+   ///   validation when invoked by Create method.
    /// </summary>
-   private UsSocialSecurityNumber(String validatedSsn)
-      => _ssn = validatedSsn;
+   private UsSocialSecurityNumber(
+      String? ssn,
+      Char separator,
+      Boolean validationRequired)
+   {
+      if (validationRequired)
+      {
+         if (!ValidateSeparatorCharacter(separator))
+         {
+            throw new ArgumentOutOfRangeException(nameof(separator), separator, Messages.UsSsnInvalidCustomSeparatorCharacter);
+         }
+
+         var validationResult = ValidateSsn(ssn, separator);
+         if (validationResult != UsSocialSecurityNumberValidationResult.ValidationPassed)
+         {
+            throw new InvalidUsSocialSecurityNumberException(validationResult);
+         }
+      }
+
+      Value = GetValidatedSsn(ssn!);
+   }
+
+   /// <summary>
+   ///   The raw SSN value.
+   /// </summary>
+   public String Value { get; init; }
 
    public static implicit operator String(UsSocialSecurityNumber ssn) 
-      => ssn?._ssn ?? throw new ArgumentNullException(nameof(ssn), Messages.UsSsnInvalidNullConversionToString);
+      => ssn?.Value ?? throw new ArgumentNullException(nameof(ssn), Messages.UsSsnInvalidNullConversionToString);
 
-   public static implicit operator UsSocialSecurityNumber(String? ssn) => new(ssn!);
+   public static implicit operator UsSocialSecurityNumber(String? ssn) => new(ssn, DefaultSeparator);
 
    /// <summary>
    ///   Create a new <see cref="UsSocialSecurityNumber"/>.
@@ -203,12 +211,9 @@ public record UsSocialSecurityNumber
       }
 
       var validationResult = ValidateSsn(ssn, separator);
-      if (validationResult != UsSocialSecurityNumberValidationResult.ValidationPassed)
-      {
-         return validationResult;
-      }
-
-      return new UsSocialSecurityNumber(GetValidatedSsn(ssn));
+      return validationResult == UsSocialSecurityNumberValidationResult.ValidationPassed
+         ? new UsSocialSecurityNumber(ssn, separator, validationRequired: false)
+         : validationResult;
    }
 
    /// <summary>
@@ -231,12 +236,12 @@ public record UsSocialSecurityNumber
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
    ///   details on creating a mask to format the SSN.
    /// </remarks>
-   public String Format(String mask = "___-__-____") => _ssn.FormatWithMask(mask);
+   public String Format(String mask = "___-__-____") => Value.FormatWithMask(mask);
 
    /// <summary>
    ///   Get a string representation of the SSN.
    /// </summary>
-   public override String ToString() => _ssn;
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="ssn"/> to determine if it contains any 
@@ -280,7 +285,9 @@ public record UsSocialSecurityNumber
          : ssn[UnformattedSerialNumberRangeStart..];
 
    /// <summary>
-   ///   Merge all three SSN sections together without allocating intermediate
+   ///   Get an unformatted SSN value from a string that has passed validation.
+   ///   If the source string is formatted, then create a new string by merging
+   ///   all three SSN sections together without allocating intermediate 
    ///   Strings.
    /// </summary>
    private static String GetValidatedSsn(String ssn)
@@ -308,11 +315,6 @@ public record UsSocialSecurityNumber
          ArrayPool<Char>.Shared.Return(buffer);
       }
    }
-
-   private static String GetValidatedSsnFromString(String ssn)
-      => ssn.Length == NonFormattedLength
-         ? ssn
-         : GetValidatedSsn(ssn);
 
    private static Boolean IsFormattedSsn(ReadOnlySpan<Char> ssn) => ssn.Length == FormattedLength;
 
@@ -343,8 +345,8 @@ public record UsSocialSecurityNumber
       const String InvalidArea666 = "666";
 
       return areaNumber[0] != Chars.DigitNine
-         && !MemoryExtensions.Equals(areaNumber, InvalidArea000, StringComparison.Ordinal)
-         && !MemoryExtensions.Equals(areaNumber, InvalidArea666, StringComparison.Ordinal);
+         && !areaNumber.Equals(InvalidArea000, StringComparison.Ordinal)
+         && !areaNumber.Equals(InvalidArea666, StringComparison.Ordinal);
    }
 
    private static Boolean ValidateEmbeddedSeparatorCharacters(
@@ -357,7 +359,7 @@ public record UsSocialSecurityNumber
    {
       const String InvalidGroup00 = "00";
 
-      return !MemoryExtensions.Equals(groupNumber, InvalidGroup00, StringComparison.Ordinal);
+      return !groupNumber.Equals(InvalidGroup00, StringComparison.Ordinal);
    }
 
    private static Boolean ValidateLength(ReadOnlySpan<Char> ssn)
@@ -376,9 +378,9 @@ public record UsSocialSecurityNumber
 
       static Boolean CheckSectionIdenticalDigits(ReadOnlySpan<Char> span, Char initialChar)
       {
-         for (var index = 0; index < span.Length; index++)
+         foreach (var ch in span)
          {
-            if (span[index] != initialChar)
+            if (ch != initialChar)
             {
                return false;
             }
@@ -397,9 +399,9 @@ public record UsSocialSecurityNumber
       const String GroupRun = "45";
       const String SerialRun = "6789";
 
-      return !MemoryExtensions.Equals(areaNumber, AreaRun, StringComparison.Ordinal)
-         && !MemoryExtensions.Equals(groupNumber, GroupRun, StringComparison.Ordinal)
-         && !MemoryExtensions.Equals(serialNumber, SerialRun, StringComparison.Ordinal);
+      return !areaNumber.Equals(AreaRun, StringComparison.Ordinal)
+         && !groupNumber.Equals(GroupRun, StringComparison.Ordinal)
+         && !serialNumber.Equals(SerialRun, StringComparison.Ordinal);
    }
 
    // A separator character may be any character except ASCII digits (which are
@@ -411,7 +413,7 @@ public record UsSocialSecurityNumber
    {
       const String InvalidSerial0000 = "0000";
 
-      return !MemoryExtensions.Equals(serialNumber, InvalidSerial0000, StringComparison.Ordinal);
+      return !serialNumber.Equals(InvalidSerial0000, StringComparison.Ordinal);
    }
 
    private static UsSocialSecurityNumberValidationResult ValidateSsn(
