@@ -1249,6 +1249,72 @@ public class UsSocialSecurityNumberTests
 
    #endregion
 
+   #region Format Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void UsSocialSecurityNumber_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new UsSocialSecurityNumber(ValidNineCharSsn);
+      var expected = ValidElevenCharSsn;
+
+      // Act.
+      var str = sut.Format();
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void UsSocialSecurityNumber_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new UsSocialSecurityNumber(ValidNineCharSsn);
+      var mask = "___ __ ____";
+      var expected = ValidElevenCharSsnWithCustomSeparator;
+
+      // Act.
+      var str = sut.Format(mask);
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void UsSocialSecurityNumber_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
+   {
+      // Arrange.
+      var sut = new UsSocialSecurityNumber(ValidNineCharSsn);
+      String mask = null!;
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+      var act = () => _ = sut.Format(mask);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void UsSocialSecurityNumber_Format_ShouldThrowArgumentNullException_WhenMaskIsEmpty(String mask)
+   {
+      // Arrange.
+      var sut = new UsSocialSecurityNumber(ValidNineCharSsn);
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+      var act = () => _ = sut.Format(mask);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
