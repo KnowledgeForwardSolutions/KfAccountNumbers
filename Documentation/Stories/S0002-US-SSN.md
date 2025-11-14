@@ -29,7 +29,7 @@ Not all nine digit sequences are valid SSNs
 
 * Create a new business object named UsSocialSecurityNumber
 * UsSocialSecurityNumber will exist in namespace KfAccountNumbers.Governmental.NorthAmerica
-* UsSocialSecurityNumber will have a public constructor that accepts a String and an optional separator character that defaults to '-'. The constructor will apply the validation rules described in [Validation Rules](#validation-rules). If any of the validation rules are failed then the constructor will throw an exception (ArgumentNullException if the string is null, otherwise ArgumentException). The exception will contain a message that describes the error encountered. 
+* UsSocialSecurityNumber will have a public constructor that accepts a String and an optional separator character that defaults to '-'. The constructor will apply the validation rules described in [Validation Rules](#validation-rules). If any of the validation rules are failed then the constructor will throw an InvalidUsSocialSecurityNumberException. The exception will contain an enum and message that describes the error encountered. 
 * UsSocialSecurityNumber will have a public static method named Create that accepts a String and an optional separator character that defaults to '-'. The Create method will use the Result pattern to return either a valid UsSocialSecurityNumber or an enum value that identifies the validation rule that failed.
 * UsSocialSecurityNumber will have a public static method named Validate that accepts a String and an optional 
 separator character that defaults to '-'. The Valdate method will apply all of the validation rules described in [Validation Rules](#validation-rules) and return an enum value that indicates if the String is a valid SSN or if not, what validation rule was failed.
@@ -53,5 +53,6 @@ separator character that defaults to '-'. The Valdate method will apply all of t
 	- InvalidSerialNumber
 	- AllIdenticalDigits
 	- InvalidRun
+* New InvalidUsSocialSecurityNumberException class
 * Unit tests that demonstrate that all of the requirements are met
 * Readme updates
