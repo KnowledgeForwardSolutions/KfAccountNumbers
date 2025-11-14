@@ -49,7 +49,7 @@ https://docs.oracle.com/en/cloud/saas/human-resources/24b/faimx/person-national-
 * MxCurp will exist in namespace KfAccountNumbers.Governmental.NorthAmerica
 * MxCurp will have a public constructor that accepts a String. The constructor will apply the validation rules described in [Validation Rules](#validation-rules). If any of the validation rules are failed then the constructor will throw an InvalidMxCurpException. The exception will contain an enum and a message that describes the error encountered. 
 * MxCurp will have a public static method named Create that accepts a String. The Create method will use the Result pattern to return either a valid MxCurp or an enum value that identifies the validation rule that failed.
-* MxCurp will have a public static method named Validate that accepts a String. The Valdate method will apply all of the validation rules described in [Validation Rules](#validation-rules) and return an enum value that indicates if the String is a valid CA SIN or if not, what validation rule was failed.
+* MxCurp will have a public static method named Validate that accepts a String. The Valdate method will apply all of the validation rules described in [Validation Rules](#validation-rules) and return an enum value that indicates if the String is a valid MxCurp or if not, what validation rule was failed.
 * MxCurp will be read-only
 * MxCurp will have an implicit conversion from String. The conversion will throw an exception if any validation rules are failed
 * MxCurp will have an implicit conversion to String. The result will be 18 characters in length and uppercase

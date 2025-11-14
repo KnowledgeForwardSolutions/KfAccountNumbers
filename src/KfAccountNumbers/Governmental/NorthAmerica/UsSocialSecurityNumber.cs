@@ -49,13 +49,23 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The area number 666 is never used.
+///               The area number 666 is invalid.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
 ///               Area numbers 900-999 are invalid because they are reserved for
 ///               Individual Taxpayer Identification Numbers.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The group number 00 is invalid.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The serial number 0000 is invalid.
 ///            </description>
 ///         </item>
 ///         <item>
