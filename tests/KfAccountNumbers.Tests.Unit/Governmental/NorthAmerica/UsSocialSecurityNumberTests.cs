@@ -1315,6 +1315,26 @@ public class UsSocialSecurityNumberTests
 
    #endregion
 
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(ValidNineCharSsn, ValidNineCharSsn)]
+   [InlineData(ValidElevenCharSsn, ValidNineCharSsn)]
+   public void UsSocialSecurityNumber_ToString_ShouldReturnExpectedValue(
+      String ssn,
+      String expected)
+   {
+      // Arrange.
+      var sut = new UsSocialSecurityNumber(ssn);
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
