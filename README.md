@@ -20,10 +20,25 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Australia (future)
 	- Europe (future)
 	- NorthAmerica
+		- [CaSocialInsuranceNumber](#casocialinsurancenumber) 
+		- [UsSocialSecurityNumber](#ussocialsecuritynumber)
 	- South America
 * Utility
 
 # Business Objects
+
+## CaSocialInsuranceNumber
+
+CaSocialInsuranceNumber represents a Canadian Social Insurance Number (SIN) issued by the Government of Canada.
+
+A Canadian SIN consists of 9 digits, typically formatted as AAA AAA AAA. The CaSocialInsuranceNumber constructor will accept either 9 character strings (all digits) or eleven character strings that include separator characters. The default separator character is space ('-'), though the default can be overridden by any non-digit character.
+
+Not all 9 digit numbers are valid SINs. A valid SIN must meet all of the following rules:
+
+* Must consist of 9 integer digits
+* Must pass the Luhn algorithm check.
+
+See [Wikipedia - Social Insurance Number](https://en.wikipedia.org/wiki/Social_Insurance_Number) for more info.
 
 ## UsSocialSecurityNumber
 
