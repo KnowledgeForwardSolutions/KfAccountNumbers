@@ -68,7 +68,7 @@ public enum UsSocialSecurityNumberValidationResult
 }
 
 /// <summary>
-///   Additional methods for type <see cref="UsSocialSecurityNumberErrorType"/>.
+///   Additional methods for type <see cref="UsSocialSecurityNumberValidationResult"/>.
 /// </summary>
 public static class UsSocialSecurityNumberValidationResultExtensions
 {

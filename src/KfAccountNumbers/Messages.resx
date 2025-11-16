@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CaSinEmpty" xml:space="preserve">
+    <value>CA Social Insurance Number may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="CaSinInvalidLength" xml:space="preserve">
+    <value>CA Social Insurance Number must have length 9 (digits only) or 11 (9 digits with two separator characters)</value>
+  </data>
   <data name="CreateResultErrorNull" xml:space="preserve">
     <value>CreateResult Failure error may not be null</value>
   </data>
@@ -142,7 +148,10 @@
     <value>US Social Security Number area number segment (AAA-xx-xxxx) must not be 000, 666 or 900-999</value>
   </data>
   <data name="UsSsnInvalidCharacterEncountered" xml:space="preserve">
-    <value>US Social Security Number contains an invalid character at location {0}; expected digit (0-9), found '{1}'</value>
+    <value>US Social Security Number must only contain digit characters (0-9) in non-separator character locations</value>
+  </data>
+  <data name="CaSinInvalidCharacterEncountered" xml:space="preserve">
+    <value>CA Social Insurance Number must only contain digit characters (0-9) in non-separator character locations</value>
   </data>
   <data name="UsSsnInvalidCustomSeparatorCharacter" xml:space="preserve">
     <value>US Social Security Number may not use a decimal digit (0-9) as a custom separator character</value>
@@ -167,5 +176,11 @@
   </data>
   <data name="ValidationPassed" xml:space="preserve">
     <value>Value does not contain any validation errors</value>
+  </data>
+  <data name="CaSinInvalidSeparatorEncountered" xml:space="preserve">
+    <value>CA Social Insurance Number with length 11 contains an unexpected character at a separator position</value>
+  </data>
+  <data name="CaSinInvalidCheckDigit" xml:space="preserve">
+    <value>CA Social Insurance Number contains an invalid check digit</value>
   </data>
 </root>

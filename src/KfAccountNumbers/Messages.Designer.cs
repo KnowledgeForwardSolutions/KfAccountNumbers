@@ -61,6 +61,51 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CA Social Insurance Number may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string CaSinEmpty {
+            get {
+                return ResourceManager.GetString("CaSinEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CA Social Insurance Number must only contain digit characters (0-9) in non-separator character locations.
+        /// </summary>
+        internal static string CaSinInvalidCharacterEncountered {
+            get {
+                return ResourceManager.GetString("CaSinInvalidCharacterEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CA Social Insurance Number contains an invalid check digit.
+        /// </summary>
+        internal static string CaSinInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("CaSinInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CA Social Insurance Number must have length 9 (digits only) or 11 (9 digits with two separator characters).
+        /// </summary>
+        internal static string CaSinInvalidLength {
+            get {
+                return ResourceManager.GetString("CaSinInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CA Social Insurance Number with length 11 contains an unexpected character at a separator position.
+        /// </summary>
+        internal static string CaSinInvalidSeparatorEncountered {
+            get {
+                return ResourceManager.GetString("CaSinInvalidSeparatorEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CreateResult Failure error may not be null.
         /// </summary>
         internal static string CreateResultErrorNull {
@@ -133,7 +178,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to US Social Security Number contains an invalid character at location {0}; expected digit (0-9), found &apos;{1}&apos;.
+        ///   Looks up a localized string similar to US Social Security Number must only contain digit characters (0-9) in non-separator character locations.
         /// </summary>
         internal static string UsSsnInvalidCharacterEncountered {
             get {
