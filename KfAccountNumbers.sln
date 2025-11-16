@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KfAccountNumbers", "src\KfA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KfAccountNumbers.Tests.Unit", "tests\KfAccountNumbers.Tests.Unit\KfAccountNumbers.Tests.Unit.csproj", "{ED6624EA-29A5-47C4-B235-2AAB58625AE7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KfAccountNumbers.Tests.Benchmarks", "tests\KfAccountNumbers.Tests.Benchmarks\KfAccountNumbers.Tests.Benchmarks.csproj", "{AD7FF00F-148A-408F-B1AA-6CBE3FD381C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{ED6624EA-29A5-47C4-B235-2AAB58625AE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED6624EA-29A5-47C4-B235-2AAB58625AE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED6624EA-29A5-47C4-B235-2AAB58625AE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD7FF00F-148A-408F-B1AA-6CBE3FD381C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD7FF00F-148A-408F-B1AA-6CBE3FD381C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD7FF00F-148A-408F-B1AA-6CBE3FD381C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD7FF00F-148A-408F-B1AA-6CBE3FD381C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -38,5 +44,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{1C267979-E397-4A62-9008-5B0724979A48} = {672A46B8-7F23-4FCA-89EA-78414E321E56}
 		{ED6624EA-29A5-47C4-B235-2AAB58625AE7} = {A938EAD7-D44C-4975-B558-1C566DB5459F}
+		{AD7FF00F-148A-408F-B1AA-6CBE3FD381C8} = {A938EAD7-D44C-4975-B558-1C566DB5459F}
 	EndGlobalSection
 EndGlobal

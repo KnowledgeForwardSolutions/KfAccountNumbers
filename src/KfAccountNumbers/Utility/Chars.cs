@@ -10,8 +10,6 @@ public static class Chars
    public const Char HashMark = '#';
    public const Char Asterisk = '*';
    public const Char Dash = '-';
-   public const Char AtSign = '@';
-   public const Char LeftAngleBracket = '<';
 
    public const Char DigitZero = '0';
    public const Char DigitOne = '1';
@@ -23,6 +21,9 @@ public static class Chars
    public const Char DigitSeven = '7';
    public const Char DigitEight = '8';
    public const Char DigitNine = '9';
+
+   public const Char LeftAngleBracket = '<';
+   public const Char AtSign = '@';
 
    public const Char UpperCaseA = 'A';
    public const Char UpperCaseB = 'B';
@@ -50,6 +51,9 @@ public static class Chars
    public const Char UpperCaseX = 'X';
    public const Char UpperCaseY = 'Y';
    public const Char UpperCaseZ = 'Z';
+
+   public const Char Backslash = '\\';
+   public const Char Underscore = '_';
 
    public const Char LowerCaseA = 'a';
    public const Char LowerCaseB = 'b';
