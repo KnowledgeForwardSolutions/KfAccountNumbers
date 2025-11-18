@@ -183,4 +183,7 @@
   <data name="CaSinInvalidCheckDigit" xml:space="preserve">
     <value>CA Social Insurance Number contains an invalid check digit</value>
   </data>
+  <data name="CaSinInvalidProvince" xml:space="preserve">
+    <value>CA Social Insurance Number may not have a leading digit (the province indicator) of zero (0) or eight (8)</value>
+  </data>
 </root>

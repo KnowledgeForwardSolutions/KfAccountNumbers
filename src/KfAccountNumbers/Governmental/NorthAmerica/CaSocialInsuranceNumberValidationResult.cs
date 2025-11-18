@@ -42,6 +42,13 @@ public enum CaSocialInsuranceNumberValidationResult
    InvalidCharacterEncountered,
 
    /// <summary>
+   ///   The leading digit of the SIN indicates the province where the SIN was
+   ///   registered. Zero (0) and eight (8) is not valid province codes for a
+   ///   SIN.
+   /// </summary>
+   InvalidProvince,
+
+   /// <summary>
    ///   SIN check digit is invalid.
    /// </summary>
    InvalidCheckDigit,
@@ -59,6 +66,7 @@ public static class CaSocialInsuranceNumberValidationResultExtensions
          CaSocialInsuranceNumberValidationResult.InvalidLength => Messages.CaSinInvalidLength,
          CaSocialInsuranceNumberValidationResult.InvalidSeparatorEncountered => Messages.CaSinInvalidSeparatorEncountered,
          CaSocialInsuranceNumberValidationResult.InvalidCharacterEncountered => Messages.CaSinInvalidCharacterEncountered,
+         CaSocialInsuranceNumberValidationResult.InvalidProvince => Messages.CaSinInvalidProvince,
          CaSocialInsuranceNumberValidationResult.InvalidCheckDigit => Messages.CaSinInvalidCheckDigit,
          CaSocialInsuranceNumberValidationResult.ValidationPassed => Messages.ValidationPassed,
          _ => throw new SwitchExpressionException()

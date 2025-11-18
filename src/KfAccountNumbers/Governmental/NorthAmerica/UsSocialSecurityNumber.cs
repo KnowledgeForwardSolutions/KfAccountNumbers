@@ -4,7 +4,7 @@
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
 /// <summary>
-///   Strongly typed business object for a US Social Security Number.
+///   Strongly typed business object for a US Social Security Number (SSN).
 /// </summary>
 /// <remarks>
 ///   <para>

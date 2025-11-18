@@ -17,6 +17,7 @@ https://en.wikipedia.org/wiki/Social_insurance_number
 * Not null, empty or all whitespace characters
 * Length 9 (no separator characters) or 11 (includes separator characters)
 * All non-separator characters are ASCII digits
+* Leading digit (the province indicator) may not be zero (0) or eight (8).
 * If length 11, then the characters in positions 3 and 7 (zero-based index) must be valid separator characters.
 * The trailing digit matches the check digit calculated from the other digits using the Luhn algorithm.
 
@@ -41,6 +42,7 @@ separator character that defaults to '-'. The Valdate method will apply all of t
 	- ValidationPassed = 1
 	-	Empty
 	- InvalidLength
+	- InvalidProvince
 	- InvalidSeparatorEncountered
 	- InvalidCharacterEncountered
 	- InvalidCheckDigit
