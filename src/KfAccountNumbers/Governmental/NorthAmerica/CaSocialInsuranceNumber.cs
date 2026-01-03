@@ -62,12 +62,16 @@ public record CaSocialInsuranceNumber
          return CaSocialInsuranceNumberValidationResult.InvalidSeparatorEncountered;
       }
 
-      // Validate the check digit and province code. Note that the check digit
-      // validation also checks that all non-separator characters are digits.
-      var checkDigitResult = ValidateCheckDigit(sin);
-      if (checkDigitResult != CaSocialInsuranceNumberValidationResult.ValidationPassed)
+      // Validate the check digit and province code.
+      var validCheckDigit = IsFormattedSin(sin)
+         ? CheckDigitAlgorithms.Luhn.Validate(sin, CheckDigitMasks.CaSocialInsuranceNumberMask)
+         : CheckDigitAlgorithms.Luhn.Validate(sin);
+      if (!validCheckDigit)
       {
-         return checkDigitResult;
+         // Either invalid check digit or invalid character encountered.
+         return ValidateDigits(sin)
+            ? CaSocialInsuranceNumberValidationResult.InvalidCheckDigit
+            : CaSocialInsuranceNumberValidationResult.InvalidCharacterEncountered;
       }
       else if (!ValidateProvince(sin))
       {
@@ -79,42 +83,21 @@ public record CaSocialInsuranceNumber
 
    private static Boolean IsFormattedSin(ReadOnlySpan<Char> sin) => sin.Length == FormattedLength;
 
-   /// <summary>
-   ///   Validate the check digit of the SIN using the Luhn algorithm. As a side
-   ///   effect, this method also validates that all non-separator characters in 
-   ///   the SIN are digits.
-   /// </summary>
-   private static CaSocialInsuranceNumberValidationResult ValidateCheckDigit(String sin)
+   private static Boolean ValidateDigits(String sin)
    {
-      var sum = 0;
-      var oddPosition = true;
-      for (var index = sin.Length - 2; index >= 0; index--)
+      var isFormatted = IsFormattedSin(sin);
+      for (var index = 0; index < sin.Length; index++)
       {
-         if (IsFormattedSin(sin) && (index == FirstSeparatorOffset || index == SecondSeparatorOffset))
+         if (isFormatted && (index == FirstSeparatorOffset || index == SecondSeparatorOffset))
          {
             continue;
          }
-         var digit = sin[index] - Chars.DigitZero;
-         if (digit < 0 || digit > 9)
+         if (!sin[index].IsAsciiDigit())
          {
-            return CaSocialInsuranceNumberValidationResult.InvalidCharacterEncountered;
+            return false;
          }
-         sum += oddPosition
-            ? digit > 4 ? (digit * 2) - 9 : digit * 2
-            : digit;
-         oddPosition = !oddPosition;
       }
-
-      var checkDigit = (10 - (sum % 10)) % 10;
-      var trailingDigit = sin[^1] - Chars.DigitZero;
-      if (trailingDigit < 0 || trailingDigit > 9)
-      {
-         return CaSocialInsuranceNumberValidationResult.InvalidCharacterEncountered;
-      }
-
-      return checkDigit == trailingDigit
-         ? CaSocialInsuranceNumberValidationResult.ValidationPassed
-         : CaSocialInsuranceNumberValidationResult.InvalidCheckDigit; 
+      return true;
    }
 
    private static Boolean ValidateEmbeddedSeparatorCharacters(
