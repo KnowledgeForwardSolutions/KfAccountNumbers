@@ -189,4 +189,7 @@
   <data name="CaSinInvalidCustomSeparatorCharacter" xml:space="preserve">
     <value>CA Social Insurance Number may not use a decimal digit (0-9) as a custom separator character</value>
   </data>
+  <data name="CaSinInvalidNullConversionToString" xml:space="preserve">
+    <value>Null CaSocialInsuranceNumber can not be converted to String</value>
+  </data>
 </root>

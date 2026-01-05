@@ -68,9 +68,39 @@ public record CaSocialInsuranceNumber
    public String Value { get; init; }
 
    public static implicit operator String(CaSocialInsuranceNumber sin)
-      => sin?.Value ?? throw new ArgumentNullException(nameof(sin), Messages.UsSsnInvalidNullConversionToString);
+      => sin?.Value ?? throw new ArgumentNullException(nameof(sin), Messages.CaSinInvalidNullConversionToString);
 
    public static implicit operator CaSocialInsuranceNumber(String? sin) => new(sin, DefaultSeparator);
+
+   /// <summary>
+   ///   Create a new <see cref="CaSocialInsuranceNumber"/>.
+   /// </summary>
+   /// <param name="sin">
+   ///   String representation of a Social Insurance Number.
+   /// </param>
+   /// <param name="separator">
+   ///   Optional. If the <paramref name="sin"/> is 11 characters in length, 
+   ///   then <paramref name="separator"/> identifies the character used to
+   ///   separate the different sections of the SIN. This parameter is ignored 
+   ///   if the <paramref name="sin"/> is 9 characters in length. Defaults to '-'.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{CaSocialInsuranceNumber, CaSocialInsuranceNumberValidationResult}"/>.
+   ///   Will contain the new <see cref="CaSocialInsuranceNumber"/> if 
+   ///   <paramref name="sin"/> is valid or 
+   ///   <see cref="CaSocialInsuranceNumberValidationResult"/> that identifies
+   ///   the validation rule that was failed if <paramref name="sin"/> is 
+   ///   invalid.
+   /// </returns>
+   /// <exception cref="ArgumentOutOfRangeException">
+   ///   <paramref name="separator"/> is an ASCII digit (0-9).
+   /// </exception>
+   public static CreateResult<CaSocialInsuranceNumber, CaSocialInsuranceNumberValidationResult> Create(
+      String? sin,
+      Char separator = DefaultSeparator)
+   {
+      throw new NotImplementedException();
+   }
 
    /// <summary>
    ///   Check the <paramref name="sin"/> to determine if it contains any 

@@ -106,6 +106,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Null CaSocialInsuranceNumber can not be converted to String.
+        /// </summary>
+        internal static string CaSinInvalidNullConversionToString {
+            get {
+                return ResourceManager.GetString("CaSinInvalidNullConversionToString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CA Social Insurance Number may not have a leading digit (the province indicator) of zero (0) or eight (8).
         /// </summary>
         internal static string CaSinInvalidProvince {
