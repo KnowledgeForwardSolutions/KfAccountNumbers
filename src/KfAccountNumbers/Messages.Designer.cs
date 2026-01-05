@@ -88,6 +88,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CA Social Insurance Number may not use a decimal digit (0-9) as a custom separator character.
+        /// </summary>
+        internal static string CaSinInvalidCustomSeparatorCharacter {
+            get {
+                return ResourceManager.GetString("CaSinInvalidCustomSeparatorCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CA Social Insurance Number must have length 9 (digits only) or 11 (9 digits with two separator characters).
         /// </summary>
         internal static string CaSinInvalidLength {

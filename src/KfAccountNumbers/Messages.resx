@@ -186,4 +186,7 @@
   <data name="CaSinInvalidProvince" xml:space="preserve">
     <value>CA Social Insurance Number may not have a leading digit (the province indicator) of zero (0) or eight (8)</value>
   </data>
+  <data name="CaSinInvalidCustomSeparatorCharacter" xml:space="preserve">
+    <value>CA Social Insurance Number may not use a decimal digit (0-9) as a custom separator character</value>
+  </data>
 </root>

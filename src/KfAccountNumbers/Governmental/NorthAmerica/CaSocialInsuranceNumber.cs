@@ -5,6 +5,11 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 /// <summary>
 ///   Strongly typed business object for a CA Social Insurance Number (SIN).
 /// </summary>
+/// <remarks>
+///   A valid Canadian Social Insurance Number (SIN) consists of nine decimal 
+///   digits. The nine digits are commonly separated into three groups of three
+///   digits with a separator character (e.g. 123-456-789). The SIN uses the
+/// </remarks>
 public record CaSocialInsuranceNumber
 {
    public const Char DefaultSeparator = Chars.Dash;
@@ -14,6 +19,58 @@ public record CaSocialInsuranceNumber
 
    private const Int32 FirstSeparatorOffset = 3;
    private const Int32 SecondSeparatorOffset = 7;
+
+   /// <summary>
+   ///   Initialize a new <see cref="CaSocialInsuranceNumber"/>.
+   /// </summary>
+   /// <param name="sin">
+   ///   The string representation of a Social Insurance Number.
+   /// </param>
+   /// <param name="separator">
+   ///   Optional. If the <paramref name="sin"/> is 11 characters in length, 
+   ///   then <paramref name="separator"/> identifies the character used to
+   ///   separate the different sections of the SIN. This parameter is ignored 
+   ///   if the <paramref name="sin"/> is 9 characters in length. Defaults to '-'.
+   /// </param>
+   /// <exception cref="ArgumentOutOfRangeException">
+   ///   <paramref name="separator"/> is an ASCII digit (0-9).
+   /// </exception>
+   /// <exception cref="InvalidCaSocialInsuranceNumberException">
+   ///   <paramref name="sin"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="sin"/> does not have length of 9 or 11.
+   ///   - or -
+   ///   <paramref name="sin"/> contains a non-ASCII digit (not 0-9).
+   ///   - or -
+   ///   <paramref name="sin"/> is 11 characters in length and contains an 
+   ///   invalid separator character.
+   ///   - or -
+   ///   <paramref name="sin"/> fails the Luhn check digit validation.
+   ///   - or -
+   ///   <paramref name="sin"/> contains an invalid province code (first digit
+   ///   may not be zero or eight).
+   /// </exception>
+   public CaSocialInsuranceNumber(String? sin, Char separator = DefaultSeparator)
+   {
+      var validationResult = Validate(sin, separator);
+      if (validationResult != CaSocialInsuranceNumberValidationResult.ValidationPassed)
+      {
+         throw new InvalidCaSocialInsuranceNumberException(validationResult);
+      }
+
+      Value = GetValidatedSin(sin!);
+   }
+
+   /// <summary>
+   ///   The raw SSN value.
+   /// </summary>
+   public String Value { get; init; }
+
+   public static implicit operator String(CaSocialInsuranceNumber sin)
+      => sin?.Value ?? throw new ArgumentNullException(nameof(sin), Messages.UsSsnInvalidNullConversionToString);
+
+   public static implicit operator CaSocialInsuranceNumber(String? sin) => new(sin, DefaultSeparator);
 
    /// <summary>
    ///   Check the <paramref name="sin"/> to determine if it contains any 
@@ -42,10 +99,7 @@ public record CaSocialInsuranceNumber
    {
       if (!ValidateSeparatorCharacter(separator))
       {
-         throw new ArgumentOutOfRangeException(
-            nameof(separator),
-            separator,
-            Messages.UsSsnInvalidCustomSeparatorCharacter);
+         throw new ArgumentOutOfRangeException(nameof(separator), separator, Messages.CaSinInvalidCustomSeparatorCharacter);
       }
 
       // Basic checks for empty/null and length and formatting.
@@ -79,6 +133,51 @@ public record CaSocialInsuranceNumber
       }
 
       return CaSocialInsuranceNumberValidationResult.ValidationPassed;
+   }
+
+   private static void CopySection(
+      ReadOnlySpan<Char> source,
+      Span<Char> target,
+      Int32 section)
+   {
+      var start = section * 3;
+      var end = (section + 1) * 3;
+      var formattedOffset = IsFormattedSin(source) ? section : 0;
+
+      var sourceSpan = source[(start + formattedOffset)..(end + formattedOffset)];
+      var targetSpan = target[start..end];
+
+      sourceSpan.CopyTo(targetSpan);
+   }
+
+   /// <summary>
+   ///   Get an unformatted SIN value from a string that has passed validation.
+   ///   If the source string is formatted, then create a new string by merging
+   ///   all three SIN sections together without allocating intermediate 
+   ///   Strings.
+   /// </summary>
+   private static String GetValidatedSin(String sin)
+   {
+      if (sin.Length == NonFormattedLength)
+      {
+         return sin;
+      }
+
+      var buffer = ArrayPool<Char>.Shared.Rent(NonFormattedLength);
+      try
+      {
+         var span = new Span<Char>(buffer);
+
+         CopySection(sin, span, 0);
+         CopySection(sin, span, 1);
+         CopySection(sin, span, 2);
+
+         return span[..NonFormattedLength].ToString();
+      }
+      finally
+      {
+         ArrayPool<Char>.Shared.Return(buffer);
+      }
    }
 
    private static Boolean IsFormattedSin(ReadOnlySpan<Char> sin) => sin.Length == FormattedLength;
