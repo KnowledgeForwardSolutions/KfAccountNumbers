@@ -63,6 +63,20 @@ public record CaSocialInsuranceNumber
    }
 
    /// <summary>
+   ///   Private constructor to support <see cref="Create(String?, Char)"/>
+   ///   method.
+   /// </summary>
+   /// <remarks>
+   ///   Boolean discard parameter is used to differentiate this constructor
+   ///   from the public constructor.
+   /// </remarks>
+   /// <param name="sin"></param>
+   private CaSocialInsuranceNumber(String sin, Boolean _)
+   {
+      Value = GetValidatedSin(sin);
+   }
+
+   /// <summary>
    ///   The raw SSN value.
    /// </summary>
    public String Value { get; init; }
@@ -99,7 +113,10 @@ public record CaSocialInsuranceNumber
       String? sin,
       Char separator = DefaultSeparator)
    {
-      throw new NotImplementedException();
+      var validationResult = Validate(sin, separator);
+      return validationResult == CaSocialInsuranceNumberValidationResult.ValidationPassed
+         ? new CaSocialInsuranceNumber(sin!, true)          // Note: invoking private ctor
+         : validationResult;
    }
 
    /// <summary>
