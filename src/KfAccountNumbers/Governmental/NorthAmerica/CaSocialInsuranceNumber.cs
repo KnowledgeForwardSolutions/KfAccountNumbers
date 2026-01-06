@@ -6,12 +6,51 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///   Strongly typed business object for a CA Social Insurance Number (SIN).
 /// </summary>
 /// <remarks>
-///   A valid Canadian Social Insurance Number (SIN) consists of nine decimal 
-///   digits. The nine digits are commonly separated into three groups of three
-///   digits with a separator character (e.g. 123-456-789). The SIN uses the
+///   <para>
+///      A valid Canadian Social Insurance Number (SIN) consists of nine decimal 
+///      digits, generall grouped in threes, e.g. 123-456-789.
+///   </para>
+///   <para>
+///      The initial digit of the SIN generally indicates the province or 
+///      territory where the SIN was registiered. However, some highy populated
+///      provinces have needed to use multiple initial digits (ex. Ontario).
+///   </para>
+///   <para>
+///      Social Insurance Numbers are commonly formatted with dashes ('-') and
+///      sometimes spaces separating the three groups. A 
+///      <see cref="CaSocialInsuranceNumber"/> can be created from strings that 
+///      include or exclude the separator character, but if used, the same 
+///      character must be used to separate both the three groups of digits. The 
+///      separator character may not be a decimal digit (0-9).
+///   </para>
+///   <para>
+///      Not all 9-digit numbers are valid Social Insurance Numbers. When 
+///      creating a new  <see cref="CaSocialInsuranceNumber"/>, after determining
+///      that a value consists of 9 decimal digits, the following validation 
+///      rules are applied:
+///      <list type="bullet">
+///         <item>
+///            <description>
+///               The initial digit may not be 0 or 8. (8 is used for business
+///               numbers assigned to business owners and corporations. 0 is 
+///               used for tax numbers assigned by the Canada Revenue Agency).
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The last digit must be a valid Luhn check digit calculated
+///               from the first eight digits.
+///            </description>
+///         </item>
+///      </list>
+///   </para>
 /// </remarks>
 public record CaSocialInsuranceNumber
 {
+   /// <summary>
+   ///   The default separator character used when formatting a SIN or parsing
+   ///   a formatted SIN string.
+   /// </summary>
    public const Char DefaultSeparator = Chars.Dash;
 
    private const Int32 FormattedLength = 11;
@@ -118,6 +157,33 @@ public record CaSocialInsuranceNumber
          ? new CaSocialInsuranceNumber(sin!, true)          // Note: invoking private ctor
          : validationResult;
    }
+
+   /// <summary>
+   ///   Format the SIN using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   The mask that specified the final output.
+   /// </param>
+   /// <returns>
+   ///   A formatted Social Insurance Number.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the SSN.
+   /// </remarks>
+   public String Format(String mask = "___-___-___") => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Get a string representation of the SSN.
+   /// </summary>
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="sin"/> to determine if it contains any 

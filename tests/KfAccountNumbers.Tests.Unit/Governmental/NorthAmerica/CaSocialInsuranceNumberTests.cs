@@ -1094,6 +1094,92 @@ public class CaSocialInsuranceNumberTests
 
    #endregion
 
+   #region Format Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void CaSocialInsuranceNumber_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new CaSocialInsuranceNumber(ValidNineCharSin);
+      var expected = ValidElevenCharSin;
+
+      // Act.
+      var str = sut.Format();
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void CaSocialInsuranceNumber_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new CaSocialInsuranceNumber(ValidNineCharSin);
+      var mask = "___ ___ ___";
+      var expected = ValidElevenCharSinWithCustomSeparator;
+
+      // Act.
+      var str = sut.Format(mask);
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void CaSocialInsuranceNumber_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
+   {
+      // Arrange.
+      var sut = new CaSocialInsuranceNumber(ValidNineCharSin);
+      String mask = null!;
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = sut.Format(mask))
+         .Should()
+         .ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(Messages.FormatMaskEmpty + "*");
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void CaSocialInsuranceNumber_Format_ShouldThrowArgumentNullException_WhenMaskIsEmpty(String mask)
+   {
+      // Arrange.
+      var sut = new CaSocialInsuranceNumber(ValidNineCharSin);
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+      var act = () => _ = sut.Format(mask);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(ValidNineCharSin)]
+   [InlineData(ValidElevenCharSin)]
+   public void CaSocialInsuranceNumber_ToString_ShouldReturnExpectedValue(String sin)
+   {
+      // Arrange.
+      var sut = new CaSocialInsuranceNumber(sin);
+      var expected = sin.Length == 9 ? sin : sin.Replace(DefaultSeparator.ToString(), String.Empty);
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
