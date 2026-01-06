@@ -864,6 +864,236 @@ public class CaSocialInsuranceNumberTests
 
    #endregion
 
+   #region Create (With Custom Separator) Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(ValidNineCharSin)]
+   [InlineData(ValidElevenCharSinWithCustomSeparator)]
+   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldCreateObject_WhenValueContainsValidSin(String sin)
+   {
+      // Arrange.
+      var expected = sin.Length == 9 ? sin : sin.Replace(CustomSeparator.ToString(), String.Empty);
+      var expectedValue = new CaSocialInsuranceNumber(expected);
+
+      // Act.
+      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [InlineData(null)]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String? sin)
+   {
+      // Arrange.
+      var expected = CaSocialInsuranceNumberValidationResult.Empty;
+
+      // Act.
+      var result = CaSocialInsuranceNumber.Create(sin!, CustomSeparator);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("55819942")]
+   [InlineData("5581994288")]
+   [InlineData("558 199 4288")]
+   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String sin)
+   {
+      // Arrange.
+      var expected = CaSocialInsuranceNumberValidationResult.InvalidLength;
+
+      // Act.
+      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("046-454 286")]
+   [InlineData("046 454-286")]
+   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldReturnInvalidSeparatorEncounteredResult_When11CharacterValueContainsAnInvalidSeparator(String sin)
+   {
+      // Arrange.
+      var expected = CaSocialInsuranceNumberValidationResult.InvalidSeparatorEncountered;
+
+      // Act.
+      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("A46454286")]
+   [InlineData("0A6454286")]
+   [InlineData("04A454286")]
+   [InlineData("046A54286")]
+   [InlineData("0464A4286")]
+   [InlineData("04645A286")]
+   [InlineData("046454A86")]
+   [InlineData("0464542A6")]
+   [InlineData("04645428A")]
+   [InlineData("0;6454286")]
+   [InlineData("0\u21536454286")]      // Unicode fraction 1/3
+   [InlineData("0\u21676454286")]      // Unicode Roman numeral VII
+   [InlineData("0\u0BEF6454286")]      // Unicode Tamil number 9
+   [InlineData("A46 454 286")]
+   [InlineData("0A6 454 286")]
+   [InlineData("04A 454 286")]
+   [InlineData("046 A54 286")]
+   [InlineData("046 4A4 286")]
+   [InlineData("046 45A 286")]
+   [InlineData("046 454 A86")]
+   [InlineData("046 454 2A6")]
+   [InlineData("046 454 28A")]
+   [InlineData("0;6 454 286")]
+   [InlineData("0\u21536 454 286")]      // Unicode fraction 1/3
+   [InlineData("0\u21676 454 286")]      // Unicode Roman numeral VII
+   [InlineData("0\u0BEF6 454 286")]      // Unicode Tamil number 9
+   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldReturnInvalidCharacterEncounteredResult_WhenValueContainsNonAsciiDigit(String sin)
+   {
+      // Arrange.
+      var expected = CaSocialInsuranceNumberValidationResult.InvalidCharacterEncountered;
+
+      // Act.
+      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("012345674")]
+   [InlineData("876543216")]
+   [InlineData("012 345 674")]
+   [InlineData("876 543 216")]
+   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldReturnInvalidProvinceResult_WhenValueHasInvalidLeadingDigit(String sin)
+   {
+      // Arrange.
+      var expected = CaSocialInsuranceNumberValidationResult.InvalidProvince;
+
+      // Act.
+      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("780912341")]     // 789012341 with two digit transposition 90 -> 09
+   [InlineData("123459018")]     // 123450918 with two digit transposition 09 -> 90
+   [InlineData("100005503")]     // 100005503 with two digit twin error 55 -> 22
+   [InlineData("107700007")]     // 104400007 with two digit twin error 44 -> 77
+   [InlineData("103300000")]     // 106600000 with two digit twin error 66 -> 33
+   [InlineData("558199428")]     // 558199428 with two digit jump transposition 994 -> 499
+   [InlineData("780 912 341")]   // 789012341 with two digit transposition 90 -> 09
+   [InlineData("123 459 018")]   // 123450918 with two digit transposition 09 -> 90
+   [InlineData("100 005 503")]   // 100005503 with two digit twin error 55 -> 22
+   [InlineData("107 700 007")]   // 104400007 with two digit twin error 44 -> 77
+   [InlineData("103 300 000")]   // 106600000 with two digit twin error 66 -> 33
+   [InlineData("558 199 428")]   // 558199428 with two digit jump transposition 994 -> 499
+   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String sin)
+   {
+      // Arrange.
+      var expected = sin.Length == 9 ? sin : sin.Replace(CustomSeparator.ToString(), String.Empty);
+      var expectedValue = new CaSocialInsuranceNumber(expected);
+
+      // Act.
+      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [InlineData("558299428")]     // 558199428 with single digit transcription error 1 -> 2
+   [InlineData("559199428")]     // 558199428 with single digit transcription error 8 -> 9
+   [InlineData("551899428")]     // 558199428 with two digit transcription error -> 81 -> 18
+   [InlineData("558199248")]     // 558199428 with two digit transcription error -> 42 -> 24
+   [InlineData("448199428")]     // 558199428 with two digit twin error 55 -> 44
+   [InlineData("558188428")]     // 558199428 with two digit twin error 99 -> 88
+   [InlineData("558 299 428")]   // 558199428 with single digit transcription error 1 -> 2
+   [InlineData("559 199 428")]   // 558199428 with single digit transcription error 8 -> 9
+   [InlineData("551 899 428")]   // 558199428 with two digit transcription error -> 81 -> 18
+   [InlineData("558 199 248")]   // 558199428 with two digit transcription error -> 42 -> 24
+   [InlineData("448 199 428")]   // 558199428 with two digit twin error 55 -> 44
+   [InlineData("558 188 428")]   // 558199428 with two digit twin error 99 -> 88
+   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldReturnInvalidCheckDigit_WhenCheckDigitContainsDetectableError(String sin)
+   {
+      // Arrange.
+      var expected = CaSocialInsuranceNumberValidationResult.InvalidCheckDigit;
+
+      // Act.
+      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("123456790")]
+   [InlineData("123 456 790")]
+   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldCreateObject_WhenCheckDigitCalculatesAsZero(String sin)
+   {
+      // Arrange.
+      var expected = sin.Length == 9 ? sin : sin.Replace(CustomSeparator.ToString(), String.Empty);
+      var expectedValue = new CaSocialInsuranceNumber(expected);
+
+      // Act.
+      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCustomSeparatorData))]
+   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldThrowArgumentOutOfRangeException_WhenCustomSeparatorIsInvalid(
+      String sin,
+      Char customSeparator)
+      => FluentActions
+         .Invoking(() => _ = CaSocialInsuranceNumber.Create(sin, customSeparator))
+         .Should()
+         .ThrowExactly<ArgumentOutOfRangeException>()
+         .WithMessage(Messages.CaSinInvalidCustomSeparatorCharacter + "*");
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
