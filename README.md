@@ -37,6 +37,7 @@ Not all 9 digit numbers are valid SINs. A valid SIN must meet all of the followi
 
 * Must consist of 9 integer digits
 * Must pass the Luhn algorithm check.
+* May not start with the digits 8 or 0, which are reserved for Business Numbers (8) and tax numbers assigned by the Canada Revenue Agency (0).
 
 See [Wikipedia - Social Insurance Number](https://en.wikipedia.org/wiki/Social_Insurance_Number) for more info.
 
