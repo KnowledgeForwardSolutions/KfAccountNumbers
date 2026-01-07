@@ -218,6 +218,17 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
+   [MemberData(nameof(InvalidCustomSeparatorData))]
+   public void CaSocialInsuranceNumber_ConstructorWithCustomSeparator_ShouldThrowArgumentOutOfRangeException_WhenCustomSeparatorIsDigit(
+      String sin,
+      Char customSeparator)
+      => FluentActions
+         .Invoking(() => _ = new CaSocialInsuranceNumber(sin, customSeparator))
+         .Should()
+         .ThrowExactly<ArgumentOutOfRangeException>()
+         .WithMessage(Messages.CaSinInvalidCustomSeparatorCharacter + "*");
+
+   [Theory]
    [InlineData(null)]
    [InlineData("")]
    [InlineData("\t")]
@@ -363,17 +374,6 @@ public class CaSocialInsuranceNumberTests
       sut.Value.Should().Be(expected);
    }
 
-   [Theory]
-   [MemberData(nameof(InvalidCustomSeparatorData))]
-   public void CaSocialInsuranceNumber_ConstructorWithCustomSeparator_ShouldThrowArgumentOutOfRangeException_WhenCustomSeparatorIsInvalid(
-      String sin,
-      Char customSeparator)
-      => FluentActions
-         .Invoking(() => _ = new CaSocialInsuranceNumber(sin, customSeparator))
-         .Should()
-         .ThrowExactly<ArgumentOutOfRangeException>()
-         .WithMessage(Messages.CaSinInvalidCustomSeparatorCharacter + "*");
-
    #endregion
 
    #region Implicit Operator Tests
@@ -415,7 +415,7 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Fact]
-   public void CaSocialInsuranceNumber_ImplicitUsSinToStringConversion_ShouldThrowArgumentNullException_WhenValueIsEmpty()
+   public void CaSocialInsuranceNumber_ImplicitUsSinToStringConversion_ShouldThrowArgumentNullException_WhenValueIsNull()
    {
       // Arrange.
       CaSocialInsuranceNumber sin = null!;
@@ -888,6 +888,17 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
+   [MemberData(nameof(InvalidCustomSeparatorData))]
+   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldThrowArgumentOutOfRangeException_WhenCustomSeparatorIsDigit(
+      String sin,
+      Char customSeparator)
+      => FluentActions
+         .Invoking(() => _ = CaSocialInsuranceNumber.Create(sin, customSeparator))
+         .Should()
+         .ThrowExactly<ArgumentOutOfRangeException>()
+         .WithMessage(Messages.CaSinInvalidCustomSeparatorCharacter + "*");
+
+   [Theory]
    [InlineData(null)]
    [InlineData("")]
    [InlineData("\t")]
@@ -1081,17 +1092,6 @@ public class CaSocialInsuranceNumberTests
       result.ValidationFailure.Should().Be(default);
    }
 
-   [Theory]
-   [MemberData(nameof(InvalidCustomSeparatorData))]
-   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldThrowArgumentOutOfRangeException_WhenCustomSeparatorIsInvalid(
-      String sin,
-      Char customSeparator)
-      => FluentActions
-         .Invoking(() => _ = CaSocialInsuranceNumber.Create(sin, customSeparator))
-         .Should()
-         .ThrowExactly<ArgumentOutOfRangeException>()
-         .WithMessage(Messages.CaSinInvalidCustomSeparatorCharacter + "*");
-
    #endregion
 
    #region Format Method Tests
@@ -1146,7 +1146,7 @@ public class CaSocialInsuranceNumberTests
    [Theory]
    [InlineData("")]
    [InlineData("\t")]
-   public void CaSocialInsuranceNumber_Format_ShouldThrowArgumentNullException_WhenMaskIsEmpty(String mask)
+   public void CaSocialInsuranceNumber_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
    {
       // Arrange.
       var sut = new CaSocialInsuranceNumber(ValidNineCharSin);
@@ -1299,6 +1299,17 @@ public class CaSocialInsuranceNumberTests
       => CaSocialInsuranceNumber.Validate(sin, CustomSeparator).Should().Be(CaSocialInsuranceNumberValidationResult.ValidationPassed);
 
    [Theory]
+   [MemberData(nameof(InvalidCustomSeparatorData))]
+   public void CaSocialInsuranceNumber_ValidateWithCustomSeparator_ShouldThrowArgumentOutOfRangeException_WhenCustomSeparatorIsDigit(
+      String sin,
+      Char customSeparator)
+      => FluentActions
+         .Invoking(() => CaSocialInsuranceNumber.Validate(sin, customSeparator))
+         .Should()
+         .ThrowExactly<ArgumentOutOfRangeException>()
+         .WithMessage(Messages.CaSinInvalidCustomSeparatorCharacter + "*");
+
+   [Theory]
    [InlineData(null)]
    [InlineData("")]
    [InlineData("\t")]
@@ -1393,17 +1404,6 @@ public class CaSocialInsuranceNumberTests
    [InlineData("123 456 790")]
    public void CaSocialInsightsNumber_ValidateWithCustomSeparator_ShouldReturnValidationPassed_WhenCheckDigitCalculatesAsZero(String sin)
       => CaSocialInsuranceNumber.Validate(sin, CustomSeparator).Should().Be(CaSocialInsuranceNumberValidationResult.ValidationPassed);
-
-   [Theory]
-   [MemberData(nameof(InvalidCustomSeparatorData))]
-   public void CaSocialInsuranceNumber_ValidateWithCustomSeparator_ShouldThrowArgumentOutOfRangeException_WhenCustomSeparatorIsInvalid(
-      String sin,
-      Char customSeparator)
-      => FluentActions
-         .Invoking(() => CaSocialInsuranceNumber.Validate(sin, customSeparator))
-         .Should()
-         .ThrowExactly<ArgumentOutOfRangeException>()
-         .WithMessage(Messages.CaSinInvalidCustomSeparatorCharacter + "*");
 
    #endregion
 }

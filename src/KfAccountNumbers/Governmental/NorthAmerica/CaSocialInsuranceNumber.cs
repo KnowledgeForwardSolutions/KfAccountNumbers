@@ -109,11 +109,7 @@ public record CaSocialInsuranceNumber
    ///   Boolean discard parameter is used to differentiate this constructor
    ///   from the public constructor.
    /// </remarks>
-   /// <param name="sin"></param>
-   private CaSocialInsuranceNumber(String sin, Boolean _)
-   {
-      Value = GetValidatedSin(sin);
-   }
+   private CaSocialInsuranceNumber(String sin, Boolean _) => Value = GetValidatedSin(sin);
 
    /// <summary>
    ///   The raw SSN value.
