@@ -112,7 +112,7 @@ public record CaSocialInsuranceNumber
    private CaSocialInsuranceNumber(String sin, Boolean _) => Value = GetValidatedSin(sin);
 
    /// <summary>
-   ///   The raw SSN value.
+   ///   The raw SIN value.
    /// </summary>
    public String Value { get; init; }
 

@@ -388,8 +388,8 @@ public record UsSocialSecurityNumber
       const String InvalidArea666 = "666";
 
       return areaNumber[0] != Chars.DigitNine
-         && !areaNumber.Equals(InvalidArea000, StringComparison.Ordinal)
-         && !areaNumber.Equals(InvalidArea666, StringComparison.Ordinal);
+             && !areaNumber.Equals(InvalidArea000, StringComparison.Ordinal)
+             && !areaNumber.Equals(InvalidArea666, StringComparison.Ordinal);
    }
 
    private static Boolean ValidateEmbeddedSeparatorCharacters(
@@ -406,7 +406,7 @@ public record UsSocialSecurityNumber
    }
 
    private static Boolean ValidateLength(ReadOnlySpan<Char> ssn)
-      => ssn.Length == NonFormattedLength || ssn.Length == FormattedLength;
+      => ssn.Length is NonFormattedLength or FormattedLength;
 
    private static Boolean ValidateNotAllIdenticalDigits(
       ReadOnlySpan<Char> areaNumber,
