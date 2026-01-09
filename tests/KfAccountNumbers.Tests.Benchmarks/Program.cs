@@ -1,2 +1,7 @@
-﻿
-BenchmarkRunner.Run<UsSocialSecurityNumberBenchmarks>(); 
+
+using KfAccountNumbers.Tests.Benchmarks;
+
+BenchmarkRunner.Run<UsSocialSecurityNumberBenchmarks>();
+//BenchmarkRunner.Run<CaSocialInsuranceNumberBenchmarks>();
+
+//BenchmarkRunner.Run<SectionValidationTests>();

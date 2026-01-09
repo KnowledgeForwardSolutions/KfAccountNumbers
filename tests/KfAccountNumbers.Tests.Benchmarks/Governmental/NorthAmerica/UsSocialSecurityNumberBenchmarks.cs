@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Ssn
+// Ignore Spelling: Ssn
 #pragma warning disable IDE0059 // Unnecessary assignment of a value
 #pragma warning disable CA1822 // Mark members as static
 
