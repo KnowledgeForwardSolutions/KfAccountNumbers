@@ -22,7 +22,7 @@ As a developer, I want a business object that represents a Mexican Clave Unica d
 There are several exceptions to the above. 
 * The Spanish letter N with tilde (considered a separate letter rather than a letter with an accent) is replaced with the letter X. 
 * If the person has two given names and the first given name is a very common name (such as Maria or Jose) then the second given name will be used in place of the person's first name.
-* If the first four characters form a work considered profane, offensive or pejorative then other characters are used. RENAPO maintains a Catalog of Inappropriate Words (Catalogo de Palabras Inconvenientes) that lists the objectional words and their replacement characters (generally by replacing one of the vowels with the letter X).
+* If the first four characters form a word considered profane, offensive or pejorative then other characters are used. RENAPO maintains a Catalog of Inappropriate Words (Catalogo de Palabras Inconvenientes) that lists the objectional words and their replacement characters (generally by replacing one of the vowels with the letter X).
 
 The non-digit characters are uppercase latin alphabetic characters (A-Z).
 
