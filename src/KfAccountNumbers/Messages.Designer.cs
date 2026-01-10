@@ -241,6 +241,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Null MxCurp can not be converted to String.
+        /// </summary>
+        internal static string MxCurpInvalidNullConversionToString {
+            get {
+                return ResourceManager.GetString("MxCurpInvalidNullConversionToString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MX CURP requires a valid two letter state code in character positions 11-12 (zero-based).
         /// </summary>
         internal static string MxCurpInvalidState {

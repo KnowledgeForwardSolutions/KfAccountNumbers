@@ -216,4 +216,7 @@
   <data name="MxCurpInvalidCheckDigit" xml:space="preserve">
     <value>MX CURP requires a digit character in character position 17 (zero-based). This is the check digit assigned by RENAPO</value>
   </data>
+  <data name="MxCurpInvalidNullConversionToString" xml:space="preserve">
+    <value>Null MxCurp can not be converted to String</value>
+  </data>
 </root>

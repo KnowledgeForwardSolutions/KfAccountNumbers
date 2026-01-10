@@ -78,6 +78,7 @@ public static class MxCurpValidationResultExtensions
          MxCurpValidationResult.InvalidState => Messages.MxCurpInvalidState,
          MxCurpValidationResult.InvalidHomoclave => Messages.MxCurpInvalidHomoclave,
          MxCurpValidationResult.InvalidCheckDigit => Messages.MxCurpInvalidCheckDigit,
+         MxCurpValidationResult.ValidationPassed => Messages.ValidationPassed,
          _ => throw new SwitchExpressionException()
       };
 }
