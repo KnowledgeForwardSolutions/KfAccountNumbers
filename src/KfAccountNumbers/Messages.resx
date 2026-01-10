@@ -192,4 +192,28 @@
   <data name="CaSinInvalidNullConversionToString" xml:space="preserve">
     <value>Null CaSocialInsuranceNumber can not be converted to String</value>
   </data>
+  <data name="MxCurpEmpty" xml:space="preserve">
+    <value>MX CURP may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="MxCurpInvalidLength" xml:space="preserve">
+    <value>MX CURP must have length 18</value>
+  </data>
+  <data name="MxCurpInvalidAlphabeticCharacterEncountered" xml:space="preserve">
+    <value>MX CURP must requires alphabetic characters in positions 0-3 and 13-15 (zero-based)</value>
+  </data>
+  <data name="MxCurpInvalidDateOfBirth" xml:space="preserve">
+    <value>MX CURP requires valid six digit date of birth (YYMMDD) in character positions 4-9 (zero-based)</value>
+  </data>
+  <data name="MxCurpInvalidGender" xml:space="preserve">
+    <value>MX CURP requires a gender code of H (Hombre), M (Mujer) or X (non-binary) in character position 10 (zero-based)</value>
+  </data>
+  <data name="MxCurpInvalidState" xml:space="preserve">
+    <value>MX CURP requires a valid two letter state code in character positions 11-12 (zero-based)</value>
+  </data>
+  <data name="MxCurpInvalidHomoclave" xml:space="preserve">
+    <value>MX CURP requires an alphanumeric character in character position 16 (zero-based). This is the homoclave character assigned by RENAPO</value>
+  </data>
+  <data name="MxCurpInvalidCheckDigit" xml:space="preserve">
+    <value>MX CURP requires a digit character in character position 17 (zero-based). This is the check digit assigned by RENAPO</value>
+  </data>
 </root>

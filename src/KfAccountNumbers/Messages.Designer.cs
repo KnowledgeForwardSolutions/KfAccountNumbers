@@ -178,6 +178,78 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to MX CURP may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string MxCurpEmpty {
+            get {
+                return ResourceManager.GetString("MxCurpEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MX CURP must requires alphabetic characters in positions 0-3 and 13-15 (zero-based).
+        /// </summary>
+        internal static string MxCurpInvalidAlphabeticCharacterEncountered {
+            get {
+                return ResourceManager.GetString("MxCurpInvalidAlphabeticCharacterEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MX CURP requires a digit character in character position 17 (zero-based). This is the check digit assigned by RENAPO.
+        /// </summary>
+        internal static string MxCurpInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("MxCurpInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MX CURP requires valid six digit date of birth (YYMMDD) in character positions 4-9 (zero-based).
+        /// </summary>
+        internal static string MxCurpInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("MxCurpInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MX CURP requires a gender code of H (Hombre), M (Mujer) or X (non-binary) in character position 10 (zero-based).
+        /// </summary>
+        internal static string MxCurpInvalidGender {
+            get {
+                return ResourceManager.GetString("MxCurpInvalidGender", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MX CURP requires an alphanumeric character in character position 16 (zero-based). This is the homoclave character assigned by RENAPO.
+        /// </summary>
+        internal static string MxCurpInvalidHomoclave {
+            get {
+                return ResourceManager.GetString("MxCurpInvalidHomoclave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MX CURP must have length 18.
+        /// </summary>
+        internal static string MxCurpInvalidLength {
+            get {
+                return ResourceManager.GetString("MxCurpInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MX CURP requires a valid two letter state code in character positions 11-12 (zero-based).
+        /// </summary>
+        internal static string MxCurpInvalidState {
+            get {
+                return ResourceManager.GetString("MxCurpInvalidState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to US Social Security Number may not have 9 consecutive identical digits.
         /// </summary>
         internal static string UsSsnAllIdenticalDigits {
