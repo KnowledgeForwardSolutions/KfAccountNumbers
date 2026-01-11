@@ -18,8 +18,8 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///      <list type="bullet">
 ///         <item>
 ///            <description>
-///               Not is <see langword="null"/>, <see cref="String.Empty"/> or 
-///               all whitespace characters.
+///               Not <see langword="null"/>, <see cref="String.Empty"/> or all
+///               whitespace characters.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -41,7 +41,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         <item>
 ///            <description>
 ///               Has a valid gender character in position 10 (zero-based). Must
-///               be H (Hombre], M (Mujer) or X (non-binary).
+///               be H (Hombre), M (Mujer) or X (non-binary).
 ///            </description>
 ///         </item>
 ///         <item>
@@ -53,13 +53,17 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///            <description>
 ///               Has an alphanumeric homoclave character in position 16 
 ///               (zero-based). The homoclave is assigned by RENAPO to avoid 
-///               duplicate CURP values.
+///               duplicate CURP values. A digit homoclave character indicates a 
+///               birth in the 1900-1999 century, while an alphabetic homoclave
+///               indicates a birth in the 2000-2099 century.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
 ///               Has a digit check digit character in position 17 (zero-based).
-///               The check digit is assigned by RENAPO.
+///               The check digit is assigned by RENAPO. (The algorithm used to
+///               generate the check digit is not published and no validation
+///               other than confirming it is a digit is performed.)
 ///            </description>
 ///         </item>
 ///      </list>
@@ -83,14 +87,6 @@ public record MxCurp
       Homoclave,
       CheckDigit
    }
-
-   // From https://es.wikipedia.org/wiki/Anexo:Cat%C3%A1logo_de_claves_de_entidades_federativas
-   private static readonly HashSet<String>.AlternateLookup<ReadOnlySpan<Char>> _validStateCodes = new HashSet<String>
-   {
-      "AS", "BC", "BS", "CC", "CL", "CM", "CS", "CH", "DF", "DG", "GT", "GR",
-      "HG", "JC", "MC", "MN", "MS", "NT", "NL", "OC", "PL", "QT", "QR", "SP",
-      "SL", "SR", "TC", "TS", "TL", "VZ", "YN", "ZS", "NE"
-   }.GetAlternateLookup<ReadOnlySpan<Char>>();
 
    public MxCurp(String curp)
    {
@@ -211,7 +207,7 @@ public record MxCurp
          "yyMMdd",
          null,
          System.Globalization.DateTimeStyles.None,
-         out var x);
+         out _);
 
       return isValid;
    }
