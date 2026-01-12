@@ -8,6 +8,14 @@ namespace KfAccountNumbers.Tests.Benchmarks.Governmental.NorthAmerica;
 [MemoryDiagnoser]
 public class MxCurpBenchmarks
 {
+   //[Benchmark()]
+   //[Arguments("HEGG560427MVZRRL04")]
+   //[Arguments("hegg560427mvzrll04")]
+   //public void MxCurpConstructor(String curp)
+   //{
+   //   MxCurp validateCurp = new MxCurp(curp);
+   //}
+
    [Benchmark()]
    [Arguments("HEGG560427MVZRRL04")]
    [Arguments("hegg560427mvzrll04")]

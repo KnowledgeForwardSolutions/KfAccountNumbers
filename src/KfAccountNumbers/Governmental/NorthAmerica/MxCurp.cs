@@ -41,7 +41,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         <item>
 ///            <description>
 ///               Has a valid gender character in position 10 (zero-based). Must
-///               be H (Hombre), M (Mujer) or X (non-binary).
+///               be H (Hombre/male), M (Mujer/female) or X (non-binary).
 ///            </description>
 ///         </item>
 ///         <item>
@@ -88,9 +88,51 @@ public record MxCurp
       CheckDigit
    }
 
+   /// <summary>
+   ///   Initialize a new instance of the <see cref="MxCurp"/> class.
+   /// </summary>
+   /// <param name="curp">
+   ///   String representation of a CURP.
+   /// </param>
+   /// <remarks>
+   ///   Validation if <paramref name="curp"/> is performed in a case-insensitive
+   ///   manner. However, the <see cref="Value"/> property will normalize the
+   ///   CURP to upper-case.
+   /// </remarks>
+   /// <exception cref="InvalidMxCurpException">
+   ///   <paramref name="curp"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="curp"/> does not have length of 18.
+   ///   - or -
+   ///   <paramref name="curp"/> contains non-alphabetic characters in positions
+   ///   0-3 or 13-15 (zero-based).
+   ///   - or -
+   ///   <paramref name="curp"/> contains an invalid date of birth in positions
+   ///   4-9 (zero-based).
+   ///   - or -
+   ///   <paramref name="curp"/> contains an invalid gender character in position
+   ///   10 (zero-based). Valid gender characters are H (Hombre/male), 
+   ///   M (Mujer/female) or X (non-binary).
+   ///   - or -
+   ///   <paramref name="curp"/> contains an invalid state code in positions
+   ///   11-12 (zero-based).
+   ///   - or -
+   ///   <paramref name="curp"/> contains a non-alphanumeric homoclave character
+   ///   in position 16 (zero-based).
+   ///   - or -
+   ///   <paramref name="curp"/> contains a non-digit check digit character in
+   ///   position 17 (zero-based).
+   /// </exception>
    public MxCurp(String curp)
    {
-      throw new NotImplementedException();
+      MxCurpValidationResult validationResult = Validate(curp);
+      if (validationResult != MxCurpValidationResult.ValidationPassed)
+      {
+         throw new InvalidMxCurpException(validationResult);
+      }
+
+      Value = curp.ToUpperInvariant();
    }
 
    /// <summary>
@@ -98,8 +140,8 @@ public record MxCurp
    ///   homoclave elements of the CURP.
    /// </summary>
    /// <remarks>
-   ///   Homoclave values 0-9 indicate birth century 1900-1999, homoclave values
-   ///   A-Z indicate brith century 2000-2099.
+   ///   Homoclave values 0-9 indicate birth in the 1900-1999 century, homoclave 
+   ///   values A-Z indicate birth in the 2000-2099 century.
    /// </remarks>
    public DateOnly DateOfBirth => throw new NotImplementedException();
 
@@ -119,6 +161,9 @@ public record MxCurp
    /// <summary>
    ///   The raw CURP value.
    /// </summary>
+   /// <remarks>
+   ///   The CURP value is always normalized to upper-case.
+   /// </remarks>
    public String Value { get; init; }
 
    public static implicit operator String(MxCurp curp)
@@ -148,6 +193,9 @@ public record MxCurp
    ///   value that indicates if the <paramref name="curp"/> passed validation
    ///   or what validation error was encountered.
    /// </returns>
+   /// <remarks>
+   ///   Validation is case-insensitive.
+   /// </remarks>
    public static MxCurpValidationResult Validate(String curp)
    {
       if (String.IsNullOrWhiteSpace(curp))
@@ -202,14 +250,44 @@ public record MxCurp
    private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> curp)
    {
       ReadOnlySpan<Char> dateOfBirthSpan = GetSectionSpan(curp, CurpSection.DateOfBirth);
-      var isValid = DateTime.TryParseExact(
-         dateOfBirthSpan,
-         "yyMMdd",
-         null,
-         System.Globalization.DateTimeStyles.None,
-         out _);
 
-      return isValid;
+      foreach(var ch in dateOfBirthSpan)
+      {
+         if (!Char.IsAsciiDigit(ch))
+         {
+            return false;
+         }
+      }
+
+      var year = ((dateOfBirthSpan[0] - Chars.DigitZero) * 10) + (dateOfBirthSpan[1] - Chars.DigitZero);
+      var month = ((dateOfBirthSpan[2] - Chars.DigitZero) * 10) + (dateOfBirthSpan[3] - Chars.DigitZero);
+      var day = ((dateOfBirthSpan[4] - Chars.DigitZero) * 10) + (dateOfBirthSpan[5] - Chars.DigitZero);
+
+      if (month is < 1 or > 12)
+      {
+         return false;
+      }
+
+      var maxDaysInMonth = month switch
+      {
+         1 => 31,
+         // Leap year calculation. Non century year divisible by 4 OR century
+         // year divisible by 400. Since homoclave determines 1900's or 2000's,
+         // we can use the homoclave for the century year divisible by 400 check.
+         2 => ((year != 0 && year % 4 == 0) || (year == 0 && Char.IsAsciiLetter(curp[HomoclaveOffset]))) ? 29 : 28,
+         3 => 31,
+         4 => 30,
+         5 => 31,
+         6 => 30,
+         7 => 31,
+         8 => 31,
+         9 => 30,
+         10 => 31,
+         11 => 30,
+         12 => 31,
+         _ => throw new SwitchExpressionException()
+      };
+      return day >= 1 && day <= maxDaysInMonth;
    }
 
    private static Boolean ValidateGenderCode(ReadOnlySpan<Char> curp)
