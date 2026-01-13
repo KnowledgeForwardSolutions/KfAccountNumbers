@@ -1,5 +1,8 @@
 // Ignore Spelling: Luhn
 
+#pragma warning disable IDE0008 // Use explicit type
+#pragma warning disable IDE0058 // Expression value is never used
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.NorthAmerica;
 
 public class CaSocialInsuranceNumberTests
@@ -19,7 +22,7 @@ public class CaSocialInsuranceNumberTests
          var data = new TheoryData<String, Char>();
          foreach (var sin in sins)
          {
-            foreach(var ch in Enumerable.Range('0', 10).Select(i => (Char)i))
+            foreach (var ch in Enumerable.Range('0', 10).Select(i => (Char)i))
             {
                data.Add(sin, ch);
             }

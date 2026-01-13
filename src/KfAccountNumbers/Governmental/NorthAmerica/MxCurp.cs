@@ -136,6 +136,16 @@ public record MxCurp
    }
 
    /// <summary>
+   ///   Private constructor to support <see cref="Create(String)"/>
+   ///   method.
+   /// </summary>
+   /// <remarks>
+   ///   Boolean discard parameter is used to differentiate this constructor
+   ///   from the public constructor.
+   /// </remarks>
+   private MxCurp(String curp, Boolean _) => Value = curp.ToUpperInvariant();
+
+   /// <summary>
    ///   The person's date of birth, derived from the YYMMDD date of birth and 
    ///   homoclave elements of the CURP.
    /// </summary>
@@ -143,7 +153,10 @@ public record MxCurp
    ///   Homoclave values 0-9 indicate birth in the 1900-1999 century, homoclave 
    ///   values A-Z indicate birth in the 2000-2099 century.
    /// </remarks>
-   public DateOnly DateOfBirth => throw new NotImplementedException();
+   public DateOnly DateOfBirth => DateOnly.ParseExact(
+      (Char.IsAsciiDigit(Value[HomoclaveOffset]) ? "19" : "20") + GetSectionSpan(Value, CurpSection.DateOfBirth).ToString(),
+      "yyyyMMdd",
+      System.Globalization.CultureInfo.InvariantCulture);
 
    /// <summary>
    ///   The person's gender, as coded in the CURP.
@@ -151,12 +164,12 @@ public record MxCurp
    /// <remarks>
    ///   Gender will be H (Hombre/male), M (Mujer/female) or X (non-binary).
    /// </remarks>
-   public Char GenderCode => throw new NotImplementedException();
+   public Char GenderCode => Value[GenderOffset];
 
    /// <summary>
    ///   The person's state of birth as coded in the CURP.
    /// </summary>
-   public String StateCode => throw new NotImplementedException();
+   public String StateCode => GetSectionSpan(Value, CurpSection.StateCode).ToString();
 
    /// <summary>
    ///   The raw CURP value.
@@ -176,9 +189,27 @@ public record MxCurp
    /// </summary>
    public override String ToString() => Value;
 
-   public CreateResult<MxCurp, MxCurpValidationResult> Create(String curp)
+   /// <summary>
+   ///   Create a new <see cref="MxCurp"/>.
+   /// </summary>
+   /// <param name="curp">
+   ///   String representation of a CURP.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{MxCurp, MxCurpValidationResult}"/>.
+   ///   Will contain the new <see cref="MxCurpValidationResult"/> if 
+   ///   <paramref name="curp"/> is valid or 
+   ///   <see cref="MxCurpValidationResult"/> that identifies
+   ///   the validation rule that was failed if <paramref name="curp"/> is 
+   ///   invalid.
+   /// </returns>
+   public static CreateResult<MxCurp, MxCurpValidationResult> Create(String curp)
    {
-      throw new NotImplementedException();
+      MxCurpValidationResult validationResult = Validate(curp);
+      
+      return validationResult == MxCurpValidationResult.ValidationPassed
+         ? new MxCurp(curp, true)
+         : validationResult;
    }
 
    /// <summary>
@@ -303,13 +334,6 @@ public record MxCurp
          or Chars.LowerCaseH
          or Chars.LowerCaseM
          or Chars.LowerCaseX;
-   }
-
-   private static Boolean ValidateHomoclaveCharacter(ReadOnlySpan<Char> curp)
-   {
-      var c = curp[HomoclaveOffset];
-
-      return Char.IsAsciiLetterOrDigit(c);
    }
 
    private static Boolean ValidateNameCharacters(ReadOnlySpan<Char> curp)
