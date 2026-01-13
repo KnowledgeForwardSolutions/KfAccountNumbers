@@ -35,7 +35,8 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         </item>
 ///         <item>
 ///            <description>
-///               Has a valid date of birth in positions 4-9 (zero-based).
+///               Has a valid date of birth (formatted as YYMMDD) in positions 
+///               4-9 (zero-based). 
 ///            </description>
 ///         </item>
 ///         <item>
@@ -65,6 +66,34 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///               generate the check digit is not published and no validation
 ///               other than confirming it is a digit is performed.)
 ///            </description>
+///         </item>
+///      </list>
+///   </para>
+///   <para>
+///      Note that YYMMDD date of birth format presents some ambiguity for the
+///      century of birth. This has several impacts:
+///      <list type="bullet">
+///         <item>
+///            The <see cref="DateOfBirth"/> property uses the homoclave 
+///            character to infer the century of birth. In cases where the
+///            person was born before 1900 and assigned a CURP when first issued
+///            in 1996, the century will be incorrectly reported as 1900's. This
+///            was considered an acceptable limitation since there are no known
+///            cases of persons born before 1900 being still alive.
+///         </item>
+///         <item>
+///            The validation for leap year dates is impacted. Specifically, the
+///            value "000229" will be considered invalid if the homoclave is a
+///            digit (since 1900 was not a leap year) but valid if the homoclave 
+///            is a letter (since 2000 was a leap year).
+///         </item>
+///         <item>
+///            While not specifically connected to the YYMMDD date of birth 
+///            format, it should be noted that the date of birth validation does
+///            not attempt to check for future dates. So a CURP with a date of
+///            "991231" and an alphabetic homoclave character would be 
+///            considered valid, even though it would indicate a birth date of 
+///            December 31, 2099.
 ///         </item>
 ///      </list>
 ///   </para>
@@ -153,10 +182,17 @@ public record MxCurp
    ///   Homoclave values 0-9 indicate birth in the 1900-1999 century, homoclave 
    ///   values A-Z indicate birth in the 2000-2099 century.
    /// </remarks>
-   public DateOnly DateOfBirth => DateOnly.ParseExact(
-      (Char.IsAsciiDigit(Value[HomoclaveOffset]) ? "19" : "20") + GetSectionSpan(Value, CurpSection.DateOfBirth).ToString(),
-      "yyyyMMdd",
-      System.Globalization.CultureInfo.InvariantCulture);
+   public DateOnly DateOfBirth
+   {
+      get
+      {
+         ReadOnlySpan<Char> dateOfBirthSpan = GetSectionSpan(Value, CurpSection.DateOfBirth);
+         var (year, month, day) = GetYearMonthDay(dateOfBirthSpan);
+         year += Char.IsAsciiDigit(Value[HomoclaveOffset]) ? 1900 : 2000;
+
+         return new DateOnly(year, month, day);
+      }
+   }
 
    /// <summary>
    ///   The person's gender, as coded in the CURP.
@@ -293,9 +329,7 @@ public record MxCurp
          }
       }
 
-      var year = ((dateOfBirthSpan[0] - Chars.DigitZero) * 10) + (dateOfBirthSpan[1] - Chars.DigitZero);
-      var month = ((dateOfBirthSpan[2] - Chars.DigitZero) * 10) + (dateOfBirthSpan[3] - Chars.DigitZero);
-      var day = ((dateOfBirthSpan[4] - Chars.DigitZero) * 10) + (dateOfBirthSpan[5] - Chars.DigitZero);
+      var (year, month, day) = GetYearMonthDay(dateOfBirthSpan);
 
       if (month is < 1 or > 12)
       {
@@ -364,4 +398,10 @@ public record MxCurp
 
       return MxCurpStateCodes.ValidateStateCode(stateCode);
    }
+
+   private static (Int32, Int32, Int32) GetYearMonthDay(ReadOnlySpan<Char> dateOfBirthSpan)
+      => (((dateOfBirthSpan[0] - Chars.DigitZero) * 10) + (dateOfBirthSpan[1] - Chars.DigitZero),
+          ((dateOfBirthSpan[2] - Chars.DigitZero) * 10) + (dateOfBirthSpan[3] - Chars.DigitZero),
+          ((dateOfBirthSpan[4] - Chars.DigitZero) * 10) + (dateOfBirthSpan[5] - Chars.DigitZero));
+
 }

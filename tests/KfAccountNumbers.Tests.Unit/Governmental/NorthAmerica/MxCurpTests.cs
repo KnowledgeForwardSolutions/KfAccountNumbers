@@ -385,6 +385,57 @@ public class MxCurpTests
 
    #endregion
 
+   #region DateOfBirth Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData("000101", '0')]         // Jan 1, 1900 (digit homoclave)
+   [InlineData("991231", '0')]         // Dec 31, 1999
+   [InlineData("000101", 'A')]         // Jan 1, 2000 (letter homoclave)
+   [InlineData("991231", 'A')]         // Dec 31, 2099
+   [InlineData("040229", 'A')]         // Feb 29, 2004 (leap year)
+
+   [InlineData("010228", 'A')]         // Max day of month February (non leap year)
+   [InlineData("040229", '0')]         // Max day of month February (leap year)
+   [InlineData("000229", 'b')]         // Max day of month February (leap year because century divisible by 400)
+   public void MxCurp_DateOfBirth_ShouldReturnExpectedValue(
+      String dateOfBirth,
+      Char homoclave)
+   {
+      // Arrange.
+      var curp = GetCurp(dateOfBirth: dateOfBirth, homoclave: homoclave);
+      var expected = DateOnly.ParseExact(
+         (Char.IsAsciiDigit(homoclave) ? "19" : "20") + dateOfBirth,
+         "yyyyMMdd",
+         System.Globalization.CultureInfo.InvariantCulture);
+      var sut = new MxCurp(curp);
+
+      // Act/assert
+      sut.DateOfBirth.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region GenderCode Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidGenders))]
+   public void MxCurp_Gender_ShouldReturnExpectedValue(Char gender)
+   {
+      // Arrange.
+      var curp = GetCurp(gender: gender);
+      var expected = Char.ToUpperInvariant(gender);
+      var sut = new MxCurp(curp);
+
+      // Act/assert
+      sut.GenderCode.Should().Be(expected);
+   }
+
+   #endregion
+
    #region Implicit Operator Tests
    // ==========================================================================
    // ==========================================================================
