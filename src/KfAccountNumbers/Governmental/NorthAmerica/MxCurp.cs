@@ -251,7 +251,10 @@ public record MxCurp
    {
       ReadOnlySpan<Char> dateOfBirthSpan = GetSectionSpan(curp, CurpSection.DateOfBirth);
 
-      foreach(var ch in dateOfBirthSpan)
+      // Switching from DateTime.TryParseExact to manual validation resulted in
+      // a performance improvement from > 60ns to < 20ns per call in benchmark tests.
+
+      foreach (var ch in dateOfBirthSpan)
       {
          if (!Char.IsAsciiDigit(ch))
          {
