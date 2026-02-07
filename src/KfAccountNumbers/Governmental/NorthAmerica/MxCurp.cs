@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Curp Mx
+// Ignore Spelling: Curp Mx
 
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
@@ -314,6 +314,11 @@ public record MxCurp
          _ => throw new SwitchExpressionException(section)
       };
 
+   private static (Int32, Int32, Int32) GetYearMonthDay(ReadOnlySpan<Char> dateOfBirthSpan)
+      => (((dateOfBirthSpan[0] - Chars.DigitZero) * 10) + (dateOfBirthSpan[1] - Chars.DigitZero),
+         ((dateOfBirthSpan[2] - Chars.DigitZero) * 10) + (dateOfBirthSpan[3] - Chars.DigitZero),
+         ((dateOfBirthSpan[4] - Chars.DigitZero) * 10) + (dateOfBirthSpan[5] - Chars.DigitZero));
+
    private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> curp)
    {
       ReadOnlySpan<Char> dateOfBirthSpan = GetSectionSpan(curp, CurpSection.DateOfBirth);
@@ -398,10 +403,4 @@ public record MxCurp
 
       return MxCurpStateCodes.ValidateStateCode(stateCode);
    }
-
-   private static (Int32, Int32, Int32) GetYearMonthDay(ReadOnlySpan<Char> dateOfBirthSpan)
-      => (((dateOfBirthSpan[0] - Chars.DigitZero) * 10) + (dateOfBirthSpan[1] - Chars.DigitZero),
-          ((dateOfBirthSpan[2] - Chars.DigitZero) * 10) + (dateOfBirthSpan[3] - Chars.DigitZero),
-          ((dateOfBirthSpan[4] - Chars.DigitZero) * 10) + (dateOfBirthSpan[5] - Chars.DigitZero));
-
 }

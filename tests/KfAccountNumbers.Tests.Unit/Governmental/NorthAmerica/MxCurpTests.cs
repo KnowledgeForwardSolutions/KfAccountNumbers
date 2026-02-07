@@ -98,9 +98,11 @@ public class MxCurpTests
    [InlineData("040229", 'A')]         // Feb 29, 2004 (leap year)
 
    [InlineData("010131", '0')]         // Max day of month January
-   [InlineData("010228", 'A')]         // Max day of month February (non leap year)
-   [InlineData("040229", '0')]         // Max day of month February (leap year)
-   [InlineData("000229", 'b')]         // Max day of month February (leap year because century divisible by 400)
+   [InlineData("010228", '0')]         // Max day of month February (non leap year, 1900's)
+   [InlineData("010228", 'A')]         // Max day of month February (non leap year, 2000's)
+   [InlineData("040229", '0')]         // Max day of month February (leap year, 1900's)
+   [InlineData("040229", 'B')]         // Max day of month February (leap year, 2000's)
+   [InlineData("000229", 'b')]         // Max day of month February (leap year because homoclave indicates 2000, a century divisible by 400)
    [InlineData("010331", '0')]         // Max day of month March
    [InlineData("010430", 'A')]         // Max day of month April
    [InlineData("010531", 'b')]         // Max day of month May
@@ -262,9 +264,12 @@ public class MxCurpTests
    [InlineData("011301", 'A')]         // Invalid month (too high)
    [InlineData("010100", 'b')]         // Invalid day of month (too low)
    [InlineData("010132", '0')]         // Invalid day of month January
-   [InlineData("010229", 'A')]         // Invalid day of month February (non leap year)
-   [InlineData("040230", 'b')]         // Invalid day of month February (leap year)
-   [InlineData("000230", 'A')]         // Invalid day of month February (leap year because century divisible by 400)
+   [InlineData("010229", '0')]         // Invalid day of month February (non leap year, 1900's)
+   [InlineData("010229", 'A')]         // Invalid day of month February (non leap year, 2000's)
+   [InlineData("040230", '0')]         // Invalid day of month February (leap year, 1900's)
+   [InlineData("040230", 'b')]         // Invalid day of month February (leap year 2000's)
+   [InlineData("000229", '0')]         // Invalid day of month February (homoclave indicated 1900, not a leap year)
+   [InlineData("000230", 'A')]         // Invalid day of month February (leap year because homoclave indicates 2000, a century divisible by 400)
    [InlineData("010332", '0')]         // Invalid day of month March
    [InlineData("010431", 'A')]         // Invalid day of month April
    [InlineData("010532", 'b')]         // Invalid day of month May
@@ -523,9 +528,11 @@ public class MxCurpTests
    [InlineData("040229", 'A')]         // Feb 29, 2004 (leap year)
 
    [InlineData("010131", '0')]         // Max day of month January
-   [InlineData("010228", 'A')]         // Max day of month February (non leap year)
-   [InlineData("040229", '0')]         // Max day of month February (leap year)
-   [InlineData("000229", 'b')]         // Max day of month February (leap year because century divisible by 400)
+   [InlineData("010228", '0')]         // Max day of month February (non leap year, 1900's)
+   [InlineData("010228", 'A')]         // Max day of month February (non leap year, 2000's)
+   [InlineData("040229", '0')]         // Max day of month February (leap year, 1900's)
+   [InlineData("040229", 'B')]         // Max day of month February (leap year, 2000's)
+   [InlineData("000229", 'b')]         // Max day of month February (leap year because homoclave indicates 2000, a century divisible by 400)
    [InlineData("010331", '0')]         // Max day of month March
    [InlineData("010430", 'A')]         // Max day of month April
    [InlineData("010531", 'b')]         // Max day of month May
@@ -700,9 +707,12 @@ public class MxCurpTests
    [InlineData("011301", 'A')]         // Invalid month (too high)
    [InlineData("010100", 'b')]         // Invalid day of month (too low)
    [InlineData("010132", '0')]         // Invalid day of month January
-   [InlineData("010229", 'A')]         // Invalid day of month February (non leap year)
-   [InlineData("040230", 'b')]         // Invalid day of month February (leap year)
-   [InlineData("000230", 'A')]         // Invalid day of month February (leap year because century divisible by 400)
+   [InlineData("010229", '0')]         // Invalid day of month February (non leap year, 1900's)
+   [InlineData("010229", 'A')]         // Invalid day of month February (non leap year, 2000's)
+   [InlineData("040230", '0')]         // Invalid day of month February (leap year, 1900's)
+   [InlineData("040230", 'b')]         // Invalid day of month February (leap year 2000's)
+   [InlineData("000229", '0')]         // Invalid day of month February (homoclave indicated 1900, not a leap year)
+   [InlineData("000230", 'A')]         // Invalid day of month February (leap year because homoclave indicates 2000, a century divisible by 400)
    [InlineData("010332", '0')]         // Invalid day of month March
    [InlineData("010431", 'A')]         // Invalid day of month April
    [InlineData("010532", 'b')]         // Invalid day of month May
@@ -860,9 +870,11 @@ public class MxCurpTests
    [InlineData("040229", 'A')]         // Feb 29, 2004 (leap year)
 
    [InlineData("010131", '0')]         // Max day of month January
-   [InlineData("010228", 'A')]         // Max day of month February (non leap year)
-   [InlineData("040229", '0')]         // Max day of month February (leap year)
-   [InlineData("000229", 'b')]         // Max day of month February (leap year because century divisible by 400)
+   [InlineData("010228", '0')]         // Max day of month February (non leap year, 1900's)
+   [InlineData("010228", 'A')]         // Max day of month February (non leap year, 2000's)
+   [InlineData("040229", '0')]         // Max day of month February (leap year, 1900's)
+   [InlineData("040229", 'B')]         // Max day of month February (leap year, 2000's)
+   [InlineData("000229", 'b')]         // Max day of month February (leap year because homoclave indicates 2000, a century divisible by 400)
    [InlineData("010331", '0')]         // Max day of month March
    [InlineData("010430", 'A')]         // Max day of month April
    [InlineData("010531", 'b')]         // Max day of month May
@@ -1048,9 +1060,12 @@ public class MxCurpTests
    [InlineData("011301", 'A')]         // Invalid month (too high)
    [InlineData("010100", 'b')]         // Invalid day of month (too low)
    [InlineData("010132", '0')]         // Invalid day of month January
-   [InlineData("010229", 'A')]         // Invalid day of month February (non leap year)
-   [InlineData("040230", 'b')]         // Invalid day of month February (leap year)
-   [InlineData("000230", 'A')]         // Invalid day of month February (leap year because century divisible by 400)
+   [InlineData("010229", '0')]         // Invalid day of month February (non leap year, 1900's)
+   [InlineData("010229", 'A')]         // Invalid day of month February (non leap year, 2000's)
+   [InlineData("040230", '0')]         // Invalid day of month February (leap year, 1900's)
+   [InlineData("040230", 'b')]         // Invalid day of month February (leap year 2000's)
+   [InlineData("000229", '0')]         // Invalid day of month February (homoclave indicated 1900, not a leap year)
+   [InlineData("000230", 'A')]         // Invalid day of month February (leap year because homoclave indicates 2000, a century divisible by 400)
    [InlineData("010332", '0')]         // Invalid day of month March
    [InlineData("010431", 'A')]         // Invalid day of month April
    [InlineData("010532", 'b')]         // Invalid day of month May
@@ -1208,9 +1223,11 @@ public class MxCurpTests
    [InlineData("040229", 'A')]         // Feb 29, 2004 (leap year)
 
    [InlineData("010131", '0')]         // Max day of month January
-   [InlineData("010228", 'A')]         // Max day of month February (non leap year)
-   [InlineData("040229", '0')]         // Max day of month February (leap year)
-   [InlineData("000229", 'b')]         // Max day of month February (leap year because century divisible by 400)
+   [InlineData("010228", '0')]         // Max day of month February (non leap year, 1900's)
+   [InlineData("010228", 'A')]         // Max day of month February (non leap year, 2000's)
+   [InlineData("040229", '0')]         // Max day of month February (leap year, 1900's)
+   [InlineData("040229", 'B')]         // Max day of month February (leap year, 2000's)
+   [InlineData("000229", 'b')]         // Max day of month February (leap year because homoclave indicates 2000, a century divisible by 400)
    [InlineData("010331", '0')]         // Max day of month March
    [InlineData("010430", 'A')]         // Max day of month April
    [InlineData("010531", 'b')]         // Max day of month May
@@ -1331,9 +1348,12 @@ public class MxCurpTests
    [InlineData("011301", 'A')]         // Invalid month (too high)
    [InlineData("010100", 'b')]         // Invalid day of month (too low)
    [InlineData("010132", '0')]         // Invalid day of month January
-   [InlineData("010229", 'A')]         // Invalid day of month February (non leap year)
-   [InlineData("040230", 'b')]         // Invalid day of month February (leap year)
-   [InlineData("000230", 'A')]         // Invalid day of month February (leap year because century divisible by 400)
+   [InlineData("010229", '0')]         // Invalid day of month February (non leap year, 1900's)
+   [InlineData("010229", 'A')]         // Invalid day of month February (non leap year, 2000's)
+   [InlineData("040230", '0')]         // Invalid day of month February (leap year, 1900's)
+   [InlineData("040230", 'b')]         // Invalid day of month February (leap year 2000's)
+   [InlineData("000229", '0')]         // Invalid day of month February (homoclave indicated 1900, not a leap year)
+   [InlineData("000230", 'A')]         // Invalid day of month February (leap year because homoclave indicates 2000, a century divisible by 400)
    [InlineData("010332", '0')]         // Invalid day of month March
    [InlineData("010431", 'A')]         // Invalid day of month April
    [InlineData("010532", 'b')]         // Invalid day of month May
