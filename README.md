@@ -88,7 +88,9 @@ First, the date of birth property will return a DateTime value with a year in th
 homoclave values of 0-9 and a year in the range 2000-2099 for homoclave values of A-Z. Second, the
 date of birth value 000229 will be considered invalid for homoclave values of 0-9 (indicating a birth
 date of February 29, 1900) but valid for homoclave values of A-Z (indicating a birth date of
-February 29, 2000 because 1900 is not a leap year but 2000 is a leap year.
+February 29, 2000 because 1900 is not a leap year but 2000 is a leap year. Also note that date of
+birth validation does not check for future dates, so a CURP with a date of birth in the future could
+be considered valid if it meets all of the other validation rules.
 
 See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/Unique_Population_Registry_Code) and
 [Wikipedia - Clave Única de Registro de Población](https://es.wikipedia.org/wiki/Clave_%C3%9Anica_de_Registro_de_Poblaci%C3%B3n)for more info.

@@ -92,7 +92,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///            format, it should be noted that the date of birth validation does
 ///            not attempt to check for future dates. So a CURP with a date of
 ///            "991231" and an alphabetic homoclave character would be 
-///            considered valid, even though it would indicate a birth date of 
+///            considered valid, even though it would indicate a birthdate of 
 ///            December 31, 2099.
 ///         </item>
 ///      </list>
