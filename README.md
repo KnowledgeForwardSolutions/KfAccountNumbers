@@ -21,6 +21,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Europe (future)
 	- NorthAmerica
 		- [CaSocialInsuranceNumber](#casocialinsurancenumber) 
+		- [MxCurp](#mxcurp) 
 		- [UsSocialSecurityNumber](#ussocialsecuritynumber)
 	- South America
 * Utility
@@ -29,9 +30,13 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 
 ## CaSocialInsuranceNumber
 
-CaSocialInsuranceNumber represents a Canadian Social Insurance Number (SIN) issued by the Government of Canada.
+CaSocialInsuranceNumber represents a Canadian Social Insurance Number (SIN) issued by the Government
+of Canada.
 
-A Canadian SIN consists of 9 digits, typically formatted as AAA AAA AAA. The CaSocialInsuranceNumber constructor will accept either 9 character strings (all digits) or eleven character strings that include separator characters. The default separator character is space ('-'), though the default can be overridden by any non-digit character.
+A Canadian SIN consists of 9 digits, typically formatted as AAA AAA AAA. The CaSocialInsuranceNumber
+constructor will accept either 9 character strings (all digits) or eleven character strings that
+include separator characters. The default separator character is dash ('-'), though the default can
+be overridden by any non-digit character.
 
 Not all 9 digit numbers are valid SINs. A valid SIN must meet all of the following rules:
 
@@ -41,13 +46,69 @@ Not all 9 digit numbers are valid SINs. A valid SIN must meet all of the followi
 
 See [Wikipedia - Social Insurance Number](https://en.wikipedia.org/wiki/Social_Insurance_Number) for more info.
 
+## MxCurp
+
+MxCurp represents a Mexican Clave Única de Registro de Población (CURP) issued by the Government of Mexico,
+specifically the Registry Nacional de Poblacion (RENAPO).
+
+A Mexican CURP consists of 18 characters, in the form AAAADDDDDDGLLNNNHC (example: HEGG560427MVZRRL04,
+from Wikipedia), where
+
+* AAAA are four alphabetic characters (A-Z) derived from the person's surname(s) and given name.
+* DDDDDD is the person's date of birth in YYMMDD format.
+* G is the person's gender with H for hombre/male, M for mujer/female and X for non-binary.
+* LL is a two alphabetic character (A-Z) code for the person's state of birth or NE (nacido en el extranjero) for persons born abroad.
+* NNN are three alphabetic characters (A-Z) derived from the person's surname(s) and given name.
+* H is an alphanumeric (A-Z, 0-9) homoclave character issued by RENAPO to prevent duplicate CURP values.
+* C is a numeric (0-9) check digit calculated using the previous 17 characters.
+
+The homoclave character is a digit (0-9) for people born before 2000 and a letter (A-Z) for people born
+in 2000 or later. The algorithm used for the check digit is not published and the only validation
+performed on the check digit is to verify that it is a digit character.
+
+MxCurp has read-only properties for accessing the DateOfBirth, GenderCode and StateCode from the
+CURP string. 
+
+A valid CURP must meet all of the following rules:
+
+* Must consist of 18 characters
+* The first 4 characters must be alphabetic (A-Z)
+* Characters 5-10 must be a valid date in YYMMDD format
+* Character 11 must be H, M or X
+* Characters 12-13 must be a valid state code or NE (see [Appendix - MxCurp list of valid state codes](#mxcurp-list-of-valid-state-codes))
+* Characters 14-16 must be alphabetic (A-Z)
+* Character 17 must be alphanumeric (A-Z, 0-9)
+* Character 18 must be a digit (0-9)
+
+MxCurp is case-insensitive for validation and parsing purposes. The MxCurp constructor, Create
+method and implicit string to MxCurp operator will convert any lowercase letters to uppercase.
+
+Note that the homoclave value is used to determine the century of birth. This has two implications.
+First, the DateOfBirth property will return a DateOnly value with a year in the range 1900-1999 for
+homoclave values of 0-9 and a year in the range 2000-2099 for homoclave values of A-Z. Second, the
+date of birth value 000229 will be considered invalid for homoclave values of 0-9 (indicating a birth
+date of February 29, 1900) but valid for homoclave values of A-Z (indicating a birth date of
+February 29, 2000 because 1900 is not a leap year but 2000 is a leap year. Also note that date of
+birth validation does not check for future dates, so a CURP with a date of birth in the future could
+be considered valid if it meets all of the other validation rules.
+
+See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/Unique_Population_Registry_Code) and
+[Wikipedia - Clave Única de Registro de Población](https://es.wikipedia.org/wiki/Clave_%C3%9Anica_de_Registro_de_Poblaci%C3%B3n) for more info.
+
 ## UsSocialSecurityNumber
 
-UsSocialSecurityNumber represents a Social Security Number (SSN) issued by the US Social Security Administration.
+UsSocialSecurityNumber represents a Social Security Number (SSN) issued by the US Social Security
+Administration.
 
-A US SSN consists of 9 digits, arranged in three groups (AAA-GG-SSSS). The first three digits are the area number, the second two digits are the area number and the final four digits are the serial number. Originally, the area number was tied to a geographic region and the group number represented a sub-grouping within the area association to a geographic region was eliminated in 2011.
+A US SSN consists of 9 digits, arranged in three groups (AAA-GG-SSSS). The first three digits are the
+area number, the second two digits are the group number and the final four digits are the serial number.
+Originally, the area number was tied to a geographic region and the group number represented a
+sub-grouping within the area association to a geographic region was eliminated in 2011.
 
-SSNs are commonly formatted with dashes separating the three groups, though spaces are sometimes used. The UsSocialSecurityNumber constructor will accept either 9 character strings (all digits) or eleven character strings that include separator characters. The default separator character is dash ('-'), though the default can be overridden by any non-digit character.
+SSNs are commonly formatted with dashes separating the three groups, though spaces are sometimes used.
+The UsSocialSecurityNumber constructor will accept either 9 character strings (all digits) or eleven
+character strings that include separator characters. The default separator character is dash ('-'),
+though the default can be overridden by any non-digit character.
 
 Not all 9 digit numbers are valid SSNs. A valid SSN must meet all of the following rules:
 
@@ -58,8 +119,53 @@ Not all 9 digit numbers are valid SSNs. A valid SSN must meet all of the followi
 * The SSN must not be 9 identical digits (i.e. not 222-22-2222).
 * The SSN must not be a consecutive run of digits from 1 to 9 (i.e. not 123-45-6789).
 
-Note that meeting the above rules is not a guarantee that the value is considered a valid SSN issued by the Social Security Administration. Determining actual validity a SSN of requires use of the Social Security Number Verification Service offered by the Social Security Administration.
+Note that meeting the above rules is not a guarantee that the value is considered a valid SSN issued
+by the Social Security Administration. Determining actual validity a SSN of requires use of the
+Social Security Number Verification Service offered by the Social Security Administration.
 
-Note also that there are several actual SSNs that have been used in advertising campaigns or other publications and that have been rescinded by the Social Security Administration (Examples: 078-05-1120, used in 1930's era advertising campaign, 721-07-4426, 219-09-9999). KfAccountNumbers does not maintain a list of rescinded SSNs and will not detect a validation failure for those SSNs. 
+Note also that there are several actual SSNs that have been used in advertising campaigns or other
+publications and that have been rescinded by the Social Security Administration (Examples: 078-05-1120,
+used in 1930's era advertising campaign, 721-07-4426, 219-09-9999). KfAccountNumbers does not maintain
+a list of rescinded SSNs and will not detect a validation failure for those SSNs. 
 
 See [Wikipedia - Social Security Number](https://en.wikipedia.org/wiki/Social_Security_number) for more info.
+
+# Appendices
+
+## MxCurp list of valid state codes
+
+| State Code | State Name              |
+|------------|-------------------------|
+| AS         | Aguascalientes          |
+| BC         | Baja California         |
+| BS         | Baja California Sur     |
+| CC         | Campeche                |
+| CL         | Coahuila de Zaragoza    |
+| CM         | Colima                  |
+| CS         | Chiapas                 |
+| CH         | Chihuahua               |
+| DF         | Ciudad de México        |
+| DG         | Durango                 | 
+| GT         | Guanajuato              | 
+| GR         | Guerrero                | 
+| HG         | Hidalgo                 | 
+| JC         | Jalisco                 | 
+| MC         | México                  | 
+| MN         | Michoacán de Ocampo     | 
+| MS         | Morelos                 | 
+| NT         | Nayarit                 | 
+| NL         | Nuevo León              | 
+| OC         | Oaxaca                  | 
+| PL         | Puebla                  | 
+| QT         | Querétaro               | 
+| QR         | Quintana Roo            | 
+| SP         | San Luis Potosí         | 
+| SL         | Sinaloa                 | 
+| SR         | Sonora                  | 
+| TC         | Tabasco                 | 
+| TS         | Tamaulipas              | 
+| TL         | Tlaxcala                | 
+| VZ         | Veracruz                | 
+| YN         | Yucatán                 | 
+| ZS         | Zacatecas               | 
+| NE         | Nacido en el Extranjero | 

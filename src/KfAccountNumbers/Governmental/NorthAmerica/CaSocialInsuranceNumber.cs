@@ -92,7 +92,7 @@ public record CaSocialInsuranceNumber
    /// </exception>
    public CaSocialInsuranceNumber(String? sin, Char separator = DefaultSeparator)
    {
-      var validationResult = Validate(sin, separator);
+      CaSocialInsuranceNumberValidationResult validationResult = Validate(sin, separator);
       if (validationResult != CaSocialInsuranceNumberValidationResult.ValidationPassed)
       {
          throw new InvalidCaSocialInsuranceNumberException(validationResult);
@@ -148,7 +148,7 @@ public record CaSocialInsuranceNumber
       String? sin,
       Char separator = DefaultSeparator)
    {
-      var validationResult = Validate(sin, separator);
+      CaSocialInsuranceNumberValidationResult validationResult = Validate(sin, separator);
       return validationResult == CaSocialInsuranceNumberValidationResult.ValidationPassed
          ? new CaSocialInsuranceNumber(sin!, true)          // Note: invoking private ctor
          : validationResult;
@@ -216,7 +216,7 @@ public record CaSocialInsuranceNumber
       {
          return CaSocialInsuranceNumberValidationResult.Empty;
       }
-      else if (sin.Length != NonFormattedLength && sin.Length != FormattedLength)
+      else if (sin.Length is not NonFormattedLength and not FormattedLength)
       {
          return CaSocialInsuranceNumberValidationResult.InvalidLength;
       }
@@ -253,8 +253,8 @@ public record CaSocialInsuranceNumber
       var end = (section + 1) * 3;
       var formattedOffset = IsFormattedSin(source) ? section : 0;
 
-      var sourceSpan = source[(start + formattedOffset)..(end + formattedOffset)];
-      var targetSpan = target[start..end];
+      ReadOnlySpan<Char> sourceSpan = source[(start + formattedOffset)..(end + formattedOffset)];
+      Span<Char> targetSpan = target[start..end];
 
       sourceSpan.CopyTo(targetSpan);
    }
@@ -309,13 +309,13 @@ public record CaSocialInsuranceNumber
    }
 
    private static Boolean ValidateEmbeddedSeparatorCharacters(
-         ReadOnlySpan<Char> sin,
-         Char separator)
+      ReadOnlySpan<Char> sin,
+      Char separator)
       // If SIN is formatted, must contain valid separator character between sections.
       => sin.Length == NonFormattedLength || (sin[FirstSeparatorOffset] == separator && sin[SecondSeparatorOffset] == separator);
 
    private static Boolean ValidateProvince(ReadOnlySpan<Char> sin)
-      => sin[0] != Chars.DigitZero && sin[0] != Chars.DigitEight;
+      => sin[0] is not Chars.DigitZero and not Chars.DigitEight;
 
    // A separator character may be any character except ASCII digits (which are
    // valid SIN characters).

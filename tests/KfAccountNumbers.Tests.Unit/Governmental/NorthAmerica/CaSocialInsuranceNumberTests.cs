@@ -1,4 +1,7 @@
-﻿// Ignore Spelling: Luhn
+// Ignore Spelling: Luhn
+
+#pragma warning disable IDE0008 // Use explicit type
+#pragma warning disable IDE0058 // Expression value is never used
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.NorthAmerica;
 
@@ -19,7 +22,7 @@ public class CaSocialInsuranceNumberTests
          var data = new TheoryData<String, Char>();
          foreach (var sin in sins)
          {
-            foreach(var ch in Enumerable.Range('0', 10).Select(i => (Char)i))
+            foreach (var ch in Enumerable.Range('0', 10).Select(i => (Char)i))
             {
                data.Add(sin, ch);
             }
@@ -383,7 +386,7 @@ public class CaSocialInsuranceNumberTests
    [Theory]
    [InlineData(ValidNineCharSin)]
    [InlineData(ValidElevenCharSin)]
-   public void CaSocialInsuranceNumber_ImplicitUsSinToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull(String sin)
+   public void CaSocialInsuranceNumber_ImplicitCaSinToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull(String sin)
    {
       // Arrange.
       var expected = sin.Length == 9 ? sin : sin.Replace(DefaultSeparator.ToString(), String.Empty);
@@ -400,7 +403,7 @@ public class CaSocialInsuranceNumberTests
    [Theory]
    [InlineData(ValidNineCharSin)]
    [InlineData(ValidElevenCharSin)]
-   public void CaSocialInsuranceNumber_CastUsSinToString_ShouldReturnExpectedValue_WhenValueIsNotNull(String sin)
+   public void CaSocialInsuranceNumber_CastCaSinToString_ShouldReturnExpectedValue_WhenValueIsNotNull(String sin)
    {
       // Arrange.
       var expected = sin.Length == 9 ? sin : sin.Replace(DefaultSeparator.ToString(), String.Empty);
@@ -415,7 +418,7 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Fact]
-   public void CaSocialInsuranceNumber_ImplicitUsSinToStringConversion_ShouldThrowArgumentNullException_WhenValueIsNull()
+   public void CaSocialInsuranceNumber_ImplicitCaSinToStringConversion_ShouldThrowArgumentNullException_WhenValueIsNull()
    {
       // Arrange.
       CaSocialInsuranceNumber sin = null!;
@@ -430,7 +433,7 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Fact]
-   public void CaSocialInsuranceNumber_CastUsSinToString_ShouldThrowArgumentNullException_WhenValueIsNull()
+   public void CaSocialInsuranceNumber_CastCaSinToString_ShouldThrowArgumentNullException_WhenValueIsNull()
    {
       // Arrange.
       CaSocialInsuranceNumber sin = null!;
@@ -446,13 +449,13 @@ public class CaSocialInsuranceNumberTests
    [Theory]
    [InlineData(ValidNineCharSin)]
    [InlineData(ValidElevenCharSin)]
-   public void CaSocialInsuranceNumber_ImplicitStringToUsSinConversion_ShouldCreateObject_WhenValueContainsValidSin(String sin)
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldCreateObject_WhenValueContainsValidSin(String sin)
    {
       // Arrange.
       var expected = sin.Length == 9 ? sin : sin.Replace(DefaultSeparator.ToString(), String.Empty);
 
       // Act.
-      var sut = new CaSocialInsuranceNumber(sin);
+      CaSocialInsuranceNumber sut = sin;
 
       // Assert.
       sut.Should().NotBeNull();
@@ -463,7 +466,7 @@ public class CaSocialInsuranceNumberTests
    [InlineData(null)]
    [InlineData("")]
    [InlineData("\t")]
-   public void CaSocialInsuranceNumber_ImplicitStringToUsSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueIsEmpty(String? str)
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueIsEmpty(String? str)
    {
       // Arrange.
       CaSocialInsuranceNumber sut;
@@ -481,7 +484,7 @@ public class CaSocialInsuranceNumberTests
    [InlineData("55819942")]
    [InlineData("5581994288")]
    [InlineData("558-199-4288")]
-   public void CaSocialInsuranceNumber_ImplicitStringToUsSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLength(String? str)
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLength(String? str)
    {
       // Arrange.
       CaSocialInsuranceNumber sut;
@@ -498,7 +501,7 @@ public class CaSocialInsuranceNumberTests
    [Theory]
    [InlineData("046 454-286")]
    [InlineData("046-454 286")]
-   public void CaSocialInsuranceNumber_ImplicitStringToUsSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_When11CharacterValueContainsAnInvalidSeparator(String str)
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_When11CharacterValueContainsAnInvalidSeparator(String str)
    {
       // Arrange.
       CaSocialInsuranceNumber sut;
@@ -539,7 +542,7 @@ public class CaSocialInsuranceNumberTests
    [InlineData("0\u21536-454-286")]      // Unicode fraction 1/3
    [InlineData("0\u21676-454-286")]      // Unicode Roman numeral VII
    [InlineData("0\u0BEF6-454-286")]      // Unicode Tamil number 9
-   public void CaSocialInsuranceNumber_ImplicitStringToUsSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueContainsNonAsciiDigit(String str)
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueContainsNonAsciiDigit(String str)
    {
       // Arrange.
       CaSocialInsuranceNumber sut;
@@ -558,7 +561,7 @@ public class CaSocialInsuranceNumberTests
    [InlineData("876543216")]
    [InlineData("012-345-674")]
    [InlineData("876-543-216")]
-   public void CaSocialInsuranceNumber_ImplicitStringToUsSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLeadingDigit(String str)
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLeadingDigit(String str)
    {
       // Arrange.
       CaSocialInsuranceNumber sut;
@@ -585,7 +588,7 @@ public class CaSocialInsuranceNumberTests
    [InlineData("107-700-007")]   // 104400007 with two digit twin error 44 -> 77
    [InlineData("103-300-000")]   // 106600000 with two digit twin error 66 -> 33
    [InlineData("558-199-428")]   // 558199428 with two digit jump transposition 994 -> 499
-   public void CaSocialInsuranceNumber_ImplicitStringToUsSinConversion_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String str)
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String str)
    {
       // Arrange.
       var expected = str.Length == 9 ? str : str.Replace(DefaultSeparator.ToString(), String.Empty);
@@ -612,7 +615,7 @@ public class CaSocialInsuranceNumberTests
    [InlineData("558-199-248")]   // 558199428 with two digit transcription error -> 42 -> 24
    [InlineData("448-199-428")]   // 558199428 with two digit twin error 55 -> 44
    [InlineData("558-188-428")]   // 558199428 with two digit twin error 99 -> 88
-   public void CaSocialInsuranceNumber_ImplicitStringToUsSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenCheckDigitContainsDetectableError(String str)
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenCheckDigitContainsDetectableError(String str)
    {
       // Arrange.
       CaSocialInsuranceNumber sut;
@@ -629,7 +632,7 @@ public class CaSocialInsuranceNumberTests
    [Theory]
    [InlineData("123456790")]
    [InlineData("123-456-790")]
-   public void CaSocialInsuranceNumber_ImplicitStringToUsSinConversion_ShouldCreateObject_WhenCheckDigitCalculatesAsZero(String str)
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldCreateObject_WhenCheckDigitCalculatesAsZero(String str)
    {
       // Arrange.
       var expected = str.Length == 9 ? str : str.Replace(DefaultSeparator.ToString(), String.Empty);
