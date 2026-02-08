@@ -42,6 +42,39 @@ public record struct UsNationalProviderIdentifier
    private const Int32 ValidLength = 10;
 
    /// <summary>
+   ///   Initialize a new <see cref="UsNationalProviderIdentifier"/>.
+   /// </summary>
+   /// <param name="npi">
+   ///   The string representation of a US National Provider Identifier.
+   /// </param>
+   /// <exception cref="InvalidUsNationalProviderIdentifierException">
+   ///   <paramref name="npi"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="npi"/> does not have length of 10.
+   ///   - or -
+   ///   <paramref name="npi"/> contains a non-ASCII digit (not 0-9).
+   ///   - or -
+   ///   <paramref name="npi"/> fails the Luhn check digit validation (after
+   ///   prefixing with "80840").
+   /// </exception>
+   public UsNationalProviderIdentifier(String? npi)
+   {
+      UsNationalProviderIdentifierValidationResult validationResult = Validate(npi);
+      if (validationResult is not UsNationalProviderIdentifierValidationResult.ValidationPassed)
+      {
+         throw new InvalidUsNationalProviderIdentifierException(validationResult);
+      }
+
+      Value = npi!;
+   }
+
+   /// <summary>
+   ///   The raw NPI value.
+   /// </summary>
+   public String Value { get; init; }
+
+   /// <summary>
    ///   Check the <paramref name="npi"/> to determine if it contains any 
    ///   validation errors.
    /// </summary>
