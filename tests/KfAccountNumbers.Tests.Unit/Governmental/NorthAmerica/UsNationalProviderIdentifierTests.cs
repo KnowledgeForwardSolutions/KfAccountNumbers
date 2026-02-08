@@ -1,6 +1,7 @@
 // Ignore Spelling: npi
 
 #pragma warning disable IDE0008 // Use explicit type
+#pragma warning disable IDE0058 // Expression value is never used
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.NorthAmerica;
 
@@ -9,21 +10,21 @@ public class UsNationalProviderIdentifierTests
    private const String _validNpi = "1245319599";        // Example from www.hippaspace.com
    private const String _altValidNpi = "1234567893";     // Example from Wikipedia article on Luhn algorithm
 
-   public static TheoryData<String> EmptyNpiValues => new()
-   {
+   public static TheoryData<String> EmptyNpiValues =>
+   [
       null!,
       String.Empty,
       "\t"
-   };
+   ];
 
-   public static TheoryData<String> InvalidLengthValues => new()
-   {
+   public static TheoryData<String> InvalidLengthValues =>
+   [
       "124531959",
       "12453195999"
-   };
+   ];
 
-   public static TheoryData<String> InvalidCharacterValues => new()
-   {
+   public static TheoryData<String> InvalidCharacterValues =>
+   [
       "A245319599",
       "1A45319599",
       "12A5319599",
@@ -38,23 +39,23 @@ public class UsNationalProviderIdentifierTests
       "1\u215345319599",      // Unicode fraction 1/3
       "1\u216745319599",      // Unicode Roman numeral VII
       "1\u0BEF45319599",      // Unicode Tamil number 9
-   };
+   ];
 
-   public static TheoryData<String> CheckDigitUndetectableErrorValues => new()
-   {
+   public static TheoryData<String> CheckDigitUndetectableErrorValues =>
+   [
       "1234569071",           // Valid NPI 1234560971 with two digit transposition 09 -> 90
       "1230967899",           // Valid NPI 1239067899 with two digit transposition 90 -> 09
       "1122334497",           // Valid NPI 1122334497 with two digit twin error 22 -> 55
       "1122337797",           // Valid NPI 1122334497 with two digit twin error 44 -> 77
       "1122664497",           // Valid NPI 1122334497 with two digit twin error 33 -> 66
-   };
+   ];
 
-   public static TheoryData<String> CheckDigitDetectableErrorValues => new()
-   {
+   public static TheoryData<String> CheckDigitDetectableErrorValues =>
+   [
       "1238560971",           // Valid NPI 1234560971 with single digit transcription error 4 -> 8
       "1243560971",           // Valid NPI 1234560971 with two digit transposition error 34 -> 43
       "4422334497",           // Valid NPI 1122334497 with two digit twin error 11 -> 44
-   };
+   ];
 
    #region Constructor Tests
    // ==========================================================================
@@ -136,7 +137,7 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_ImplicitUsNpiToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var npi = _validNpi; 
+      var npi = _validNpi;
       var sut = new UsNationalProviderIdentifier(npi);
 
       // Act.
@@ -166,7 +167,7 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_ImplicitUsNpiToStringConversion_ShouldThrowArgumentNullException_WhenValueIsDefault()
    {
       // Arrange.
-      UsNationalProviderIdentifier npi = default;
+      UsNationalProviderIdentifier npi = null!;
       String str;
 
       // Act/assert.
@@ -174,21 +175,21 @@ public class UsNationalProviderIdentifierTests
          .Invoking(() => str = npi)
          .Should().ThrowExactly<ArgumentNullException>()
          .WithParameterName(nameof(npi))
-         .WithMessage(Messages.UsNationalProviderIdentifierInvalidDefaultConversionToString + "*");
+         .WithMessage(Messages.UsNationalProviderIdentifierInvalidNullConversionToString + "*");
    }
 
    [Fact]
-   public void UsNationalProviderIdentifier_CastUsNpiToString_ShouldThrowArgumentNullException_WhenValueIsDefault()
+   public void UsNationalProviderIdentifier_CastUsNpiToString_ShouldThrowArgumentNullException_WhenValueIsNull()
    {
       // Arrange.
-      UsNationalProviderIdentifier npi = default;
+      UsNationalProviderIdentifier npi = null!;
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (String)npi)
          .Should().ThrowExactly<ArgumentNullException>()
          .WithParameterName(nameof(npi))
-         .WithMessage(Messages.UsNationalProviderIdentifierInvalidDefaultConversionToString + "*");
+         .WithMessage(Messages.UsNationalProviderIdentifierInvalidNullConversionToString + "*");
    }
 
    [Fact]

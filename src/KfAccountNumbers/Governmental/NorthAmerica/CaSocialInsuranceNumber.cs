@@ -308,10 +308,10 @@ public record CaSocialInsuranceNumber
       return true;
    }
 
+   // If SIN is formatted, must contain valid separator character between sections.
    private static Boolean ValidateEmbeddedSeparatorCharacters(
       ReadOnlySpan<Char> sin,
       Char separator)
-      // If SIN is formatted, must contain valid separator character between sections.
       => sin.Length == NonFormattedLength || (sin[FirstSeparatorOffset] == separator && sin[SecondSeparatorOffset] == separator);
 
    private static Boolean ValidateProvince(ReadOnlySpan<Char> sin)

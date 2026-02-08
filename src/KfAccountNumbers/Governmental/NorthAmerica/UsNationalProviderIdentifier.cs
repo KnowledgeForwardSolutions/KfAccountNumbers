@@ -37,7 +37,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///      </list>
 ///   </para>
 /// </remarks>
-public record struct UsNationalProviderIdentifier
+public record UsNationalProviderIdentifier
 {
    private const Int32 ValidLength = 10;
 
@@ -61,7 +61,7 @@ public record struct UsNationalProviderIdentifier
    public UsNationalProviderIdentifier(String? npi)
    {
       UsNationalProviderIdentifierValidationResult validationResult = Validate(npi);
-      if (validationResult is not UsNationalProviderIdentifierValidationResult.ValidationPassed)
+      if (validationResult != UsNationalProviderIdentifierValidationResult.ValidationPassed)
       {
          throw new InvalidUsNationalProviderIdentifierException(validationResult);
       }
@@ -69,9 +69,15 @@ public record struct UsNationalProviderIdentifier
       Value = npi!;
    }
 
+   // Prevent the default parameterless constructor from being used to create an invalid instance.
+   // This also forces the use of the public constructor that performs validation.
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+   private UsNationalProviderIdentifier() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+
    /// <summary>
-   ///   Private constructor to support <see cref="Create(String?)"/>
-   ///   method.
+   ///   Private constructor to support <see cref="Create(String?)"/> method not
+   ///   performing validation again on a value that has already been validated.
    /// </summary>
    /// <remarks>
    ///   Boolean discard parameter is used to differentiate this constructor
@@ -82,10 +88,10 @@ public record struct UsNationalProviderIdentifier
    /// <summary>
    ///   The raw NPI value.
    /// </summary>
-   public String Value { get; init; }
+   public String Value { get; private init; }
 
    public static implicit operator String(UsNationalProviderIdentifier npi)
-      => npi.Value ?? throw new ArgumentNullException(nameof(npi), Messages.UsNationalProviderIdentifierInvalidDefaultConversionToString);
+      => npi?.Value ?? throw new ArgumentNullException(nameof(npi), Messages.UsNationalProviderIdentifierInvalidNullConversionToString);
 
    public static implicit operator UsNationalProviderIdentifier(String? npi) => new(npi);
 
@@ -105,11 +111,13 @@ public record struct UsNationalProviderIdentifier
    /// </returns>
    public static CreateResult<UsNationalProviderIdentifier, UsNationalProviderIdentifierValidationResult> Create(
       String? npi)
-      => Validate(npi) switch
-      {
-         UsNationalProviderIdentifierValidationResult.ValidationPassed => new UsNationalProviderIdentifier(npi!, true), // Note: invoking private ctor
-         var validationResult => validationResult
-      };
+   {
+      UsNationalProviderIdentifierValidationResult validationResult = Validate(npi);
+
+      return validationResult is UsNationalProviderIdentifierValidationResult.ValidationPassed
+         ? new UsNationalProviderIdentifier(npi!, true)     // Note: invoking private ctor
+         : validationResult;
+   }
 
    /// <summary>
    ///   Get a string representation of the NPI.
@@ -128,7 +136,7 @@ public record struct UsNationalProviderIdentifier
    ///   value that indicates if the <paramref name="npi"/> passed validation
    ///   or what validation error was encountered.
    /// </returns>
-   public static UsNationalProviderIdentifierValidationResult Validate (String? npi)
+   public static UsNationalProviderIdentifierValidationResult Validate(String? npi)
    {
 
       // Basic checks for empty/null and length and formatting.
@@ -142,14 +150,17 @@ public record struct UsNationalProviderIdentifier
       }
 
       // Validate the check digit (and by extension, that all characters are digits).
-      if (!Algorithms.Npi.Validate(npi))
+      if (Algorithms.Npi.Validate(npi))
       {
-         return ValidateDigits(npi)
-            ? UsNationalProviderIdentifierValidationResult.InvalidCheckDigit
-            : UsNationalProviderIdentifierValidationResult.InvalidCharacterEncountered;
+         return UsNationalProviderIdentifierValidationResult.ValidationPassed;
       }
 
-      return UsNationalProviderIdentifierValidationResult.ValidationPassed;
+      // Invalid check digit could be due to either an invalid character or an incorrect
+      // check digit. Check if all characters are digits to determine which validation
+      // error to return.
+      return ValidateDigits(npi)
+            ? UsNationalProviderIdentifierValidationResult.InvalidCheckDigit
+            : UsNationalProviderIdentifierValidationResult.InvalidCharacterEncountered;
    }
 
    private static Boolean ValidateDigits(String npi)

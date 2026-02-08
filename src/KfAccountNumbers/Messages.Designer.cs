@@ -259,11 +259,11 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Default/uninitialized UsNationalProviderIdentifier can not be converted to String.
+        ///   Looks up a localized string similar to Null UsNationalProviderIdentifier can not be converted to String.
         /// </summary>
-        internal static string UsNationalProviderIdentifierInvalidDefaultConversionToString {
+        internal static string UsNationalProviderIdentifierInvalidNullConversionToString {
             get {
-                return ResourceManager.GetString("UsNationalProviderIdentifierInvalidDefaultConversionToString", resourceCulture);
+                return ResourceManager.GetString("UsNationalProviderIdentifierInvalidNullConversionToString", resourceCulture);
             }
         }
         
