@@ -35,7 +35,7 @@ The National Provider Identifier (NPI) is a 10-digit numeric identifier used to 
   - Constructor with validation **or**
   - Static factory method (e.g., `Npi.Create(string value)`)
 - Validation errors should provide meaningful feedback
-- NPI Luhn checkdigit validation via **CheckDigits.Net*
+- NPI Luhn checkdigit validation via **CheckDigits.Net**
 - Override:
   - `Equals`
   - `GetHashCode`

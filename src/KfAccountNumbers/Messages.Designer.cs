@@ -187,7 +187,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MX CURP must requires alphabetic characters in positions 0-3 and 13-15 (zero-based).
+        ///   Looks up a localized string similar to MX CURP requires alphabetic characters in positions 0-3 and 13-15 (zero-based).
         /// </summary>
         internal static string MxCurpInvalidAlphabeticCharacterEncountered {
             get {

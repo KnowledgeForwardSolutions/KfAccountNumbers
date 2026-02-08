@@ -1,4 +1,4 @@
-﻿namespace KfAccountNumbers.Governmental.NorthAmerica;
+namespace KfAccountNumbers.Governmental.NorthAmerica;
 
 /// <summary>
 ///   Collection of state codes (claves de entidades federativas) used in a
@@ -45,8 +45,6 @@ public static class MxCurpStateCodes
          { "YN", "Yucatán" }, 
          { "ZS", "Zacatecas" }, 
          { "NE", "Nacido en el Extranjero" }, 
-
-
       }
       .GetAlternateLookup<ReadOnlySpan<Char>>();
 

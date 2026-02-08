@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Curp Mx
+// Ignore Spelling: Curp Mx
 
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
@@ -20,7 +20,7 @@ public enum MxCurpValidationResult
    Empty,
 
    /// <summary>
-   ///   CURP value has incorrect length. Must be either 18 characters in length.
+   ///   CURP value has incorrect length. Must be 18 characters in length.
    /// </summary>
    InvalidLength,
 
@@ -33,7 +33,7 @@ public enum MxCurpValidationResult
 
    /// <summary>
    ///   Character positions 4-9 (zero-based) are not a valid 6 digit date of 
-   ///   birth (YYYYMMDD).
+   ///   birth (YYMMDD).
    /// </summary>
    InvalidDateOfBirth,
 
@@ -50,13 +50,13 @@ public enum MxCurpValidationResult
 
    /// <summary>
    ///   Character position 16 (zero-based) is not a valid homoclave character. 
-   ///   Homeclave characters are alphanumeric characters (A-Z, 0-9) issued by 
+   ///   Homoclave characters are alphanumeric characters (A-Z, 0-9) issued by 
    ///   RENAPO (Registro Nacional de Población) to avoid duplicate CURP values.
    /// </summary>
    InvalidHomoclave,
    /// <summary>
    ///   Character position 17 (zero-based) is not a valid check digit character. 
-   ///   The check digit algorithn used for CURP is not published by RENAPO, but 
+   ///   The check digit algorithm used for CURP is not published by RENAPO, but 
    ///   it is known that it is a single digit character (0-9).
    /// </summary>
    InvalidCheckDigit

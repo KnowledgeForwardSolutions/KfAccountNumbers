@@ -9,7 +9,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 /// <remarks>
 ///   <para>
 ///      A valid CURP is an 18-character alphanumeric identifier assigned to 
-///      Mexican citizens by the Registry Nacional de Poblacion (RENAPO). 
+///      Mexican citizens by the Registro Nacional de Población (RENAPO). 
 ///      Portions of the string are generated from a person's personal 
 ///      information and the two trailing characters are assigned by RENAPO. 
 ///   </para>
@@ -153,7 +153,7 @@ public record MxCurp
    ///   <paramref name="curp"/> contains a non-digit check digit character in
    ///   position 17 (zero-based).
    /// </exception>
-   public MxCurp(String curp)
+   public MxCurp(String? curp)
    {
       MxCurpValidationResult validationResult = Validate(curp);
       if (validationResult != MxCurpValidationResult.ValidationPassed)
@@ -263,7 +263,7 @@ public record MxCurp
    /// <remarks>
    ///   Validation is case-insensitive.
    /// </remarks>
-   public static MxCurpValidationResult Validate(String curp)
+   public static MxCurpValidationResult Validate(String? curp)
    {
       if (String.IsNullOrWhiteSpace(curp))
       {
@@ -277,6 +277,12 @@ public record MxCurp
       {
          return MxCurpValidationResult.InvalidAlphabeticCharacterEncountered;
       }
+      else if (!Char.IsAsciiLetterOrDigit(curp[HomoclaveOffset]))
+      {
+         // Check moved prior to date of birth validation since homoclave is used to determine
+         // the century for leap year date of birth validation.
+         return MxCurpValidationResult.InvalidHomoclave;
+      }
       else if (!ValidateDateOfBirth(curp))
       {
          return MxCurpValidationResult.InvalidDateOfBirth;
@@ -288,10 +294,6 @@ public record MxCurp
       else if (!ValidateStateCode(curp))
       {
          return MxCurpValidationResult.InvalidState;
-      }
-      else if (!Char.IsAsciiLetterOrDigit(curp[HomoclaveOffset]))
-      {
-         return MxCurpValidationResult.InvalidHomoclave;
       }
       else if (!Char.IsAsciiDigit(curp[CheckDigitOffset]))
       {

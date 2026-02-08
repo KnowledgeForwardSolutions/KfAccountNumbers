@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -199,7 +199,7 @@
     <value>MX CURP must have length 18</value>
   </data>
   <data name="MxCurpInvalidAlphabeticCharacterEncountered" xml:space="preserve">
-    <value>MX CURP must requires alphabetic characters in positions 0-3 and 13-15 (zero-based)</value>
+    <value>MX CURP requires alphabetic characters in positions 0-3 and 13-15 (zero-based)</value>
   </data>
   <data name="MxCurpInvalidDateOfBirth" xml:space="preserve">
     <value>MX CURP requires valid six digit date of birth (YYMMDD) in character positions 4-9 (zero-based)</value>

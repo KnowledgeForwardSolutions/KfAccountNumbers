@@ -54,11 +54,11 @@ specifically the Registry Nacional de Poblacion (RENAPO).
 A Mexican CURP consists of 18 characters, in the form AAAADDDDDDGLLNNNHC (example: HEGG560427MVZRRL04,
 from Wikipedia), where
 
-* AAAA are four alphabetic characters (A-Z) derived from the persons surname(s) and given name.
+* AAAA are four alphabetic characters (A-Z) derived from the person's surname(s) and given name.
 * DDDDDD is the person's date of birth in YYMMDD format.
 * G is the person's gender with H for hombre/male, M for mujer/female and X for non-binary.
 * LL is a two alphabetic character (A-Z) code for the person's state of birth or NE (nacido en el extranjero) for persons born abroad.
-* NNN are three alphabetic characters (A-Z) derived from the persons surname(s) and given name.
+* NNN are three alphabetic characters (A-Z) derived from the person's surname(s) and given name.
 * H is an alphanumeric (A-Z, 0-9) homoclave character issued by RENAPO to prevent duplicate CURP values.
 * C is a numeric (0-9) check digit calculated using the previous 17 characters.
 
@@ -80,11 +80,11 @@ A valid CURP must meet all of the following rules:
 * Character 17 must be alphanumeric (A-Z, 0-9)
 * Character 18 must be a digit (0-9)
 
-MxCurp is case-insensitive for validation and parsing purposes. The MxCurp constructor, Convert
+MxCurp is case-insensitive for validation and parsing purposes. The MxCurp constructor, Create
 method and implicit string to MxCurp operator will convert any lowercase letters to uppercase.
 
 Note that the homoclave value is used to determine the century of birth. This has two implications.
-First, the date of birth property will return a DateTime value with a year in the range 1900-1999 for
+First, the DateOfBirth property will return a DateOnly value with a year in the range 1900-1999 for
 homoclave values of 0-9 and a year in the range 2000-2099 for homoclave values of A-Z. Second, the
 date of birth value 000229 will be considered invalid for homoclave values of 0-9 (indicating a birth
 date of February 29, 1900) but valid for homoclave values of A-Z (indicating a birth date of
@@ -93,7 +93,7 @@ birth validation does not check for future dates, so a CURP with a date of birth
 be considered valid if it meets all of the other validation rules.
 
 See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/Unique_Population_Registry_Code) and
-[Wikipedia - Clave Única de Registro de Población](https://es.wikipedia.org/wiki/Clave_%C3%9Anica_de_Registro_de_Poblaci%C3%B3n)for more info.
+[Wikipedia - Clave Única de Registro de Población](https://es.wikipedia.org/wiki/Clave_%C3%9Anica_de_Registro_de_Poblaci%C3%B3n) for more info.
 
 ## UsSocialSecurityNumber
 
@@ -134,38 +134,38 @@ See [Wikipedia - Social Security Number](https://en.wikipedia.org/wiki/Social_Se
 
 ## MxCurp list of valid state codes
 
-| State Code | State Name            |
-|------------|-----------------------|
-| AS         |Aguascalientes         |
-| BC         |Baja California        |
-| BS         |Baja California Sur    |
-| CC         |Campeche               |
-| CL         |Coahuila de Zaragoza   |
-| CM         |Colima                 |
-| CS         |Chiapas                |
-| CH         |Chihuahua              |
-| DF         |Ciudad de México       |
-| DG         |Durango                | 
-| GT         |Guanajuato             | 
-| GR         |Guerrero               | 
-| HG         |Hidalgo                | 
-| JC         |Jalisco                | 
-| MC         |México                 | 
-| MN         |Michoacán de Ocampo    | 
-| MS         |Morelos                | 
-| NT         |Nayarit                | 
-| NL         |Nuevo León             | 
-| OC         |Oaxaca                 | 
-| PL         |Puebla                 | 
-| QT         |Querétaro              | 
-| QR         |Quintana Roo           | 
-| SP         |San Luis Potosí        | 
-| SL         |Sinaloa                | 
-| SR         |Sonora                 | 
-| TC         |Tabasco                | 
-| TS         |Tamaulipas             | 
-| TL         |Tlaxcala               | 
-| VZ         |Veracruz               | 
-| YN         |Yucatán                | 
-| ZS         |Zacatecas              | 
-| NE         |Nacido en el Extranjero| 
+| State Code | State Name              |
+|------------|-------------------------|
+| AS         | Aguascalientes          |
+| BC         | Baja California         |
+| BS         | Baja California Sur     |
+| CC         | Campeche                |
+| CL         | Coahuila de Zaragoza    |
+| CM         | Colima                  |
+| CS         | Chiapas                 |
+| CH         | Chihuahua               |
+| DF         | Ciudad de México        |
+| DG         | Durango                 | 
+| GT         | Guanajuato              | 
+| GR         | Guerrero                | 
+| HG         | Hidalgo                 | 
+| JC         | Jalisco                 | 
+| MC         | México                  | 
+| MN         | Michoacán de Ocampo     | 
+| MS         | Morelos                 | 
+| NT         | Nayarit                 | 
+| NL         | Nuevo León              | 
+| OC         | Oaxaca                  | 
+| PL         | Puebla                  | 
+| QT         | Querétaro               | 
+| QR         | Quintana Roo            | 
+| SP         | San Luis Potosí         | 
+| SL         | Sinaloa                 | 
+| SR         | Sonora                  | 
+| TC         | Tabasco                 | 
+| TS         | Tamaulipas              | 
+| TL         | Tlaxcala                | 
+| VZ         | Veracruz                | 
+| YN         | Yucatán                 | 
+| ZS         | Zacatecas               | 
+| NE         | Nacido en el Extranjero | 
