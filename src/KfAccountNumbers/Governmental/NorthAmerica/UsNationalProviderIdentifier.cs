@@ -74,6 +74,11 @@ public record struct UsNationalProviderIdentifier
    /// </summary>
    public String Value { get; init; }
 
+   public static implicit operator String(UsNationalProviderIdentifier npi)
+      => npi.Value ?? throw new ArgumentNullException(nameof(npi), Messages.UsNationalProviderIdentifierInvalidDefaultConversionToString);
+
+   public static implicit operator UsNationalProviderIdentifier(String? npi) => new(npi);
+
    /// <summary>
    ///   Check the <paramref name="npi"/> to determine if it contains any 
    ///   validation errors.

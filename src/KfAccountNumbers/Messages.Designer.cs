@@ -259,6 +259,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Default/uninitialized UsNationalProviderIdentifier can not be converted to String.
+        /// </summary>
+        internal static string UsNationalProviderIdentifierInvalidDefaultConversionToString {
+            get {
+                return ResourceManager.GetString("UsNationalProviderIdentifierInvalidDefaultConversionToString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to US National Provider Identifier may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string UsNpiEmpty {

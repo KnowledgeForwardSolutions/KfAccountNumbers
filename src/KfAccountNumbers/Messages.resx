@@ -231,4 +231,7 @@
   <data name="UsNpiInvalidCheckDigit" xml:space="preserve">
     <value>US National Provider Identifier contains an invalid check digit</value>
   </data>
+  <data name="UsNationalProviderIdentifierInvalidDefaultConversionToString" xml:space="preserve">
+    <value>Default/uninitialized UsNationalProviderIdentifier can not be converted to String</value>
+  </data>
 </root>
