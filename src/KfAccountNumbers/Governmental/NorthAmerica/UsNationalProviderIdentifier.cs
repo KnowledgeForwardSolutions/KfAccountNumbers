@@ -70,6 +70,16 @@ public record struct UsNationalProviderIdentifier
    }
 
    /// <summary>
+   ///   Private constructor to support <see cref="Create(String?)"/>
+   ///   method.
+   /// </summary>
+   /// <remarks>
+   ///   Boolean discard parameter is used to differentiate this constructor
+   ///   from the public constructor.
+   /// </remarks>
+   private UsNationalProviderIdentifier(String npi, Boolean _) => Value = npi;
+
+   /// <summary>
    ///   The raw NPI value.
    /// </summary>
    public String Value { get; init; }
@@ -78,6 +88,28 @@ public record struct UsNationalProviderIdentifier
       => npi.Value ?? throw new ArgumentNullException(nameof(npi), Messages.UsNationalProviderIdentifierInvalidDefaultConversionToString);
 
    public static implicit operator UsNationalProviderIdentifier(String? npi) => new(npi);
+
+   /// <summary>
+   ///   Create a new <see cref="UsNationalProviderIdentifier"/>.
+   /// </summary>
+   /// <param name="npi">
+   ///   String representation of a US National Provider Identifier.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{UsNationalProviderIdentifier, UsNationalProviderIdentifierValidationResult}"/>.
+   ///   Will contain the new <see cref="UsNationalProviderIdentifier"/> if 
+   ///   <paramref name="npi"/> is valid or 
+   ///   <see cref="UsNationalProviderIdentifierValidationResult"/> that identifies
+   ///   the validation rule that was failed if <paramref name="npi"/> is 
+   ///   invalid.
+   /// </returns>
+   public static CreateResult<UsNationalProviderIdentifier, UsNationalProviderIdentifierValidationResult> Create(
+      String? npi)
+      => Validate(npi) switch
+      {
+         UsNationalProviderIdentifierValidationResult.ValidationPassed => new UsNationalProviderIdentifier(npi!, true), // Note: invoking private ctor
+         var validationResult => validationResult
+      };
 
    /// <summary>
    ///   Check the <paramref name="npi"/> to determine if it contains any 
