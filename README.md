@@ -1,6 +1,7 @@
 # KfAccountNumbers
 
-KfAccountNumbers is a collection of strongly typed business objects for a wide range of government and commercial account numbers (ex. US Social Security Number, UK National Insurance Number, etc.).
+KfAccountNumbers is a collection of strongly typed business objects for a wide range of government
+and commercial account numbers (ex. US Social Security Number, UK National Insurance Number, etc.).
 
 The business objects in KfAccountNumbers all have the following capabilities:
 
@@ -8,6 +9,19 @@ The business objects in KfAccountNumbers all have the following capabilities:
 * A static Validate method that accepts a string representation of the account number and that returns an enum value that indicates if the string value is valid or the validation rule for the account number that was failed.
 * A static Create method that accepts a string representation of the account number and that uses the result pattern to return either an instance of the account number business object or an enum value that indicates the validation rule that was failed.
 * Implicit conversion to/from string.
+
+If the business object represents an account number that has a defined format (ex. US Social Security
+Number, etc.), the constructor, Create and Validate methods and implicit string to business object
+operator will accept either a string that consists of only the characters in the account number or a
+string that includes format characters (ex. dashes, spaces, etc.) in the appropriate places. The
+business object will also implement a Format method that returns a string representation of the
+account number with the appropriate format characters in the appropriate places.
+
+If the business object represents an account number that normally has no formatting other than the
+raw characters of the account number then the business object constructor, Create and Validate methods
+and implicit string to business object operator will only accept strings that consist of the raw
+characters of the account number. Nor will the business object implement a Format method since there
+is no formatting to be done.
 
 # Namespace Hierarchy
 

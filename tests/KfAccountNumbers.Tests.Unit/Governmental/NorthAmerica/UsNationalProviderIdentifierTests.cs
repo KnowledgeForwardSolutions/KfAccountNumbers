@@ -447,6 +447,23 @@ public class UsNationalProviderIdentifierTests
 
    #endregion
 
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void UsNationalProviderIdentifier_ToString_ShouldReturnExpectedValue()
+   {
+      // Arrange.
+      var npi = _validNpi;
+      var sut = new UsNationalProviderIdentifier(npi);
+
+      // Act/assert.
+      sut.ToString().Should().Be(npi);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================

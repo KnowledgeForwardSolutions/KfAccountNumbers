@@ -112,6 +112,11 @@ public record struct UsNationalProviderIdentifier
       };
 
    /// <summary>
+   ///   Get a string representation of the NPI.
+   /// </summary>
+   public override String ToString() => Value;
+
+   /// <summary>
    ///   Check the <paramref name="npi"/> to determine if it contains any 
    ///   validation errors.
    /// </summary>

@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Luhn
+// Ignore Spelling: Luhn
 
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
@@ -172,12 +172,12 @@ public record CaSocialInsuranceNumber
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the SSN.
+   ///   details on creating a mask to format the SIN.
    /// </remarks>
    public String Format(String mask = "___-___-___") => Value.FormatWithMask(mask);
 
    /// <summary>
-   ///   Get a string representation of the SSN.
+   ///   Get a string representation of the SIN.
    /// </summary>
    public override String ToString() => Value;
 
