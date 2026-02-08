@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Luhn
+// Ignore Spelling: Luhn
 
 namespace KfAccountNumbers.Utility;
 
@@ -8,6 +8,7 @@ using GeneralCheckDigitAlgorithms = CheckDigits.Net.GeneralAlgorithms;
 ///   Lazy instantiated singleton instances of check digit algorithms used by
 ///   various identifier types.
 /// </summary>
+/// TODO: Rethink the need for this class once CheckDigits.Net supports MaskedAlgorithms class
 public static class CheckDigitAlgorithms
 {
    private static readonly Lazy<GeneralCheckDigitAlgorithms.LuhnAlgorithm> _luhn =

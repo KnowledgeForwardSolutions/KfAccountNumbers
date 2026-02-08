@@ -98,8 +98,9 @@ See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/
 
 ## UsNationalProviderNumber
 
-UsNationalProviderNumber represents a National Provider Identifier (NPI) issued by the US Centers for
-Medicare & Medicaid Services (CMS).
+UsNationalProviderNumber represents a National Provider Identifier (NPI) issued to health care
+providers by the US Centers for Medicare & Medicaid Services (CMS). The NPI is used in administrative
+and billing transactions within the U.S. healthcare system.
 
 A US NPI consists of 10 digits, without any formatting characters. The trailing (right-most) digit
 is a check digit calculated using the Luhn algorithm with a prefix of '80840' added to the left of

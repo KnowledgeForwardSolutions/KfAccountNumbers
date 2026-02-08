@@ -259,6 +259,42 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to US National Provider Identifier may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string UsNpiEmpty {
+            get {
+                return ResourceManager.GetString("UsNpiEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to US National Provider Identifier must only contain digit characters (0-9).
+        /// </summary>
+        internal static string UsNpiInvalidCharacterEncountered {
+            get {
+                return ResourceManager.GetString("UsNpiInvalidCharacterEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to US National Provider Identifier contains an invalid check digit.
+        /// </summary>
+        internal static string UsNpiInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("UsNpiInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to US National Provider Identifier must have length 10.
+        /// </summary>
+        internal static string UsNpiInvalidLength {
+            get {
+                return ResourceManager.GetString("UsNpiInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to US Social Security Number may not have 9 consecutive identical digits.
         /// </summary>
         internal static string UsSsnAllIdenticalDigits {
