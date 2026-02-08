@@ -21,7 +21,8 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Europe (future)
 	- NorthAmerica
 		- [CaSocialInsuranceNumber](#casocialinsurancenumber) 
-		- [MxCurp](#mxcurp) 
+		- [MxCurp](#mxcurp)
+        - [UsNationalProviderNumber](#usnationalprovidernumber)
 		- [UsSocialSecurityNumber](#ussocialsecuritynumber)
 	- South America
 * Utility
@@ -94,6 +95,22 @@ be considered valid if it meets all of the other validation rules.
 
 See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/Unique_Population_Registry_Code) and
 [Wikipedia - Clave Única de Registro de Población](https://es.wikipedia.org/wiki/Clave_%C3%9Anica_de_Registro_de_Poblaci%C3%B3n) for more info.
+
+## UsNationalProviderNumber
+
+UsNationalProviderNumber represents a National Provider Identifier (NPI) issued by the US Centers for
+Medicare & Medicaid Services (CMS).
+
+A US NPI consists of 10 digits, without any formatting characters. The trailing (right-most) digit
+is a check digit calculated using the Luhn algorithm with a prefix of '80840' added to the left of
+the NPI value.
+
+A valid US NPI must meet all of the following rules:
+
+* Must consist of 10 integer digits
+* Must pass the Luhn algorithm check with a prefix of '80840' added to the left of the NPI value.
+
+See [Wikipedia - National Provider Identifier](https://en.wikipedia.org/wiki/National_Provider_Identifier) for more info.
 
 ## UsSocialSecurityNumber
 
