@@ -1,4 +1,4 @@
-// Ignore Spelling: Luhn
+// Ignore Spelling: Luhn Json
 
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
@@ -8,7 +8,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 /// <remarks>
 ///   <para>
 ///      A valid Canadian Social Insurance Number (SIN) consists of nine decimal 
-///      digits, generall grouped in threes, e.g. 123-456-789.
+///      digits, generally grouped in threes, e.g. 123-456-789.
 ///   </para>
 ///   <para>
 ///      The initial digit of the SIN generally indicates the province or 
@@ -45,6 +45,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///      </list>
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(CaSocialInsuranceNumberJsonConverter))]
 public record CaSocialInsuranceNumber
 {
    /// <summary>
@@ -103,7 +104,8 @@ public record CaSocialInsuranceNumber
 
    /// <summary>
    ///   Private constructor to support <see cref="Create(String?, Char)"/>
-   ///   method.
+   ///   method not performing validation again on a value that has already been
+   ///   validated.
    /// </summary>
    /// <remarks>
    ///   Boolean discard parameter is used to differentiate this constructor
@@ -114,7 +116,7 @@ public record CaSocialInsuranceNumber
    /// <summary>
    ///   The raw SIN value.
    /// </summary>
-   public String Value { get; init; }
+   public String Value { get; private init; }
 
    public static implicit operator String(CaSocialInsuranceNumber sin)
       => sin?.Value ?? throw new ArgumentNullException(nameof(sin), Messages.CaSinInvalidNullConversionToString);
@@ -191,7 +193,7 @@ public record CaSocialInsuranceNumber
    /// <param name="separator">
    ///   Optional. If the <paramref name="sin"/> is 11 characters in length, 
    ///   then <paramref name="separator"/> identifies the character used to
-   ///   separate the different sections of the SSN. This parameter is ignored 
+   ///   separate the different sections of the SIN. This parameter is ignored 
    ///   if the <paramref name="sin"/> is 9 characters in length. Defaults to '-'.
    /// </param>
    /// <returns>
@@ -244,6 +246,7 @@ public record CaSocialInsuranceNumber
       return CaSocialInsuranceNumberValidationResult.ValidationPassed;
    }
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static void CopySection(
       ReadOnlySpan<Char> source,
       Span<Char> target,
@@ -291,7 +294,7 @@ public record CaSocialInsuranceNumber
 
    private static Boolean IsFormattedSin(ReadOnlySpan<Char> sin) => sin.Length == FormattedLength;
 
-   private static Boolean ValidateDigits(String sin)
+   private static Boolean ValidateDigits(ReadOnlySpan<Char> sin)
    {
       var isFormatted = IsFormattedSin(sin);
       for (var index = 0; index < sin.Length; index++)
@@ -321,4 +324,16 @@ public record CaSocialInsuranceNumber
    // valid SIN characters).
    private static Boolean ValidateSeparatorCharacter(Char separator)
       => !separator.IsAsciiDigit();
+}
+
+public class CaSocialInsuranceNumberJsonConverter : JsonConverter<CaSocialInsuranceNumber>
+{
+   public override CaSocialInsuranceNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      var sinString = reader.GetString();
+      return new CaSocialInsuranceNumber(sinString);
+   }
+
+   public override void Write(Utf8JsonWriter writer, CaSocialInsuranceNumber value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }

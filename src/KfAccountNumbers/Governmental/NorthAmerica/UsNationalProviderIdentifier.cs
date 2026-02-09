@@ -69,12 +69,6 @@ public record UsNationalProviderIdentifier
       Value = npi!;
    }
 
-   // Prevent the default parameterless constructor from being used to create an invalid instance.
-   // This also forces the use of the public constructor that performs validation.
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-   private UsNationalProviderIdentifier() { }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-
    /// <summary>
    ///   Private constructor to support <see cref="Create(String?)"/> method not
    ///   performing validation again on a value that has already been validated.
@@ -163,15 +157,16 @@ public record UsNationalProviderIdentifier
             : UsNationalProviderIdentifierValidationResult.InvalidCharacterEncountered;
    }
 
-   private static Boolean ValidateDigits(String npi)
+   private static Boolean ValidateDigits(ReadOnlySpan<Char> npi)
    {
-      for (var index = 0; index < npi.Length; index++)
+      foreach (var ch in npi)
       {
-         if (!npi[index].IsAsciiDigit())
+         if (!ch.IsAsciiDigit())
          {
             return false;
          }
       }
+
       return true;
    }
 

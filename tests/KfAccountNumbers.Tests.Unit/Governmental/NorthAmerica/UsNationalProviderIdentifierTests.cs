@@ -7,8 +7,8 @@ namespace KfAccountNumbers.Tests.Unit.Governmental.NorthAmerica;
 
 public class UsNationalProviderIdentifierTests
 {
-   private const String _validNpi = "1245319599";        // Example from www.hippaspace.com
-   private const String _altValidNpi = "1234567893";     // Example from Wikipedia article on Luhn algorithm
+   private const String ValidNpi = "1245319599";         // Example from www.hippaspace.com
+   private const String AltValidNpi = "1234567893";     // Example from Wikipedia article on Luhn algorithm
 
    public static TheoryData<String> EmptyNpiValues =>
    [
@@ -65,7 +65,7 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_Constructor_ShouldCreateObject_WhenValueContainsValidNpi()
    {
       // Arrange.
-      var npi = _validNpi;
+      var npi = ValidNpi;
 
       // Act.
       var sut = new UsNationalProviderIdentifier(npi);
@@ -137,7 +137,7 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_ImplicitUsNpiToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var npi = _validNpi;
+      var npi = ValidNpi;
       var sut = new UsNationalProviderIdentifier(npi);
 
       // Act.
@@ -152,7 +152,7 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_CastUsNpiToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var npi = _validNpi;
+      var npi = ValidNpi;
       var sut = new UsNationalProviderIdentifier(npi);
 
       // Act.
@@ -196,7 +196,7 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_ImplicitStringToUsNpiConversion_ShouldCreateObject_WhenValueContainsValidNpi()
    {
       // Arrange.
-      var npi = _validNpi;
+      var npi = ValidNpi;
 
       // Act.
       UsNationalProviderIdentifier sut = npi;
@@ -292,8 +292,8 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var npi1 = new UsNationalProviderIdentifier(_validNpi);
-      var npi2 = new UsNationalProviderIdentifier(_validNpi);
+      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
+      var npi2 = new UsNationalProviderIdentifier(ValidNpi);
 
       // Act/assert.
       (npi1 == npi2).Should().BeTrue();
@@ -303,8 +303,8 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var npi1 = new UsNationalProviderIdentifier(_validNpi);
-      var npi2 = new UsNationalProviderIdentifier(_altValidNpi);
+      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
+      var npi2 = new UsNationalProviderIdentifier(AltValidNpi);
 
       // Act/assert.
       (npi1 == npi2).Should().BeFalse();
@@ -320,8 +320,8 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var npi1 = new UsNationalProviderIdentifier(_validNpi);
-      var npi2 = new UsNationalProviderIdentifier(_altValidNpi);
+      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
+      var npi2 = new UsNationalProviderIdentifier(AltValidNpi);
 
       // Act/assert.
       (npi1 != npi2).Should().BeTrue();
@@ -331,8 +331,8 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var npi1 = new UsNationalProviderIdentifier(_validNpi);
-      var npi2 = new UsNationalProviderIdentifier(_validNpi);
+      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
+      var npi2 = new UsNationalProviderIdentifier(ValidNpi);
 
       // Act/assert.
       (npi1 != npi2).Should().BeFalse();
@@ -348,7 +348,7 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_Create_ShouldCreateObject_WhenValueContainsValidNpi()
    {
       // Arrange.
-      var npi = _validNpi;
+      var npi = ValidNpi;
       var expected = new UsNationalProviderIdentifier(npi);
 
       // Act.
@@ -374,7 +374,7 @@ public class UsNationalProviderIdentifierTests
       // Assert.
       result.Should().NotBeNull();
       result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(default(UsNationalProviderIdentifier));
+      result.Value.Should().BeNull();
       result.ValidationFailure.Should().Be(expected);
    }
 
@@ -391,7 +391,7 @@ public class UsNationalProviderIdentifierTests
       // Assert.
       result.Should().NotBeNull();
       result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(default(UsNationalProviderIdentifier));
+      result.Value.Should().BeNull();
       result.ValidationFailure.Should().Be(expected);
    }
 
@@ -408,7 +408,7 @@ public class UsNationalProviderIdentifierTests
       // Assert.
       result.Should().NotBeNull();
       result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(default(UsNationalProviderIdentifier));
+      result.Value.Should().BeNull();
       result.ValidationFailure.Should().Be(expected);
    }
 
@@ -442,8 +442,29 @@ public class UsNationalProviderIdentifierTests
       // Assert.
       result.Should().NotBeNull();
       result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(default(UsNationalProviderIdentifier));
+      result.Value.Should().BeNull();
       result.ValidationFailure.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void UsNationalProviderIdentifier_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
+      var npi2 = new UsNationalProviderIdentifier(ValidNpi);    // Same internal value
+
+      // Act.
+      var hash1 = npi1.GetHashCode();
+      var hash2 = npi2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
    }
 
    #endregion
@@ -456,7 +477,7 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_ToString_ShouldReturnExpectedValue()
    {
       // Arrange.
-      var npi = _validNpi;
+      var npi = ValidNpi;
       var sut = new UsNationalProviderIdentifier(npi);
 
       // Act/assert.
@@ -471,7 +492,7 @@ public class UsNationalProviderIdentifierTests
 
    [Fact]
    public void UsNationalProviderIdentifier_Validate_ShouldReturnValidationPassed_WhenValueContainsValidNpi()
-      => UsNationalProviderIdentifier.Validate(_validNpi)
+      => UsNationalProviderIdentifier.Validate(ValidNpi)
          .Should().Be(UsNationalProviderIdentifierValidationResult.ValidationPassed);
 
    [Theory]
