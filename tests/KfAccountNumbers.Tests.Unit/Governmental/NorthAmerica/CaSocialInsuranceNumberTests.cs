@@ -1,4 +1,4 @@
-// Ignore Spelling: Luhn
+// Ignore Spelling: Luhn Json
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -96,7 +96,6 @@ public class CaSocialInsuranceNumberTests
       "0\u0BEF6-454-286",     // Unicode Tamil number 9
    ];
 
-   // Values that will report an invalid character when a custom separator is used
    public static TheoryData<String> InvalidCharacterValuesCustomSeparator =>
    [
       "A46 454 286",
