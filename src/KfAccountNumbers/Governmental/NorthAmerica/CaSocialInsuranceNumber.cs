@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Luhn
+// Ignore Spelling: Luhn Json
 
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
@@ -8,11 +8,11 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 /// <remarks>
 ///   <para>
 ///      A valid Canadian Social Insurance Number (SIN) consists of nine decimal 
-///      digits, generall grouped in threes, e.g. 123-456-789.
+///      digits, generally grouped in threes, e.g. 123-456-789.
 ///   </para>
 ///   <para>
 ///      The initial digit of the SIN generally indicates the province or 
-///      territory where the SIN was registiered. However, some highy populated
+///      territory where the SIN was registered. However, some highly populated
 ///      provinces have needed to use multiple initial digits (ex. Ontario).
 ///   </para>
 ///   <para>
@@ -45,14 +45,9 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///      </list>
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(CaSocialInsuranceNumberJsonConverter))]
 public record CaSocialInsuranceNumber
 {
-   /// <summary>
-   ///   The default separator character used when formatting a SIN or parsing
-   ///   a formatted SIN string.
-   /// </summary>
-   public const Char DefaultSeparator = Chars.Dash;
-
    private const Int32 FormattedLength = 11;
    private const Int32 NonFormattedLength = 9;
 
@@ -65,15 +60,6 @@ public record CaSocialInsuranceNumber
    /// <param name="sin">
    ///   The string representation of a Social Insurance Number.
    /// </param>
-   /// <param name="separator">
-   ///   Optional. If the <paramref name="sin"/> is 11 characters in length, 
-   ///   then <paramref name="separator"/> identifies the character used to
-   ///   separate the different sections of the SIN. This parameter is ignored 
-   ///   if the <paramref name="sin"/> is 9 characters in length. Defaults to '-'.
-   /// </param>
-   /// <exception cref="ArgumentOutOfRangeException">
-   ///   <paramref name="separator"/> is an ASCII digit (0-9).
-   /// </exception>
    /// <exception cref="InvalidCaSocialInsuranceNumberException">
    ///   <paramref name="sin"/> is <see langword="null"/>, empty or all 
    ///   whitespace characters.
@@ -90,26 +76,25 @@ public record CaSocialInsuranceNumber
    ///   <paramref name="sin"/> contains an invalid province code (first digit
    ///   may not be zero or eight).
    /// </exception>
-   public CaSocialInsuranceNumber(String? sin, Char separator = DefaultSeparator)
-   {
-      CaSocialInsuranceNumberValidationResult validationResult = Validate(sin, separator);
-      if (validationResult != CaSocialInsuranceNumberValidationResult.ValidationPassed)
-      {
-         throw new InvalidCaSocialInsuranceNumberException(validationResult);
-      }
-
-      Value = GetValidatedSin(sin!);
-   }
+   public CaSocialInsuranceNumber(String? sin)
+      : this(sin, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor to support <see cref="Create(String?, Char)"/>
-   ///   method.
+   ///   Private constructor that actually does the work. Supports optional validation,
+   ///   specifically to support the <see cref="Create(String?)"/> method.
    /// </summary>
-   /// <remarks>
-   ///   Boolean discard parameter is used to differentiate this constructor
-   ///   from the public constructor.
-   /// </remarks>
-   private CaSocialInsuranceNumber(String sin, Boolean _) => Value = GetValidatedSin(sin);
+   private CaSocialInsuranceNumber(String? sin, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         CaSocialInsuranceNumberValidationResult validationResult = Validate(sin);
+         if (validationResult != CaSocialInsuranceNumberValidationResult.ValidationPassed)
+         {
+            throw new InvalidCaSocialInsuranceNumberException(validationResult);
+         }
+      }
+      Value = GetValidatedSin(sin!);
+   }
 
    /// <summary>
    ///   The raw SIN value.
@@ -119,19 +104,13 @@ public record CaSocialInsuranceNumber
    public static implicit operator String(CaSocialInsuranceNumber sin)
       => sin?.Value ?? throw new ArgumentNullException(nameof(sin), Messages.CaSinInvalidNullConversionToString);
 
-   public static implicit operator CaSocialInsuranceNumber(String? sin) => new(sin, DefaultSeparator);
+   public static implicit operator CaSocialInsuranceNumber(String? sin) => new(sin);
 
    /// <summary>
    ///   Create a new <see cref="CaSocialInsuranceNumber"/>.
    /// </summary>
    /// <param name="sin">
    ///   String representation of a Social Insurance Number.
-   /// </param>
-   /// <param name="separator">
-   ///   Optional. If the <paramref name="sin"/> is 11 characters in length, 
-   ///   then <paramref name="separator"/> identifies the character used to
-   ///   separate the different sections of the SIN. This parameter is ignored 
-   ///   if the <paramref name="sin"/> is 9 characters in length. Defaults to '-'.
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{CaSocialInsuranceNumber, CaSocialInsuranceNumberValidationResult}"/>.
@@ -141,16 +120,11 @@ public record CaSocialInsuranceNumber
    ///   the validation rule that was failed if <paramref name="sin"/> is 
    ///   invalid.
    /// </returns>
-   /// <exception cref="ArgumentOutOfRangeException">
-   ///   <paramref name="separator"/> is an ASCII digit (0-9).
-   /// </exception>
-   public static CreateResult<CaSocialInsuranceNumber, CaSocialInsuranceNumberValidationResult> Create(
-      String? sin,
-      Char separator = DefaultSeparator)
+   public static CreateResult<CaSocialInsuranceNumber, CaSocialInsuranceNumberValidationResult> Create(String? sin)
    {
-      CaSocialInsuranceNumberValidationResult validationResult = Validate(sin, separator);
+      CaSocialInsuranceNumberValidationResult validationResult = Validate(sin);
       return validationResult == CaSocialInsuranceNumberValidationResult.ValidationPassed
-         ? new CaSocialInsuranceNumber(sin!, true)          // Note: invoking private ctor
+         ? new CaSocialInsuranceNumber(sin, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
@@ -172,12 +146,12 @@ public record CaSocialInsuranceNumber
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the SSN.
+   ///   details on creating a mask to format the SIN.
    /// </remarks>
    public String Format(String mask = "___-___-___") => Value.FormatWithMask(mask);
 
    /// <summary>
-   ///   Get a string representation of the SSN.
+   ///   Get a string representation of the SIN.
    /// </summary>
    public override String ToString() => Value;
 
@@ -188,29 +162,13 @@ public record CaSocialInsuranceNumber
    /// <param name="sin">
    ///   String representation of a Social Insurance Number.
    /// </param>
-   /// <param name="separator">
-   ///   Optional. If the <paramref name="sin"/> is 11 characters in length, 
-   ///   then <paramref name="separator"/> identifies the character used to
-   ///   separate the different sections of the SSN. This parameter is ignored 
-   ///   if the <paramref name="sin"/> is 9 characters in length. Defaults to '-'.
-   /// </param>
    /// <returns>
    ///   A <see cref="CaSocialInsuranceNumberValidationResult"/> enumeration 
    ///   value that indicates if the <paramref name="sin"/> passed validation
    ///   or what validation error was encountered.
    /// </returns>
-   /// <exception cref="ArgumentOutOfRangeException">
-   ///   <paramref name="separator"/> is an ASCII digit (0-9).
-   /// </exception>
-   public static CaSocialInsuranceNumberValidationResult Validate(
-      String? sin,
-      Char separator = DefaultSeparator)
+   public static CaSocialInsuranceNumberValidationResult Validate(String? sin)
    {
-      if (!ValidateSeparatorCharacter(separator))
-      {
-         throw new ArgumentOutOfRangeException(nameof(separator), separator, Messages.CaSinInvalidCustomSeparatorCharacter);
-      }
-
       // Basic checks for empty/null and length and formatting.
       if (String.IsNullOrWhiteSpace(sin))
       {
@@ -220,7 +178,7 @@ public record CaSocialInsuranceNumber
       {
          return CaSocialInsuranceNumberValidationResult.InvalidLength;
       }
-      else if (IsFormattedSin(sin) && !ValidateEmbeddedSeparatorCharacters(sin, separator))
+      else if (IsFormattedSin(sin) && !ValidateEmbeddedSeparatorCharacters(sin))
       {
          return CaSocialInsuranceNumberValidationResult.InvalidSeparatorEncountered;
       }
@@ -244,6 +202,7 @@ public record CaSocialInsuranceNumber
       return CaSocialInsuranceNumberValidationResult.ValidationPassed;
    }
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static void CopySection(
       ReadOnlySpan<Char> source,
       Span<Char> target,
@@ -291,12 +250,12 @@ public record CaSocialInsuranceNumber
 
    private static Boolean IsFormattedSin(ReadOnlySpan<Char> sin) => sin.Length == FormattedLength;
 
-   private static Boolean ValidateDigits(String sin)
+   private static Boolean ValidateDigits(ReadOnlySpan<Char> sin)
    {
       var isFormatted = IsFormattedSin(sin);
       for (var index = 0; index < sin.Length; index++)
       {
-         if (isFormatted && (index == FirstSeparatorOffset || index == SecondSeparatorOffset))
+         if (isFormatted && (index is FirstSeparatorOffset or SecondSeparatorOffset))
          {
             continue;
          }
@@ -305,20 +264,32 @@ public record CaSocialInsuranceNumber
             return false;
          }
       }
+
       return true;
    }
 
-   private static Boolean ValidateEmbeddedSeparatorCharacters(
-      ReadOnlySpan<Char> sin,
-      Char separator)
-      // If SIN is formatted, must contain valid separator character between sections.
-      => sin.Length == NonFormattedLength || (sin[FirstSeparatorOffset] == separator && sin[SecondSeparatorOffset] == separator);
+   // A formatted SIN must contain the same separator character at the expected
+   // offsets. And the separator character must be a non-digit character.
+   private static Boolean ValidateEmbeddedSeparatorCharacters(ReadOnlySpan<Char> sin)
+   {
+      var firstSeparator = sin[FirstSeparatorOffset];
+      var secondSeparator = sin[SecondSeparatorOffset];
+
+      return firstSeparator == secondSeparator && !firstSeparator.IsAsciiDigit();
+   }
 
    private static Boolean ValidateProvince(ReadOnlySpan<Char> sin)
       => sin[0] is not Chars.DigitZero and not Chars.DigitEight;
+}
 
-   // A separator character may be any character except ASCII digits (which are
-   // valid SIN characters).
-   private static Boolean ValidateSeparatorCharacter(Char separator)
-      => !separator.IsAsciiDigit();
+public class CaSocialInsuranceNumberJsonConverter : JsonConverter<CaSocialInsuranceNumber>
+{
+   public override CaSocialInsuranceNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      var sinString = reader.GetString();
+      return new CaSocialInsuranceNumber(sinString);
+   }
+
+   public override void Write(Utf8JsonWriter writer, CaSocialInsuranceNumber value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }

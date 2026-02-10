@@ -161,7 +161,7 @@ public record MxCurp
          throw new InvalidMxCurpException(validationResult);
       }
 
-      Value = curp.ToUpperInvariant();
+      Value = curp!.ToUpperInvariant();
    }
 
    /// <summary>
@@ -172,7 +172,7 @@ public record MxCurp
    ///   Boolean discard parameter is used to differentiate this constructor
    ///   from the public constructor.
    /// </remarks>
-   private MxCurp(String curp, Boolean _) => Value = curp.ToUpperInvariant();
+   private MxCurp(String? curp, Boolean _) => Value = curp!.ToUpperInvariant();
 
    /// <summary>
    ///   The person's date of birth, derived from the YYMMDD date of birth and 
@@ -239,7 +239,7 @@ public record MxCurp
    ///   the validation rule that was failed if <paramref name="curp"/> is 
    ///   invalid.
    /// </returns>
-   public static CreateResult<MxCurp, MxCurpValidationResult> Create(String curp)
+   public static CreateResult<MxCurp, MxCurpValidationResult> Create(String? curp)
    {
       MxCurpValidationResult validationResult = Validate(curp);
       

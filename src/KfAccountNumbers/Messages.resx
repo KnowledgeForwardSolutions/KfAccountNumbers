@@ -219,4 +219,19 @@
   <data name="MxCurpInvalidNullConversionToString" xml:space="preserve">
     <value>Null MxCurp can not be converted to String</value>
   </data>
+  <data name="UsNpiEmpty" xml:space="preserve">
+    <value>US National Provider Identifier may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="UsNpiInvalidLength" xml:space="preserve">
+    <value>US National Provider Identifier must have length 10</value>
+  </data>
+  <data name="UsNpiInvalidCharacterEncountered" xml:space="preserve">
+    <value>US National Provider Identifier must only contain digit characters (0-9)</value>
+  </data>
+  <data name="UsNpiInvalidCheckDigit" xml:space="preserve">
+    <value>US National Provider Identifier contains an invalid check digit</value>
+  </data>
+  <data name="UsNationalProviderIdentifierInvalidNullConversionToString" xml:space="preserve">
+    <value>Null UsNationalProviderIdentifier can not be converted to String</value>
+  </data>
 </root>

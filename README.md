@@ -1,6 +1,7 @@
 # KfAccountNumbers
 
-KfAccountNumbers is a collection of strongly typed business objects for a wide range of government and commercial account numbers (ex. US Social Security Number, UK National Insurance Number, etc.).
+KfAccountNumbers is a collection of strongly typed business objects for a wide range of government
+and commercial account numbers (ex. US Social Security Number, UK National Insurance Number, etc.).
 
 The business objects in KfAccountNumbers all have the following capabilities:
 
@@ -8,6 +9,19 @@ The business objects in KfAccountNumbers all have the following capabilities:
 * A static Validate method that accepts a string representation of the account number and that returns an enum value that indicates if the string value is valid or the validation rule for the account number that was failed.
 * A static Create method that accepts a string representation of the account number and that uses the result pattern to return either an instance of the account number business object or an enum value that indicates the validation rule that was failed.
 * Implicit conversion to/from string.
+
+If the business object represents an account number that has a defined format (ex. US Social Security
+Number, etc.), the constructor, Create and Validate methods and implicit string to business object
+operator will accept either a string that consists of only the characters in the account number or a
+string that includes format characters (ex. dashes, spaces, etc.) in the appropriate places. The
+business object will also implement a Format method that returns a string representation of the
+account number with the appropriate format characters in the appropriate places.
+
+If the business object represents an account number that normally has no formatting other than the
+raw characters of the account number then the business object constructor, Create and Validate methods
+and implicit string to business object operator will only accept strings that consist of the raw
+characters of the account number. Nor will the business object implement a Format method since there
+is no formatting to be done.
 
 # Namespace Hierarchy
 
@@ -21,7 +35,8 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Europe (future)
 	- NorthAmerica
 		- [CaSocialInsuranceNumber](#casocialinsurancenumber) 
-		- [MxCurp](#mxcurp) 
+		- [MxCurp](#mxcurp)
+        - [UsNationalProviderNumber](#usnationalprovidernumber)
 		- [UsSocialSecurityNumber](#ussocialsecuritynumber)
 	- South America
 * Utility
@@ -35,8 +50,8 @@ of Canada.
 
 A Canadian SIN consists of 9 digits, typically formatted as AAA AAA AAA. The CaSocialInsuranceNumber
 constructor will accept either 9 character strings (all digits) or eleven character strings that
-include separator characters. The default separator character is dash ('-'), though the default can
-be overridden by any non-digit character.
+include separator characters between the three groups of digits. If used, the separator character
+must be the same for both separators and must be a non-digit character.
 
 Not all 9 digit numbers are valid SINs. A valid SIN must meet all of the following rules:
 
@@ -95,6 +110,23 @@ be considered valid if it meets all of the other validation rules.
 See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/Unique_Population_Registry_Code) and
 [Wikipedia - Clave Única de Registro de Población](https://es.wikipedia.org/wiki/Clave_%C3%9Anica_de_Registro_de_Poblaci%C3%B3n) for more info.
 
+## UsNationalProviderNumber
+
+UsNationalProviderNumber represents a National Provider Identifier (NPI) issued to health care
+providers by the US Centers for Medicare & Medicaid Services (CMS). The NPI is used in administrative
+and billing transactions within the U.S. healthcare system.
+
+A US NPI consists of 10 digits, without any formatting characters. The trailing (right-most) digit
+is a check digit calculated using the Luhn algorithm with a prefix of '80840' added to the left of
+the NPI value.
+
+A valid US NPI must meet all of the following rules:
+
+* Must consist of 10 integer digits
+* Must pass the Luhn algorithm check with a prefix of '80840' added to the left of the NPI value.
+
+See [Wikipedia - National Provider Identifier](https://en.wikipedia.org/wiki/National_Provider_Identifier) for more info.
+
 ## UsSocialSecurityNumber
 
 UsSocialSecurityNumber represents a Social Security Number (SSN) issued by the US Social Security
@@ -107,8 +139,8 @@ sub-grouping within the area association to a geographic region was eliminated i
 
 SSNs are commonly formatted with dashes separating the three groups, though spaces are sometimes used.
 The UsSocialSecurityNumber constructor will accept either 9 character strings (all digits) or eleven
-character strings that include separator characters. The default separator character is dash ('-'),
-though the default can be overridden by any non-digit character.
+character strings that include separator characters between the three groups. If used, the separator
+character must be the same for both separators and must be a non-digit character.
 
 Not all 9 digit numbers are valid SSNs. A valid SSN must meet all of the following rules:
 
