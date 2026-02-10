@@ -158,14 +158,9 @@ public class UsSocialSecurityNumberTests
    /// Assumes input is exactly 11 characters with separators at positions 3 and 6.
    /// </summary>
    private static String GetUnformattedSsnFromFormattedSsn(String formattedSsn)
-   {
-      if (formattedSsn.Length != 11)
-      {
-         throw new ArgumentException("Input must be 11 characters", nameof(formattedSsn));
-      }
-
-      return formattedSsn[0..3] + formattedSsn[4..6] + formattedSsn[7..11];
-   }
+      => formattedSsn.Length != 11
+         ? throw new ArgumentException("Input must be 11 characters", nameof(formattedSsn))
+         : formattedSsn[0..3] + formattedSsn[4..6] + formattedSsn[7..11];
 
    #region Constructor Tests
    // ==========================================================================
@@ -796,8 +791,6 @@ public class UsSocialSecurityNumberTests
    {
       // Arrange.
       var sut = new UsSocialSecurityNumber(ValidNineCharSsn);
-      var expectedMessage = Messages.FormatMaskEmpty + "*";
-      var act = () => _ = sut.Format(mask);
 
       // Act/assert.
       FluentActions

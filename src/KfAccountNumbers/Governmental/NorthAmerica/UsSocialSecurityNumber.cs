@@ -331,7 +331,7 @@ public record UsSocialSecurityNumber
       var isFormatted = IsFormattedSsn(ssn);
       for (var index = 0; index < ssn.Length; index++)
       {
-         if (isFormatted && (index == GroupSeparatorOffset || index == SerialSeparatorOffset))
+         if (isFormatted && (index is GroupSeparatorOffset or SerialSeparatorOffset))
          {
             continue;  // Skip separator character positions in formatted SSN
          }

@@ -10,59 +10,44 @@ public class CaSocialInsuranceNumberTests
    private const String ValidNineCharSin = "558199428";     // From singen.ca
    private const String AltValidNineCharSin = "226019727";  // From singen.ca
    private const String ValidElevenCharSin = "558-199-428";
-   private const String ValidElevenCharSinWithCustomSeparator = "558 199 428";
-
-   private const Char CustomSeparator = ' ';
-   private const Char DefaultSeparator = '-';
+   private const String AltElevenCharSin = "226 019 727";
 
    // Values that will successfully create a CaSocialInsuranceNumber object
-   public static TheoryData<String> ValidValuesNoSeparator =>
+   public static TheoryData<String> ValidValues =>
    [
       ValidNineCharSin,
-   ];
-
-   public static TheoryData<String> ValidValuesDefaultSeparator =>
-   [
-      ValidElevenCharSin
-   ];
-
-   public static TheoryData<String> ValidValuesCustomSeparator =>
-   [
-      ValidElevenCharSinWithCustomSeparator
+      ValidElevenCharSin,
+      AltElevenCharSin
    ];
 
    // Values that will report an invalid length
-   public static TheoryData<String> InvalidLengthValuesNoSeparator =>
+   public static TheoryData<String> InvalidLengthValues =>
    [
       "55819942",
       "5581994288",
-   ];
-
-   public static TheoryData<String> InvalidLengthValuesDefaultSeparator =>
-   [
-      "558-199-4288"
-   ];
-
-   public static TheoryData<String> InvalidLengthValuesCustomSeparator =>
-   [
+      "558-199-4288",
       "558 199 4288"
    ];
 
    // Values that will report an invalid separator character
-   public static TheoryData<String> InvalidSeparatorValuesDefaultSeparator =>
+   public static TheoryData<String> InvalidSeparatorValues =>
    [
-      "046_454-286",
-      "046-454_286",
-   ];
-
-   public static TheoryData<String> InvalidSeparatorValuesCustomSeparator =>
-   [
-      "046_454 286",
-      "046 454_286",
+      "046 454-286",
+      "046-454 286",
+      "04604540286",
+      "04614541286",
+      "04624542286",
+      "04634543286",
+      "04644544286",
+      "04654545286",
+      "04664546286",
+      "04674547286",
+      "04684548286",
+      "04694549286",
    ];
 
    // Values that will report an invalid character encountered
-   public static TheoryData<String> InvalidCharacterValuesNoSeparator =>
+   public static TheoryData<String> InvalidCharacterValues =>
    [
       "A46454286",
       "0A6454286",
@@ -77,10 +62,6 @@ public class CaSocialInsuranceNumberTests
       "0\u21536454286",       // Unicode fraction 1/3
       "0\u21676454286",       // Unicode Roman numeral VII
       "0\u0BEF6454286",       // Unicode Tamil number 9
-   ];
-
-   public static TheoryData<String> InvalidCharacterValuesDefaultSeparator =>
-   [
       "A46-454-286",
       "0A6-454-286",
       "04A-454-286",
@@ -96,45 +77,18 @@ public class CaSocialInsuranceNumberTests
       "0\u0BEF6-454-286",     // Unicode Tamil number 9
    ];
 
-   public static TheoryData<String> InvalidCharacterValuesCustomSeparator =>
-   [
-      "A46 454 286",
-      "0A6 454 286",
-      "04A 454 286",
-      "046 A54 286",
-      "046 4A4 286",
-      "046 45A 286",
-      "046 454 A86",
-      "046 454 2A6",
-      "046 454 28A",
-      "0;6 454 286",
-      "0\u21536 454 286",     // Unicode fraction 1/3
-      "0\u21676 454 286",     // Unicode Roman numeral VII
-      "0\u0BEF6 454 286",     // Unicode Tamil number 9
-   ];
-
    // Values that will report an invalid province
-   public static TheoryData<String> InvalidProvinceValuesNoSeparator =>
+   public static TheoryData<String> InvalidProvinceValues =>
    [
       "012345674",
       "876543216",
-   ];
-
-   public static TheoryData<String> InvalidProvinceValuesDefaultSeparator =>
-   [
-      "012-345-674",
-      "876-543-216",
-   ];
-
-   public static TheoryData<String> InvalidProvinceValuesCustomSeparator =>
-   [
       "012 345 674",
       "876 543 216",
    ];
 
    // Values that contain a transcription error that is undetectable by the Luhn algorithm
    // and will successfully create a CaSocialInsuranceNumber object
-   public static TheoryData<String> UndetectableErrorValuesNoSeparator =>
+   public static TheoryData<String> CheckDigitUndetectableErrorValues =>
    [
       "780912341",            // 789012341 with two digit transposition 90 -> 09
       "123459018",            // 123450918 with two digit transposition 09 -> 90
@@ -142,10 +96,6 @@ public class CaSocialInsuranceNumberTests
       "107700007",            // 104400007 with two digit twin error 44 -> 77
       "103300000",            // 106600000 with two digit twin error 66 -> 33
       "558199428",            // 558199428 with two digit jump transposition 994 -> 499
-   ];
-
-   public static TheoryData<String> UndetectableErrorValuesDefaultSeparator =>
-   [
       "780-912-341",          // 789012341 with two digit transposition 90 -> 09
       "123-459-018",          // 123450918 with two digit transposition 09 -> 90
       "100-005-503",          // 100005503 with two digit twin error 55 -> 22
@@ -154,18 +104,8 @@ public class CaSocialInsuranceNumberTests
       "558-199-428",          // 558199428 with two digit jump transposition 994 -> 499
    ];
 
-   public static TheoryData<String> UndetectableErrorValuesCustomSeparator =>
-   [
-      "780 912 341",          // 789012341 with two digit transposition 90 -> 09
-      "123 459 018",          // 123450918 with two digit transposition 09 -> 90
-      "100 005 503",          // 100005503 with two digit twin error 55 -> 22
-      "107 700 007",          // 104400007 with two digit twin error 44 -> 77
-      "103 300 000",          // 106600000 with two digit twin error 66 -> 33
-      "558 199 428",          // 558199428 with two digit jump transposition 994 -> 499
-   ];
-
    // Values that will report an invalid check digit
-   public static TheoryData<String> InvalidCheckDigitValuesNoSeparator =>
+   public static TheoryData<String> InvalidCheckDigitValues =>
    [
       "558299428",            // 558199428 with single digit transcription error 1 -> 2
       "559199428",            // 558199428 with single digit transcription error 8 -> 9
@@ -173,20 +113,6 @@ public class CaSocialInsuranceNumberTests
       "558199248",            // 558199428 with two digit transcription error -> 42 -> 24
       "448199428",            // 558199428 with two digit twin error 55 -> 44
       "558188428",            // 558199428 with two digit twin error 99 -> 88
-   ];
-
-   public static TheoryData<String> InvalidCheckDigitValuesDefaultSeparator =>
-   [
-      "558-299-428",          // 558199428 with single digit transcription error 1 -> 2
-      "559-199-428",          // 558199428 with single digit transcription error 8 -> 9
-      "551-899-428",          // 558199428 with two digit transcription error -> 81 -> 18
-      "558-199-248",          // 558199428 with two digit transcription error -> 42 -> 24
-      "448-199-428",          // 558199428 with two digit twin error 55 -> 44
-      "558-188-428",          // 558199428 with two digit twin error 99 -> 88
-   ];
-
-   public static TheoryData<String> InvalidCheckDigitValuesCustomSeparator =>
-   [
       "558 299 428",          // 558199428 with single digit transcription error 1 -> 2
       "559 199 428",          // 558199428 with single digit transcription error 8 -> 9
       "551 899 428",          // 558199428 with two digit transcription error -> 81 -> 18
@@ -197,19 +123,10 @@ public class CaSocialInsuranceNumberTests
 
    // Values that contain a Luhn check digit that calcuates as zero and will
    // successfully create a CaSocialInsuranceNumber object
-   public static TheoryData<String> ZeroCheckDigitValuesNoSeparator =>
+   public static TheoryData<String> ZeroCheckDigitValues =>
    [
       "123456790",
-   ];
-
-   public static TheoryData<String> ZeroCheckDigitValuesDefaultSeparator =>
-   [
       "123-456-790",
-   ];
-
-   public static TheoryData<String> ZeroCheckDigitValuesCustomSeparator =>
-   [
-      "123 456 790",
    ];
 
    public static TheoryData<String> EmptySinValues =>
@@ -219,35 +136,25 @@ public class CaSocialInsuranceNumberTests
       "\t"
    ];
 
-   public static TheoryData<String, Char> InvalidCustomSeparatorData
-   {
-      get
-      {
-         var sins = new[] { ValidNineCharSin, ValidElevenCharSin };
-         var data = new TheoryData<String, Char>();
-         foreach (var sin in sins)
-         {
-            foreach (var ch in Enumerable.Range('0', 10).Select(i => (Char)i))
-            {
-               data.Add(sin, ch);
-            }
-         }
-
-         return data;
-      }
-   }
+   /// <summary>
+   /// Extracts unformatted SIN from an 11-character formatted SIN.
+   /// Assumes input is exactly 11 characters with separators at positions 3 and 6.
+   /// </summary>
+   private static String GetUnformattedSinFromFormattedSin(String formattedSin)
+      => formattedSin.Length != 11
+         ? throw new ArgumentException("Input must be 11 characters", nameof(formattedSin))
+         : formattedSin[0..3] + formattedSin[4..7] + formattedSin[8..11];
 
    #region Constructor Tests
    // ==========================================================================
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidValuesNoSeparator))]
-   [MemberData(nameof(ValidValuesDefaultSeparator))]
+   [MemberData(nameof(ValidValues))]
    public void CaSocialInsuranceNumber_Constructor_ShouldCreateObject_WhenValueContainsValidSin(String sin)
    {
       // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(DefaultSeparator.ToString(), String.Empty);
+      var expected = sin.Length == 9 ? sin : GetUnformattedSinFromFormattedSin(sin);
 
       // Act.
       var sut = new CaSocialInsuranceNumber(sin);
@@ -268,8 +175,7 @@ public class CaSocialInsuranceNumberTests
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.Empty);
 
    [Theory]
-   [MemberData(nameof(InvalidLengthValuesNoSeparator))]
-   [MemberData(nameof(InvalidLengthValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidLengthValues))]
    public void CaSocialInsuranceNumber_Constructor_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLength(String? sin)
       => FluentActions
          .Invoking(() => _ = new CaSocialInsuranceNumber(sin))
@@ -279,7 +185,7 @@ public class CaSocialInsuranceNumberTests
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidLength);
 
    [Theory]
-   [MemberData(nameof(InvalidSeparatorValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidSeparatorValues))]
    public void CaSocialInsuranceNumber_Constructor_ShouldThrowInvalidCaSocialInsuranceNumberException_When11CharacterValueContainsAnInvalidSeparator(String sin)
       => FluentActions
          .Invoking(() => _ = new CaSocialInsuranceNumber(sin))
@@ -289,8 +195,7 @@ public class CaSocialInsuranceNumberTests
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidSeparatorEncountered);
 
    [Theory]
-   [MemberData(nameof(InvalidCharacterValuesNoSeparator))]
-   [MemberData(nameof(InvalidCharacterValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidCharacterValues))]
    public void CaSocialInsuranceNumber_Constructor_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueContainsNonAsciiDigit(String sin)
       => FluentActions
          .Invoking(() => _ = new CaSocialInsuranceNumber(sin))
@@ -300,8 +205,7 @@ public class CaSocialInsuranceNumberTests
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidCharacterEncountered);
 
    [Theory]
-   [MemberData(nameof(InvalidProvinceValuesNoSeparator))]
-   [MemberData(nameof(InvalidProvinceValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidProvinceValues))]
    public void CaSocialInsuranceNumber_Constructor_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLeadingDigit(String sin)
       => FluentActions
          .Invoking(() => _ = new CaSocialInsuranceNumber(sin))
@@ -311,12 +215,11 @@ public class CaSocialInsuranceNumberTests
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidProvince);
 
    [Theory]
-   [MemberData(nameof(UndetectableErrorValuesNoSeparator))]
-   [MemberData(nameof(UndetectableErrorValuesDefaultSeparator))]
+   [MemberData(nameof(CheckDigitUndetectableErrorValues))]
    public void CaSocialInsuranceNumber_Constructor_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String sin)
    {
       // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(DefaultSeparator.ToString(), String.Empty);
+      var expected = sin.Length == 9 ? sin : GetUnformattedSinFromFormattedSin(sin);
 
       // Act.
       var sut = new CaSocialInsuranceNumber(sin);
@@ -327,8 +230,7 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidCheckDigitValuesNoSeparator))]
-   [MemberData(nameof(InvalidCheckDigitValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidCheckDigitValues))]
    public void CaSocialInsuranceNumber_Constructor_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenCheckDigitContainsDetectableError(String sin)
       => FluentActions
          .Invoking(() => _ = new CaSocialInsuranceNumber(sin))
@@ -338,144 +240,14 @@ public class CaSocialInsuranceNumberTests
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidCheckDigit);
 
    [Theory]
-   [MemberData(nameof(ZeroCheckDigitValuesNoSeparator))]
-   [MemberData(nameof(ZeroCheckDigitValuesDefaultSeparator))]
+   [MemberData(nameof(ZeroCheckDigitValues))]
    public void CaSocialInsuranceNumber_Constructor_ShouldCreateObject_WhenCheckDigitCalculatesAsZero(String sin)
    {
       // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(DefaultSeparator.ToString(), String.Empty);
+      var expected = sin.Length == 9 ? sin : GetUnformattedSinFromFormattedSin(sin);
 
       // Act.
       var sut = new CaSocialInsuranceNumber(sin);
-
-      // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
-   }
-
-   #endregion
-
-   #region Constructor (With Custom Separator) Tests
-   // ==========================================================================
-   // ==========================================================================
-
-   [Theory]
-   [MemberData(nameof(ValidValuesNoSeparator))]
-   [MemberData(nameof(ValidValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ConstructorWithCustomSeparator_ShouldCreateObject_WhenValueContainsValidSin(String sin)
-   {
-      // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(CustomSeparator.ToString(), String.Empty);
-
-      // Act.
-      var sut = new CaSocialInsuranceNumber(sin, CustomSeparator);
-
-      // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
-   }
-
-   [Theory]
-   [MemberData(nameof(InvalidCustomSeparatorData))]
-   public void CaSocialInsuranceNumber_ConstructorWithCustomSeparator_ShouldThrowArgumentOutOfRangeException_WhenCustomSeparatorIsDigit(
-      String sin,
-      Char customSeparator)
-      => FluentActions
-         .Invoking(() => _ = new CaSocialInsuranceNumber(sin, customSeparator))
-         .Should()
-         .ThrowExactly<ArgumentOutOfRangeException>()
-         .WithMessage(Messages.CaSinInvalidCustomSeparatorCharacter + "*");
-
-   [Theory]
-   [MemberData(nameof(EmptySinValues))]
-   public void CaSocialInsuranceNumber_ConstructorWithCustomSeparator_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueIsEmpty(String? sin)
-      => FluentActions
-         .Invoking(() => _ = new CaSocialInsuranceNumber(sin, CustomSeparator))
-         .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
-         .WithMessage(Messages.CaSinEmpty + "*")
-         .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.Empty);
-
-   [Theory]
-   [MemberData(nameof(InvalidLengthValuesNoSeparator))]
-   [MemberData(nameof(InvalidLengthValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ConstructorWithCustomSeparator_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLength(String? sin)
-      => FluentActions
-         .Invoking(() => _ = new CaSocialInsuranceNumber(sin, CustomSeparator))
-         .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
-         .WithMessage(Messages.CaSinInvalidLength + "*")
-         .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidLength);
-
-   [Theory]
-   [MemberData(nameof(InvalidSeparatorValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ConstructorWithCustomSeparator_ShouldThrowInvalidCaSocialInsuranceNumberException_When11CharacterValueContainsAnInvalidSeparator(String sin)
-      => FluentActions
-         .Invoking(() => _ = new CaSocialInsuranceNumber(sin, CustomSeparator))
-         .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
-         .WithMessage(Messages.CaSinInvalidSeparatorEncountered + "*")
-         .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidSeparatorEncountered);
-
-   [Theory]
-   [MemberData(nameof(InvalidCharacterValuesNoSeparator))]
-   [MemberData(nameof(InvalidCharacterValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ConstructorWithCustomSeparator_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueContainsNonAsciiDigit(String sin)
-      => FluentActions
-         .Invoking(() => _ = new CaSocialInsuranceNumber(sin, CustomSeparator))
-         .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
-         .WithMessage(Messages.CaSinInvalidCharacterEncountered + "*")
-         .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidCharacterEncountered);
-
-   [Theory]
-   [MemberData(nameof(InvalidProvinceValuesNoSeparator))]
-   [MemberData(nameof(InvalidProvinceValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ConstructorWithCustomSeparator_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLeadingDigit(String sin)
-      => FluentActions
-         .Invoking(() => _ = new CaSocialInsuranceNumber(sin, CustomSeparator))
-         .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
-         .WithMessage(Messages.CaSinInvalidProvince + "*")
-         .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidProvince);
-
-   [Theory]
-   [MemberData(nameof(UndetectableErrorValuesNoSeparator))]
-   [MemberData(nameof(UndetectableErrorValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ConstructorWithCustomSeparator_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String sin)
-   {
-      // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(CustomSeparator.ToString(), String.Empty);
-
-      // Act.
-      var sut = new CaSocialInsuranceNumber(sin, CustomSeparator);
-
-      // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
-   }
-
-   [Theory]
-   [MemberData(nameof(InvalidCheckDigitValuesNoSeparator))]
-   [MemberData(nameof(InvalidCheckDigitValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ConstructorWithCustomSeparator_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenCheckDigitContainsDetectableError(String sin)
-      => FluentActions
-         .Invoking(() => _ = new CaSocialInsuranceNumber(sin, CustomSeparator))
-         .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
-         .WithMessage(Messages.CaSinInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidCheckDigit);
-
-   [Theory]
-   [MemberData(nameof(ZeroCheckDigitValuesNoSeparator))]
-   [MemberData(nameof(ZeroCheckDigitValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ConstructorWithCustomSeparator_ShouldCreateObject_WhenCheckDigitCalculatesAsZero(String sin)
-   {
-      // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(CustomSeparator.ToString(), String.Empty);
-
-      // Act.
-      var sut = new CaSocialInsuranceNumber(sin, CustomSeparator);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -489,12 +261,11 @@ public class CaSocialInsuranceNumberTests
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidValuesNoSeparator))]
-   [MemberData(nameof(ValidValuesDefaultSeparator))]
+   [MemberData(nameof(ValidValues))]
    public void CaSocialInsuranceNumber_ImplicitCaSinToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull(String sin)
    {
       // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(DefaultSeparator.ToString(), String.Empty);
+      var expected = sin.Length == 9 ? sin : GetUnformattedSinFromFormattedSin(sin);
       var sut = new CaSocialInsuranceNumber(sin);
 
       // Act.
@@ -506,12 +277,11 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(ValidValuesNoSeparator))]
-   [MemberData(nameof(ValidValuesDefaultSeparator))]
+   [MemberData(nameof(ValidValues))]
    public void CaSocialInsuranceNumber_CastCaSinToString_ShouldReturnExpectedValue_WhenValueIsNotNull(String sin)
    {
       // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(DefaultSeparator.ToString(), String.Empty);
+      var expected = sin.Length == 9 ? sin : GetUnformattedSinFromFormattedSin(sin);
       var sut = new CaSocialInsuranceNumber(sin);
 
       // Act.
@@ -552,12 +322,11 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(ValidValuesNoSeparator))]
-   [MemberData(nameof(ValidValuesDefaultSeparator))]
+   [MemberData(nameof(ValidValues))]
    public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldCreateObject_WhenValueContainsValidSin(String sin)
    {
       // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(DefaultSeparator.ToString(), String.Empty);
+      var expected = sin.Length == 9 ? sin : GetUnformattedSinFromFormattedSin(sin);
 
       // Act.
       CaSocialInsuranceNumber sut = sin;
@@ -569,14 +338,14 @@ public class CaSocialInsuranceNumberTests
 
    [Theory]
    [MemberData(nameof(EmptySinValues))]
-   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueIsEmpty(String? str)
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueIsEmpty(String? sin)
    {
       // Arrange.
       CaSocialInsuranceNumber sut;
 
       // Act/assert.
       FluentActions
-         .Invoking(() => sut = str)
+         .Invoking(() => sut = sin)
          .Should()
          .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
          .WithMessage(Messages.CaSinEmpty + "*")
@@ -584,16 +353,15 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidLengthValuesNoSeparator))]
-   [MemberData(nameof(InvalidLengthValuesDefaultSeparator))]
-   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLength(String? str)
+   [MemberData(nameof(InvalidLengthValues))]
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLength(String? sin)
    {
       // Arrange.
       CaSocialInsuranceNumber sut;
 
       // Act/assert.
       FluentActions
-         .Invoking(() => sut = str)
+         .Invoking(() => sut = sin)
          .Should()
          .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
          .WithMessage(Messages.CaSinInvalidLength + "*")
@@ -601,15 +369,15 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidSeparatorValuesDefaultSeparator))]
-   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_When11CharacterValueContainsAnInvalidSeparator(String str)
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_When11CharacterValueContainsAnInvalidSeparator(String sin)
    {
       // Arrange.
       CaSocialInsuranceNumber sut;
 
       // Act/assert.
       FluentActions
-         .Invoking(() => sut = str)
+         .Invoking(() => sut = sin)
          .Should()
          .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
          .WithMessage(Messages.CaSinInvalidSeparatorEncountered + "*")
@@ -617,16 +385,15 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidCharacterValuesNoSeparator))]
-   [MemberData(nameof(InvalidCharacterValuesDefaultSeparator))]
-   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueContainsNonAsciiDigit(String str)
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueContainsNonAsciiDigit(String sin)
    {
       // Arrange.
       CaSocialInsuranceNumber sut;
 
       // Act/assert.
       FluentActions
-         .Invoking(() => sut = str)
+         .Invoking(() => sut = sin)
          .Should()
          .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
          .WithMessage(Messages.CaSinInvalidCharacterEncountered + "*")
@@ -634,16 +401,15 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidProvinceValuesNoSeparator))]
-   [MemberData(nameof(InvalidProvinceValuesDefaultSeparator))]
-   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLeadingDigit(String str)
+   [MemberData(nameof(InvalidProvinceValues))]
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLeadingDigit(String sin)
    {
       // Arrange.
       CaSocialInsuranceNumber sut;
 
       // Act/assert.
       FluentActions
-         .Invoking(() => sut = str)
+         .Invoking(() => sut = sin)
          .Should()
          .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
          .WithMessage(Messages.CaSinInvalidProvince + "*")
@@ -651,16 +417,15 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(UndetectableErrorValuesNoSeparator))]
-   [MemberData(nameof(UndetectableErrorValuesDefaultSeparator))]
-   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String str)
+   [MemberData(nameof(CheckDigitUndetectableErrorValues))]
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String sin)
    {
       // Arrange.
-      var expected = str.Length == 9 ? str : str.Replace(DefaultSeparator.ToString(), String.Empty);
+      var expected = sin.Length == 9 ? sin : GetUnformattedSinFromFormattedSin(sin);
       CaSocialInsuranceNumber sut;
 
       // Act.
-      sut = new CaSocialInsuranceNumber(str);
+      sut = new CaSocialInsuranceNumber(sin);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -668,16 +433,15 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidCheckDigitValuesNoSeparator))]
-   [MemberData(nameof(InvalidCheckDigitValuesDefaultSeparator))]
-   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenCheckDigitContainsDetectableError(String str)
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenCheckDigitContainsDetectableError(String sin)
    {
       // Arrange.
       CaSocialInsuranceNumber sut;
 
       // Act/assert.
       FluentActions
-         .Invoking(() => sut = str)
+         .Invoking(() => sut = sin)
          .Should()
          .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
          .WithMessage(Messages.CaSinInvalidCheckDigit + "*")
@@ -685,16 +449,15 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(ZeroCheckDigitValuesNoSeparator))]
-   [MemberData(nameof(ZeroCheckDigitValuesDefaultSeparator))]
-   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldCreateObject_WhenCheckDigitCalculatesAsZero(String str)
+   [MemberData(nameof(ZeroCheckDigitValues))]
+   public void CaSocialInsuranceNumber_ImplicitStringToCaSinConversion_ShouldCreateObject_WhenCheckDigitCalculatesAsZero(String sin)
    {
       // Arrange.
-      var expected = str.Length == 9 ? str : str.Replace(DefaultSeparator.ToString(), String.Empty);
+      var expected = sin.Length == 9 ? sin : GetUnformattedSinFromFormattedSin(sin);
       CaSocialInsuranceNumber sut;
 
       // Act.
-      sut = new CaSocialInsuranceNumber(str);
+      sut = new CaSocialInsuranceNumber(sin);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -764,12 +527,11 @@ public class CaSocialInsuranceNumberTests
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidValuesNoSeparator))]
-   [MemberData(nameof(ValidValuesDefaultSeparator))]
+   [MemberData(nameof(ValidValues))]
    public void CaSocialInsuranceNumber_Create_ShouldCreateObject_WhenValueContainsValidSin(String sin)
    {
       // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(DefaultSeparator.ToString(), String.Empty);
+      var expected = sin.Length == 9 ? sin : GetUnformattedSinFromFormattedSin(sin);
       var expectedValue = new CaSocialInsuranceNumber(expected);
 
       // Act.
@@ -800,8 +562,7 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidLengthValuesNoSeparator))]
-   [MemberData(nameof(InvalidLengthValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidLengthValues))]
    public void CaSocialInsuranceNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String sin)
    {
       // Arrange.
@@ -818,7 +579,7 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidSeparatorValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidSeparatorValues))]
    public void CaSocialInsuranceNumber_Create_ShouldReturnInvalidSeparatorEncounteredResult_When11CharacterValueContainsAnInvalidSeparator(String sin)
    {
       // Arrange.
@@ -835,8 +596,7 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidCharacterValuesNoSeparator))]
-   [MemberData(nameof(InvalidCharacterValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidCharacterValues))]
    public void CaSocialInsuranceNumber_Create_ShouldReturnInvalidCharacterEncounteredResult_WhenValueContainsNonAsciiDigit(String sin)
    {
       // Arrange.
@@ -853,8 +613,7 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidProvinceValuesNoSeparator))]
-   [MemberData(nameof(InvalidProvinceValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidProvinceValues))]
    public void CaSocialInsuranceNumber_Create_ShouldReturnInvalidProvinceResult_WhenValueHasInvalidLeadingDigit(String sin)
    {
       // Arrange.
@@ -871,12 +630,11 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(UndetectableErrorValuesNoSeparator))]
-   [MemberData(nameof(UndetectableErrorValuesDefaultSeparator))]
+   [MemberData(nameof(CheckDigitUndetectableErrorValues))]
    public void CaSocialInsuranceNumber_Create_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String sin)
    {
       // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(DefaultSeparator.ToString(), String.Empty);
+      var expected = sin.Length == 9 ? sin : GetUnformattedSinFromFormattedSin(sin);
       var expectedValue = new CaSocialInsuranceNumber(expected);
 
       // Act.
@@ -890,8 +648,7 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidCheckDigitValuesNoSeparator))]
-   [MemberData(nameof(InvalidCheckDigitValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidCheckDigitValues))]
    public void CaSocialInsuranceNumber_Create_ShouldReturnInvalidCheckDigit_WhenCheckDigitContainsDetectableError(String sin)
    {
       // Arrange.
@@ -908,196 +665,15 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(ZeroCheckDigitValuesNoSeparator))]
-   [MemberData(nameof(ZeroCheckDigitValuesDefaultSeparator))]
+   [MemberData(nameof(ZeroCheckDigitValues))]
    public void CaSocialInsuranceNumber_Create_ShouldCreateObject_WhenCheckDigitCalculatesAsZero(String sin)
    {
       // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(DefaultSeparator.ToString(), String.Empty);
+      var expected = sin.Length == 9 ? sin : GetUnformattedSinFromFormattedSin(sin);
       var expectedValue = new CaSocialInsuranceNumber(expected);
 
       // Act.
       var result = CaSocialInsuranceNumber.Create(sin);
-
-      // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
-   }
-
-   #endregion
-
-   #region Create (With Custom Separator) Method Tests
-   // ==========================================================================
-   // ==========================================================================
-
-   [Theory]
-   [MemberData(nameof(ValidValuesNoSeparator))]
-   [MemberData(nameof(ValidValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldCreateObject_WhenValueContainsValidSin(String sin)
-   {
-      // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(CustomSeparator.ToString(), String.Empty);
-      var expectedValue = new CaSocialInsuranceNumber(expected);
-
-      // Act.
-      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
-
-      // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
-   }
-
-   [Theory]
-   [MemberData(nameof(InvalidCustomSeparatorData))]
-   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldThrowArgumentOutOfRangeException_WhenCustomSeparatorIsDigit(
-      String sin,
-      Char customSeparator)
-      => FluentActions
-         .Invoking(() => _ = CaSocialInsuranceNumber.Create(sin, customSeparator))
-         .Should()
-         .ThrowExactly<ArgumentOutOfRangeException>()
-         .WithMessage(Messages.CaSinInvalidCustomSeparatorCharacter + "*");
-
-   [Theory]
-   [MemberData(nameof(EmptySinValues))]
-   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String? sin)
-   {
-      // Arrange.
-      var expected = CaSocialInsuranceNumberValidationResult.Empty;
-
-      // Act.
-      var result = CaSocialInsuranceNumber.Create(sin!, CustomSeparator);
-
-      // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(expected);
-   }
-
-   [Theory]
-   [MemberData(nameof(InvalidLengthValuesNoSeparator))]
-   [MemberData(nameof(InvalidLengthValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String sin)
-   {
-      // Arrange.
-      var expected = CaSocialInsuranceNumberValidationResult.InvalidLength;
-
-      // Act.
-      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
-
-      // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(expected);
-   }
-
-   [Theory]
-   [MemberData(nameof(InvalidSeparatorValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldReturnInvalidSeparatorEncounteredResult_When11CharacterValueContainsAnInvalidSeparator(String sin)
-   {
-      // Arrange.
-      var expected = CaSocialInsuranceNumberValidationResult.InvalidSeparatorEncountered;
-
-      // Act.
-      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
-
-      // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(expected);
-   }
-
-   [Theory]
-   [MemberData(nameof(InvalidCharacterValuesNoSeparator))]
-   [MemberData(nameof(InvalidCharacterValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldReturnInvalidCharacterEncounteredResult_WhenValueContainsNonAsciiDigit(String sin)
-   {
-      // Arrange.
-      var expected = CaSocialInsuranceNumberValidationResult.InvalidCharacterEncountered;
-
-      // Act.
-      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
-
-      // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(expected);
-   }
-
-   [Theory]
-   [MemberData(nameof(InvalidProvinceValuesNoSeparator))]
-   [MemberData(nameof(InvalidProvinceValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldReturnInvalidProvinceResult_WhenValueHasInvalidLeadingDigit(String sin)
-   {
-      // Arrange.
-      var expected = CaSocialInsuranceNumberValidationResult.InvalidProvince;
-
-      // Act.
-      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
-
-      // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(expected);
-   }
-
-   [Theory]
-   [MemberData(nameof(UndetectableErrorValuesNoSeparator))]
-   [MemberData(nameof(UndetectableErrorValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String sin)
-   {
-      // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(CustomSeparator.ToString(), String.Empty);
-      var expectedValue = new CaSocialInsuranceNumber(expected);
-
-      // Act.
-      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
-
-      // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
-   }
-
-   [Theory]
-   [MemberData(nameof(InvalidCheckDigitValuesNoSeparator))]
-   [MemberData(nameof(InvalidCheckDigitValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldReturnInvalidCheckDigit_WhenCheckDigitContainsDetectableError(String sin)
-   {
-      // Arrange.
-      var expected = CaSocialInsuranceNumberValidationResult.InvalidCheckDigit;
-
-      // Act.
-      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
-
-      // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(expected);
-   }
-
-   [Theory]
-   [MemberData(nameof(ZeroCheckDigitValuesNoSeparator))]
-   [MemberData(nameof(ZeroCheckDigitValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_CreateWithCustomSeparator_ShouldCreateObject_WhenCheckDigitCalculatesAsZero(String sin)
-   {
-      // Arrange.
-      var expected = sin.Length == 9 ? sin : sin.Replace(CustomSeparator.ToString(), String.Empty);
-      var expectedValue = new CaSocialInsuranceNumber(expected);
-
-      // Act.
-      var result = CaSocialInsuranceNumber.Create(sin, CustomSeparator);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1130,9 +706,9 @@ public class CaSocialInsuranceNumberTests
    public void CaSocialInsuranceNumber_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
    {
       // Arrange.
-      var sut = new CaSocialInsuranceNumber(ValidNineCharSin);
+      var sut = new CaSocialInsuranceNumber(AltValidNineCharSin);
       var mask = "___ ___ ___";
-      var expected = ValidElevenCharSinWithCustomSeparator;
+      var expected = AltElevenCharSin;
 
       // Act.
       var str = sut.Format(mask);
@@ -1201,13 +777,12 @@ public class CaSocialInsuranceNumberTests
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidValuesNoSeparator))]
-   [MemberData(nameof(ValidValuesDefaultSeparator))]
+   [MemberData(nameof(ValidValues))]
    public void CaSocialInsuranceNumber_ToString_ShouldReturnExpectedValue(String sin)
    {
       // Arrange.
       var sut = new CaSocialInsuranceNumber(sin);
-      var expected = sin.Length == 9 ? sin : sin.Replace(DefaultSeparator.ToString(), String.Empty);
+      var expected = sin.Length == 9 ? sin : GetUnformattedSinFromFormattedSin(sin);
 
       // Act/assert.
       sut.ToString().Should().Be(expected);
@@ -1220,8 +795,7 @@ public class CaSocialInsuranceNumberTests
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidValuesNoSeparator))]
-   [MemberData(nameof(ValidValuesDefaultSeparator))]
+   [MemberData(nameof(ValidValues))]
    public void CaSocialInsuranceNumber_Validate_ShouldReturnValidationPassed_WhenValueContainsValidSin(String sin)
       => CaSocialInsuranceNumber.Validate(sin).Should().Be(CaSocialInsuranceNumberValidationResult.ValidationPassed);
 
@@ -1231,114 +805,39 @@ public class CaSocialInsuranceNumberTests
       => CaSocialInsuranceNumber.Validate(sin).Should().Be(CaSocialInsuranceNumberValidationResult.Empty);
 
    [Theory]
-   [MemberData(nameof(InvalidLengthValuesNoSeparator))]
-   [MemberData(nameof(InvalidLengthValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidLengthValues))]
    public void CaSocialInsuranceNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String sin)
       => CaSocialInsuranceNumber.Validate(sin).Should().Be(CaSocialInsuranceNumberValidationResult.InvalidLength);
 
    [Theory]
-   [MemberData(nameof(InvalidSeparatorValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidSeparatorValues))]
    public void CaSocialInsuranceNumber_Validate_ShouldReturnInvalidSeparatorEncountered_When11CharacterValueContainsAnInvalidSeparator(String sin)
       => CaSocialInsuranceNumber.Validate(sin).Should().Be(CaSocialInsuranceNumberValidationResult.InvalidSeparatorEncountered);
 
    [Theory]
-   [MemberData(nameof(InvalidCharacterValuesNoSeparator))]
-   [MemberData(nameof(InvalidCharacterValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidCharacterValues))]
    public void CaSocialInsuranceNumber_Validate_ShouldReturnInvalidCharacterEncountered_WhenValueContainsNonAsciiDigit(String sin)
       => CaSocialInsuranceNumber.Validate(sin).Should().Be(CaSocialInsuranceNumberValidationResult.InvalidCharacterEncountered);
 
    [Theory]
-   [MemberData(nameof(InvalidProvinceValuesNoSeparator))]
-   [MemberData(nameof(InvalidProvinceValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidProvinceValues))]
    public void CaSocialInsuranceNumber_Validate_ShouldReturnInvalidProvince_WhenValueHasInvalidLeadingDigit(String sin)
       => CaSocialInsuranceNumber.Validate(sin).Should().Be(CaSocialInsuranceNumberValidationResult.InvalidProvince);
 
    [Theory]
-   [MemberData(nameof(UndetectableErrorValuesNoSeparator))]
-   [MemberData(nameof(UndetectableErrorValuesDefaultSeparator))]
+   [MemberData(nameof(CheckDigitUndetectableErrorValues))]
    public void CaSocialInsuranceNumber_Validate_ShouldReturnValidationPassed_WhenCheckDigitContainsUndetectableError(String sin)
       => CaSocialInsuranceNumber.Validate(sin).Should().Be(CaSocialInsuranceNumberValidationResult.ValidationPassed);
 
    [Theory]
-   [MemberData(nameof(InvalidCheckDigitValuesNoSeparator))]
-   [MemberData(nameof(InvalidCheckDigitValuesDefaultSeparator))]
+   [MemberData(nameof(InvalidCheckDigitValues))]
    public void CaSocialInsuranceNumber_Validate_ShouldReturnValidationPassed_WhenCheckDigitContainsDetectableError(String sin)
       => CaSocialInsuranceNumber.Validate(sin).Should().Be(CaSocialInsuranceNumberValidationResult.InvalidCheckDigit);
 
    [Theory]
-   [MemberData(nameof(ZeroCheckDigitValuesNoSeparator))]
-   [MemberData(nameof(ZeroCheckDigitValuesDefaultSeparator))]
+   [MemberData(nameof(ZeroCheckDigitValues))]
    public void CaSocialInsuranceNumber_Validate_ShouldReturnValidationPassed_WhenCheckDigitCalculatesAsZero(String sin)
       => CaSocialInsuranceNumber.Validate(sin).Should().Be(CaSocialInsuranceNumberValidationResult.ValidationPassed);
-
-   #endregion
-
-   #region Validate (With Custom Separator) Method Tests
-   // ==========================================================================
-   // ==========================================================================
-
-   [Theory]
-   [MemberData(nameof(ValidValuesNoSeparator))]
-   [MemberData(nameof(ValidValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ValidateWithCustomSeparator_ShouldReturnValidationPassed_WhenValueContainsValidSin(String sin)
-      => CaSocialInsuranceNumber.Validate(sin, CustomSeparator).Should().Be(CaSocialInsuranceNumberValidationResult.ValidationPassed);
-
-   [Theory]
-   [MemberData(nameof(InvalidCustomSeparatorData))]
-   public void CaSocialInsuranceNumber_ValidateWithCustomSeparator_ShouldThrowArgumentOutOfRangeException_WhenCustomSeparatorIsDigit(
-      String sin,
-      Char customSeparator)
-      => FluentActions
-         .Invoking(() => CaSocialInsuranceNumber.Validate(sin, customSeparator))
-         .Should()
-         .ThrowExactly<ArgumentOutOfRangeException>()
-         .WithMessage(Messages.CaSinInvalidCustomSeparatorCharacter + "*");
-
-   [Theory]
-   [MemberData(nameof(EmptySinValues))]
-   public void CaSocialInsuranceNumber_ValidateWithCustomSeparator_ShouldReturnEmpty_WhenValueIsEmpty(String? sin)
-      => CaSocialInsuranceNumber.Validate(sin, CustomSeparator).Should().Be(CaSocialInsuranceNumberValidationResult.Empty);
-
-   [Theory]
-   [MemberData(nameof(InvalidLengthValuesNoSeparator))]
-   [MemberData(nameof(InvalidLengthValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ValidateWithCustomSeparator_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String sin)
-      => CaSocialInsuranceNumber.Validate(sin, CustomSeparator).Should().Be(CaSocialInsuranceNumberValidationResult.InvalidLength);
-
-   [Theory]
-   [MemberData(nameof(InvalidSeparatorValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ValidateWithCustomSeparator_ShouldReturnInvalidSeparatorEncountered_When11CharacterValueContainsAnInvalidSeparator(String sin)
-      => CaSocialInsuranceNumber.Validate(sin, CustomSeparator).Should().Be(CaSocialInsuranceNumberValidationResult.InvalidSeparatorEncountered);
-
-   [Theory]
-   [MemberData(nameof(InvalidCharacterValuesNoSeparator))]
-   [MemberData(nameof(InvalidCharacterValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ValidateWithCustomSeparator_ShouldReturnInvalidCharacterEncountered_WhenValueContainsNonAsciiDigit(String sin)
-      => CaSocialInsuranceNumber.Validate(sin, CustomSeparator).Should().Be(CaSocialInsuranceNumberValidationResult.InvalidCharacterEncountered);
-
-   [Theory]
-   [MemberData(nameof(InvalidProvinceValuesNoSeparator))]
-   [MemberData(nameof(InvalidProvinceValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ValidateWithCustomSeparator_ShouldReturnInvalidProvince_WhenValueHasInvalidLeadingDigit(String sin)
-      => CaSocialInsuranceNumber.Validate(sin, CustomSeparator).Should().Be(CaSocialInsuranceNumberValidationResult.InvalidProvince);
-
-   [Theory]
-   [MemberData(nameof(UndetectableErrorValuesNoSeparator))]
-   [MemberData(nameof(UndetectableErrorValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ValidateWithCustomSeparator_ShouldReturnValidationPassed_WhenCheckDigitContainsUndetectableError(String sin)
-      => CaSocialInsuranceNumber.Validate(sin, CustomSeparator).Should().Be(CaSocialInsuranceNumberValidationResult.ValidationPassed);
-
-   [Theory]
-   [MemberData(nameof(InvalidCheckDigitValuesNoSeparator))]
-   [MemberData(nameof(InvalidCheckDigitValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ValidateWithCustomSeparator_ShouldReturnInvalidCheckDigit_WhenCheckDigitContainsDetectableError(String sin)
-      => CaSocialInsuranceNumber.Validate(sin, CustomSeparator).Should().Be(CaSocialInsuranceNumberValidationResult.InvalidCheckDigit);
-
-   [Theory]
-   [MemberData(nameof(ZeroCheckDigitValuesNoSeparator))]
-   [MemberData(nameof(ZeroCheckDigitValuesCustomSeparator))]
-   public void CaSocialInsuranceNumber_ValidateWithCustomSeparator_ShouldReturnValidationPassed_WhenCheckDigitCalculatesAsZero(String sin)
-      => CaSocialInsuranceNumber.Validate(sin, CustomSeparator).Should().Be(CaSocialInsuranceNumberValidationResult.ValidationPassed);
 
    #endregion
 

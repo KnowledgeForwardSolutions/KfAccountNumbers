@@ -50,8 +50,8 @@ of Canada.
 
 A Canadian SIN consists of 9 digits, typically formatted as AAA AAA AAA. The CaSocialInsuranceNumber
 constructor will accept either 9 character strings (all digits) or eleven character strings that
-include separator characters. The default separator character is dash ('-'), though the default can
-be overridden by any non-digit character.
+include separator characters between the three groups of digits. If used, the separator character
+must be the same for both separators and must be a non-digit character.
 
 Not all 9 digit numbers are valid SINs. A valid SIN must meet all of the following rules:
 
@@ -139,8 +139,8 @@ sub-grouping within the area association to a geographic region was eliminated i
 
 SSNs are commonly formatted with dashes separating the three groups, though spaces are sometimes used.
 The UsSocialSecurityNumber constructor will accept either 9 character strings (all digits) or eleven
-character strings that include separator characters. The default separator character is dash ('-'),
-though the default can be overridden by any non-digit character.
+character strings that include separator characters between the three groups. If used, the separator
+character must be the same for both separators and must be a non-digit character.
 
 Not all 9 digit numbers are valid SSNs. A valid SSN must meet all of the following rules:
 
