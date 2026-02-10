@@ -1,4 +1,4 @@
-// Ignore Spelling: npi
+// Ignore Spelling: Json npi
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -467,6 +467,21 @@ public class UsNationalProviderIdentifierTests
       hash1.Should().Be(hash2);
    }
 
+   [Fact]
+   public void UsNationalProviderIdentifier_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
+      var npi2 = new UsNationalProviderIdentifier(AltValidNpi);
+
+      // Act.
+      var hash1 = npi1.GetHashCode();
+      var hash2 = npi2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
    #endregion
 
    #region ToString Method Tests
@@ -524,6 +539,40 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_Validate_ShouldReturnInvalidCheckDigit_WhenCheckDigitContainsDetectableError(String npi)
       => UsNationalProviderIdentifier.Validate(npi)
          .Should().Be(UsNationalProviderIdentifierValidationResult.InvalidCheckDigit);
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void UsNationalProviderIdentifier_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new UsNationalProviderIdentifier(ValidNpi);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<UsNationalProviderIdentifier>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void UsNationalProviderIdentifier_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new UsNationalProviderIdentifier(ValidNpi);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{ValidNpi}\"");  // Simple string, not object
+   }
 
    #endregion
 }

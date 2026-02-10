@@ -770,6 +770,21 @@ public class CaSocialInsuranceNumberTests
       hash1.Should().Be(hash2);
    }
 
+   [Fact]
+   public void CaSocialInsuranceNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var sin1 = new CaSocialInsuranceNumber(ValidNineCharSin);
+      var sin2 = new CaSocialInsuranceNumber(AltValidNineCharSin);
+
+      // Act.
+      var hash1 = sin1.GetHashCode();
+      var hash2 = sin2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
    #endregion
 
    #region ToString Method Tests
@@ -858,6 +873,19 @@ public class CaSocialInsuranceNumberTests
       // Assert.
       result.Should().NotBeNull();
       result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void CaSocialInsuranceNumber_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new CaSocialInsuranceNumber(ValidNineCharSin);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{ValidNineCharSin}\"");  // Simple string, not object
    }
 
    #endregion

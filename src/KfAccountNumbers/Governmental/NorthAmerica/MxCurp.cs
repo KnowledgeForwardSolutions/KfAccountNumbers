@@ -1,4 +1,6 @@
-// Ignore Spelling: Curp Mx
+// Ignore Spelling: Curp Json Mx
+
+#pragma warning disable IDE0008 // Use explicit type
 
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
@@ -98,6 +100,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///      </list>
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(MxCurpJsonConverter))]
 public record MxCurp
 {
    private const Int32 ValidLength = 18;
@@ -153,26 +156,25 @@ public record MxCurp
    ///   <paramref name="curp"/> contains a non-digit check digit character in
    ///   position 17 (zero-based).
    /// </exception>
-   public MxCurp(String? curp)
+   public MxCurp(String? curp) : this(curp, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Private constructor that actually does the work. Supports optional validation,
+   ///   specifically to support the <see cref="Create(String?)"/> method.
+   /// </summary>
+   private MxCurp(String? curp, ValidationMode validationMode)
    {
-      MxCurpValidationResult validationResult = Validate(curp);
-      if (validationResult != MxCurpValidationResult.ValidationPassed)
+      if (validationMode == ValidationMode.ValidationRequired)
       {
-         throw new InvalidMxCurpException(validationResult);
+         MxCurpValidationResult validationResult = Validate(curp);
+         if (validationResult != MxCurpValidationResult.ValidationPassed)
+         {
+            throw new InvalidMxCurpException(validationResult);
+         }
       }
 
       Value = curp!.ToUpperInvariant();
    }
-
-   /// <summary>
-   ///   Private constructor to support <see cref="Create(String)"/>
-   ///   method.
-   /// </summary>
-   /// <remarks>
-   ///   Boolean discard parameter is used to differentiate this constructor
-   ///   from the public constructor.
-   /// </remarks>
-   private MxCurp(String? curp, Boolean _) => Value = curp!.ToUpperInvariant();
 
    /// <summary>
    ///   The person's date of birth, derived from the YYMMDD date of birth and 
@@ -244,7 +246,7 @@ public record MxCurp
       MxCurpValidationResult validationResult = Validate(curp);
       
       return validationResult == MxCurpValidationResult.ValidationPassed
-         ? new MxCurp(curp, true)
+         ? new MxCurp(curp, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
@@ -303,6 +305,25 @@ public record MxCurp
       return MxCurpValidationResult.ValidationPassed;
    }
 
+   private static Int32 GetFebruaryDays(Int32 yearTwoDigit, Char homoclave)
+   {
+      // Leap year rules:
+      // - Non-century year (YY != 00) divisible by 4 is leap year
+      // - Century year (YY == 00) divisible by 400 is leap year
+      //   (homoclave letter = 2000s = divisible by 400)
+      //   (homoclave digit = 1900s = NOT divisible by 400)
+
+      if (yearTwoDigit == 0)
+      {
+         // Century year: 1900 or 2000
+         return Char.IsAsciiLetter(homoclave) ? 29 : 28;  // 2000 is leap, 1900 is not
+      }
+
+      // Non-century year: divisible by 4 is leap year
+      return yearTwoDigit % 4 == 0 ? 29 : 28;
+   }
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static ReadOnlySpan<Char> GetSectionSpan(ReadOnlySpan<Char> curp, CurpSection section)
       => section switch
       {
@@ -316,10 +337,18 @@ public record MxCurp
          _ => throw new SwitchExpressionException(section)
       };
 
-   private static (Int32, Int32, Int32) GetYearMonthDay(ReadOnlySpan<Char> dateOfBirthSpan)
-      => (((dateOfBirthSpan[0] - Chars.DigitZero) * 10) + (dateOfBirthSpan[1] - Chars.DigitZero),
-         ((dateOfBirthSpan[2] - Chars.DigitZero) * 10) + (dateOfBirthSpan[3] - Chars.DigitZero),
-         ((dateOfBirthSpan[4] - Chars.DigitZero) * 10) + (dateOfBirthSpan[5] - Chars.DigitZero));
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static (Int32 year, Int32 month, Int32 day) GetYearMonthDay(ReadOnlySpan<Char> dateOfBirthSpan)
+   {
+      var year = ParseTwoDigits(dateOfBirthSpan[0], dateOfBirthSpan[1]);
+      var month = ParseTwoDigits(dateOfBirthSpan[2], dateOfBirthSpan[3]);
+      var day = ParseTwoDigits(dateOfBirthSpan[4], dateOfBirthSpan[5]);
+      return (year, month, day);
+   }
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Int32 ParseTwoDigits(Char tens, Char ones)
+      => ((tens - Chars.DigitZero) * 10) + (ones - Chars.DigitZero);
 
    private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> curp)
    {
@@ -346,10 +375,7 @@ public record MxCurp
       var maxDaysInMonth = month switch
       {
          1 => 31,
-         // Leap year calculation. Non century year divisible by 4 OR century
-         // year divisible by 400. Since homoclave determines 1900's or 2000's,
-         // we can use the homoclave for the century year divisible by 400 check.
-         2 => ((year != 0 && year % 4 == 0) || (year == 0 && Char.IsAsciiLetter(curp[HomoclaveOffset]))) ? 29 : 28,
+         2 => GetFebruaryDays(year, curp[HomoclaveOffset]),
          3 => 31,
          4 => 30,
          5 => 31,
@@ -405,4 +431,16 @@ public record MxCurp
 
       return MxCurpStateCodes.ValidateStateCode(stateCode);
    }
+}
+
+public class MxCurpJsonConverter : JsonConverter<MxCurp>
+{
+   public override MxCurp Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      var curpString = reader.GetString();
+      return new MxCurp(curpString);
+   }
+
+   public override void Write(Utf8JsonWriter writer, MxCurp value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }
