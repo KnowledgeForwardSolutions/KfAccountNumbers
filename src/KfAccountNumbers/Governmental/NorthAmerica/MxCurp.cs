@@ -99,6 +99,11 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         </item>
 ///      </list>
 ///   </para>
+///   <para>
+///      See <see href="https://en.wikipedia.org/wiki/Unique_Population_Registry_Code">Wikipedia - Unique Population Registry Code</see>
+///      and <see href="https://es.wikipedia.org/wiki/Clave_%C3%9Anica_de_Registro_de_Poblaci%C3%B3n">Wikipedia - Clave Única de Registro de Población</see>
+///      for more details.
+///   </para>
 /// </remarks>
 [JsonConverter(typeof(MxCurpJsonConverter))]
 public record MxCurp
@@ -189,7 +194,9 @@ public record MxCurp
       get
       {
          ReadOnlySpan<Char> dateOfBirthSpan = GetSectionSpan(Value, CurpSection.DateOfBirth);
+#pragma warning disable IDE0008 // Use explicit type
          var (year, month, day) = GetYearMonthDay(dateOfBirthSpan);
+#pragma warning restore IDE0008 // Use explicit type
          year += Char.IsAsciiDigit(Value[HomoclaveOffset]) ? 1900 : 2000;
 
          return new DateOnly(year, month, day);
@@ -244,15 +251,14 @@ public record MxCurp
    public static CreateResult<MxCurp, MxCurpValidationResult> Create(String? curp)
    {
       MxCurpValidationResult validationResult = Validate(curp);
-      
       return validationResult == MxCurpValidationResult.ValidationPassed
          ? new MxCurp(curp, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
    /// <summary>
-   ///   Check the <paramref name="curp"/> to determine if it contains any 
-   ///   validation errors.
+   ///   Check the <paramref name="curp"/> to determine if it contains a valid
+   ///   CURP value.
    /// </summary>
    /// <param name="curp">
    ///   String representation of a CURP.
@@ -365,7 +371,9 @@ public record MxCurp
          }
       }
 
+#pragma warning disable IDE0008 // Use explicit type
       var (year, month, day) = GetYearMonthDay(dateOfBirthSpan);
+#pragma warning restore IDE0008 // Use explicit type
 
       if (month is < 1 or > 12)
       {

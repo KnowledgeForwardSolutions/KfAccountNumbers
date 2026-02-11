@@ -44,6 +44,10 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         </item>
 ///      </list>
 ///   </para>
+///   <para>
+///      See <see href="https://en.wikipedia.org/wiki/Social_Insurance_Number">Wikipedia - Social Insurance Number</see>
+///      for more details.
+///   </para>
 /// </remarks>
 [JsonConverter(typeof(CaSocialInsuranceNumberJsonConverter))]
 public record CaSocialInsuranceNumber
@@ -156,8 +160,8 @@ public record CaSocialInsuranceNumber
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="sin"/> to determine if it contains any 
-   ///   validation errors.
+   ///   Check the <paramref name="sin"/> to determine if it contains a valid
+   ///   Canadian Social Insurance Number (SIN).
    /// </summary>
    /// <param name="sin">
    ///   String representation of a Social Insurance Number.

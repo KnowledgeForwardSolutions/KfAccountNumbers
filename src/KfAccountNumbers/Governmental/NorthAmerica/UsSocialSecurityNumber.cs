@@ -219,8 +219,8 @@ public record UsSocialSecurityNumber
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="ssn"/> to determine if it contains any 
-   ///   validation errors.
+   ///   Check the <paramref name="ssn"/> to determine if it contains a valid
+   ///   US Social Security Number (SSN).
    /// </summary>
    /// <param name="ssn">
    ///   String representation of a Social Security Number.

@@ -36,6 +36,10 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         </item>
 ///      </list>
 ///   </para>
+///   <para>
+///      See <see href="https://en.wikipedia.org/wiki/National_Provider_Identifier">Wikipedia - National Provider Identifier</see>
+///      for more details.
+///   </para>
 /// </remarks>
 [JsonConverter(typeof(UsNationalProviderIdentifierJsonConverter))]
 public record UsNationalProviderIdentifier
@@ -120,8 +124,8 @@ public record UsNationalProviderIdentifier
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="npi"/> to determine if it contains any 
-   ///   validation errors.
+   ///   Check the <paramref name="npi"/> to determine if it contains a valid
+   ///   US National Provider Identifier (NPI).
    /// </summary>
    /// <param name="npi">
    ///   String representation of a US National Provider Identifier.
