@@ -88,15 +88,6 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CA Social Insurance Number may not use a decimal digit (0-9) as a custom separator character.
-        /// </summary>
-        internal static string CaSinInvalidCustomSeparatorCharacter {
-            get {
-                return ResourceManager.GetString("CaSinInvalidCustomSeparatorCharacter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to CA Social Insurance Number must have length 9 (digits only) or 11 (9 digits with two separator characters).
         /// </summary>
         internal static string CaSinInvalidLength {
@@ -259,6 +250,60 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to US Individual Taxpayer Identification Number may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string UsItinEmpty {
+            get {
+                return ResourceManager.GetString("UsItinEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to US Individual Taxpayer Identification Number area number segment (AAA-xx-xxxx) must not be 000-899.
+        /// </summary>
+        internal static string UsItinInvalidAreaNumber {
+            get {
+                return ResourceManager.GetString("UsItinInvalidAreaNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to US Individual Taxpayer Identification Number must only contain digit characters (0-9) in non-separator character locations.
+        /// </summary>
+        internal static string UsItinInvalidCharacterEncountered {
+            get {
+                return ResourceManager.GetString("UsItinInvalidCharacterEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to US Individual Taxpayer Identification Number group number segment (xxx-GG-xxxx) must not be 00-49, 66-69, 89 or 93.
+        /// </summary>
+        internal static string UsItinInvalidGroupNumber {
+            get {
+                return ResourceManager.GetString("UsItinInvalidGroupNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to US Individual Taxpayer Identification Number must have length 9 (digits only) or 11 (9 digits with two separator characters).
+        /// </summary>
+        internal static string UsItinInvalidLength {
+            get {
+                return ResourceManager.GetString("UsItinInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to US Individual Taxpayer Identification Number with length 11 contains an unexpected character at a separator position.
+        /// </summary>
+        internal static string UsItinInvalidSeparatorEncountered {
+            get {
+                return ResourceManager.GetString("UsItinInvalidSeparatorEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Null UsNationalProviderIdentifier can not be converted to String.
         /// </summary>
         internal static string UsNationalProviderIdentifierInvalidNullConversionToString {
@@ -336,15 +381,6 @@ namespace KfAccountNumbers {
         internal static string UsSsnInvalidCharacterEncountered {
             get {
                 return ResourceManager.GetString("UsSsnInvalidCharacterEncountered", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to US Social Security Number may not use a decimal digit (0-9) as a custom separator character.
-        /// </summary>
-        internal static string UsSsnInvalidCustomSeparatorCharacter {
-            get {
-                return ResourceManager.GetString("UsSsnInvalidCustomSeparatorCharacter", resourceCulture);
             }
         }
         
