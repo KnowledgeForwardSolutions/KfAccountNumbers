@@ -153,9 +153,6 @@
   <data name="CaSinInvalidCharacterEncountered" xml:space="preserve">
     <value>CA Social Insurance Number must only contain digit characters (0-9) in non-separator character locations</value>
   </data>
-  <data name="UsSsnInvalidCustomSeparatorCharacter" xml:space="preserve">
-    <value>US Social Security Number may not use a decimal digit (0-9) as a custom separator character</value>
-  </data>
   <data name="UsSsnInvalidGroupNumber" xml:space="preserve">
     <value>US Social Security Number group number segment (xxx-GG-xxxx) must not be 00</value>
   </data>
@@ -185,9 +182,6 @@
   </data>
   <data name="CaSinInvalidProvince" xml:space="preserve">
     <value>CA Social Insurance Number may not have a leading digit (the province indicator) of zero (0) or eight (8)</value>
-  </data>
-  <data name="CaSinInvalidCustomSeparatorCharacter" xml:space="preserve">
-    <value>CA Social Insurance Number may not use a decimal digit (0-9) as a custom separator character</value>
   </data>
   <data name="CaSinInvalidNullConversionToString" xml:space="preserve">
     <value>Null CaSocialInsuranceNumber can not be converted to String</value>
@@ -233,5 +227,23 @@
   </data>
   <data name="UsNationalProviderIdentifierInvalidNullConversionToString" xml:space="preserve">
     <value>Null UsNationalProviderIdentifier can not be converted to String</value>
+  </data>
+  <data name="UsItinEmpty" xml:space="preserve">
+    <value>US Individual Taxpayer Identification Number may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="UsItinInvalidLength" xml:space="preserve">
+    <value>US Individual Taxpayer Identification Number must have length 9 (digits only) or 11 (9 digits with two separator characters)</value>
+  </data>
+  <data name="UsItinInvalidSeparatorEncountered" xml:space="preserve">
+    <value>US Individual Taxpayer Identification Number with length 11 contains an unexpected character at a separator position</value>
+  </data>
+  <data name="UsItinInvalidCharacterEncountered" xml:space="preserve">
+    <value>US Individual Taxpayer Identification Number must only contain digit characters (0-9) in non-separator character locations</value>
+  </data>
+  <data name="UsItinInvalidAreaNumber" xml:space="preserve">
+    <value>US Individual Taxpayer Identification Number area number segment (AAA-xx-xxxx) must not be 000-899</value>
+  </data>
+  <data name="UsItinInvalidGroupNumber" xml:space="preserve">
+    <value>US Individual Taxpayer Identification Number group number segment (xxx-GG-xxxx) must not be 00-49, 66-69, 89 or 93</value>
   </data>
 </root>
