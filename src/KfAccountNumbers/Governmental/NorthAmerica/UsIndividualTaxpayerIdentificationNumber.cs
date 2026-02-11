@@ -102,11 +102,32 @@ public record class UsIndividualTaxpayerIdentificationNumber
       {
          return UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered;
       }
+      if (!ValidateGroupNumber(itin))
+      {
+         return UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber;
+      }
 
-      throw new NotImplementedException();
+      return UsIndividualTaxpayerIdentificationNumberValidationResult.ValidationPassed;
    }
 
+   private static ReadOnlySpan<Char> GetAreaNumber(ReadOnlySpan<Char> itin)
+      => itin[..AreaRangeEnd];
+
+   private static ReadOnlySpan<Char> GetGroupNumber(ReadOnlySpan<Char> itin)
+      => IsFormattedItin(itin)
+         ? itin[FormattedGroupRangeStart..FormattedGroupRangeEnd]
+         : itin[UnformattedGroupRangeStart..UnformattedGroupRangeEnd];
+
+   private static ReadOnlySpan<Char> GetSerialNumber(ReadOnlySpan<Char> itin)
+      => IsFormattedItin(itin)
+         ? itin[FormattedSerialNumberRangeStart..]
+         : itin[UnformattedSerialNumberRangeStart..];
+
    private static Boolean IsFormattedItin(ReadOnlySpan<Char> itin) => itin.Length == FormattedLength;
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Int32 ParseGroupNumber(ReadOnlySpan<Char> groupSpan)
+      => ((groupSpan[0] - Chars.DigitZero) * 10) + (groupSpan[1] - Chars.DigitZero);
 
    private static Boolean ValidateAllDigits(ReadOnlySpan<Char> itin)
    {
@@ -135,6 +156,17 @@ public record class UsIndividualTaxpayerIdentificationNumber
       var serialSeparator = itin[SerialSeparatorOffset];
 
       return groupSeparator == serialSeparator && !groupSeparator.IsAsciiDigit();
+   }
+
+   private static Boolean ValidateGroupNumber(ReadOnlySpan<Char> itin)
+   {
+      ReadOnlySpan<Char> groupSpan = GetGroupNumber(itin);
+      var groupNumber = ParseGroupNumber(groupSpan);
+      return groupNumber is
+            (>= 0 and <= 65) or
+            (>= 70 and <= 88) or
+            (>= 90 and <= 92) or
+            (>= 94 and <= 99);
    }
 
    private static Boolean ValidateLength(ReadOnlySpan<Char> itin)
