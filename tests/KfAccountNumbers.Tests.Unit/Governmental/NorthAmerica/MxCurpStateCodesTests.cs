@@ -159,6 +159,49 @@ public class MxCurpStateCodesTests
       MxCurpStateCodes.ValidateStateCode(span).Should().BeTrue();
    }
 
+   [Theory]
+   [InlineData("AS")]
+   [InlineData("BC")]
+   [InlineData("BS")]
+   [InlineData("CC")]
+   [InlineData("CL")]
+   [InlineData("CM")]
+   [InlineData("CS")]
+   [InlineData("CH")]
+   [InlineData("DF")]
+   [InlineData("DG")]
+   [InlineData("GT")]
+   [InlineData("GR")]
+   [InlineData("HG")]
+   [InlineData("JC")]
+   [InlineData("MC")]
+   [InlineData("MN")]
+   [InlineData("MS")]
+   [InlineData("NT")]
+   [InlineData("NL")]
+   [InlineData("OC")]
+   [InlineData("PL")]
+   [InlineData("QT")]
+   [InlineData("QR")]
+   [InlineData("SP")]
+   [InlineData("SL")]
+   [InlineData("SR")]
+   [InlineData("TC")]
+   [InlineData("TS")]
+   [InlineData("TL")]
+   [InlineData("VZ")]
+   [InlineData("YN")]
+   [InlineData("ZS")]
+   [InlineData("NE")]
+   public void MxCurpStateCodes_ValidateStateCode_ShouldReturnTrue_WhenLowerCaseStateCodeIsValid(String stateCode)
+   {
+      // Arrange.
+      ReadOnlySpan<Char> span = stateCode.ToLowerInvariant().AsSpan();
+
+      // Act/assert.
+      MxCurpStateCodes.ValidateStateCode(span).Should().BeTrue();
+   }
+
    [Fact]
    public void MxCurpStateCodes_ValidateStateCode_ShouldReturnFalse_WhenStateCodeIsInvalid()
    {

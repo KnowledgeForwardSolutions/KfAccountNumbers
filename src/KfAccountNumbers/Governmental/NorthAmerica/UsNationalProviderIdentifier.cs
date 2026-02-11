@@ -1,4 +1,4 @@
-// Ignore Spelling: npi
+// Ignore Spelling: Json npi
 
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
@@ -37,6 +37,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///      </list>
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(UsNationalProviderIdentifierJsonConverter))]
 public record UsNationalProviderIdentifier
 {
    private const Int32 ValidLength = 10;
@@ -169,5 +170,16 @@ public record UsNationalProviderIdentifier
 
       return true;
    }
+}
 
+public class UsNationalProviderIdentifierJsonConverter : JsonConverter<UsNationalProviderIdentifier>
+{
+   public override UsNationalProviderIdentifier Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      var npiString = reader.GetString();
+      return new UsNationalProviderIdentifier(npiString);
+   }
+
+   public override void Write(Utf8JsonWriter writer, UsNationalProviderIdentifier value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }

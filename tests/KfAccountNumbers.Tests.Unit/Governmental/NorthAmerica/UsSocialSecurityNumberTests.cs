@@ -811,15 +811,30 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var sin1 = new UsSocialSecurityNumber(ValidNineCharSsn);
-      var sin2 = new UsSocialSecurityNumber(ValidElevenCharSsn);    // Same internal value
+      var ssn1 = new UsSocialSecurityNumber(ValidNineCharSsn);
+      var ssn2 = new UsSocialSecurityNumber(ValidElevenCharSsn);    // Same internal value
 
       // Act.
-      var hash1 = sin1.GetHashCode();
-      var hash2 = sin2.GetHashCode();
+      var hash1 = ssn1.GetHashCode();
+      var hash2 = ssn2.GetHashCode();
 
       // Assert.
       hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void UsSocialSecurityNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var ssn1 = new UsSocialSecurityNumber(ValidNineCharSsn);
+      var ssn2 = new UsSocialSecurityNumber(AltValidNineCharSsn);
+
+      // Act.
+      var hash1 = ssn1.GetHashCode();
+      var hash2 = ssn2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
    }
 
    #endregion
@@ -918,6 +933,19 @@ public class UsSocialSecurityNumberTests
       // Assert.
       result.Should().NotBeNull();
       result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void UsSocialSecurityNumber_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new UsSocialSecurityNumber(ValidNineCharSsn);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{ValidNineCharSsn}\"");  // Simple string, not object
    }
 
    #endregion
