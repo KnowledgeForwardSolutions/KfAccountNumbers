@@ -68,6 +68,55 @@ public record class UsIndividualTaxpayerIdentificationNumber
    private const Int32 SerialSeparatorOffset = 6;  // Offset of separator between group and serial number sections in formatted SSN
 
    /// <summary>
+   ///   Initialize a new <see cref="UsIndividualTaxpayerIdentificationNumber"/>.
+   /// </summary>
+   /// <param name="itin">
+   ///   String representation of an Individual Taxpayer Identification Number.
+   /// </param>
+   /// <exception cref="InvalidUsIndividualTaxpayerIdentificationNumberException">
+   ///   <paramref name="itin"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="itin"/> does not have length of 9 or 11.
+   ///   - or -
+   ///   <paramref name="itin"/> contains a non-ASCII digit (not 0-9).
+   ///   - or -
+   ///   <paramref name="itin"/> is 11 characters in length and contains and 
+   ///   separator characters that are not identical or are ASCII digits (0-9).
+   ///   - or -
+   ///   <paramref name="itin"/> contains an invalid area number (000-899).
+   ///   - or -
+   ///   <paramref name="itin"/> contains an invalid group number (not in the
+   ///   ranges 0-65, 70-88, 90-92 or 94-99).
+   /// </exception>
+   public UsIndividualTaxpayerIdentificationNumber(String? itin)
+      : this(itin, ValidationMode.ValidationRequired) { } 
+
+   /// <summary>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private UsIndividualTaxpayerIdentificationNumber(String? ssn, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         UsIndividualTaxpayerIdentificationNumberValidationResult validationResult = Validate(ssn);
+         if (validationResult != UsIndividualTaxpayerIdentificationNumberValidationResult.ValidationPassed)
+         {
+            throw new InvalidUsIndividualTaxpayerIdentificationNumberException(validationResult);
+         }
+      }
+
+      Value = GetValidatedItin(ssn!);
+   }
+
+   /// <summary>
+   ///   The raw SSN value.
+   /// </summary>
+   public String Value { get; init; }
+
+   /// <summary>
    ///   Check the <paramref name="itin"/> to determine if it contains a valid
    ///   US Individual Taxpayer Identification Number (ITIN).
    /// </summary>
@@ -110,19 +159,55 @@ public record class UsIndividualTaxpayerIdentificationNumber
       return UsIndividualTaxpayerIdentificationNumberValidationResult.ValidationPassed;
    }
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static ReadOnlySpan<Char> GetAreaNumber(ReadOnlySpan<Char> itin)
       => itin[..AreaRangeEnd];
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static ReadOnlySpan<Char> GetGroupNumber(ReadOnlySpan<Char> itin)
       => IsFormattedItin(itin)
          ? itin[FormattedGroupRangeStart..FormattedGroupRangeEnd]
          : itin[UnformattedGroupRangeStart..UnformattedGroupRangeEnd];
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static ReadOnlySpan<Char> GetSerialNumber(ReadOnlySpan<Char> itin)
       => IsFormattedItin(itin)
          ? itin[FormattedSerialNumberRangeStart..]
          : itin[UnformattedSerialNumberRangeStart..];
 
+   /// <summary>
+   ///   Get an unformatted ITIN value from a string that has passed validation.
+   ///   If the source string is formatted, then create a new string by merging
+   ///   all three ITIN sections together without allocating intermediate 
+   ///   Strings.
+   /// </summary>
+   private static String GetValidatedItin(String itin)
+   {
+      if (itin.Length == NonFormattedLength)
+      {
+         return itin;
+      }
+
+      var buffer = ArrayPool<Char>.Shared.Rent(NonFormattedLength);
+      try
+      {
+         var span = new Span<Char>(buffer);
+         ReadOnlySpan<Char> areaNumber = GetAreaNumber(itin);
+         ReadOnlySpan<Char> groupNumber = GetGroupNumber(itin);
+         ReadOnlySpan<Char> serialNumber = GetSerialNumber(itin);
+         areaNumber.CopyTo(span[..AreaRangeEnd]);
+         groupNumber.CopyTo(span[UnformattedGroupRangeStart..UnformattedGroupRangeEnd]);
+         serialNumber.CopyTo(span[UnformattedSerialNumberRangeStart..]);
+
+         return span[..NonFormattedLength].ToString();
+      }
+      finally
+      {
+         ArrayPool<Char>.Shared.Return(buffer);
+      }
+   }
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean IsFormattedItin(ReadOnlySpan<Char> itin) => itin.Length == FormattedLength;
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]

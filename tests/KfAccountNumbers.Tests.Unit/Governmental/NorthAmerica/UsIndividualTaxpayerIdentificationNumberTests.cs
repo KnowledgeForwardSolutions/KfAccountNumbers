@@ -129,6 +129,101 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       "\t"
    ];
 
+   /// <summary>
+   /// Extracts unformatted ITIN from an 11-character formatted ITIN.
+   /// Assumes input is exactly 11 characters with separators at positions 3 and 6.
+   /// </summary>
+   private static String GetRawItin(String itin)
+      => itin.Length switch
+      {
+         9 => itin,
+         11 => itin[0..3] + itin[4..6] + itin[7..11],
+         _ => throw new ArgumentException("Input must be 9 or 11 characters", nameof(itin))
+      };
+
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   [MemberData(nameof(ValidGroupNumberBoundaryValues))]
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldCreateObject_WhenValueContainsValidItin(String itin)
+   {
+      // Arrange.
+      var expected = GetRawItin(itin);
+
+      // Act.
+      var sut = new UsIndividualTaxpayerIdentificationNumber(itin);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(EmptyItinValues))]
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueIsEmpty(String? itin)
+      => FluentActions
+         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
+         .Should()
+         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .WithMessage(Messages.UsItinEmpty + "*")
+         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueHasInvalidLength(String itin)
+      => FluentActions
+         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
+         .Should()
+         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .WithMessage(Messages.UsItinInvalidLength + "*")
+         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidAreaNumberValues))]
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueHasInvalidAreaNumber(String itin)
+      => FluentActions
+         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
+         .Should()
+         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .WithMessage(Messages.UsItinInvalidAreaNumber + "*")
+         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidAreaNumber);
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_When11CharacterValueContainsInvalidSeparator(String itin)
+      => FluentActions
+         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
+         .Should()
+         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .WithMessage(Messages.UsItinInvalidSeparatorEncountered + "*")
+         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidSeparatorEncountered);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueContainsNonAsciiDigit(String itin)
+      => FluentActions
+         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
+         .Should()
+         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .WithMessage(Messages.UsItinInvalidCharacterEncountered + "*")
+         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered);
+
+   [Theory]
+   [MemberData(nameof(InvalidGroupNumberValues))]
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueHasInvalidGroupNumber(String itin)
+      => FluentActions
+         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
+         .Should()
+         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .WithMessage(Messages.UsItinInvalidGroupNumber + "*")
+         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber);
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
