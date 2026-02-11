@@ -64,25 +64,26 @@ public record UsNationalProviderIdentifier
    ///   prefixing with "80840").
    /// </exception>
    public UsNationalProviderIdentifier(String? npi)
+      : this(npi, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private UsNationalProviderIdentifier(String? npi, ValidationMode validationMode)
    {
-      UsNationalProviderIdentifierValidationResult validationResult = Validate(npi);
-      if (validationResult != UsNationalProviderIdentifierValidationResult.ValidationPassed)
+      if (validationMode == ValidationMode.ValidationRequired)
       {
-         throw new InvalidUsNationalProviderIdentifierException(validationResult);
+         UsNationalProviderIdentifierValidationResult validationResult = Validate(npi);
+         if (validationResult != UsNationalProviderIdentifierValidationResult.ValidationPassed)
+         {
+            throw new InvalidUsNationalProviderIdentifierException(validationResult);
+         }
       }
 
       Value = npi!;
    }
-
-   /// <summary>
-   ///   Private constructor to support <see cref="Create(String?)"/> method not
-   ///   performing validation again on a value that has already been validated.
-   /// </summary>
-   /// <remarks>
-   ///   Boolean discard parameter is used to differentiate this constructor
-   ///   from the public constructor.
-   /// </remarks>
-   private UsNationalProviderIdentifier(String npi, Boolean _) => Value = npi;
 
    /// <summary>
    ///   The raw NPI value.
@@ -114,7 +115,7 @@ public record UsNationalProviderIdentifier
       UsNationalProviderIdentifierValidationResult validationResult = Validate(npi);
 
       return validationResult is UsNationalProviderIdentifierValidationResult.ValidationPassed
-         ? new UsNationalProviderIdentifier(npi!, true)     // Note: invoking private ctor
+         ? new UsNationalProviderIdentifier(npi!, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 

@@ -164,8 +164,9 @@ public record MxCurp
    public MxCurp(String? curp) : this(curp, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports optional validation,
-   ///   specifically to support the <see cref="Create(String?)"/> method.
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
    /// </summary>
    private MxCurp(String? curp, ValidationMode validationMode)
    {

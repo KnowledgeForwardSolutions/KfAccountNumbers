@@ -84,8 +84,9 @@ public record CaSocialInsuranceNumber
       : this(sin, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports optional validation,
-   ///   specifically to support the <see cref="Create(String?)"/> method.
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
    /// </summary>
    private CaSocialInsuranceNumber(String? sin, ValidationMode validationMode)
    {
