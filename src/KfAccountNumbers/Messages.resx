@@ -225,9 +225,6 @@
   <data name="UsNpiInvalidCheckDigit" xml:space="preserve">
     <value>US National Provider Identifier contains an invalid check digit</value>
   </data>
-  <data name="UsNationalProviderIdentifierInvalidNullConversionToString" xml:space="preserve">
-    <value>Null UsNationalProviderIdentifier can not be converted to String</value>
-  </data>
   <data name="UsItinEmpty" xml:space="preserve">
     <value>US Individual Taxpayer Identification Number may not be null, empty or all whitespace characters</value>
   </data>
@@ -245,8 +242,5 @@
   </data>
   <data name="UsItinInvalidGroupNumber" xml:space="preserve">
     <value>US Individual Taxpayer Identification Number group number segment (xxx-GG-xxxx) must not be 00-49, 66-69, 89 or 93</value>
-  </data>
-  <data name="UsItinInvalidNullConversionToString" xml:space="preserve">
-    <value>Null UsIndividualTaxpayerIdentificationNumber can not be converted to String</value>
   </data>
 </root>

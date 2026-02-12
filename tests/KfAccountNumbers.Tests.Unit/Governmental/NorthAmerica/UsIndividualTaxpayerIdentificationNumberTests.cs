@@ -1,4 +1,4 @@
-// Ignore Spelling: Deserialization Deserialize itin Itin Json 
+// Ignore Spelling: Deserialization Deserialize itin Itin Json  Unformatted
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -132,8 +132,9 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    ];
 
    /// <summary>
-   /// Extracts unformatted ITIN from an 11-character formatted ITIN.
-   /// Assumes input is exactly 11 characters with separators at positions 3 and 6.
+   /// Extracts unformatted ITIN value. If ITTN is 9 characters then value is
+   /// returned unchanged. If an 11-character formatted ITIN then assumes
+   /// separators at positions 3 and 6.
    /// </summary>
    private static String GetRawItin(String itin)
       => itin.Length switch
@@ -267,14 +268,13 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    {
       // Arrange.
       UsIndividualTaxpayerIdentificationNumber itin = null!;
-      String str;
+
+      // Act.
+      String str = itin;
 
       // Act/assert.
-      FluentActions
-         .Invoking(() => str = itin)
-         .Should().ThrowExactly<ArgumentNullException>()
-         .WithParameterName(nameof(itin))
-         .WithMessage(Messages.UsItinInvalidNullConversionToString + "*");
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
    }
 
    [Fact]
@@ -283,12 +283,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       // Arrange.
       UsIndividualTaxpayerIdentificationNumber itin = null!;
 
+      // Act.
+      String str = itin;
+
       // Act/assert.
-      FluentActions
-         .Invoking(() => _ = (String)itin)
-         .Should().ThrowExactly<ArgumentNullException>()
-         .WithParameterName(nameof(itin))
-         .WithMessage(Messages.UsItinInvalidNullConversionToString + "*");
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
    }
 
    [Theory]
@@ -601,20 +601,20 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
    {
       // Arrange.
-      var itin = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
 
       // Act/assert.
-      itin.Equals(ValidNineCharItin).Should().BeFalse();
+      sut.Equals(ValidNineCharItin).Should().BeFalse();
    }
 
    [Fact]
    public void UsIndividualTaxpayerIdentificationNumber_Equals_ShouldReturnFalse_WhenComparedWithNull()
    {
       // Arrange.
-      var itin = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
 
       // Act/assert.
-      itin.Equals(null).Should().BeFalse();
+      sut.Equals(null).Should().BeFalse();
    }
 
    #endregion
@@ -728,7 +728,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    // ==========================================================================
 
    // UsIndividualTaxpayerIdentificationNumber does not override
-   // Object.ReferenceEquals, so thest tests just to confirm that two different
+   // Object.ReferenceEquals, so this test just confirms that two different
    // instances with the same value are not considered reference equal.
 
    [Fact]

@@ -118,8 +118,9 @@ public record UsIndividualTaxpayerIdentificationNumber
    public String Value { get; private init; }
 
    public static implicit operator String(UsIndividualTaxpayerIdentificationNumber itin)
-      => itin?.Value ?? throw new ArgumentNullException(nameof(itin), Messages.UsItinInvalidNullConversionToString);
+      => itin?.Value ?? String.Empty;     // Handle null ITIN object gracefully by returning empty string
 
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
    public static explicit operator UsIndividualTaxpayerIdentificationNumber(String? itin) => new(itin);
 
    /// <summary>

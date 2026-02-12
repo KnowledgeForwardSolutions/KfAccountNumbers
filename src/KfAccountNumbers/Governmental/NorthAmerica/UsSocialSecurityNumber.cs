@@ -165,9 +165,10 @@ public record UsSocialSecurityNumber
    public String Value { get; private init; }
 
    public static implicit operator String(UsSocialSecurityNumber ssn)
-      => ssn?.Value ?? throw new ArgumentNullException(nameof(ssn), Messages.UsSsnInvalidNullConversionToString);
+      => ssn?.Value ?? String.Empty;      // Handle null SSN object gracefully by returning empty string
 
-   public static implicit operator UsSocialSecurityNumber(String? ssn) => new(ssn);
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator UsSocialSecurityNumber(String? ssn) => new(ssn);
 
    /// <summary>
    ///   Create a new <see cref="UsSocialSecurityNumber"/>.
@@ -451,10 +452,30 @@ public class UsSocialSecurityNumberJsonConverter : JsonConverter<UsSocialSecurit
 {
    public override UsSocialSecurityNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
       var ssnString = reader.GetString();
       return new UsSocialSecurityNumber(ssnString);
    }
 
    public override void Write(Utf8JsonWriter writer, UsSocialSecurityNumber value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
+}
+
+/// <summary>
+///   Exception thrown by the <see cref="UsSocialSecurityNumber"/> constructor
+///   when supplied with a string that contains validation errors.
+/// </summary>
+/// <param name="validationResult">
+///   Enum value that indicates the validation rule that was failed during the
+///   conversion.
+/// </param>
+public class InvalidUsSocialSecurityNumberException(UsSocialSecurityNumberValidationResult validationResult)
+   : InvalidAccountNumberException<UsSocialSecurityNumberValidationResult>(
+      validationResult,
+      validationResult.ToErrorDescription())
+{
 }

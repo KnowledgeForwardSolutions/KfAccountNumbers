@@ -168,14 +168,13 @@ public class UsNationalProviderIdentifierTests
    {
       // Arrange.
       UsNationalProviderIdentifier npi = null!;
-      String str;
+
+      // Act.
+      String str = npi;
 
       // Act/assert.
-      FluentActions
-         .Invoking(() => str = npi)
-         .Should().ThrowExactly<ArgumentNullException>()
-         .WithParameterName(nameof(npi))
-         .WithMessage(Messages.UsNationalProviderIdentifierInvalidNullConversionToString + "*");
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
    }
 
    [Fact]
@@ -184,12 +183,12 @@ public class UsNationalProviderIdentifierTests
       // Arrange.
       UsNationalProviderIdentifier npi = null!;
 
+      // Act.
+      String str = npi;
+
       // Act/assert.
-      FluentActions
-         .Invoking(() => _ = (String)npi)
-         .Should().ThrowExactly<ArgumentNullException>()
-         .WithParameterName(nameof(npi))
-         .WithMessage(Messages.UsNationalProviderIdentifierInvalidNullConversionToString + "*");
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
    }
 
    [Fact]

@@ -91,7 +91,7 @@ public record UsNationalProviderIdentifier
    public String Value { get; private init; }
 
    public static implicit operator String(UsNationalProviderIdentifier npi)
-      => npi?.Value ?? throw new ArgumentNullException(nameof(npi), Messages.UsNationalProviderIdentifierInvalidNullConversionToString);
+      => npi?.Value ?? String.Empty;      // Handle null NPI object gracefully by returning empty string
 
    public static implicit operator UsNationalProviderIdentifier(String? npi) => new(npi);
 
