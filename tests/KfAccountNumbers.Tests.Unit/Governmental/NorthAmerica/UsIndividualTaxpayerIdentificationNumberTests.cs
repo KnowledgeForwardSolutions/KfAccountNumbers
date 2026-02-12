@@ -264,7 +264,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    }
 
    [Fact]
-   public void UsIndividualTaxpayerIdentificationNumber_ImplicitToStringConversion_ShouldThrowArgumentNullException_WhenValueIsNull()
+   public void UsIndividualTaxpayerIdentificationNumber_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
       UsIndividualTaxpayerIdentificationNumber itin = null!;
@@ -278,13 +278,13 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    }
 
    [Fact]
-   public void UsIndividualTaxpayerIdentificationNumber_CastToString_ShouldThrowArgumentNullException_WhenValueIsNull()
+   public void UsIndividualTaxpayerIdentificationNumber_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
       UsIndividualTaxpayerIdentificationNumber itin = null!;
 
       // Act.
-      String str = itin;
+      var str = (String)itin;
 
       // Act/assert.
       str.Should().NotBeNull();

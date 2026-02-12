@@ -183,9 +183,6 @@
   <data name="CaSinInvalidProvince" xml:space="preserve">
     <value>CA Social Insurance Number may not have a leading digit (the province indicator) of zero (0) or eight (8)</value>
   </data>
-  <data name="CaSinInvalidNullConversionToString" xml:space="preserve">
-    <value>Null CaSocialInsuranceNumber can not be converted to String</value>
-  </data>
   <data name="MxCurpEmpty" xml:space="preserve">
     <value>MX CURP may not be null, empty or all whitespace characters</value>
   </data>
