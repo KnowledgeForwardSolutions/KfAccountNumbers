@@ -342,6 +342,7 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [MemberData(nameof(ValidValues))]
+   [MemberData(nameof(ValidAreaNumberBoundaryValues))]
    public void UsSocialSecurityNumber_ImplicitStringToUsSsnConversion_ShouldCreateObject_WhenValueContainsValidSsn(String ssn)
    {
       // Arrange.
@@ -509,22 +510,22 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sin1 = new UsSocialSecurityNumber(ValidNineCharSsn);
-      var sin2 = new UsSocialSecurityNumber(ValidElevenCharSsn);    // Same internal value
+      var ssn1 = new UsSocialSecurityNumber(ValidNineCharSsn);
+      var ssn2 = new UsSocialSecurityNumber(ValidElevenCharSsn);    // Same internal value
 
       // Act/assert.
-      (sin1 == sin2).Should().BeTrue();
+      (ssn1 == ssn2).Should().BeTrue();
    }
 
    [Fact]
    public void UsSocialSecurityNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sin1 = new UsSocialSecurityNumber(ValidNineCharSsn);
-      var sin2 = new UsSocialSecurityNumber(AltValidNineCharSsn);
+      var ssn1 = new UsSocialSecurityNumber(ValidNineCharSsn);
+      var ssn2 = new UsSocialSecurityNumber(AltValidNineCharSsn);
 
       // Act/assert.
-      (sin1 == sin2).Should().BeFalse();
+      (ssn1 == ssn2).Should().BeFalse();
    }
 
    #endregion
@@ -537,22 +538,22 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sin1 = new UsSocialSecurityNumber(ValidNineCharSsn);
-      var sin2 = new UsSocialSecurityNumber(AltValidNineCharSsn);
+      var ssn1 = new UsSocialSecurityNumber(ValidNineCharSsn);
+      var ssn2 = new UsSocialSecurityNumber(AltValidNineCharSsn);
 
       // Act/assert.
-      (sin1 != sin2).Should().BeTrue();
+      (ssn1 != ssn2).Should().BeTrue();
    }
 
    [Fact]
    public void UsSocialSecurityNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var sin1 = new UsSocialSecurityNumber(ValidNineCharSsn);
-      var sin2 = new UsSocialSecurityNumber(ValidElevenCharSsn);    // Same internal value
+      var ssn1 = new UsSocialSecurityNumber(ValidNineCharSsn);
+      var ssn2 = new UsSocialSecurityNumber(ValidElevenCharSsn);    // Same internal value
 
       // Act/assert.
-      (sin1 != sin2).Should().BeFalse();
+      (ssn1 != ssn2).Should().BeFalse();
    }
 
    #endregion
@@ -588,7 +589,7 @@ public class UsSocialSecurityNumberTests
       var expected = UsSocialSecurityNumberValidationResult.Empty;
 
       // Act.
-      var result = UsSocialSecurityNumber.Create(ssn!);
+      var result = UsSocialSecurityNumber.Create(ssn);
 
       // Assert.
       result.Should().NotBeNull();

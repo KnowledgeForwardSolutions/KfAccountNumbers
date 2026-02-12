@@ -1,4 +1,4 @@
-// Ignore Spelling: itin
+// Ignore Spelling: itin Json
 
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
@@ -51,6 +51,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///      for more details.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(UsIndividualTaxpayerIdentificationNumberJsonConverter))]
 public record UsIndividualTaxpayerIdentificationNumber
 {
    private const Int32 FormattedLength = 11;
@@ -64,8 +65,8 @@ public record UsIndividualTaxpayerIdentificationNumber
    private const Int32 FormattedGroupRangeEnd = 6;
    private const Int32 FormattedSerialNumberRangeStart = 7;
 
-   private const Int32 GroupSeparatorOffset = 3;   // Offset of separator between area and group sections in formatted SSN
-   private const Int32 SerialSeparatorOffset = 6;  // Offset of separator between group and serial number sections in formatted SSN
+   private const Int32 GroupSeparatorOffset = 3;   // Offset of separator between area and group sections in formatted ITIN
+   private const Int32 SerialSeparatorOffset = 6;  // Offset of separator between group and serial number sections in formatted ITIN
 
    /// <summary>
    ///   Initialize a new <see cref="UsIndividualTaxpayerIdentificationNumber"/>.
@@ -87,34 +88,39 @@ public record UsIndividualTaxpayerIdentificationNumber
    ///   <paramref name="itin"/> contains an invalid area number (000-899).
    ///   - or -
    ///   <paramref name="itin"/> contains an invalid group number (not in the
-   ///   ranges 0-65, 70-88, 90-92 or 94-99).
+   ///   ranges 50-65, 70-88, 90-92 or 94-99).
    /// </exception>
    public UsIndividualTaxpayerIdentificationNumber(String? itin)
-      : this(itin, ValidationMode.ValidationRequired) { } 
+      : this(itin, ValidationMode.ValidationRequired) { }
 
    /// <summary>
    ///   Private constructor that actually does the work. Supports bypassing
    ///   validation when creating a new instance from a value that has already
    ///   been validated.
    /// </summary>
-   private UsIndividualTaxpayerIdentificationNumber(String? ssn, ValidationMode validationMode)
+   private UsIndividualTaxpayerIdentificationNumber(String? itin, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         UsIndividualTaxpayerIdentificationNumberValidationResult validationResult = Validate(ssn);
+         UsIndividualTaxpayerIdentificationNumberValidationResult validationResult = Validate(itin);
          if (validationResult != UsIndividualTaxpayerIdentificationNumberValidationResult.ValidationPassed)
          {
             throw new InvalidUsIndividualTaxpayerIdentificationNumberException(validationResult);
          }
       }
 
-      Value = GetValidatedItin(ssn!);
+      Value = GetValidatedItin(itin!);
    }
 
    /// <summary>
-   ///   The raw SSN value.
+   ///   The raw ITIN value.
    /// </summary>
-   public String Value { get; init; }
+   public String Value { get; private init; }
+
+   public static implicit operator String(UsIndividualTaxpayerIdentificationNumber itin)
+      => itin?.Value ?? throw new ArgumentNullException(nameof(itin), Messages.UsItinInvalidNullConversionToString);
+
+   public static explicit operator UsIndividualTaxpayerIdentificationNumber(String? itin) => new(itin);
 
    /// <summary>
    ///   Create a new <see cref="UsIndividualTaxpayerIdentificationNumber"/>.
@@ -137,6 +143,33 @@ public record UsIndividualTaxpayerIdentificationNumber
             => new UsIndividualTaxpayerIdentificationNumber(itin, validationMode: ValidationMode.BypassValidation),
          var validationFailure => validationFailure
       };
+
+   /// <summary>
+   ///   Format the ITIN using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   The mask that specified the final output.
+   /// </param>
+   /// <returns>
+   ///   A formatted Individual Taxpayer Identification Number.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the ITIN.
+   /// </remarks>
+   public String Format(String mask = "___-__-____") => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Get a string representation of the ITIN.
+   /// </summary>
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="itin"/> to determine if it contains a valid
@@ -238,10 +271,10 @@ public record UsIndividualTaxpayerIdentificationNumber
 
    private static Boolean ValidateAllDigits(ReadOnlySpan<Char> itin)
    {
-      var isFormatted = IsFormattedItin(itin);
+      var length = itin.Length;
       for (var index = 1; index < itin.Length; index++)     // Can skip the first character since it is already validated to be '9'
       {
-         if (isFormatted && (index is GroupSeparatorOffset or SerialSeparatorOffset))
+         if (length == FormattedLength && (index is GroupSeparatorOffset or SerialSeparatorOffset))
          {
             continue;  // Skip separator character positions in formatted ITIN
          }
@@ -279,3 +312,36 @@ public record UsIndividualTaxpayerIdentificationNumber
    private static Boolean ValidateLength(ReadOnlySpan<Char> itin)
       => itin.Length is NonFormattedLength or FormattedLength;
 }
+
+public class UsIndividualTaxpayerIdentificationNumberJsonConverter : JsonConverter<UsIndividualTaxpayerIdentificationNumber>
+{
+   public override UsIndividualTaxpayerIdentificationNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var itinString = reader.GetString();
+      return new UsIndividualTaxpayerIdentificationNumber(itinString);
+   }
+
+   public override void Write(Utf8JsonWriter writer, UsIndividualTaxpayerIdentificationNumber value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
+}
+
+/// <summary>
+///   Exception thrown by the <see cref="UsIndividualTaxpayerIdentificationNumber"/>
+///   constructor when supplied with a string that contains validation errors.
+/// </summary>
+/// <param name="validationResult">
+///   Enum value that indicates the validation rule that was failed during the
+///   conversion.
+/// </param>
+public class InvalidUsIndividualTaxpayerIdentificationNumberException(UsIndividualTaxpayerIdentificationNumberValidationResult validationResult)
+   : InvalidAccountNumberException<UsIndividualTaxpayerIdentificationNumberValidationResult>(
+      validationResult,
+      validationResult.ToErrorDescription())
+{
+}
+

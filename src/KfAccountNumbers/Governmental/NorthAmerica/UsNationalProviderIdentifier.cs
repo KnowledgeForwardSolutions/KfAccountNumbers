@@ -88,7 +88,7 @@ public record UsNationalProviderIdentifier
    /// <summary>
    ///   The raw NPI value.
    /// </summary>
-   public String Value { get; init; }
+   public String Value { get; private init; }
 
    public static implicit operator String(UsNationalProviderIdentifier npi)
       => npi?.Value ?? throw new ArgumentNullException(nameof(npi), Messages.UsNationalProviderIdentifierInvalidNullConversionToString);

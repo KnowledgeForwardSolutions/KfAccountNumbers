@@ -246,4 +246,7 @@
   <data name="UsItinInvalidGroupNumber" xml:space="preserve">
     <value>US Individual Taxpayer Identification Number group number segment (xxx-GG-xxxx) must not be 00-49, 66-69, 89 or 93</value>
   </data>
+  <data name="UsItinInvalidNullConversionToString" xml:space="preserve">
+    <value>Null UsIndividualTaxpayerIdentificationNumber can not be converted to String</value>
+  </data>
 </root>

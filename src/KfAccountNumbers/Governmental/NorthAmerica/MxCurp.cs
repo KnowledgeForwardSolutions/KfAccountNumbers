@@ -223,7 +223,7 @@ public record MxCurp
    /// <remarks>
    ///   The CURP value is always normalized to upper-case.
    /// </remarks>
-   public String Value { get; init; }
+   public String Value { get; private init; }
 
    public static implicit operator String(MxCurp curp)
       => curp?.Value ?? throw new ArgumentNullException(nameof(curp), Messages.MxCurpInvalidNullConversionToString);

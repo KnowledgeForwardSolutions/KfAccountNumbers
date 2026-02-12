@@ -162,7 +162,7 @@ public record UsSocialSecurityNumber
    /// <summary>
    ///   The raw SSN value.
    /// </summary>
-   public String Value { get; init; }
+   public String Value { get; private init; }
 
    public static implicit operator String(UsSocialSecurityNumber ssn)
       => ssn?.Value ?? throw new ArgumentNullException(nameof(ssn), Messages.UsSsnInvalidNullConversionToString);

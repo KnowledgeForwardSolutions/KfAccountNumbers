@@ -104,7 +104,7 @@ public record CaSocialInsuranceNumber
    /// <summary>
    ///   The raw SIN value.
    /// </summary>
-   public String Value { get; init; }
+   public String Value { get; private init; }
 
    public static implicit operator String(CaSocialInsuranceNumber sin)
       => sin?.Value ?? throw new ArgumentNullException(nameof(sin), Messages.CaSinInvalidNullConversionToString);

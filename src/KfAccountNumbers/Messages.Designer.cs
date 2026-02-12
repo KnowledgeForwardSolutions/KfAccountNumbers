@@ -295,6 +295,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Null UsIndividualTaxpayerIdentificationNumber can not be converted to String.
+        /// </summary>
+        internal static string UsItinInvalidNullConversionToString {
+            get {
+                return ResourceManager.GetString("UsItinInvalidNullConversionToString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to US Individual Taxpayer Identification Number with length 11 contains an unexpected character at a separator position.
         /// </summary>
         internal static string UsItinInvalidSeparatorEncountered {
