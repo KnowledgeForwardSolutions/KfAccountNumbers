@@ -267,7 +267,7 @@ public class CaSocialInsuranceNumberTests
    [Theory]
    [InlineData(ValidNineCharSin)]
    [InlineData(ValidElevenCharSin)]
-   public void CaSocialInsuranceNumber_Value_ShouldReturnUnformattedItin(String sin)
+   public void CaSocialInsuranceNumber_Value_ShouldReturnRawSin(String sin)
    {
       // Arrange.
       var expected = GetRawSin(sin);
@@ -279,7 +279,7 @@ public class CaSocialInsuranceNumberTests
 
    #endregion
 
-   #region Implicit Operator Tests
+   #region Conversion Operator Tests
    // ==========================================================================
    // ==========================================================================
 

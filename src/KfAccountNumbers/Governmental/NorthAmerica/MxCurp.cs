@@ -226,9 +226,10 @@ public record MxCurp
    public String Value { get; private init; }
 
    public static implicit operator String(MxCurp curp)
-      => curp?.Value ?? throw new ArgumentNullException(nameof(curp), Messages.MxCurpInvalidNullConversionToString);
+      => curp?.Value ?? String.Empty;     // Handle null CURP object gracefully by returning empty string
 
-   public static implicit operator MxCurp(String curp) => new(curp);
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator MxCurp(String curp) => new(curp);
 
    /// <summary>
    ///   Get a string representation of the CURP.
@@ -446,10 +447,29 @@ public class MxCurpJsonConverter : JsonConverter<MxCurp>
 {
    public override MxCurp Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
       var curpString = reader.GetString();
       return new MxCurp(curpString);
    }
 
    public override void Write(Utf8JsonWriter writer, MxCurp value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
+}
+/// <summary>
+///   Exception thrown by the <see cref="MxCurp"/>
+///   constructor when supplied with a string that contains validation errors.
+/// </summary>
+/// <param name="validationResult">
+///   Enum value that indicates the validation rule that was failed during the
+///   conversion.
+/// </param>
+public class InvalidMxCurpException(MxCurpValidationResult validationResult)
+   : InvalidAccountNumberException<MxCurpValidationResult>(
+      validationResult,
+      validationResult.ToErrorDescription())
+{
 }

@@ -285,7 +285,7 @@ public class UsSocialSecurityNumberTests
    [Theory]
    [InlineData(ValidNineCharSsn)]
    [InlineData(ValidElevenCharSsn)]
-   public void UsSocialSecurityNumber_Value_ShouldReturnUnformattedSsn(String ssn)
+   public void UsSocialSecurityNumber_Value_ShouldReturnRawSsn(String ssn)
    {
       // Arrange.
       var expected = GetRawSsn(ssn);

@@ -432,7 +432,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    [Theory]
    [InlineData(ValidNineCharItin)]
    [InlineData(ValidElevenCharItin)]
-   public void UsIndividualTaxpayerIdentificationNumber_Value_ShouldReturnUnformattedItin(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Value_ShouldReturnRawItin(String itin)
    {
       // Arrange.
       var expected = GetRawItin(itin);
