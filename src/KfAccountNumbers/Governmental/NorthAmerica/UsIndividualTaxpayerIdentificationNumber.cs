@@ -41,7 +41,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The group number must be in the range 0-65, 70-88, 90-92 or 94-99.
+///               The group number must be in the range 50-65, 70-88, 90-92 or 94-99.
 ///            </description>
 ///         </item>
 ///      </list>
@@ -51,7 +51,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///      for more details.
 ///   </para>
 /// </remarks>
-public record class UsIndividualTaxpayerIdentificationNumber
+public record UsIndividualTaxpayerIdentificationNumber
 {
    private const Int32 FormattedLength = 11;
    private const Int32 NonFormattedLength = 9;
@@ -115,6 +115,28 @@ public record class UsIndividualTaxpayerIdentificationNumber
    ///   The raw SSN value.
    /// </summary>
    public String Value { get; init; }
+
+   /// <summary>
+   ///   Create a new <see cref="UsIndividualTaxpayerIdentificationNumber"/>.
+   /// </summary>
+   /// <param name="itin">
+   ///   String representation of an Individual Taxpayer Identification Number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{UsIndividualTaxpayerIdentificationNumber, UsIndividualTaxpayerIdentificationNumberValidationResult}"/>.
+   ///   Will contain the new <see cref="UsIndividualTaxpayerIdentificationNumber"/> if 
+   ///   <paramref name="itin"/> is valid or 
+   ///   <see cref="UsIndividualTaxpayerIdentificationNumberValidationResult"/> that identifies
+   ///   the validation rule that was failed if <paramref name="itin"/> is 
+   ///   invalid.
+   /// </returns>
+   public static CreateResult<UsIndividualTaxpayerIdentificationNumber, UsIndividualTaxpayerIdentificationNumberValidationResult> Create(String? itin)
+      => Validate(itin) switch
+      {
+         UsIndividualTaxpayerIdentificationNumberValidationResult.ValidationPassed
+            => new UsIndividualTaxpayerIdentificationNumber(itin, validationMode: ValidationMode.BypassValidation),
+         var validationFailure => validationFailure
+      };
 
    /// <summary>
    ///   Check the <paramref name="itin"/> to determine if it contains a valid
@@ -248,7 +270,7 @@ public record class UsIndividualTaxpayerIdentificationNumber
       ReadOnlySpan<Char> groupSpan = GetGroupNumber(itin);
       var groupNumber = ParseGroupNumber(groupSpan);
       return groupNumber is
-            (>= 0 and <= 65) or
+            (>= 50 and <= 65) or
             (>= 70 and <= 88) or
             (>= 90 and <= 92) or
             (>= 94 and <= 99);

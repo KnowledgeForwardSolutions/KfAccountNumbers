@@ -129,7 +129,7 @@ A valid ITIN must meet all of the following rules:
 
 * Must consist of 9 integer digits
 * The first digit must be 9.
-* The fourth and fifth digits must be in the range 0-65, 70-88, 90-92 or 94-99
+* The fourth and fifth digits must be in the range 50-65, 70-88, 90-92 or 94-99
 
 Note that meeting the above rules is not a guarantee that the value is considered a valid ITIN issued
 by the IRS. Determining actual validity of an ITIN requires use of the IRS's Taxpayer Identification

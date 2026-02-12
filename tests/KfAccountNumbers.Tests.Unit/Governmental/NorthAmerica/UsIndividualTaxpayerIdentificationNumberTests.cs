@@ -22,7 +22,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    public static TheoryData<String> ValidGroupNumberBoundaryValues =>
    [
-      "900000123",
+      "900500123",
       "900650123",
       "900700123",
       "900880123",
@@ -113,9 +113,11 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       "9\u0BEF1 50 1234",       // Unicode Tamil number 9
    ];
 
-   // Values that will report an invalid group number (group number must be in the range 0-65, 70-88, 90-92 or 94-99)
-   public static TheoryData<String> InvalidGroupNumberValues =>
+   // Values that will report an invalid group number (group number must be in the range 50-65, 70-88, 90-92 or 94-99)
+   public static TheoryData<String> InvalidGroupNumberBoundaryValues =>
    [
+      "900000123",
+      "900490123",
       "900660123",
       "900690123",
       "900890123",
@@ -142,7 +144,6 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       };
 
    #region Constructor Tests
-   // ==========================================================================
    // ==========================================================================
    // ==========================================================================
 
@@ -213,7 +214,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered);
 
    [Theory]
-   [MemberData(nameof(InvalidGroupNumberValues))]
+   [MemberData(nameof(InvalidGroupNumberBoundaryValues))]
    public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueHasInvalidGroupNumber(String itin)
       => FluentActions
          .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
@@ -221,6 +222,133 @@ public class UsIndividualTaxpayerIdentificationNumberTests
          .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
          .WithMessage(Messages.UsItinInvalidGroupNumber + "*")
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber);
+
+   #endregion
+
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   [MemberData(nameof(ValidGroupNumberBoundaryValues))]
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldCreateObject_WhenValueContainsValidSsn(String itin)
+   {
+      // Arrange.
+      var expected = itin.Length == 9 ? itin : GetRawItin(itin);
+      var expectedValue = new UsIndividualTaxpayerIdentificationNumber(expected);
+
+      // Act.
+      var result = UsIndividualTaxpayerIdentificationNumber.Create(itin);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(EmptyItinValues))]
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String? itin)
+   {
+      // Arrange.
+      var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.Empty;
+
+      // Act.
+      var result = UsIndividualTaxpayerIdentificationNumber.Create(itin!);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String itin)
+   {
+      // Arrange.
+      var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidLength;
+
+      // Act.
+      var result = UsIndividualTaxpayerIdentificationNumber.Create(itin);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidAreaNumberValues))]
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidAreaNumberValidationResult_WhenValueHasInvalidAreaNumber(String itin)
+   {
+      // Arrange.
+      var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidAreaNumber;
+
+      // Act.
+      var result = UsIndividualTaxpayerIdentificationNumber.Create(itin);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidSeparatorCharacterValidationResult_When11CharacterValueContainsInvalidSeparator(String itin)
+   {
+      // Arrange.
+      var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidSeparatorEncountered;
+
+      // Act.
+      var result = UsIndividualTaxpayerIdentificationNumber.Create(itin);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueContainsNonAsciiDigit(String itin)
+   {
+      // Arrange.
+      var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered;
+
+      // Act.
+      var result = UsIndividualTaxpayerIdentificationNumber.Create(itin);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidGroupNumberBoundaryValues))]
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidGroupNumberValidationResult_WhenValueHasInvalidGroupNumber(String itin)
+   {
+      // Arrange.
+      var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber;
+
+      // Act.
+      var result = UsIndividualTaxpayerIdentificationNumber.Create(itin);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(expected);
+   }
 
    #endregion
 
@@ -260,7 +388,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       => UsIndividualTaxpayerIdentificationNumber.Validate(itin).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered);
 
    [Theory]
-   [MemberData(nameof(InvalidGroupNumberValues))]
+   [MemberData(nameof(InvalidGroupNumberBoundaryValues))]
    public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidGroupNumber_WhenValueHasInvalidGroupNumber(String itin)
       => UsIndividualTaxpayerIdentificationNumber.Validate(itin).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber);
 
