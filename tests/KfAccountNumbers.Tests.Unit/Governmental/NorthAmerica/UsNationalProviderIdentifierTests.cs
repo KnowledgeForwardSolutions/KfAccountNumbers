@@ -10,13 +10,6 @@ public class UsNationalProviderIdentifierTests
    private const String ValidNpi = "1245319599";         // Example from www.hippaspace.com
    private const String AltValidNpi = "1234567893";     // Example from Wikipedia article on Luhn algorithm
 
-   public static TheoryData<String> EmptyNpiValues =>
-   [
-      null!,
-      String.Empty,
-      "\t"
-   ];
-
    public static TheoryData<String> InvalidLengthValues =>
    [
       "124531959",
@@ -76,7 +69,7 @@ public class UsNationalProviderIdentifierTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptyNpiValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsNationalProviderIdentifier_Constructor_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenValueIsEmpty(String? npi)
       => FluentActions
          .Invoking(() => _ = new UsNationalProviderIdentifier(npi))
@@ -224,7 +217,7 @@ public class UsNationalProviderIdentifierTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptyNpiValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenValueIsEmpty(String str)
       => FluentActions
          .Invoking(() => _ = (UsNationalProviderIdentifier)str)
@@ -355,7 +348,7 @@ public class UsNationalProviderIdentifierTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptyNpiValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsNationalProviderIdentifier_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String npi)
    {
       // Arrange.
@@ -525,6 +518,28 @@ public class UsNationalProviderIdentifierTests
 
    #endregion
 
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // UsNationalProviderIdentifier does not override
+   // Object.ReferenceEquals, so this test just confirms that two different
+   // instances with the same value are not considered reference equal.
+
+   [Fact]
+   public void UsNationalProviderIdentifier_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
+      var npi2 = new UsNationalProviderIdentifier(ValidNpi);    // Same internal value
+
+      // Act/assert.
+      (npi1 == npi2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(npi1, npi2).Should().BeFalse();
+   }
+
+   #endregion
+
    #region ToString Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -552,7 +567,7 @@ public class UsNationalProviderIdentifierTests
          .Should().Be(UsNationalProviderIdentifierValidationResult.ValidationPassed);
 
    [Theory]
-   [MemberData(nameof(EmptyNpiValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsNationalProviderIdentifier_Validate_ShouldReturnEmpty_WhenValueIsEmpty(String? npi)
       => UsNationalProviderIdentifier.Validate(npi)
          .Should().Be(UsNationalProviderIdentifierValidationResult.Empty);
@@ -664,7 +679,7 @@ public class UsNationalProviderIdentifierTests
    }
 
    [Fact]
-   public void UsNationalProviderIdentifier_JsonDeserialization_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenItinIsInvalid()
+   public void UsNationalProviderIdentifier_JsonDeserialization_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenNpiIsInvalid()
    {
       // Arrange.
       var json = "{\"Npi\":\"124531959\"}";  // Invalid length

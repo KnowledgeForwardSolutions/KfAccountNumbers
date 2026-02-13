@@ -146,13 +146,6 @@ public class UsSocialSecurityNumberTests
       "123 45 6789",
    ];
 
-   public static TheoryData<String> EmptySsnValues =>
-   [
-      null!,
-      String.Empty,
-      "\t"
-   ];
-
    /// <summary>
    /// Extracts unformatted SSN value. If ITTN is 9 characters then value is
    /// returned unchanged. If an 11-character formatted SSN then assumes
@@ -187,7 +180,7 @@ public class UsSocialSecurityNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptySsnValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsSocialSecurityNumber_Constructor_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueIsEmpty(String? ssn)
       => FluentActions
          .Invoking(() => _ = new UsSocialSecurityNumber(ssn))
@@ -379,7 +372,7 @@ public class UsSocialSecurityNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptySsnValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueIsEmpty(String? str)
       => FluentActions
          .Invoking(() => _ = (UsSocialSecurityNumber)str)
@@ -550,7 +543,7 @@ public class UsSocialSecurityNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptySsnValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsSocialSecurityNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String? ssn)
    {
       // Arrange.
@@ -856,7 +849,7 @@ public class UsSocialSecurityNumberTests
 
    #endregion
 
-   #region ObjectReferenceEquals Method Tests
+   #region ReferenceEquals Method Tests
    // ==========================================================================
    // ==========================================================================
 
@@ -873,7 +866,7 @@ public class UsSocialSecurityNumberTests
 
       // Act/assert.
       (ssn1 == ssn2).Should().BeTrue();                         // Value equality should be true
-      Object.ReferenceEquals(ssn1, ssn2).Should().BeFalse();
+      ReferenceEquals(ssn1, ssn2).Should().BeFalse();
    }
 
    #endregion
@@ -909,7 +902,7 @@ public class UsSocialSecurityNumberTests
       => UsSocialSecurityNumber.Validate(ssn).Should().Be(UsSocialSecurityNumberValidationResult.ValidationPassed);
 
    [Theory]
-   [MemberData(nameof(EmptySsnValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsSocialSecurityNumber_Validate_ShouldReturnEmpty_WhenValueIsEmpty(String? ssn)
       => UsSocialSecurityNumber.Validate(ssn).Should().Be(UsSocialSecurityNumberValidationResult.Empty);
 

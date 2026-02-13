@@ -124,13 +124,6 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       "900930123",
    ];
 
-   public static TheoryData<String> EmptyItinValues =>
-   [
-      null!,
-      String.Empty,
-      "\t"
-   ];
-
    /// <summary>
    /// Extracts unformatted ITIN value. If ITTN is 9 characters then value is
    /// returned unchanged. If an 11-character formatted ITIN then assumes
@@ -165,7 +158,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptyItinValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueIsEmpty(String? itin)
       => FluentActions
          .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
@@ -308,7 +301,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptyItinValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueIsEmpty(String? str)
       => FluentActions
          .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)str)
@@ -468,7 +461,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptyItinValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String? itin)
    {
       // Arrange.
@@ -776,7 +769,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       => UsIndividualTaxpayerIdentificationNumber.Validate(itin).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.ValidationPassed);
 
    [Theory]
-   [MemberData(nameof(EmptyItinValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnEmpty_WhenValueIsEmpty(String? itin)
       => UsIndividualTaxpayerIdentificationNumber.Validate(itin).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.Empty);
 

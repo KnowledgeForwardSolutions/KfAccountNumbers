@@ -129,13 +129,6 @@ public class CaSocialInsuranceNumberTests
       "123-456-790",
    ];
 
-   public static TheoryData<String> EmptySinValues =>
-   [
-      null!,
-      String.Empty,
-      "\t"
-   ];
-
    /// <summary>
    /// Extracts unformatted SIN value. If Sin is 9 characters then value is
    /// returned unchanged. If an 11-character formatted SIN then assumes
@@ -169,7 +162,7 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptySinValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void CaSocialInsuranceNumber_Constructor_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueIsEmpty(String? sin)
       => FluentActions
          .Invoking(() => _ = new CaSocialInsuranceNumber(sin))
@@ -359,7 +352,7 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptySinValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueIsEmpty(String? str)
       => FluentActions
          .Invoking(() => _ = (CaSocialInsuranceNumber)str)
@@ -529,14 +522,14 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptySinValues))]
-   public void CaSocialInsuranceNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String? sin)
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void CaSocialInsuranceNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String sin)
    {
       // Arrange.
       var expected = CaSocialInsuranceNumberValidationResult.Empty;
 
       // Act.
-      var result = CaSocialInsuranceNumber.Create(sin!);
+      var result = CaSocialInsuranceNumber.Create(sin);
 
       // Assert.
       result.Should().NotBeNull();
@@ -819,7 +812,7 @@ public class CaSocialInsuranceNumberTests
 
    #endregion
 
-   #region ObjectReferenceEquals Method Tests
+   #region ReferenceEquals Method Tests
    // ==========================================================================
    // ==========================================================================
 
@@ -836,7 +829,7 @@ public class CaSocialInsuranceNumberTests
 
       // Act/assert.
       (itin1 == itin2).Should().BeTrue();                         // Value equality should be true
-      Object.ReferenceEquals(itin1, itin2).Should().BeFalse();
+      ReferenceEquals(itin1, itin2).Should().BeFalse();
    }
 
    #endregion
@@ -869,7 +862,7 @@ public class CaSocialInsuranceNumberTests
       => CaSocialInsuranceNumber.Validate(sin).Should().Be(CaSocialInsuranceNumberValidationResult.ValidationPassed);
 
    [Theory]
-   [MemberData(nameof(EmptySinValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void CaSocialInsuranceNumber_Validate_ShouldReturnEmpty_WhenValueIsEmpty(String? sin)
       => CaSocialInsuranceNumber.Validate(sin).Should().Be(CaSocialInsuranceNumberValidationResult.Empty);
 

@@ -206,13 +206,6 @@ public class MxCurpTests
       '\u2153',      // Invalid check digit Unicode fraction 1
    ];
 
-   public static TheoryData<String> EmptyCurpValues =>
-   [
-      null!,
-      String.Empty,
-      "\t"
-   ];
-
    #region Constructor Tests
    // ==========================================================================
    // ==========================================================================
@@ -362,7 +355,7 @@ public class MxCurpTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptyCurpValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void MxCurp_Constructor_ShouldThrowInvalidMxCurpException_WhenValueIsNullOrEmpty(String curp)
       => FluentActions
          .Invoking(() => new MxCurp(curp))
@@ -796,7 +789,7 @@ public class MxCurpTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptyCurpValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void MxCurp_ExplicitCastToMxCurp_ShouldThrowInvalidMxCurpException_WhenValueIsNullOrEmpty(String str)
       => FluentActions
          .Invoking(() => _ = (MxCurp)str)
@@ -1159,7 +1152,7 @@ public class MxCurpTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptyCurpValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void MxCurp_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String curp)
    {
       // Act.
@@ -1551,7 +1544,7 @@ public class MxCurpTests
    }
 
    [Theory]
-   [MemberData(nameof(EmptyCurpValues))]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void MxCurp_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String curp)
       => MxCurp.Validate(curp).Should().Be(MxCurpValidationResult.Empty);
 
