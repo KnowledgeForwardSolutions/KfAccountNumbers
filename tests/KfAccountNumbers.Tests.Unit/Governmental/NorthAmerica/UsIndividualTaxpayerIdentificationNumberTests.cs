@@ -125,7 +125,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    ];
 
    /// <summary>
-   /// Extracts unformatted ITIN value. If ITTN is 9 characters then value is
+   /// Extracts unformatted ITIN value. If ITIN is 9 characters then value is
    /// returned unchanged. If an 11-character formatted ITIN then assumes
    /// separators at positions 3 and 6.
    /// </summary>

@@ -453,7 +453,7 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidRunValues))]
-   public void UsSocialSecurityNumber_ImplicitStringToUsSsnConversion_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueHasConsecutiveRun(String str)
+   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueHasConsecutiveRun(String str)
       => FluentActions
          .Invoking(() => _ = (UsSocialSecurityNumber)str)
          .Should()

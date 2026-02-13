@@ -1,4 +1,4 @@
-﻿namespace KfAccountNumbers.Governmental.NorthAmerica;
+namespace KfAccountNumbers.Governmental.NorthAmerica;
 
 /// <summary>
 ///   Defines the possible results returned when validating a US Social Security 
@@ -29,10 +29,9 @@ public enum UsSocialSecurityNumberValidationResult
    /// </summary>
    /// <remarks>
    ///   A SSN with length 11 should have valid separator character between the 
-   ///   area, group and serial number sections. When using the default
-   ///   separator, the expected separator character is a dash ('-'). When using
-   ///   a custom separator, the expected separator character is the custom
-   ///   separator.
+   ///   area, group and serial number sections. The same character must be used
+   ///   to separate both the area/group numbers and the group/serial numbers.
+   ///   The separator character may not be a decimal digit (0-9).
    /// </remarks>
    InvalidSeparatorEncountered,
 

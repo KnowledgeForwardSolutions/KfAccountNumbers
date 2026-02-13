@@ -824,12 +824,12 @@ public class CaSocialInsuranceNumberTests
    public void CaSocialInsuranceNumber_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var itin1 = new CaSocialInsuranceNumber(ValidNineCharSin);
-      var itin2 = new CaSocialInsuranceNumber(ValidElevenCharSin);    // Same internal value
+      var sin1 = new CaSocialInsuranceNumber(ValidNineCharSin);
+      var sin2 = new CaSocialInsuranceNumber(ValidElevenCharSin);    // Same internal value
 
       // Act/assert.
-      (itin1 == itin2).Should().BeTrue();                         // Value equality should be true
-      ReferenceEquals(itin1, itin2).Should().BeFalse();
+      (sin1 == sin2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sin1, sin2).Should().BeFalse();
    }
 
    #endregion

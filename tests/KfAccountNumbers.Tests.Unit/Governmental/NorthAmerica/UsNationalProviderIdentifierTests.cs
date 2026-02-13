@@ -238,7 +238,7 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsNationalProviderIdentifier_ImplicitStringToUsNpiConversion_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenValueContainsNonAsciiDigit(String str)
+   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenValueContainsNonAsciiDigit(String str)
       => FluentActions
          .Invoking(() => _ = (UsNationalProviderIdentifier)str)
          .Should()
@@ -442,22 +442,22 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var itin1 = new UsNationalProviderIdentifier(ValidNpi);
-      var itin2 = new UsNationalProviderIdentifier(ValidNpi);    // Same internal value
+      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
+      var npi2 = new UsNationalProviderIdentifier(ValidNpi);    // Same internal value
 
       // Act/assert.
-      itin1.Equals(itin2).Should().BeTrue();
+      npi1.Equals(npi2).Should().BeTrue();
    }
 
    [Fact]
    public void UsNationalProviderIdentifier_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var itin1 = new UsNationalProviderIdentifier(ValidNpi);
-      var itin2 = new UsNationalProviderIdentifier(AltValidNpi);
+      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
+      var npi2 = new UsNationalProviderIdentifier(AltValidNpi);
 
       // Act/assert.
-      itin1.Equals(itin2).Should().BeFalse();
+      npi1.Equals(npi2).Should().BeFalse();
    }
 
    [Fact]
