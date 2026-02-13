@@ -669,22 +669,22 @@ public class CaSocialInsuranceNumberTests
    public void CaSocialInsuranceNumber_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var itin1 = new CaSocialInsuranceNumber(ValidNineCharSin);
-      var itin2 = new CaSocialInsuranceNumber(ValidElevenCharSin);    // Same internal value
+      var sin1 = new CaSocialInsuranceNumber(ValidNineCharSin);
+      var sin2 = new CaSocialInsuranceNumber(ValidElevenCharSin);    // Same internal value
 
       // Act/assert.
-      itin1.Equals(itin2).Should().BeTrue();
+      sin1.Equals(sin2).Should().BeTrue();
    }
 
    [Fact]
    public void CaSocialInsuranceNumber_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var itin1 = new CaSocialInsuranceNumber(ValidNineCharSin);
-      var itin2 = new CaSocialInsuranceNumber(AltValidNineCharSin);
+      var sin1 = new CaSocialInsuranceNumber(ValidNineCharSin);
+      var sin2 = new CaSocialInsuranceNumber(AltValidNineCharSin);
 
       // Act/assert.
-      itin1.Equals(itin2).Should().BeFalse();
+      sin1.Equals(sin2).Should().BeFalse();
    }
 
    [Fact]
