@@ -1729,7 +1729,7 @@ public class MxCurpTests
    public void MxCurp_JsonDeserialization_ShouldThrowInvalidMxCurpException_WhenCurpIsInvalid()
    {
       // Arrange.
-      var json = "{\"Curp\":\"MAAR790213HMNRLF0\"}";  // Invalid area number
+      var json = "{\"Curp\":\"MAAR790213HMNRLF0\"}";  // Invalid length
 
       // Act/assert.
       FluentActions
