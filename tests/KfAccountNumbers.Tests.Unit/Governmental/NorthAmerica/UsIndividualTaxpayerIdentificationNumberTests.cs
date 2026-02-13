@@ -723,7 +723,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    #endregion
 
-   #region ObjectReferenceEquals Method Tests
+   #region ReferenceEquals Method Tests
    // ==========================================================================
    // ==========================================================================
 
@@ -740,7 +740,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
       // Act/assert.
       (itin1 == itin2).Should().BeTrue();                         // Value equality should be true
-      Object.ReferenceEquals(itin1, itin2).Should().BeFalse();
+      ReferenceEquals(itin1, itin2).Should().BeFalse();
    }
 
    #endregion

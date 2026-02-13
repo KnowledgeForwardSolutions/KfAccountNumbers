@@ -93,7 +93,8 @@ public record UsNationalProviderIdentifier
    public static implicit operator String(UsNationalProviderIdentifier npi)
       => npi?.Value ?? String.Empty;      // Handle null NPI object gracefully by returning empty string
 
-   public static implicit operator UsNationalProviderIdentifier(String? npi) => new(npi);
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator UsNationalProviderIdentifier(String? npi) => new(npi);
 
    /// <summary>
    ///   Create a new <see cref="UsNationalProviderIdentifier"/>.
@@ -115,7 +116,7 @@ public record UsNationalProviderIdentifier
       UsNationalProviderIdentifierValidationResult validationResult = Validate(npi);
 
       return validationResult is UsNationalProviderIdentifierValidationResult.ValidationPassed
-         ? new UsNationalProviderIdentifier(npi!, validationMode: ValidationMode.BypassValidation)
+         ? new UsNationalProviderIdentifier(npi, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
@@ -181,10 +182,30 @@ public class UsNationalProviderIdentifierJsonConverter : JsonConverter<UsNationa
 {
    public override UsNationalProviderIdentifier Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
       var npiString = reader.GetString();
       return new UsNationalProviderIdentifier(npiString);
    }
 
    public override void Write(Utf8JsonWriter writer, UsNationalProviderIdentifier value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
+}
+
+/// <summary>
+///   Exception thrown by the <see cref="UsNationalProviderIdentifier"/>
+///   constructor when supplied with a string that contains validation errors.
+/// </summary>
+/// <param name="validationResult">
+///   Enum value that indicates the validation rule that was failed during the
+///   conversion.
+/// </param>
+public class InvalidUsNationalProviderIdentifierException(UsNationalProviderIdentifierValidationResult validationResult)
+   : InvalidAccountNumberException<UsNationalProviderIdentifierValidationResult>(
+      validationResult,
+      validationResult.ToErrorDescription())
+{
 }

@@ -1,4 +1,4 @@
-// Ignore Spelling: Curp Json Mx Homoclaves Homoclave
+// Ignore Spelling: Curp Deserialize Deserialization Homoclaves Homoclave Json  Mx
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -26,7 +26,7 @@ public class MxCurpTests
 
    public static TheoryData<String> ValidFullCurpValues =>
    [
-      ValidCurp,  
+      ValidCurp,
       AltValidCurp,
    ];
 
@@ -363,9 +363,9 @@ public class MxCurpTests
 
    [Theory]
    [MemberData(nameof(EmptyCurpValues))]
-   public void MxCurp_Constructor_ShouldThrowInvalidMxCurpException_WhenValueIsNullOrEmpty(String? curp)
+   public void MxCurp_Constructor_ShouldThrowInvalidMxCurpException_WhenValueIsNullOrEmpty(String curp)
       => FluentActions
-         .Invoking(() => new MxCurp(curp!))
+         .Invoking(() => new MxCurp(curp))
          .Should().Throw<InvalidMxCurpException>()
          .WithMessage(Messages.MxCurpEmpty + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.Empty);
@@ -1160,10 +1160,10 @@ public class MxCurpTests
 
    [Theory]
    [MemberData(nameof(EmptyCurpValues))]
-   public void MxCurp_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String? curp)
+   public void MxCurp_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String curp)
    {
       // Act.
-      var result = MxCurp.Create(curp!);
+      var result = MxCurp.Create(curp);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1177,7 +1177,7 @@ public class MxCurpTests
    public void MxCurp_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String curp)
    {
       // Act.
-      var result = MxCurp.Create(curp!);
+      var result = MxCurp.Create(curp);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1194,7 +1194,7 @@ public class MxCurpTests
       var curp = GetCurp(initials: initials);
 
       // Act.
-      var result = MxCurp.Create(curp!);
+      var result = MxCurp.Create(curp);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1213,7 +1213,7 @@ public class MxCurpTests
       var curp = GetCurp(dateOfBirth: dateOfBirth, homoclave: homoclave);
 
       // Act.
-      var result = MxCurp.Create(curp!);
+      var result = MxCurp.Create(curp);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1230,7 +1230,7 @@ public class MxCurpTests
       var curp = GetCurp(gender: gender);
 
       // Act.
-      var result = MxCurp.Create(curp!);
+      var result = MxCurp.Create(curp);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1247,7 +1247,7 @@ public class MxCurpTests
       var curp = GetCurp(stateCode: stateCode);
 
       // Act.
-      var result = MxCurp.Create(curp!);
+      var result = MxCurp.Create(curp);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1264,7 +1264,7 @@ public class MxCurpTests
       var curp = GetCurp(consonants: consonants);
 
       // Act.
-      var result = MxCurp.Create(curp!);
+      var result = MxCurp.Create(curp);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1281,7 +1281,7 @@ public class MxCurpTests
       var curp = GetCurp(homoclave: homoclave);
 
       // Act.
-      var result = MxCurp.Create(curp!);
+      var result = MxCurp.Create(curp);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1297,7 +1297,7 @@ public class MxCurpTests
       var curp = GetCurp(dateOfBirth: "010132", homoclave: '!'); // Invalid day of month and invalid homoclave
 
       // Act.
-      var result = MxCurp.Create(curp!);
+      var result = MxCurp.Create(curp);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1314,7 +1314,7 @@ public class MxCurpTests
       var curp = GetCurp(checkDigit: checkDigit);
 
       // Act.
-      var result = MxCurp.Create(curp!);
+      var result = MxCurp.Create(curp);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1409,7 +1409,7 @@ public class MxCurpTests
 
    #endregion
 
-   #region ObjectReferenceEquals Method Tests
+   #region ReferenceEquals Method Tests
    // ==========================================================================
    // ==========================================================================
 
@@ -1426,7 +1426,7 @@ public class MxCurpTests
 
       // Act/assert.
       (curp1 == curp2).Should().BeTrue();                         // Value equality should be true
-      Object.ReferenceEquals(curp1, curp2).Should().BeFalse();
+      ReferenceEquals(curp1, curp2).Should().BeFalse();
    }
 
    #endregion
@@ -1552,8 +1552,8 @@ public class MxCurpTests
 
    [Theory]
    [MemberData(nameof(EmptyCurpValues))]
-   public void MxCurp_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String? curp)
-      => MxCurp.Validate(curp!).Should().Be(MxCurpValidationResult.Empty);
+   public void MxCurp_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String curp)
+      => MxCurp.Validate(curp).Should().Be(MxCurpValidationResult.Empty);
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
