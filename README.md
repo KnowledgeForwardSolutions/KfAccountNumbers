@@ -36,6 +36,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- NorthAmerica
 		- [CaSocialInsuranceNumber](#casocialinsurancenumber) 
 		- [MxCurp](#mxcurp)
+        - [UsIndividualTaxpayerIdentificationNumber](#usindividualtaxpayeridentificationnumber)
         - [UsNationalProviderNumber](#usnationalprovidernumber)
 		- [UsSocialSecurityNumber](#ussocialsecuritynumber)
 	- South America
@@ -84,16 +85,16 @@ performed on the check digit is to verify that it is a digit character.
 MxCurp has read-only properties for accessing the DateOfBirth, GenderCode and StateCode from the
 CURP string. 
 
-A valid CURP must meet all of the following rules:
+A valid CURP must meet all of the following rules (specific character offsets are zero-based):
 
 * Must consist of 18 characters
-* The first 4 characters must be alphabetic (A-Z)
-* Characters 5-10 must be a valid date in YYMMDD format
-* Character 11 must be H, M or X
-* Characters 12-13 must be a valid state code or NE (see [Appendix - MxCurp list of valid state codes](#mxcurp-list-of-valid-state-codes))
-* Characters 14-16 must be alphabetic (A-Z)
-* Character 17 must be alphanumeric (A-Z, 0-9)
-* Character 18 must be a digit (0-9)
+* Characters 0-3 characters must be alphabetic (A-Z)
+* Characters 3-9 must be a valid date in YYMMDD format
+* Character 10 must be H, M or X
+* Characters 11-12 must be a valid state code or NE (see [Appendix - MxCurp list of valid state codes](#mxcurp-list-of-valid-state-codes))
+* Characters 13-15 must be alphabetic (A-Z)
+* Character 16 must be alphanumeric (A-Z, 0-9)
+* Character 17 must be a digit (0-9)
 
 MxCurp is case-insensitive for validation and parsing purposes. The MxCurp constructor, Create
 method and implicit string to MxCurp operator will convert any lowercase letters to uppercase.
@@ -109,6 +110,32 @@ be considered valid if it meets all of the other validation rules.
 
 See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/Unique_Population_Registry_Code) and
 [Wikipedia - Clave Única de Registro de Población](https://es.wikipedia.org/wiki/Clave_%C3%9Anica_de_Registro_de_Poblaci%C3%B3n) for more info.
+
+## UsIndividualTaxpayerIdentificationNumber
+
+UsIndividualTaxpayerIdentificationNumber represents an Individual Taxpayer Identification Number (ITIN)
+issued by the US Internal Revenue Service (IRS). ITINs are used for tax processing purposes for
+individuals who are not eligible for a Social Security Number (SSN) but who have a tax filing
+requirement in the United States.
+
+A US ITIN consists of 9 digits, arranged in the format 9XX-XX-XXXX. The first digit is always a 9,
+the fourth and fifth digits are in the range 50-65, 70-88, 90-92 or 94-99 and the remaining digits can be any
+decimal digit. The UsIndividualTaxpayerIdentificationNumber constructor will accept either 9 character
+strings (all digits) or eleven character strings that include separator characters between the three
+groups. If used, the separator character must be the same for both separators and must be a non-digit
+character.
+
+A valid ITIN must meet all of the following rules:
+
+* Must consist of 9 integer digits
+* The first digit must be 9.
+* The fourth and fifth digits must be in the range 50-65, 70-88, 90-92 or 94-99
+
+Note that meeting the above rules is not a guarantee that the value is considered a valid ITIN issued
+by the IRS. Determining actual validity of an ITIN requires use of the IRS's Taxpayer Identification
+Number (TIN) Matching Program or other IRS services.
+
+See [Wikipedia - Individual Taxpayer Identification Number](https://en.wikipedia.org/wiki/Individual_Taxpayer_Identification_Number) for more info.
 
 ## UsNationalProviderNumber
 

@@ -44,6 +44,10 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         </item>
 ///      </list>
 ///   </para>
+///   <para>
+///      See <see href="https://en.wikipedia.org/wiki/Social_Insurance_Number">Wikipedia - Social Insurance Number</see>
+///      for more details.
+///   </para>
 /// </remarks>
 [JsonConverter(typeof(CaSocialInsuranceNumberJsonConverter))]
 public record CaSocialInsuranceNumber
@@ -80,8 +84,9 @@ public record CaSocialInsuranceNumber
       : this(sin, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports optional validation,
-   ///   specifically to support the <see cref="Create(String?)"/> method.
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
    /// </summary>
    private CaSocialInsuranceNumber(String? sin, ValidationMode validationMode)
    {
@@ -99,12 +104,13 @@ public record CaSocialInsuranceNumber
    /// <summary>
    ///   The raw SIN value.
    /// </summary>
-   public String Value { get; init; }
+   public String Value { get; private init; }
 
    public static implicit operator String(CaSocialInsuranceNumber sin)
-      => sin?.Value ?? throw new ArgumentNullException(nameof(sin), Messages.CaSinInvalidNullConversionToString);
+      => sin?.Value ?? String.Empty;     // Handle null SIN object gracefully by returning empty string
 
-   public static implicit operator CaSocialInsuranceNumber(String? sin) => new(sin);
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator CaSocialInsuranceNumber(String? sin) => new(sin);
 
    /// <summary>
    ///   Create a new <see cref="CaSocialInsuranceNumber"/>.
@@ -156,8 +162,8 @@ public record CaSocialInsuranceNumber
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="sin"/> to determine if it contains any 
-   ///   validation errors.
+   ///   Check the <paramref name="sin"/> to determine if it contains a valid
+   ///   Canadian Social Insurance Number (SIN).
    /// </summary>
    /// <param name="sin">
    ///   String representation of a Social Insurance Number.
@@ -286,10 +292,29 @@ public class CaSocialInsuranceNumberJsonConverter : JsonConverter<CaSocialInsura
 {
    public override CaSocialInsuranceNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
       var sinString = reader.GetString();
       return new CaSocialInsuranceNumber(sinString);
    }
 
    public override void Write(Utf8JsonWriter writer, CaSocialInsuranceNumber value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
+}
+/// <summary>
+///   Exception thrown by the <see cref="CaSocialInsuranceNumber"/>
+///   constructor when supplied with a string that contains validation errors.
+/// </summary>
+/// <param name="validationResult">
+///   Enum value that indicates the validation rule that was failed during the
+///   conversion.
+/// </param>
+public class InvalidCaSocialInsuranceNumberException(CaSocialInsuranceNumberValidationResult validationResult)
+   : InvalidAccountNumberException<CaSocialInsuranceNumberValidationResult>(
+      validationResult,
+      validationResult.ToErrorDescription())
+{
 }

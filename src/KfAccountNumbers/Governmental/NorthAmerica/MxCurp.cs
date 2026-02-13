@@ -99,6 +99,11 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         </item>
 ///      </list>
 ///   </para>
+///   <para>
+///      See <see href="https://en.wikipedia.org/wiki/Unique_Population_Registry_Code">Wikipedia - Unique Population Registry Code</see>
+///      and <see href="https://es.wikipedia.org/wiki/Clave_%C3%9Anica_de_Registro_de_Poblaci%C3%B3n">Wikipedia - Clave Única de Registro de Población</see>
+///      for more details.
+///   </para>
 /// </remarks>
 [JsonConverter(typeof(MxCurpJsonConverter))]
 public record MxCurp
@@ -159,8 +164,9 @@ public record MxCurp
    public MxCurp(String? curp) : this(curp, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports optional validation,
-   ///   specifically to support the <see cref="Create(String?)"/> method.
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
    /// </summary>
    private MxCurp(String? curp, ValidationMode validationMode)
    {
@@ -189,7 +195,9 @@ public record MxCurp
       get
       {
          ReadOnlySpan<Char> dateOfBirthSpan = GetSectionSpan(Value, CurpSection.DateOfBirth);
+#pragma warning disable IDE0008 // Use explicit type
          var (year, month, day) = GetYearMonthDay(dateOfBirthSpan);
+#pragma warning restore IDE0008 // Use explicit type
          year += Char.IsAsciiDigit(Value[HomoclaveOffset]) ? 1900 : 2000;
 
          return new DateOnly(year, month, day);
@@ -215,12 +223,13 @@ public record MxCurp
    /// <remarks>
    ///   The CURP value is always normalized to upper-case.
    /// </remarks>
-   public String Value { get; init; }
+   public String Value { get; private init; }
 
    public static implicit operator String(MxCurp curp)
-      => curp?.Value ?? throw new ArgumentNullException(nameof(curp), Messages.MxCurpInvalidNullConversionToString);
+      => curp?.Value ?? String.Empty;     // Handle null CURP object gracefully by returning empty string
 
-   public static implicit operator MxCurp(String curp) => new(curp);
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator MxCurp(String curp) => new(curp);
 
    /// <summary>
    ///   Get a string representation of the CURP.
@@ -244,15 +253,14 @@ public record MxCurp
    public static CreateResult<MxCurp, MxCurpValidationResult> Create(String? curp)
    {
       MxCurpValidationResult validationResult = Validate(curp);
-      
       return validationResult == MxCurpValidationResult.ValidationPassed
          ? new MxCurp(curp, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
    /// <summary>
-   ///   Check the <paramref name="curp"/> to determine if it contains any 
-   ///   validation errors.
+   ///   Check the <paramref name="curp"/> to determine if it contains a valid
+   ///   CURP value.
    /// </summary>
    /// <param name="curp">
    ///   String representation of a CURP.
@@ -365,7 +373,9 @@ public record MxCurp
          }
       }
 
+#pragma warning disable IDE0008 // Use explicit type
       var (year, month, day) = GetYearMonthDay(dateOfBirthSpan);
+#pragma warning restore IDE0008 // Use explicit type
 
       if (month is < 1 or > 12)
       {
@@ -437,10 +447,29 @@ public class MxCurpJsonConverter : JsonConverter<MxCurp>
 {
    public override MxCurp Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
       var curpString = reader.GetString();
       return new MxCurp(curpString);
    }
 
    public override void Write(Utf8JsonWriter writer, MxCurp value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
+}
+/// <summary>
+///   Exception thrown by the <see cref="MxCurp"/>
+///   constructor when supplied with a string that contains validation errors.
+/// </summary>
+/// <param name="validationResult">
+///   Enum value that indicates the validation rule that was failed during the
+///   conversion.
+/// </param>
+public class InvalidMxCurpException(MxCurpValidationResult validationResult)
+   : InvalidAccountNumberException<MxCurpValidationResult>(
+      validationResult,
+      validationResult.ToErrorDescription())
+{
 }

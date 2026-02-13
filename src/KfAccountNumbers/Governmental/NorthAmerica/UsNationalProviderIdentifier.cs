@@ -36,6 +36,10 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         </item>
 ///      </list>
 ///   </para>
+///   <para>
+///      See <see href="https://en.wikipedia.org/wiki/National_Provider_Identifier">Wikipedia - National Provider Identifier</see>
+///      for more details.
+///   </para>
 /// </remarks>
 [JsonConverter(typeof(UsNationalProviderIdentifierJsonConverter))]
 public record UsNationalProviderIdentifier
@@ -60,35 +64,37 @@ public record UsNationalProviderIdentifier
    ///   prefixing with "80840").
    /// </exception>
    public UsNationalProviderIdentifier(String? npi)
+      : this(npi, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private UsNationalProviderIdentifier(String? npi, ValidationMode validationMode)
    {
-      UsNationalProviderIdentifierValidationResult validationResult = Validate(npi);
-      if (validationResult != UsNationalProviderIdentifierValidationResult.ValidationPassed)
+      if (validationMode == ValidationMode.ValidationRequired)
       {
-         throw new InvalidUsNationalProviderIdentifierException(validationResult);
+         UsNationalProviderIdentifierValidationResult validationResult = Validate(npi);
+         if (validationResult != UsNationalProviderIdentifierValidationResult.ValidationPassed)
+         {
+            throw new InvalidUsNationalProviderIdentifierException(validationResult);
+         }
       }
 
       Value = npi!;
    }
 
    /// <summary>
-   ///   Private constructor to support <see cref="Create(String?)"/> method not
-   ///   performing validation again on a value that has already been validated.
-   /// </summary>
-   /// <remarks>
-   ///   Boolean discard parameter is used to differentiate this constructor
-   ///   from the public constructor.
-   /// </remarks>
-   private UsNationalProviderIdentifier(String npi, Boolean _) => Value = npi;
-
-   /// <summary>
    ///   The raw NPI value.
    /// </summary>
-   public String Value { get; init; }
+   public String Value { get; private init; }
 
    public static implicit operator String(UsNationalProviderIdentifier npi)
-      => npi?.Value ?? throw new ArgumentNullException(nameof(npi), Messages.UsNationalProviderIdentifierInvalidNullConversionToString);
+      => npi?.Value ?? String.Empty;      // Handle null NPI object gracefully by returning empty string
 
-   public static implicit operator UsNationalProviderIdentifier(String? npi) => new(npi);
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator UsNationalProviderIdentifier(String? npi) => new(npi);
 
    /// <summary>
    ///   Create a new <see cref="UsNationalProviderIdentifier"/>.
@@ -110,7 +116,7 @@ public record UsNationalProviderIdentifier
       UsNationalProviderIdentifierValidationResult validationResult = Validate(npi);
 
       return validationResult is UsNationalProviderIdentifierValidationResult.ValidationPassed
-         ? new UsNationalProviderIdentifier(npi!, true)     // Note: invoking private ctor
+         ? new UsNationalProviderIdentifier(npi, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
@@ -120,8 +126,8 @@ public record UsNationalProviderIdentifier
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="npi"/> to determine if it contains any 
-   ///   validation errors.
+   ///   Check the <paramref name="npi"/> to determine if it contains a valid
+   ///   US National Provider Identifier (NPI).
    /// </summary>
    /// <param name="npi">
    ///   String representation of a US National Provider Identifier.
@@ -176,10 +182,30 @@ public class UsNationalProviderIdentifierJsonConverter : JsonConverter<UsNationa
 {
    public override UsNationalProviderIdentifier Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
       var npiString = reader.GetString();
       return new UsNationalProviderIdentifier(npiString);
    }
 
    public override void Write(Utf8JsonWriter writer, UsNationalProviderIdentifier value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
+}
+
+/// <summary>
+///   Exception thrown by the <see cref="UsNationalProviderIdentifier"/>
+///   constructor when supplied with a string that contains validation errors.
+/// </summary>
+/// <param name="validationResult">
+///   Enum value that indicates the validation rule that was failed during the
+///   conversion.
+/// </param>
+public class InvalidUsNationalProviderIdentifierException(UsNationalProviderIdentifierValidationResult validationResult)
+   : InvalidAccountNumberException<UsNationalProviderIdentifierValidationResult>(
+      validationResult,
+      validationResult.ToErrorDescription())
+{
 }
