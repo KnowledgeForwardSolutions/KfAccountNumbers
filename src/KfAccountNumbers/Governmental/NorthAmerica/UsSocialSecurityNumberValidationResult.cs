@@ -71,8 +71,8 @@ public enum UsSocialSecurityNumberValidationResult
 /// </summary>
 public static class UsSocialSecurityNumberValidationResultExtensions
 {
-   public static String ToErrorDescription(this UsSocialSecurityNumberValidationResult errorType)
-      => errorType switch
+   public static String ToErrorDescription(this UsSocialSecurityNumberValidationResult validationResult)
+      => validationResult switch
       {
          UsSocialSecurityNumberValidationResult.Empty => Messages.UsSsnEmpty,
          UsSocialSecurityNumberValidationResult.InvalidLength => Messages.UsSsnInvalidLength,
@@ -86,4 +86,8 @@ public static class UsSocialSecurityNumberValidationResultExtensions
          UsSocialSecurityNumberValidationResult.ValidationPassed => Messages.ValidationPassed,
          _ => throw new SwitchExpressionException()
       };
+
+   public static KfValidationException<UsSocialSecurityNumberValidationResult> ToValidationException(
+      this UsSocialSecurityNumberValidationResult validationResult)
+      => new(validationResult, validationResult.ToErrorDescription());
 }

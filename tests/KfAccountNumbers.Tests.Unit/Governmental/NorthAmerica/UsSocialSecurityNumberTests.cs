@@ -1,4 +1,4 @@
-// Ignore Spelling: Deserialization Deserialize Json ssn
+// Ignore Spelling: Deserialization Deserialize Json Kf ssn
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -181,91 +181,91 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsSocialSecurityNumber_Constructor_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueIsEmpty(String? ssn)
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueIsEmpty(String? ssn)
       => FluentActions
          .Invoking(() => _ = new UsSocialSecurityNumber(ssn))
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnEmpty + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.Empty);
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsSocialSecurityNumber_Constructor_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueHasInvalidLength(String ssn)
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String ssn)
       => FluentActions
          .Invoking(() => _ = new UsSocialSecurityNumber(ssn))
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidLength + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidLength);
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void UsSocialSecurityNumber_Constructor_ShouldThrowInvalidUsSocialSecurityNumberException_When11CharacterValueContainsInvalidSeparator(String ssn)
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_When11CharacterValueContainsInvalidSeparator(String ssn)
       => FluentActions
          .Invoking(() => _ = new UsSocialSecurityNumber(ssn))
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidSeparatorEncountered + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidSeparatorEncountered);
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsSocialSecurityNumber_Constructor_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueContainsNonAsciiDigit(String ssn)
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String ssn)
       => FluentActions
          .Invoking(() => _ = new UsSocialSecurityNumber(ssn))
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidCharacterEncountered + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidCharacterEncountered);
 
    [Theory]
    [MemberData(nameof(InvalidAreaNumberValues))]
-   public void UsSocialSecurityNumber_Constructor_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueHasInvalidAreaNumber(String ssn)
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidAreaNumber(String ssn)
       => FluentActions
          .Invoking(() => _ = new UsSocialSecurityNumber(ssn))
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidAreaNumber + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidAreaNumber);
 
    [Theory]
    [MemberData(nameof(InvalidGroupNumberValues))]
-   public void UsSocialSecurityNumber_Constructor_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueHasInvalidGroupNumber(String ssn)
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidGroupNumber(String ssn)
       => FluentActions
          .Invoking(() => _ = new UsSocialSecurityNumber(ssn))
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidGroupNumber + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidGroupNumber);
 
    [Theory]
    [MemberData(nameof(InvalidSerialNumberValues))]
-   public void UsSocialSecurityNumber_Constructor_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueHasInvalidSerialNumber(String ssn)
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSerialNumber(String ssn)
       => FluentActions
          .Invoking(() => _ = new UsSocialSecurityNumber(ssn))
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidSerialNumber + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidSerialNumber);
 
    [Theory]
    [MemberData(nameof(AllIdenticalDigitsValues))]
-   public void UsSocialSecurityNumber_Constructor_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueHas9IdenticalDigits(String ssn)
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHas9IdenticalDigits(String ssn)
       => FluentActions
          .Invoking(() => _ = new UsSocialSecurityNumber(ssn))
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnAllIdenticalDigits + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.AllIdenticalDigits);
 
    [Theory]
    [MemberData(nameof(InvalidRunValues))]
-   public void UsSocialSecurityNumber_Constructor_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueHasConsecutiveRun(String ssn)
+   public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasConsecutiveRun(String ssn)
       => FluentActions
          .Invoking(() => _ = new UsSocialSecurityNumber(ssn))
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidRun + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidRun);
 
@@ -373,91 +373,91 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueIsEmpty(String? str)
+   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueIsEmpty(String? str)
       => FluentActions
          .Invoking(() => _ = (UsSocialSecurityNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnEmpty + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.Empty);
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueHasInvalidLength(String str)
+   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String str)
       => FluentActions
          .Invoking(() => _ = (UsSocialSecurityNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidLength + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidLength);
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowInvalidUsSocialSecurityNumberException_When11CharacterValueContainsInvalidSeparator(String str)
+   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_When11CharacterValueContainsInvalidSeparator(String str)
       => FluentActions
          .Invoking(() => _ = (UsSocialSecurityNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidSeparatorEncountered + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidSeparatorEncountered);
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueContainsNonAsciiDigit(String str)
+   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String str)
       => FluentActions
          .Invoking(() => _ = (UsSocialSecurityNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidCharacterEncountered + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidCharacterEncountered);
 
    [Theory]
    [MemberData(nameof(InvalidAreaNumberValues))]
-   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueHasInvalidAreaNumber(String str)
+   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHasInvalidAreaNumber(String str)
       => FluentActions
          .Invoking(() => _ = (UsSocialSecurityNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidAreaNumber + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidAreaNumber);
 
    [Theory]
    [MemberData(nameof(InvalidGroupNumberValues))]
-   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueHasInvalidGroupNumber(String str)
+   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHasInvalidGroupNumber(String str)
       => FluentActions
          .Invoking(() => _ = (UsSocialSecurityNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidGroupNumber + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidGroupNumber);
 
    [Theory]
    [MemberData(nameof(InvalidSerialNumberValues))]
-   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueHasInvalidSerialNumber(String str)
+   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHasInvalidSerialNumber(String str)
       => FluentActions
          .Invoking(() => _ = (UsSocialSecurityNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidSerialNumber + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidSerialNumber);
 
    [Theory]
    [MemberData(nameof(AllIdenticalDigitsValues))]
-   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueHas9IdenticalDigits(String str)
+   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHas9IdenticalDigits(String str)
       => FluentActions
          .Invoking(() => _ = (UsSocialSecurityNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnAllIdenticalDigits + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.AllIdenticalDigits);
 
    [Theory]
    [MemberData(nameof(InvalidRunValues))]
-   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowInvalidUsSocialSecurityNumberException_WhenValueHasConsecutiveRun(String str)
+   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHasConsecutiveRun(String str)
       => FluentActions
          .Invoking(() => _ = (UsSocialSecurityNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidRun + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidRun);
 
@@ -1029,7 +1029,7 @@ public class UsSocialSecurityNumberTests
    }
 
    [Fact]
-   public void UsSocialSecurityNumber_JsonDeserialization_ShouldThrowInvalidUsSocialSecurityNumberException_WhenSsnIsInvalid()
+   public void UsSocialSecurityNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenSsnIsInvalid()
    {
       // Arrange.
       var json = "{\"Ssn\":\"666123456\"}";  // Invalid area number
@@ -1038,7 +1038,7 @@ public class UsSocialSecurityNumberTests
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
          .Should()
-         .ThrowExactly<InvalidUsSocialSecurityNumberException>()
+         .ThrowExactly<KfValidationException<UsSocialSecurityNumberValidationResult>>()
          .WithMessage(Messages.UsSsnInvalidAreaNumber + "*")
          .And.ValidationResult.Should().Be(UsSocialSecurityNumberValidationResult.InvalidAreaNumber);
    }

@@ -1,4 +1,4 @@
-// Ignore Spelling: ssn Json
+// Ignore Spelling: ssn Json Kf
 
 #pragma warning disable IDE0046 // Convert to conditional expression
 
@@ -115,7 +115,7 @@ public record UsSocialSecurityNumber
    /// <param name="ssn">
    ///   String representation of a Social Security Number.
    /// </param>
-   /// <exception cref="InvalidUsSocialSecurityNumberException">
+   /// <exception cref="KfValidationException{UsSocialSecurityNumberValidationResult}">
    ///   <paramref name="ssn"/> is <see langword="null"/>, empty or all 
    ///   whitespace characters.
    ///   - or -
@@ -152,7 +152,7 @@ public record UsSocialSecurityNumber
          UsSocialSecurityNumberValidationResult validationResult = Validate(ssn);
          if (validationResult != UsSocialSecurityNumberValidationResult.ValidationPassed)
          {
-            throw new InvalidUsSocialSecurityNumberException(validationResult);
+            throw validationResult.ToValidationException();
          }
       }
 
