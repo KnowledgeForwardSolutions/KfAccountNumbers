@@ -1,4 +1,4 @@
-// Ignore Spelling: Curp Deserialize Deserialization Homoclaves Homoclave Json  Mx
+// Ignore Spelling: Curp Deserialize Deserialization Homoclaves Homoclave Json Kf Mx
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -356,25 +356,25 @@ public class MxCurpTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void MxCurp_Constructor_ShouldThrowInvalidMxCurpException_WhenValueIsNullOrEmpty(String curp)
+   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String curp)
       => FluentActions
          .Invoking(() => new MxCurp(curp))
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpEmpty + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.Empty);
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void MxCurp_Constructor_ShouldThrowInvalidMxCurpException_WhenValueHasInvalidLength(String curp)
+   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String curp)
       => FluentActions
          .Invoking(() => new MxCurp(curp))
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidLength + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidLength);
 
    [Theory]
    [MemberData(nameof(InvalidNameInitials))]
-   public void MxCurp_Constructor_ShouldThrowInvalidMxCurpException_WhenNameInitialsAreInvalid(String initials)
+   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenNameInitialsAreInvalid(String initials)
    {
       // Arrange.
       var curp = GetCurp(initials);
@@ -382,14 +382,14 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(curp))
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidAlphabeticCharacterEncountered + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidAlphabeticCharacterEncountered);
    }
 
    [Theory]
    [MemberData(nameof(InvalidBirthDates))]
-   public void MxCurp_Constructor_ShouldThrowInvalidMxCurpException_WhenDateOfBirthIsInvalid(
+   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenDateOfBirthIsInvalid(
       String dateOfBirth,
       Char homoclave)
    {
@@ -399,14 +399,14 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(curp))
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidDateOfBirth + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidDateOfBirth);
    }
 
    [Theory]
    [MemberData(nameof(InvalidGenders))]
-   public void MxCurp_Constructor_ShouldThrowInvalidMxCurpException_WhenGenderIsInvalidCharacter(Char gender)
+   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenGenderIsInvalidCharacter(Char gender)
    {
       // Arrange.
       var curp = GetCurp(gender: gender);
@@ -414,14 +414,14 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(curp))
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidGender + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidGender);
    }
 
    [Theory]
    [MemberData(nameof(InvalidStateCodes))]
-   public void MxCurp_Constructor_ShouldThrowInvalidMxCurpException_WhenStateCodeIsInvalid(String stateCode)
+   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenStateCodeIsInvalid(String stateCode)
    {
       // Arrange.
       var curp = GetCurp(stateCode: stateCode);
@@ -429,14 +429,14 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(curp))
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidState + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidState);
    }
 
    [Theory]
    [MemberData(nameof(InvalidNameConsonants))]
-   public void MxCurp_Constructor_ShouldThrowInvalidMxCurpException_WhenNameConsonantsAreInvalid(String consonants)
+   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenNameConsonantsAreInvalid(String consonants)
    {
       // Arrange.
       var curp = GetCurp(consonants: consonants);
@@ -444,14 +444,14 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(curp))
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidAlphabeticCharacterEncountered + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidAlphabeticCharacterEncountered);
    }
 
    [Theory]
    [MemberData(nameof(InvalidHomoclaves))]
-   public void MxCurp_Constructor_ShouldThrowInvalidMxCurpException_WhenHomoclaveIsInvalidCharacter(Char homoclave)
+   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenHomoclaveIsInvalidCharacter(Char homoclave)
    {
       // Arrange.
       var curp = GetCurp(homoclave: homoclave);
@@ -459,13 +459,13 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(curp))
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidHomoclave + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidHomoclave);
    }
 
    [Fact]
-   public void MxCurp_Constructor_ShouldThrowInvalidMxCurpException_WhenBothHomoclaveAndDateOfBirthAreInvalid()
+   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenBothHomoclaveAndDateOfBirthAreInvalid()
    {
       // Arrange.
       var curp = GetCurp(dateOfBirth: "010132", homoclave: '!'); // Invalid day of month and invalid homoclave
@@ -473,14 +473,14 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(curp))
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidHomoclave + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidHomoclave);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigits))]
-   public void MxCurp_Constructor_ShouldThrowInvalidMxCurpException_WhenCheckDigitIsInvalidCharacter(Char checkDigit)
+   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenCheckDigitIsInvalidCharacter(Char checkDigit)
    {
       // Arrange.
       var curp = GetCurp(checkDigit: checkDigit);
@@ -488,7 +488,7 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(curp))
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidCheckDigit + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidCheckDigit);
    }
@@ -790,25 +790,25 @@ public class MxCurpTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowInvalidMxCurpException_WhenValueIsNullOrEmpty(String str)
+   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String str)
       => FluentActions
          .Invoking(() => _ = (MxCurp)str)
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpEmpty + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.Empty);
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowInvalidMxCurpException_WhenValueHasInvalidLength(String str)
+   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String str)
    => FluentActions
          .Invoking(() => _ = (MxCurp)str)
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidLength + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidLength);
 
    [Theory]
    [MemberData(nameof(InvalidNameInitials))]
-   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowInvalidMxCurpException_WhenNameInitialsAreInvalid(String initials)
+   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenNameInitialsAreInvalid(String initials)
    {
       // Arrange.
       var str = GetCurp(initials);
@@ -816,14 +816,14 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)str)
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidAlphabeticCharacterEncountered + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidAlphabeticCharacterEncountered);
    }
 
    [Theory]
    [MemberData(nameof(InvalidBirthDates))]
-   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowInvalidMxCurpException_WhenDateOfBirthIsInvalid(
+   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenDateOfBirthIsInvalid(
       String dateOfBirth,
       Char homoclave)
    {
@@ -833,14 +833,14 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)str)
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidDateOfBirth + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidDateOfBirth);
    }
 
    [Theory]
    [MemberData(nameof(InvalidGenders))]
-   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowInvalidMxCurpException_WhenGenderIsInvalidCharacter(Char gender)
+   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenGenderIsInvalidCharacter(Char gender)
    {
       // Arrange.
       var str = GetCurp(gender: gender);
@@ -848,14 +848,14 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)str)
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidGender + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidGender);
    }
 
    [Theory]
    [MemberData(nameof(InvalidStateCodes))]
-   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowInvalidMxCurpException_WhenStateCodeIsInvalid(String stateCode)
+   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenStateCodeIsInvalid(String stateCode)
    {
       // Arrange.
       var str = GetCurp(stateCode: stateCode);
@@ -863,14 +863,14 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)str)
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidState + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidState);
    }
 
    [Theory]
    [MemberData(nameof(InvalidNameConsonants))]
-   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowInvalidMxCurpException_WhenNameConsonantsAreInvalid(String consonants)
+   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenNameConsonantsAreInvalid(String consonants)
    {
       // Arrange.
       var str = GetCurp(consonants: consonants);
@@ -878,14 +878,14 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)str)
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidAlphabeticCharacterEncountered + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidAlphabeticCharacterEncountered);
    }
 
    [Theory]
    [MemberData(nameof(InvalidHomoclaves))]
-   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowInvalidMxCurpException_WhenHomoclaveIsInvalidCharacter(Char homoclave)
+   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenHomoclaveIsInvalidCharacter(Char homoclave)
    {
       // Arrange.
       var str = GetCurp(homoclave: homoclave);
@@ -893,13 +893,13 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)str)
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidHomoclave + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidHomoclave);
    }
 
    [Fact]
-   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowInvalidMxCurpException_WhenBothHomoclaveAndDateOfBirthAreInvalid()
+   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenBothHomoclaveAndDateOfBirthAreInvalid()
    {
       // Arrange.
       var str = GetCurp(dateOfBirth: "010132", homoclave: '!'); // Invalid day of month and invalid homoclave
@@ -907,14 +907,14 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)str)
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidHomoclave + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidHomoclave);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigits))]
-   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowInvalidMxCurpException_WhenCheckDigitIsInvalidCharacter(Char checkDigit)
+   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenCheckDigitIsInvalidCharacter(Char checkDigit)
    {
       // Arrange.
       var str = GetCurp(checkDigit: checkDigit);
@@ -922,7 +922,7 @@ public class MxCurpTests
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)str)
-         .Should().Throw<InvalidMxCurpException>()
+         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidCheckDigit + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidCheckDigit);
    }
@@ -1726,7 +1726,7 @@ public class MxCurpTests
    }
 
    [Fact]
-   public void MxCurp_JsonDeserialization_ShouldThrowInvalidMxCurpException_WhenCurpIsInvalid()
+   public void MxCurp_JsonDeserialization_ShouldThrowKfValidationException_WhenCurpIsInvalid()
    {
       // Arrange.
       var json = "{\"Curp\":\"MAAR790213HMNRLF0\"}";  // Invalid length
@@ -1735,7 +1735,7 @@ public class MxCurpTests
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
          .Should()
-         .ThrowExactly<InvalidMxCurpException>()
+         .ThrowExactly<KfValidationException<MxCurpValidationResult>>()
          .WithMessage(Messages.MxCurpInvalidLength + "*")
          .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidLength);
    }

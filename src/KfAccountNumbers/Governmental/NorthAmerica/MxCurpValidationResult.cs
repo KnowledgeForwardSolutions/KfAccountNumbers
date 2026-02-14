@@ -81,4 +81,8 @@ public static class MxCurpValidationResultExtensions
          MxCurpValidationResult.ValidationPassed => Messages.ValidationPassed,
          _ => throw new SwitchExpressionException()
       };
+
+   public static KfValidationException<MxCurpValidationResult> ToValidationException(
+      this MxCurpValidationResult validationResult)
+      => new(validationResult, validationResult.ToErrorDescription());
 }
