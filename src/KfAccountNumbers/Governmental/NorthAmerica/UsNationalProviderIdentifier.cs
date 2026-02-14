@@ -194,18 +194,3 @@ public class UsNationalProviderIdentifierJsonConverter : JsonConverter<UsNationa
    public override void Write(Utf8JsonWriter writer, UsNationalProviderIdentifier value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
 }
-
-/// <summary>
-///   Exception thrown by the <see cref="UsNationalProviderIdentifier"/>
-///   constructor when supplied with a string that contains validation errors.
-/// </summary>
-/// <param name="validationResult">
-///   Enum value that indicates the validation rule that was failed during the
-///   conversion.
-/// </param>
-public class InvalidUsNationalProviderIdentifierException(UsNationalProviderIdentifierValidationResult validationResult)
-   : InvalidAccountNumberException<UsNationalProviderIdentifierValidationResult>(
-      validationResult,
-      validationResult.ToErrorDescription())
-{
-}
