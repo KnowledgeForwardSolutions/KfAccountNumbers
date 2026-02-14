@@ -1,4 +1,4 @@
-// Ignore Spelling: ssn Json
+// Ignore Spelling: ssn Json Kf
 
 #pragma warning disable IDE0046 // Convert to conditional expression
 
@@ -115,7 +115,7 @@ public record UsSocialSecurityNumber
    /// <param name="ssn">
    ///   String representation of a Social Security Number.
    /// </param>
-   /// <exception cref="InvalidUsSocialSecurityNumberException">
+   /// <exception cref="KfValidationException{UsSocialSecurityNumberValidationResult}">
    ///   <paramref name="ssn"/> is <see langword="null"/>, empty or all 
    ///   whitespace characters.
    ///   - or -
@@ -152,7 +152,7 @@ public record UsSocialSecurityNumber
          UsSocialSecurityNumberValidationResult validationResult = Validate(ssn);
          if (validationResult != UsSocialSecurityNumberValidationResult.ValidationPassed)
          {
-            throw new InvalidUsSocialSecurityNumberException(validationResult);
+            throw validationResult.ToValidationException();
          }
       }
 
@@ -463,19 +463,4 @@ public class UsSocialSecurityNumberJsonConverter : JsonConverter<UsSocialSecurit
 
    public override void Write(Utf8JsonWriter writer, UsSocialSecurityNumber value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
-}
-
-/// <summary>
-///   Exception thrown by the <see cref="UsSocialSecurityNumber"/> constructor
-///   when supplied with a string that contains validation errors.
-/// </summary>
-/// <param name="validationResult">
-///   Enum value that indicates the validation rule that was failed during the
-///   conversion.
-/// </param>
-public class InvalidUsSocialSecurityNumberException(UsSocialSecurityNumberValidationResult validationResult)
-   : InvalidAccountNumberException<UsSocialSecurityNumberValidationResult>(
-      validationResult,
-      validationResult.ToErrorDescription())
-{
 }

@@ -1,4 +1,4 @@
-// Ignore Spelling: Json npi
+// Ignore Spelling: Json Kf npi
 
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
@@ -52,7 +52,7 @@ public record UsNationalProviderIdentifier
    /// <param name="npi">
    ///   The string representation of a US National Provider Identifier.
    /// </param>
-   /// <exception cref="InvalidUsNationalProviderIdentifierException">
+   /// <exception cref="KfValidationException{UsNationalProviderIdentifierValidationResult}">
    ///   <paramref name="npi"/> is <see langword="null"/>, empty or all 
    ///   whitespace characters.
    ///   - or -
@@ -78,7 +78,7 @@ public record UsNationalProviderIdentifier
          UsNationalProviderIdentifierValidationResult validationResult = Validate(npi);
          if (validationResult != UsNationalProviderIdentifierValidationResult.ValidationPassed)
          {
-            throw new InvalidUsNationalProviderIdentifierException(validationResult);
+            throw validationResult.ToValidationException();
          }
       }
 
@@ -193,19 +193,4 @@ public class UsNationalProviderIdentifierJsonConverter : JsonConverter<UsNationa
 
    public override void Write(Utf8JsonWriter writer, UsNationalProviderIdentifier value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
-}
-
-/// <summary>
-///   Exception thrown by the <see cref="UsNationalProviderIdentifier"/>
-///   constructor when supplied with a string that contains validation errors.
-/// </summary>
-/// <param name="validationResult">
-///   Enum value that indicates the validation rule that was failed during the
-///   conversion.
-/// </param>
-public class InvalidUsNationalProviderIdentifierException(UsNationalProviderIdentifierValidationResult validationResult)
-   : InvalidAccountNumberException<UsNationalProviderIdentifierValidationResult>(
-      validationResult,
-      validationResult.ToErrorDescription())
-{
 }

@@ -136,7 +136,7 @@ public record MxCurp
    ///   manner. However, the <see cref="Value"/> property will normalize the
    ///   CURP to upper-case.
    /// </remarks>
-   /// <exception cref="InvalidMxCurpException">
+   /// <exception cref="KfValidationException{MxCurpValidationResult}">
    ///   <paramref name="curp"/> is <see langword="null"/>, empty or all 
    ///   whitespace characters.
    ///   - or -
@@ -175,7 +175,7 @@ public record MxCurp
          MxCurpValidationResult validationResult = Validate(curp);
          if (validationResult != MxCurpValidationResult.ValidationPassed)
          {
-            throw new InvalidMxCurpException(validationResult);
+            throw validationResult.ToValidationException();
          }
       }
 
@@ -458,18 +458,4 @@ public class MxCurpJsonConverter : JsonConverter<MxCurp>
 
    public override void Write(Utf8JsonWriter writer, MxCurp value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
-}
-/// <summary>
-///   Exception thrown by the <see cref="MxCurp"/>
-///   constructor when supplied with a string that contains validation errors.
-/// </summary>
-/// <param name="validationResult">
-///   Enum value that indicates the validation rule that was failed during the
-///   conversion.
-/// </param>
-public class InvalidMxCurpException(MxCurpValidationResult validationResult)
-   : InvalidAccountNumberException<MxCurpValidationResult>(
-      validationResult,
-      validationResult.ToErrorDescription())
-{
 }

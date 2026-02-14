@@ -1,4 +1,4 @@
-// Ignore Spelling: Deserialization Deserialize Json npi
+// Ignore Spelling: Deserialization Deserialize Json Kf npi
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -70,31 +70,31 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsNationalProviderIdentifier_Constructor_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenValueIsEmpty(String? npi)
+   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenValueIsEmpty(String? npi)
       => FluentActions
          .Invoking(() => _ = new UsNationalProviderIdentifier(npi))
          .Should()
-         .ThrowExactly<InvalidUsNationalProviderIdentifierException>()
+         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiEmpty + "*")
          .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.Empty);
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsNationalProviderIdentifier_Constructor_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenValueHasInvalidLength(String? npi)
+   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String? npi)
       => FluentActions
          .Invoking(() => _ = new UsNationalProviderIdentifier(npi))
          .Should()
-         .ThrowExactly<InvalidUsNationalProviderIdentifierException>()
+         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiInvalidLength + "*")
          .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.InvalidLength);
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsNationalProviderIdentifier_Constructor_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenValueContainsNonAsciiDigit(String npi)
+   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String npi)
       => FluentActions
          .Invoking(() => _ = new UsNationalProviderIdentifier(npi))
          .Should()
-         .ThrowExactly<InvalidUsNationalProviderIdentifierException>()
+         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiInvalidCharacterEncountered + "*")
          .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.InvalidCharacterEncountered);
 
@@ -112,11 +112,11 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [MemberData(nameof(CheckDigitDetectableErrorValues))]
-   public void UsNationalProviderIdentifier_Constructor_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenCheckDigitContainsDetectableError(String npi)
+   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenCheckDigitContainsDetectableError(String npi)
       => FluentActions
          .Invoking(() => _ = new UsNationalProviderIdentifier(npi))
          .Should()
-         .ThrowExactly<InvalidUsNationalProviderIdentifierException>()
+         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiInvalidCheckDigit + "*")
          .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.InvalidCheckDigit);
 
@@ -218,31 +218,31 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenValueIsEmpty(String str)
+   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenValueIsEmpty(String str)
       => FluentActions
          .Invoking(() => _ = (UsNationalProviderIdentifier)str)
          .Should()
-         .ThrowExactly<InvalidUsNationalProviderIdentifierException>()
+         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiEmpty + "*")
          .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.Empty);
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenValueHasInvalidLength(String str)
+   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String str)
       => FluentActions
          .Invoking(() => _ = (UsNationalProviderIdentifier)str)
          .Should()
-         .ThrowExactly<InvalidUsNationalProviderIdentifierException>()
+         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiInvalidLength + "*")
          .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.InvalidLength);
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsNationalProviderIdentifier_ImplicitStringToUsNpiConversion_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenValueContainsNonAsciiDigit(String str)
+   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String str)
       => FluentActions
          .Invoking(() => _ = (UsNationalProviderIdentifier)str)
          .Should()
-         .ThrowExactly<InvalidUsNationalProviderIdentifierException>()
+         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiInvalidCharacterEncountered + "*")
          .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.InvalidCharacterEncountered);
 
@@ -260,11 +260,11 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [MemberData(nameof(CheckDigitDetectableErrorValues))]
-   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenCheckDigitContainsDetectableError(String str)
+   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenCheckDigitContainsDetectableError(String str)
       => FluentActions
          .Invoking(() => _ = (UsNationalProviderIdentifier)str)
          .Should()
-         .ThrowExactly<InvalidUsNationalProviderIdentifierException>()
+         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiInvalidCheckDigit + "*")
          .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.InvalidCheckDigit);
 
@@ -442,22 +442,22 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var itin1 = new UsNationalProviderIdentifier(ValidNpi);
-      var itin2 = new UsNationalProviderIdentifier(ValidNpi);    // Same internal value
+      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
+      var npi2 = new UsNationalProviderIdentifier(ValidNpi);    // Same internal value
 
       // Act/assert.
-      itin1.Equals(itin2).Should().BeTrue();
+      npi1.Equals(npi2).Should().BeTrue();
    }
 
    [Fact]
    public void UsNationalProviderIdentifier_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var itin1 = new UsNationalProviderIdentifier(ValidNpi);
-      var itin2 = new UsNationalProviderIdentifier(AltValidNpi);
+      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
+      var npi2 = new UsNationalProviderIdentifier(AltValidNpi);
 
       // Act/assert.
-      itin1.Equals(itin2).Should().BeFalse();
+      npi1.Equals(npi2).Should().BeFalse();
    }
 
    [Fact]
@@ -679,7 +679,7 @@ public class UsNationalProviderIdentifierTests
    }
 
    [Fact]
-   public void UsNationalProviderIdentifier_JsonDeserialization_ShouldThrowInvalidUsNationalProviderIdentifierException_WhenNpiIsInvalid()
+   public void UsNationalProviderIdentifier_JsonDeserialization_ShouldThrowKfValidationException_WhenNpiIsInvalid()
    {
       // Arrange.
       var json = "{\"Npi\":\"124531959\"}";  // Invalid length
@@ -688,7 +688,7 @@ public class UsNationalProviderIdentifierTests
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
          .Should()
-         .ThrowExactly<InvalidUsNationalProviderIdentifierException>()
+         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiInvalidLength + "*")
          .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.InvalidLength);
    }

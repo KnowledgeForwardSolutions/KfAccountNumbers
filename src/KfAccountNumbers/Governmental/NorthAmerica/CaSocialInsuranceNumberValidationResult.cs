@@ -1,4 +1,4 @@
-﻿namespace KfAccountNumbers.Governmental.NorthAmerica;
+namespace KfAccountNumbers.Governmental.NorthAmerica;
 
 /// <summary>
 ///   Defines the possible results returned when validating a Canadian Social 
@@ -29,10 +29,9 @@ public enum CaSocialInsuranceNumberValidationResult
    /// </summary>
    /// <remarks>
    ///   A SIN with length 11 should have valid separator character between the 
-   ///   three groups of digits. When using the default separator, the expected 
-   ///   separator character is a dash ('-'). When using a custom separator, the 
-   ///   expected separator character is the custom
-   ///   separator.
+   ///   three groups of digits. The same character must be used to separate
+   ///   the three groups. The separator character may not be a decimal digit
+   ///   (0-9).
    /// </remarks>
    InvalidSeparatorEncountered,
 
@@ -71,4 +70,8 @@ public static class CaSocialInsuranceNumberValidationResultExtensions
          CaSocialInsuranceNumberValidationResult.ValidationPassed => Messages.ValidationPassed,
          _ => throw new SwitchExpressionException()
       };
+
+   public static KfValidationException<CaSocialInsuranceNumberValidationResult> ToValidationException(
+      this CaSocialInsuranceNumberValidationResult validationResult)
+      => new(validationResult, validationResult.ToErrorDescription());
 }

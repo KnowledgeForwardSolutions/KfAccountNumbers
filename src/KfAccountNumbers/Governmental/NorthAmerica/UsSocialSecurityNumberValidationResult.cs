@@ -1,4 +1,4 @@
-﻿namespace KfAccountNumbers.Governmental.NorthAmerica;
+namespace KfAccountNumbers.Governmental.NorthAmerica;
 
 /// <summary>
 ///   Defines the possible results returned when validating a US Social Security 
@@ -29,10 +29,9 @@ public enum UsSocialSecurityNumberValidationResult
    /// </summary>
    /// <remarks>
    ///   A SSN with length 11 should have valid separator character between the 
-   ///   area, group and serial number sections. When using the default
-   ///   separator, the expected separator character is a dash ('-'). When using
-   ///   a custom separator, the expected separator character is the custom
-   ///   separator.
+   ///   area, group and serial number sections. The same character must be used
+   ///   to separate both the area/group numbers and the group/serial numbers.
+   ///   The separator character may not be a decimal digit (0-9).
    /// </remarks>
    InvalidSeparatorEncountered,
 
@@ -72,8 +71,8 @@ public enum UsSocialSecurityNumberValidationResult
 /// </summary>
 public static class UsSocialSecurityNumberValidationResultExtensions
 {
-   public static String ToErrorDescription(this UsSocialSecurityNumberValidationResult errorType)
-      => errorType switch
+   public static String ToErrorDescription(this UsSocialSecurityNumberValidationResult validationResult)
+      => validationResult switch
       {
          UsSocialSecurityNumberValidationResult.Empty => Messages.UsSsnEmpty,
          UsSocialSecurityNumberValidationResult.InvalidLength => Messages.UsSsnInvalidLength,
@@ -87,4 +86,8 @@ public static class UsSocialSecurityNumberValidationResultExtensions
          UsSocialSecurityNumberValidationResult.ValidationPassed => Messages.ValidationPassed,
          _ => throw new SwitchExpressionException()
       };
+
+   public static KfValidationException<UsSocialSecurityNumberValidationResult> ToValidationException(
+      this UsSocialSecurityNumberValidationResult validationResult)
+      => new(validationResult, validationResult.ToErrorDescription());
 }

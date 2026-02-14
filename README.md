@@ -88,7 +88,7 @@ CURP string.
 A valid CURP must meet all of the following rules (specific character offsets are zero-based):
 
 * Must consist of 18 characters
-* Characters 0-3 characters must be alphabetic (A-Z)
+* Characters 0-3 must be alphabetic (A-Z)
 * Characters 3-9 must be a valid date in YYMMDD format
 * Character 10 must be H, M or X
 * Characters 11-12 must be a valid state code or NE (see [Appendix - MxCurp list of valid state codes](#mxcurp-list-of-valid-state-codes))
