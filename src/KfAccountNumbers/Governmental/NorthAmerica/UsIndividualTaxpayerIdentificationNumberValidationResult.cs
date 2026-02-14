@@ -68,4 +68,8 @@ public static class UsIndividualTaxpayerIdentificationNumberValidationResultExte
          UsIndividualTaxpayerIdentificationNumberValidationResult.ValidationPassed => Messages.ValidationPassed,
          _ => throw new SwitchExpressionException()
       };
+
+   public static KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult> ToValidationException(
+      this UsIndividualTaxpayerIdentificationNumberValidationResult validationResult)
+      => new(validationResult, validationResult.ToErrorDescription());
 }

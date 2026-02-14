@@ -1,4 +1,4 @@
-// Ignore Spelling: itin Json
+// Ignore Spelling: itin Json Kf
 
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
@@ -74,7 +74,7 @@ public record UsIndividualTaxpayerIdentificationNumber
    /// <param name="itin">
    ///   String representation of an Individual Taxpayer Identification Number.
    /// </param>
-   /// <exception cref="InvalidUsIndividualTaxpayerIdentificationNumberException">
+   /// <exception cref="KfValidationException{UsIndividualTaxpayerIdentificationNumberValidationResult}">
    ///   <paramref name="itin"/> is <see langword="null"/>, empty or all 
    ///   whitespace characters.
    ///   - or -
@@ -105,7 +105,7 @@ public record UsIndividualTaxpayerIdentificationNumber
          UsIndividualTaxpayerIdentificationNumberValidationResult validationResult = Validate(itin);
          if (validationResult != UsIndividualTaxpayerIdentificationNumberValidationResult.ValidationPassed)
          {
-            throw new InvalidUsIndividualTaxpayerIdentificationNumberException(validationResult);
+            throw validationResult.ToValidationException();
          }
       }
 
@@ -330,19 +330,3 @@ public class UsIndividualTaxpayerIdentificationNumberJsonConverter : JsonConvert
    public override void Write(Utf8JsonWriter writer, UsIndividualTaxpayerIdentificationNumber value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
 }
-
-/// <summary>
-///   Exception thrown by the <see cref="UsIndividualTaxpayerIdentificationNumber"/>
-///   constructor when supplied with a string that contains validation errors.
-/// </summary>
-/// <param name="validationResult">
-///   Enum value that indicates the validation rule that was failed during the
-///   conversion.
-/// </param>
-public class InvalidUsIndividualTaxpayerIdentificationNumberException(UsIndividualTaxpayerIdentificationNumberValidationResult validationResult)
-   : InvalidAccountNumberException<UsIndividualTaxpayerIdentificationNumberValidationResult>(
-      validationResult,
-      validationResult.ToErrorDescription())
-{
-}
-

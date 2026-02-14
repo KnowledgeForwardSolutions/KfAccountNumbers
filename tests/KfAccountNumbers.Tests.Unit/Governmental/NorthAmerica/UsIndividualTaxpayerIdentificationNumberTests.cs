@@ -1,4 +1,4 @@
-// Ignore Spelling: Deserialization Deserialize itin Itin Json  Unformatted
+// Ignore Spelling: Deserialization Deserialize itin Itin Json Kf Unformatted
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -159,61 +159,61 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueIsEmpty(String? itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueIsEmpty(String? itin)
       => FluentActions
          .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
          .Should()
-         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinEmpty + "*")
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.Empty);
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueHasInvalidLength(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String itin)
       => FluentActions
          .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
          .Should()
-         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidLength + "*")
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidLength);
 
    [Theory]
    [MemberData(nameof(InvalidAreaNumberValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueHasInvalidAreaNumber(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidAreaNumber(String itin)
       => FluentActions
          .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
          .Should()
-         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidAreaNumber + "*")
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidAreaNumber);
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_When11CharacterValueContainsInvalidSeparator(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_When11CharacterValueContainsInvalidSeparator(String itin)
       => FluentActions
          .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
          .Should()
-         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidSeparatorEncountered + "*")
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidSeparatorEncountered);
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueContainsNonAsciiDigit(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String itin)
       => FluentActions
          .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
          .Should()
-         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidCharacterEncountered + "*")
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered);
 
    [Theory]
    [MemberData(nameof(InvalidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueHasInvalidGroupNumber(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidGroupNumber(String itin)
       => FluentActions
          .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
          .Should()
-         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidGroupNumber + "*")
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber);
 
@@ -302,61 +302,61 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueIsEmpty(String? str)
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueIsEmpty(String? str)
       => FluentActions
          .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinEmpty + "*")
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.Empty);
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueHasInvalidLength(String str)
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String str)
       => FluentActions
          .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidLength + "*")
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidLength);
 
    [Theory]
    [MemberData(nameof(InvalidAreaNumberValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueHasInvalidAreaNumber(String str)
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueHasInvalidAreaNumber(String str)
       => FluentActions
          .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidAreaNumber + "*")
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidAreaNumber);
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_When11CharacterValueContainsInvalidSeparator(String str)
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_When11CharacterValueContainsInvalidSeparator(String str)
       => FluentActions
          .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidSeparatorEncountered + "*")
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidSeparatorEncountered);
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueContainsNonAsciiDigit(String str)
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String str)
       => FluentActions
          .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidCharacterEncountered + "*")
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered);
 
    [Theory]
    [MemberData(nameof(InvalidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenValueHasInvalidGroupNumber(String str)
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueHasInvalidGroupNumber(String str)
       => FluentActions
          .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)str)
          .Should()
-         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidGroupNumber + "*")
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber);
 
@@ -881,7 +881,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    }
 
    [Fact]
-   public void UsIndividualTaxpayerIdentificationNumber_JsonDeserialization_ShouldThrowInvalidUsIndividualTaxpayerIdentificationNumberException_WhenItinIsInvalid()
+   public void UsIndividualTaxpayerIdentificationNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenItinIsInvalid()
    {
       // Arrange.
       var json = "{\"Itin\":\"123456789\"}";  // Invalid area number
@@ -890,7 +890,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
          .Should()
-         .ThrowExactly<InvalidUsIndividualTaxpayerIdentificationNumberException>()
+         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidAreaNumber + "*")
          .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidAreaNumber);
    }
