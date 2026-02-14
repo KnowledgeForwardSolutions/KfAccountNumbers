@@ -1,4 +1,4 @@
-// Ignore Spelling: Deserialization Deserialize Json Luhn
+// Ignore Spelling: Deserialization Deserialize Json Kf Luhn
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -163,51 +163,51 @@ public class CaSocialInsuranceNumberTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void CaSocialInsuranceNumber_Constructor_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueIsEmpty(String? sin)
+   public void CaSocialInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueIsEmpty(String? sin)
       => FluentActions
          .Invoking(() => _ = new CaSocialInsuranceNumber(sin))
          .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
+         .ThrowExactly<KfValidationException<CaSocialInsuranceNumberValidationResult>>()
          .WithMessage(Messages.CaSinEmpty + "*")
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.Empty);
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void CaSocialInsuranceNumber_Constructor_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLength(String? sin)
+   public void CaSocialInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String? sin)
       => FluentActions
          .Invoking(() => _ = new CaSocialInsuranceNumber(sin))
          .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
+         .ThrowExactly<KfValidationException<CaSocialInsuranceNumberValidationResult>>()
          .WithMessage(Messages.CaSinInvalidLength + "*")
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidLength);
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void CaSocialInsuranceNumber_Constructor_ShouldThrowInvalidCaSocialInsuranceNumberException_When11CharacterValueContainsAnInvalidSeparator(String sin)
+   public void CaSocialInsuranceNumber_Constructor_ShouldThrowKfValidationException_When11CharacterValueContainsAnInvalidSeparator(String sin)
       => FluentActions
          .Invoking(() => _ = new CaSocialInsuranceNumber(sin))
          .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
+         .ThrowExactly<KfValidationException<CaSocialInsuranceNumberValidationResult>>()
          .WithMessage(Messages.CaSinInvalidSeparatorEncountered + "*")
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidSeparatorEncountered);
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void CaSocialInsuranceNumber_Constructor_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueContainsNonAsciiDigit(String sin)
+   public void CaSocialInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String sin)
       => FluentActions
          .Invoking(() => _ = new CaSocialInsuranceNumber(sin))
          .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
+         .ThrowExactly<KfValidationException<CaSocialInsuranceNumberValidationResult>>()
          .WithMessage(Messages.CaSinInvalidCharacterEncountered + "*")
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidCharacterEncountered);
 
    [Theory]
    [MemberData(nameof(InvalidProvinceValues))]
-   public void CaSocialInsuranceNumber_Constructor_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLeadingDigit(String sin)
+   public void CaSocialInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLeadingDigit(String sin)
       => FluentActions
          .Invoking(() => _ = new CaSocialInsuranceNumber(sin))
          .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
+         .ThrowExactly<KfValidationException<CaSocialInsuranceNumberValidationResult>>()
          .WithMessage(Messages.CaSinInvalidProvince + "*")
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidProvince);
 
@@ -228,11 +228,11 @@ public class CaSocialInsuranceNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void CaSocialInsuranceNumber_Constructor_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenCheckDigitContainsDetectableError(String sin)
+   public void CaSocialInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenCheckDigitContainsDetectableError(String sin)
       => FluentActions
          .Invoking(() => _ = new CaSocialInsuranceNumber(sin))
          .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
+         .ThrowExactly<KfValidationException<CaSocialInsuranceNumberValidationResult>>()
          .WithMessage(Messages.CaSinInvalidCheckDigit + "*")
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidCheckDigit);
 
@@ -353,51 +353,51 @@ public class CaSocialInsuranceNumberTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueIsEmpty(String? str)
+   public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldThrowKfValidationException_WhenValueIsEmpty(String? str)
       => FluentActions
          .Invoking(() => _ = (CaSocialInsuranceNumber)str)
          .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
+         .ThrowExactly<KfValidationException<CaSocialInsuranceNumberValidationResult>>()
          .WithMessage(Messages.CaSinEmpty + "*")
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.Empty);
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLength(String str)
+   public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String str)
       => FluentActions
          .Invoking(() => _ = (CaSocialInsuranceNumber)str)
          .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
+         .ThrowExactly<KfValidationException<CaSocialInsuranceNumberValidationResult>>()
          .WithMessage(Messages.CaSinInvalidLength + "*")
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidLength);
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldThrowInvalidCaSocialInsuranceNumberException_When11CharacterValueContainsAnInvalidSeparator(String str)
+   public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldThrowKfValidationException_When11CharacterValueContainsAnInvalidSeparator(String str)
       => FluentActions
          .Invoking(() => _ = (CaSocialInsuranceNumber)str)
          .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
+         .ThrowExactly<KfValidationException<CaSocialInsuranceNumberValidationResult>>()
          .WithMessage(Messages.CaSinInvalidSeparatorEncountered + "*")
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidSeparatorEncountered);
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueContainsNonAsciiDigit(String str)
+   public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String str)
       => FluentActions
          .Invoking(() => _ = (CaSocialInsuranceNumber)str)
          .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
+         .ThrowExactly<KfValidationException<CaSocialInsuranceNumberValidationResult>>()
          .WithMessage(Messages.CaSinInvalidCharacterEncountered + "*")
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidCharacterEncountered);
 
    [Theory]
    [MemberData(nameof(InvalidProvinceValues))]
-   public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenValueHasInvalidLeadingDigit(String str)
+   public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldThrowKfValidationException_WhenValueHasInvalidLeadingDigit(String str)
       => FluentActions
          .Invoking(() => _ = (CaSocialInsuranceNumber)str)
          .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
+         .ThrowExactly<KfValidationException<CaSocialInsuranceNumberValidationResult>>()
          .WithMessage(Messages.CaSinInvalidProvince + "*")
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidProvince);
 
@@ -418,11 +418,11 @@ public class CaSocialInsuranceNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenCheckDigitContainsDetectableError(String str)
+   public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldThrowKfValidationException_WhenCheckDigitContainsDetectableError(String str)
       => FluentActions
          .Invoking(() => _ = (CaSocialInsuranceNumber)str)
          .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
+         .ThrowExactly<KfValidationException<CaSocialInsuranceNumberValidationResult>>()
          .WithMessage(Messages.CaSinInvalidCheckDigit + "*")
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidCheckDigit);
 
@@ -984,7 +984,7 @@ public class CaSocialInsuranceNumberTests
    }
 
    [Fact]
-   public void CaSocialInsuranceNumber_JsonDeserialization_ShouldThrowInvalidCaSocialInsuranceNumberException_WhenSinIsInvalid()
+   public void CaSocialInsuranceNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenSinIsInvalid()
    {
       // Arrange.
       var json = "{\"Sin\":\"55819942\"}";  // Invalid length
@@ -993,7 +993,7 @@ public class CaSocialInsuranceNumberTests
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
          .Should()
-         .ThrowExactly<InvalidCaSocialInsuranceNumberException>()
+         .ThrowExactly<KfValidationException<CaSocialInsuranceNumberValidationResult>>()
          .WithMessage(Messages.CaSinInvalidLength + "*")
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidLength);
    }

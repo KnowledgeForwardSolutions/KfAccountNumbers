@@ -464,18 +464,3 @@ public class UsSocialSecurityNumberJsonConverter : JsonConverter<UsSocialSecurit
    public override void Write(Utf8JsonWriter writer, UsSocialSecurityNumber value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
 }
-
-/// <summary>
-///   Exception thrown by the <see cref="UsSocialSecurityNumber"/> constructor
-///   when supplied with a string that contains validation errors.
-/// </summary>
-/// <param name="validationResult">
-///   Enum value that indicates the validation rule that was failed during the
-///   conversion.
-/// </param>
-public class InvalidUsSocialSecurityNumberException(UsSocialSecurityNumberValidationResult validationResult)
-   : InvalidAccountNumberException<UsSocialSecurityNumberValidationResult>(
-      validationResult,
-      validationResult.ToErrorDescription())
-{
-}

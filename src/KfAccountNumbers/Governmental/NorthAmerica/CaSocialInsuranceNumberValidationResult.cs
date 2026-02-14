@@ -70,4 +70,8 @@ public static class CaSocialInsuranceNumberValidationResultExtensions
          CaSocialInsuranceNumberValidationResult.ValidationPassed => Messages.ValidationPassed,
          _ => throw new SwitchExpressionException()
       };
+
+   public static KfValidationException<CaSocialInsuranceNumberValidationResult> ToValidationException(
+      this CaSocialInsuranceNumberValidationResult validationResult)
+      => new(validationResult, validationResult.ToErrorDescription());
 }

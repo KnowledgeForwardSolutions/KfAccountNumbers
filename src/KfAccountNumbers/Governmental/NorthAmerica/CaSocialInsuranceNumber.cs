@@ -1,4 +1,4 @@
-// Ignore Spelling: Luhn Json
+// Ignore Spelling: Json Kf Luhn
 
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
@@ -64,7 +64,7 @@ public record CaSocialInsuranceNumber
    /// <param name="sin">
    ///   The string representation of a Social Insurance Number.
    /// </param>
-   /// <exception cref="InvalidCaSocialInsuranceNumberException">
+   /// <exception cref="KfValidationException{CaSocialInsuranceNumberValidationResult}">
    ///   <paramref name="sin"/> is <see langword="null"/>, empty or all 
    ///   whitespace characters.
    ///   - or -
@@ -95,7 +95,7 @@ public record CaSocialInsuranceNumber
          CaSocialInsuranceNumberValidationResult validationResult = Validate(sin);
          if (validationResult != CaSocialInsuranceNumberValidationResult.ValidationPassed)
          {
-            throw new InvalidCaSocialInsuranceNumberException(validationResult);
+            throw validationResult.ToValidationException();
          }
       }
       Value = GetValidatedSin(sin!);
@@ -303,18 +303,4 @@ public class CaSocialInsuranceNumberJsonConverter : JsonConverter<CaSocialInsura
 
    public override void Write(Utf8JsonWriter writer, CaSocialInsuranceNumber value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
-}
-/// <summary>
-///   Exception thrown by the <see cref="CaSocialInsuranceNumber"/>
-///   constructor when supplied with a string that contains validation errors.
-/// </summary>
-/// <param name="validationResult">
-///   Enum value that indicates the validation rule that was failed during the
-///   conversion.
-/// </param>
-public class InvalidCaSocialInsuranceNumberException(CaSocialInsuranceNumberValidationResult validationResult)
-   : InvalidAccountNumberException<CaSocialInsuranceNumberValidationResult>(
-      validationResult,
-      validationResult.ToErrorDescription())
-{
 }
