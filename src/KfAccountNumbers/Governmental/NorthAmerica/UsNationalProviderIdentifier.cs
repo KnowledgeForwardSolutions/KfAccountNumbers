@@ -1,4 +1,4 @@
-// Ignore Spelling: Json npi
+// Ignore Spelling: Json Kf npi
 
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
@@ -52,7 +52,7 @@ public record UsNationalProviderIdentifier
    /// <param name="npi">
    ///   The string representation of a US National Provider Identifier.
    /// </param>
-   /// <exception cref="InvalidUsNationalProviderIdentifierException">
+   /// <exception cref="KfValidationException{UsNationalProviderIdentifierValidationResult}">
    ///   <paramref name="npi"/> is <see langword="null"/>, empty or all 
    ///   whitespace characters.
    ///   - or -
@@ -78,7 +78,7 @@ public record UsNationalProviderIdentifier
          UsNationalProviderIdentifierValidationResult validationResult = Validate(npi);
          if (validationResult != UsNationalProviderIdentifierValidationResult.ValidationPassed)
          {
-            throw new InvalidUsNationalProviderIdentifierException(validationResult);
+            throw validationResult.ToValidationException();
          }
       }
 

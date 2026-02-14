@@ -48,4 +48,8 @@ public static class UsNationalProviderIdentifierValidationResultExtensions
          UsNationalProviderIdentifierValidationResult.ValidationPassed => Messages.ValidationPassed,
          _ => throw new SwitchExpressionException()
       };
+
+   public static KfValidationException<UsNationalProviderIdentifierValidationResult> ToValidationException(
+      this UsNationalProviderIdentifierValidationResult validationResult)
+      => new(validationResult, validationResult.ToErrorDescription());
 }
