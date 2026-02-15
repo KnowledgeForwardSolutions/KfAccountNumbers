@@ -189,6 +189,25 @@ a list of rescinded SSNs and will not detect a validation failure for those SSNs
 
 See [Wikipedia - Social Security Number](https://en.wikipedia.org/wiki/Social_Security_number) for more info.
 
+# Language Notes
+
+We apologize in advance for providing primarily English language documentation
+for software with international scope. Unfortunately, the principal developer is
+a product of the US educational system, with foreign language skills that fall
+somewhere between limited and nonexistent. This has meant that we have had to
+rely on mostly English language sources (generally Wikipedia and various AI
+tools) for specifications and that the thorough documentation that we wish to
+provide is likewise English only. (We have chosen not to use AI translation tools
+for documentation because of our inability to review the output for accuracy.)
+
+If you wish to help with language specific documentation for any of the business
+objects in KfAccountNumbers, we would be very grateful for your assistance. You
+can use the "Contact owners" link on https://www.nuget.org/packages/KfAccountNumbers
+to send an email. Or you can log an issue or contribute directly to the Github
+repository: https://github.com/KnowledgeForwardSolutions/KfAccountNumbers
+
+# Release History
+
 # Appendices
 
 ## MxCurp list of valid state codes
