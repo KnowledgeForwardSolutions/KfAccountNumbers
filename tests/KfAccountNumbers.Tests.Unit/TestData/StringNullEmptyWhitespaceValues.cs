@@ -1,12 +1,12 @@
 namespace KfAccountNumbers.Tests.Unit.TestData;
 
-public sealed class StringNullEmptyWhitespaceValues : IEnumerable<Object[]>
+public sealed class StringNullEmptyWhitespaceValues : IEnumerable<TheoryDataRow<String>>
 {
-   public IEnumerator<Object[]> GetEnumerator()
+   public IEnumerator<TheoryDataRow<String>> GetEnumerator()
    {
-      yield return [null!];
-      yield return [String.Empty];
-      yield return ["\t"];
+      yield return new TheoryDataRow<String>(null!);
+      yield return new TheoryDataRow<String>(String.Empty);
+      yield return new TheoryDataRow<String>("\t");
    }
 
    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

@@ -103,8 +103,8 @@ public class MxCurpTests
       {
          var data = new TheoryData<String>();
          var stateCodes = MxCurpStateCodes.GetAllStateCodes();
-         data.AddRange(stateCodes);
-         data.AddRange([.. stateCodes.Select(c => c.ToLowerInvariant())]);
+         data.AddRange(stateCodes.AsEnumerable());
+         data.AddRange(stateCodes.Select(c => c.ToLowerInvariant()));
          return data;
       }
    }
