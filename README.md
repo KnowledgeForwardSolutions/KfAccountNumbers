@@ -46,7 +46,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 
 ## CaSocialInsuranceNumber
 
-CaSocialInsuranceNumber represents a Canadian Social Insurance Number (SIN) issued by the Government
+CaSocialInsuranceNumber represents a Social Insurance Number (SIN) issued by the Government
 of Canada.
 
 A Canadian SIN consists of 9 digits, typically formatted as AAA AAA AAA. The CaSocialInsuranceNumber
@@ -64,7 +64,7 @@ See [Wikipedia - Social Insurance Number](https://en.wikipedia.org/wiki/Social_I
 
 ## MxCurp
 
-MxCurp represents a Mexican Clave Única de Registro de Población (CURP) issued by the Government of Mexico,
+MxCurp represents a Clave Única de Registro de Población (CURP) issued by the Government of Mexico,
 specifically the Registry Nacional de Poblacion (RENAPO).
 
 A Mexican CURP consists of 18 characters, in the form AAAADDDDDDGLLNNNHC (example: HEGG560427MVZRRL04,
