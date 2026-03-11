@@ -1,4 +1,4 @@
-﻿using KfAccountNumbers.Governmental.NorthAmerica;
+using KfAccountNumbers.Governmental.NorthAmerica;
 
 namespace KfAccountNumbers.Utility;
 
