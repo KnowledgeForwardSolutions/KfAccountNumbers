@@ -54,6 +54,7 @@ public enum MxCurpValidationResult
    ///   RENAPO (Registro Nacional de Población) to avoid duplicate CURP values.
    /// </summary>
    InvalidHomoclave,
+
    /// <summary>
    ///   Character position 17 (zero-based) is not a valid check digit character. 
    ///   The check digit algorithm used for CURP is not published by RENAPO, but 

@@ -232,6 +232,60 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SE Personnummer may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string SePersonnummerEmpty {
+            get {
+                return ResourceManager.GetString("SePersonnummerEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SE Personnummer must have a three digit birth serial number in character positions 7-9 (YYMMDD format) or character positions 9-11 (YYYYMMDD format).
+        /// </summary>
+        internal static string SePersonnummerInvalidBirthSerialNumber {
+            get {
+                return ResourceManager.GetString("SePersonnummerInvalidBirthSerialNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SE Personnummer must have a valid Luhn algorithm check digit in character position 10 (YYMMDD format) or character position 12 (YYYYMMDD format).
+        /// </summary>
+        internal static string SePersonnummerInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("SePersonnummerInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SE Personnummer requires valid six digit date of birth (YYMMDD) in character positions 0-5 (zero-based) or a valid eight digit date of birth (YYYYMMDD) in character positions 0-7 (zero-based).
+        /// </summary>
+        internal static string SePersonnummerInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("SePersonnummerInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SE Personnummer must have length 11 (YYMMDD format) or 13 (YYYYMMDD format).
+        /// </summary>
+        internal static string SePersonnummerInvalidLength {
+            get {
+                return ResourceManager.GetString("SePersonnummerInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SE Personnummer must have a valid separator character (either &apos;-&apos; or &apos;+&apos;) in character position 6 (zero-based, YYMMDD format) or character position 8 (zero-based, YYYYMMDD format).
+        /// </summary>
+        internal static string SePersonnummerInvalidSeparator {
+            get {
+                return ResourceManager.GetString("SePersonnummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to US Individual Taxpayer Identification Number may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string UsItinEmpty {
