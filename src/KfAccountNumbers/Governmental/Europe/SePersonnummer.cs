@@ -4,11 +4,13 @@ namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
 ///   Strongly typed business object for a Swedish Personal Identity Number
-///   (Personnummer).
+///   (personnummer). Also supports Swedish coordination numbers
+///   (samordningsnummer) for persons who are not eligible for a personnummer
+///   (non-residents, foreign employees, etc.).
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A valid Swedish Personal Identity Number (Personnummer) is a string
+///      A valid Swedish Personal Identity Number (personnummer) is a string
 ///      that is 11 or 13 characters long. The first 6 or 8 characters represent
 ///      the date of birth in the format YYMMDD or YYYYMMDD, followed by a
 ///      hyphen or plus sign, and then a three-digit birth serial number and a
@@ -17,6 +19,13 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      number indicates a female. The hyphen indicates that the person is under
 ///      100 years old, while the plus sign indicates that the person is 100
 ///      years old or older.
+///   </para>
+///   <para>
+///      A valid Swedish coordination umber (samordningsnummer) uses the same
+///      format as a personnummer, but in the date of birth section, 60 is added
+///      to the day. For example a date of birth Jan, 23, 1995 would be "950123"
+///      for a YYMMDD format personnummer, but would be "951283" for a YYMMDD
+///      format samordningsnummer.
 ///   </para>
 ///   <para>
 ///      Not all combinations of digits are valid, as the date of birth must be
@@ -61,6 +70,16 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            </description>
 ///         </item>
 ///      </list>
+///   </para>
+///   <para>
+///      When determining if a date of birth is valid, YYMMDD format dates are
+///      assumed to be in the 20th century (1900-1999). The reason for this
+///      assumption is that the YYYYMMDD format was introduced in 1997,
+///      presumably as part of Y2K preparations. The practical impact of this
+///      assumption is that the YYMMDD format date "000229" will always be
+///      considered invalid because 1900 is not a leap year. (The opposite
+///      would be true if "00" represented the year 2000, which is a leap
+///      year because of the century divisible by 400 rule for leap years).
 ///   </para>
 /// </remarks>
 public record SePersonnummer
@@ -205,6 +224,12 @@ public record SePersonnummer
       else if (month < 1 || month > 12)
       {
          return false;
+      }
+
+      // Handle samordningsnummer, which adds 60 to the date of birth.
+      if (day > 60)
+      {
+         day -= 60;
       }
 
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);
