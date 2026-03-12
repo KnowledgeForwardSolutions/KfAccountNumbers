@@ -589,6 +589,84 @@ public class SePersonnummerTests
 
    #endregion
 
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void SePersonnummer_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var personnummer1 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
+      var personnummer2 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
+
+      // Act/assert.
+      (personnummer1 == personnummer2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void SePersonnummer_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var personnummer1 = new SePersonnummer(Valid13CharacterDashPersonnummer);
+      var personnummer2 = new SePersonnummer(Valid13CharacterDashSamordningsnummer);
+
+      // Act/assert.
+      (personnummer1 == personnummer2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void SePersonnummer_EqualityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 11 and 13 character versions for same person should still not be equal.
+      var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var personnummer2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
+
+      // Act/assert.
+      (personnummer1 == personnummer2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void SePersonnummer_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var personnummer1 = new SePersonnummer(Valid13CharacterDashPersonnummer);
+      var personnummer2 = new SePersonnummer(Valid13CharacterDashSamordningsnummer);
+
+      // Act/assert.
+      (personnummer1 != personnummer2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void SePersonnummer_InequalityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 11 and 13 character versions for same person should still not be equal.
+      var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var personnummer2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
+
+      // Act/assert.
+      (personnummer1 != personnummer2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void SePersonnummer_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var personnummer1 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
+      var personnummer2 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
+
+      // Act/assert.
+      (personnummer1 != personnummer2).Should().BeFalse();
+   }
+
+   #endregion
+
    #region Create Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -724,6 +802,156 @@ public class SePersonnummerTests
       result.IsSuccess.Should().BeFalse();
       result.Value.Should().Be(null);
       result.ValidationFailure.Should().Be(SePersonnummerValidationResult.InvalidCheckDigit);
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void SePersonnummer_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var personnummer1 = new SePersonnummer(Valid13CharacterPlusPersonnummer);
+      var personnummer2 = new SePersonnummer(Valid13CharacterPlusPersonnummer);
+
+      // Act/assert.
+      personnummer1.Equals(personnummer2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void SePersonnummer_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var personnummer1 = new SePersonnummer(Valid13CharacterPlusPersonnummer);     // +
+      var personnummer2 = new SePersonnummer(Valid13CharacterDashPersonnummer);     // -
+
+      // Act/assert.
+      personnummer1.Equals(personnummer2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void SePersonnummer_Equals_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 11 and 13 character versions for same person should still not be equal.
+      var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var personnummer2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
+
+      // Act/assert.
+      personnummer1.Equals(personnummer2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void SePersonnummer_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new SePersonnummer(Valid13CharacterPlusPersonnummer);
+
+      // Act/assert.
+      sut.Equals(Valid13CharacterPlusPersonnummer).Should().BeFalse();
+   }
+
+   [Fact]
+   public void SePersonnummer_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new SePersonnummer(Valid13CharacterPlusPersonnummer);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void SePersonnummer_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var personnummer2 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+
+      // Act.
+      var hash1 = personnummer1.GetHashCode();
+      var hash2 = personnummer2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void SePersonnummer_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var personnummer2 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
+
+      // Act.
+      var hash1 = personnummer1.GetHashCode();
+      var hash2 = personnummer2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   [Fact]
+   public void SePersonnummer_GetHashCode_ShouldReturnDifferentValues_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 11 and 13 character versions for same person should still not be equal.
+      var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var personnummer2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
+
+      // Act.
+      var hash1 = personnummer1.GetHashCode();
+      var hash2 = personnummer2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // SePersonnummer does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void SePersonnummer_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var personnummer2 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+
+      // Act/assert.
+      (personnummer1 == personnummer2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(personnummer1, personnummer2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidPersonnummerValues))]
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SePersonnummer_ToString_ShouldReturnExpectedValue(String personnummer)
+   {
+      // Arrange.
+      var sut = new SePersonnummer(personnummer);
+
+      // Act/assert.
+      sut.ToString().Should().Be(personnummer);
    }
 
    #endregion
