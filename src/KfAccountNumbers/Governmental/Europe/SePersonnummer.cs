@@ -151,6 +151,39 @@ public record SePersonnummer
    /// </summary>
    public String Value { get; private init; }
 
+   public static implicit operator String(SePersonnummer personnummer)
+      => personnummer?.Value ?? String.Empty;     // Handle null personnummer object gracefully by returning empty string
+
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator SePersonnummer(String personnummer) => new(personnummer);
+
+   /// <summary>
+   ///   Get a string representation of the personnummer.
+   /// </summary>
+   public override String ToString() => Value;
+
+   /// <summary>
+   ///   Create a new <see cref="SePersonnummer"/>.
+   /// </summary>
+   /// <param name="personnummer">
+   ///   String representation of a Swedish Personal Identity Number (Personnummer).
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{SePersonnummer, SePersonnummerValidationResult}"/>.
+   ///   Will contain the new <see cref="SePersonnummerValidationResult"/> if 
+   ///   <paramref name="personnummer"/> is valid or 
+   ///   <see cref="SePersonnummerValidationResult"/> that identifies
+   ///   the validation rule that was failed if <paramref name="personnummer"/> is 
+   ///   invalid.
+   /// </returns>
+   public static CreateResult<SePersonnummer, SePersonnummerValidationResult> Create(String? personnummer)
+   {
+      SePersonnummerValidationResult validationResult = Validate(personnummer);
+      return validationResult == SePersonnummerValidationResult.ValidationPassed
+         ? new SePersonnummer(personnummer, validationMode: ValidationMode.BypassValidation)
+         : validationResult;
+   }
+
    /// <summary>
    ///   Check the <paramref name="personnummer"/> to determine if it contains a
    ///   valid Swedish Personal Identity Number (Personnummer) value.
@@ -223,25 +256,20 @@ public record SePersonnummer
          // Assume that short format personnummer values are for people born in
          // the 20th century, as long format personnummer was introduced in 1997,
          // presumably as part of Y2K preparations.
-         year = 1900 + ParseTwoDigits(personnummer[0], personnummer[1]);
-         month = ParseTwoDigits(personnummer[2], personnummer[3]);
-         day = ParseTwoDigits(personnummer[4], personnummer[5]);
+         year = 1900 + personnummer.ParseTwoDigits();
+         month = personnummer[2..].ParseTwoDigits();
+         day = personnummer[4..].ParseTwoDigits();
       }
       else
       {
-         var century = ParseTwoDigits(personnummer[0], personnummer[1]) * 100;
-         year = century + ParseTwoDigits(personnummer[2], personnummer[3]);
-         month = ParseTwoDigits(personnummer[4], personnummer[5]);
-         day = ParseTwoDigits(personnummer[6], personnummer[7]);
+         var century = personnummer.ParseTwoDigits() * 100;
+         year = century + personnummer[2..].ParseTwoDigits();
+         month = personnummer[4..].ParseTwoDigits();
+         day = personnummer[6..].ParseTwoDigits();
       }
 
       return (year, month, day);
    }
-
-   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static Int32 ParseTwoDigits(Char tens, Char ones)
-      => ((tens - Chars.DigitZero) * 10) + (ones - Chars.DigitZero);
-
    private static Boolean ValidateBirthSerialNumber(ReadOnlySpan<Char> personnummer)
    {
       ReadOnlySpan<Char> birthSerialNumberSpan = GetBirthSerialNumber(personnummer);

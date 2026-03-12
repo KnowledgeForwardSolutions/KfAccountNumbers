@@ -1,5 +1,7 @@
 // Ignore Spelling: Kf Personnummer Samordningsnummer
 
+#pragma warning disable IDE0008 // Use explicit type
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class SePersonnummerTests
@@ -282,7 +284,7 @@ public class SePersonnummerTests
    [Theory]
    [MemberData(nameof(ValidPersonnummerValues))]
    [MemberData(nameof(ValidSamordningsnummerValues))]
-   public void SePersonnummer_Constructor_ShouldCreateInstance_WhenFullPersonnummerValueIsValid(String personnummer)
+   public void SePersonnummer_Constructor_ShouldCreateInstance_WhenValueIsValid(String personnummer)
    {
       // Act.
       var sut = new SePersonnummer(personnummer);
@@ -394,6 +396,145 @@ public class SePersonnummerTests
 
    #endregion
 
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidPersonnummerValues))]
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SePersonnummer_Create_ShouldCreateInstance_WhenValueIsValid(String personnummer)
+   {
+      // Arrange.
+      var expectedValue = new SePersonnummer(personnummer);
+
+      // Act.
+      var result = SePersonnummer.Create(personnummer);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidPersonnummerDateOfBirthValues))]
+   [MemberData(nameof(ValidSamordningsnummerDateOfBirthValues))]
+   public void SePersonnummer_Create_ShouldCreateInstance_WhenDateOfBirthIsValid(String dateOfBirth)
+   {
+      // Arrange.
+      var personnummer = GetPersonnummerWithValidCheckDigit(dateOfBirth: dateOfBirth);
+      var expectedValue = new SePersonnummer(personnummer);
+
+      // Act.
+      var result = SePersonnummer.Create(personnummer);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void SePersonnummer_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String personnummer)
+   {
+      // Act.
+      var result = SePersonnummer.Create(personnummer);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(SePersonnummerValidationResult.Empty);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void SePersonnummer_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String personnummer)
+   {
+      // Act.
+      var result = SePersonnummer.Create(personnummer);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(SePersonnummerValidationResult.InvalidLength);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSixDigitPersonnummerDateOfBirthValues))]
+   [MemberData(nameof(InvalidEightDigitPersonnummerDateOfBirthValues))]
+   [MemberData(nameof(InvalidSixDigitSamordningsnummerDateOfBirthValues))]
+   [MemberData(nameof(InvalidEightDigitSamordningsnummerDateOfBirthValues))]
+   public void SePersonnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasInvalidDateOfBirth(String dateOfBirth)
+   {
+      // Arrange.
+      var personnummer = GetPersonnummer(dateOfBirth: dateOfBirth);
+
+      // Act.
+      var result = SePersonnummer.Create(personnummer);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(SePersonnummerValidationResult.InvalidDateOfBirth);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidBirthSerialNumberValues))]
+   public void SePersonnummer_Create_ShouldReturnInvalidBirthSerialNumberValidationResult_WhenValueHasInvalidBirthSerialNumber(String birthSerialNumber)
+   {
+      // Arrange.
+      var personnummer = GetPersonnummer(birthSerialNumber: birthSerialNumber);
+
+      // Act.
+      var result = SePersonnummer.Create(personnummer);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(SePersonnummerValidationResult.InvalidBirthSerialNumber);
+   }
+
+   [Theory]
+   [MemberData(nameof(UndetectableCheckDigitErrors))]
+   public void SePersonnummer_Create_ShouldCreateInstance_WhenValueHasUndetectableCheckDigitError(String personnummer)
+   {
+      // Arrange.
+      var expectedValue = new SePersonnummer(personnummer);
+
+      // Act.
+      var result = SePersonnummer.Create(personnummer);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void SePersonnummer_Create_ShouldReturnInvalidCheckDigitValidationResult_WhenValueHasInvalidCheckDigit(String personnummer)
+   {
+      // Act.
+      var result = SePersonnummer.Create(personnummer);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(SePersonnummerValidationResult.InvalidCheckDigit);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -401,7 +542,7 @@ public class SePersonnummerTests
    [Theory]
    [MemberData(nameof(ValidPersonnummerValues))]
    [MemberData(nameof(ValidSamordningsnummerValues))]
-   public void SePersonnummer_Validate_ShouldReturnValidationPassed_WhenFullPersonnummerValueIsValid(String personnummer)
+   public void SePersonnummer_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String personnummer)
       => SePersonnummer.Validate(personnummer).Should().Be(SePersonnummerValidationResult.ValidationPassed);
 
    [Theory]
