@@ -396,6 +396,199 @@ public class SePersonnummerTests
 
    #endregion
 
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidPersonnummerValues))]
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SePersonnummer_Value_ShouldValidatedPersonnummer(String personnummer)
+   {
+      // Arrange.
+      var sut = new SePersonnummer(personnummer);
+
+      // Act/assert.
+      sut.Value.Should().Be(personnummer);
+   }
+
+   #endregion
+
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void SePersonnummer_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var personnummer = Valid11CharacterDashPersonnummer;
+      var sut = new SePersonnummer(personnummer);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(personnummer);
+   }
+
+   [Fact]
+   public void SePersonnummer_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var personnummer = Valid11CharacterDashPersonnummer;
+      var sut = new SePersonnummer(personnummer);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(personnummer);
+   }
+
+   [Fact]
+   public void SePersonnummer_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      SePersonnummer personnummer = null!;
+
+      // Act.
+      String str = personnummer;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void SePersonnummer_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      SePersonnummer personnummer = null!;
+
+      // Act.
+      String str = personnummer;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidPersonnummerValues))]
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldCreateInstance_WhenValueIsValid(String personnummer)
+   {
+      // Act.
+      var sut = (SePersonnummer)personnummer;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(personnummer);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidPersonnummerDateOfBirthValues))]
+   [MemberData(nameof(ValidSamordningsnummerDateOfBirthValues))]
+   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldCreateInstance_WhenDateOfBirthIsValid(String dateOfBirth)
+   {
+      // Act.
+      var personnummer = GetPersonnummerWithValidCheckDigit(dateOfBirth: dateOfBirth);
+      var sut = (SePersonnummer)personnummer;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(personnummer);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String personnummer)
+      => FluentActions
+         .Invoking(() => _ = (SePersonnummer)personnummer)
+         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
+         .WithMessage(Messages.SePersonnummerEmpty + "*")
+         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String personnummer)
+      => FluentActions
+         .Invoking(() => _ = (SePersonnummer)personnummer)
+         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
+         .WithMessage(Messages.SePersonnummerInvalidLength + "*")
+         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidSixDigitPersonnummerDateOfBirthValues))]
+   [MemberData(nameof(InvalidEightDigitPersonnummerDateOfBirthValues))]
+   [MemberData(nameof(InvalidSixDigitSamordningsnummerDateOfBirthValues))]
+   [MemberData(nameof(InvalidEightDigitSamordningsnummerDateOfBirthValues))]
+   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(String dateOfBirth)
+   {
+      // Arrange.
+      var personnummer = GetPersonnummer(dateOfBirth: dateOfBirth);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (SePersonnummer)personnummer)
+         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
+         .WithMessage(Messages.SePersonnummerInvalidDateOfBirth + "*")
+         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidDateOfBirth);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String personnummer)
+      => FluentActions
+         .Invoking(() => _ = (SePersonnummer)personnummer)
+         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
+         .WithMessage(Messages.SePersonnummerInvalidSeparator + "*")
+         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidSeparator);
+
+   [Theory]
+   [MemberData(nameof(InvalidBirthSerialNumberValues))]
+   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidBirthSerialNumber(String birthSerialNumber)
+   {
+      // Arrange.
+      var dateOfBirth = "20010616";
+      var personnummer = GetPersonnummer(
+         dateOfBirth: dateOfBirth,
+         birthSerialNumber: birthSerialNumber);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (SePersonnummer)personnummer)
+         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
+         .WithMessage(Messages.SePersonnummerInvalidBirthSerialNumber + "*")
+         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidBirthSerialNumber);
+   }
+
+   [Theory]
+   [MemberData(nameof(UndetectableCheckDigitErrors))]
+   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldCreateInstance_WhenCheckDigitHasUndetectableError(String personnummer)
+   {
+      // Act.
+      var sut = (SePersonnummer)personnummer;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(personnummer);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String personnummer)
+      => FluentActions
+         .Invoking(() => _ = (SePersonnummer)personnummer)
+         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
+         .WithMessage(Messages.SePersonnummerInvalidCheckDigit + "*")
+         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidCheckDigit);
+
+   #endregion
+
    #region Create Method Tests
    // ==========================================================================
    // ==========================================================================
