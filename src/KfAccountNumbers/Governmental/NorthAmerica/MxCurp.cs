@@ -1,7 +1,5 @@
 // Ignore Spelling: Curp Json Mx
 
-#pragma warning disable IDE0008 // Use explicit type
-
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
 /// <summary>
@@ -132,7 +130,7 @@ public record MxCurp
    ///   String representation of a CURP.
    /// </param>
    /// <remarks>
-   ///   Validation if <paramref name="curp"/> is performed in a case-insensitive
+   ///   Validation of <paramref name="curp"/> is performed in a case-insensitive
    ///   manner. However, the <see cref="Value"/> property will normalize the
    ///   CURP to upper-case.
    /// </remarks>

@@ -66,7 +66,9 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///               Character position 10 (zero based, YYMMDD format) or position
 ///               12 (zero based, YYYYMMDD format) must be a valid checksum
 ///               calculated using the Luhn algorithm based on the six digit
-///               date of birth and the three-digit birth serial number.
+///               date of birth and the three-digit birth serial number. (The
+///               leading two digits of an eight digit date of birth are
+///               ignored.)
 ///            </description>
 ///         </item>
 ///      </list>
@@ -89,6 +91,65 @@ public record SePersonnummer
 
    private const Int32 SeparatorOffsetSixDigitDateOfBirthLength = 6;
    private const Int32 SeparatorOffsetEightDigitDateOfBirthLength = 8;
+
+   /// <summary>
+   ///   Initialize a new instance of the <see cref="SePersonnummer"/> class.
+   /// </summary>
+   /// <param name="personnummer">
+   ///   String representation of a personnummer.
+   /// </param>
+   /// <exception cref="KfValidationException{SePersonnummerValidationResult}">
+   ///   <paramref name="personnummer"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="personnummer"/> is not length 11 or 13.
+   ///   - or -
+   ///   <paramref name="personnummer"/> contains an invalid date of birth in
+   ///   positions 0-5 (zero-based, YYMMDD format) or positions 0-7 (zero-based,
+   ///   YYYYMMDD format).
+   ///   - or -
+   ///   <paramref name="personnummer"/> contains an invalid separator character
+   ///   in position 6 (zero-based, YYMMDD format) or position 8 (zero-based,
+   ///   YYYYMMDD format). Valid separator characters are dash ('-') and plus
+   ///   ('+').
+   ///   - or -
+   ///   <paramref name="personnummer"/> contains an invalid birth serial number
+   ///   (i.e. one or more non-digit characters) in positions 7-9 (zero-based,
+   ///   YYMMDD format) or positions 9-11 (zero-based, YYYYMMDD format).
+   ///   - or -
+   ///   <paramref name="personnummer"/> contains an invalid check digit in 
+   ///   position 10 (zero-based, YYMMDD format) or position 12 (zero-based,
+   ///   YYYYMMDD format). The check digit is calculated using the Luhn algorithm
+   ///   based on the six digit date of birth and the three-digit birth serial
+   ///   number. (The leading two digits of an eight digit date of birth are
+   ///   ignored.)
+   /// </exception>
+   public SePersonnummer(String? personnummer)
+      : this(personnummer, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private SePersonnummer(String? personnummer, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         SePersonnummerValidationResult validationResult = Validate(personnummer);
+         if (validationResult != SePersonnummerValidationResult.ValidationPassed)
+         {
+            throw validationResult.ToValidationException();
+         }
+      }
+
+      Value = personnummer!;
+   }
+
+   /// <summary>
+   ///   The raw personnummer value.
+   /// </summary>
+   public String Value { get; private init; }
 
    /// <summary>
    ///   Check the <paramref name="personnummer"/> to determine if it contains a
@@ -139,13 +200,13 @@ public record SePersonnummer
 
    private static ReadOnlySpan<Char> GetBirthSerialNumber(ReadOnlySpan<Char> personnummer)
       => personnummer.Length == ShortFormatLength
-         ? personnummer[7.. 10]
-         : personnummer[9.. 12];
+         ? personnummer[7..10]
+         : personnummer[9..12];
 
    private static ReadOnlySpan<Char> GetDateOfBirth(ReadOnlySpan<Char> personnummer)
       => personnummer.Length == ShortFormatLength
-         ? personnummer[.. 6]
-         : personnummer[.. 8];
+         ? personnummer[..6]
+         : personnummer[..8];
 
    private static Char GetSeparator(ReadOnlySpan<Char> personnummer)
       => personnummer.Length == ShortFormatLength
@@ -215,7 +276,9 @@ public record SePersonnummer
       }
 
       // Manual validation is faster than using DateTime.TryParseExact.
+#pragma warning disable IDE0008 // Use explicit type
       var (year, month, day) = GetYearMonthDay(personnummer);
+#pragma warning restore IDE0008 // Use explicit type
 
       if (year < 1900 || year > 2099)
       {
