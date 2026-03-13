@@ -3,35 +3,113 @@
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
-///   Strongly typed business object for a Swedish Personal Identity Number
-///   (personnummer). Also supports Swedish coordination numbers
-///   (samordningsnummer) for persons who are not eligible for a personnummer
-///   (non-residents, foreign employees, etc.).
+///   Strongly typed business object that represents either of two identifiers
+///   issued by the Swedish Tax Agency that have the same format and are used
+///   for similar purposes. The first, the Personal Identity Number
+///   (personnummer) is issued to persons born in Sweden or who are residents
+///   of Sweden for 12 months or longer. The second, the coordination number
+///   (samordningsnummer) is issued to persons who reside in Sweden for less
+///   than a year.
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A valid Swedish Personal Identity Number (personnummer) is a string
-///      that is 11 or 13 characters long. The first 6 or 8 characters represent
-///      the date of birth in the format YYMMDD or YYYYMMDD, followed by a
-///      hyphen or plus sign, and then a three-digit birth serial number and a
-///      single digit that is a checksum calculated using the Luhn algorithm.
-///      An odd birth serial number indicates a male, while an even birth serial
-///      number indicates a female. The hyphen indicates that the person is under
-///      100 years old, while the plus sign indicates that the person is 100
-///      years old or older.
+///      Swedish personummer and samordningsnummer values are both 11 or 13
+///      character strings with the only difference between the two lengths
+///      are the number of digits used to represent the date of birth, either
+///      six or eight. The format of personnummer and samordningsnummer are
+///      the same and consist of the following fields/sections:
+///      <list type="bullet">
+///         <item>
+///            <description>
+///               The date of birth, represented by either six or eight digits
+///               (YYMMDD format or YYYYMMDD format). Originally six digits
+///               were used but the eight digit format was introduced in 1997.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               A separator character that separates the date of birth from
+///               the remaining four digits. The separator character is
+///               normally a dash ('-') but when a person turns 100 years old
+///               the dash is replaced by a plus sign ('+').
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               A three digit birth serial number, issued serially as births
+///               are recorded for a particular date. The last digit of the
+///               birth serial number serves an additional purpose of indicating
+///               the person's gender, with odd digits assigned to males and
+///               even digits assigned to females.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               A single check digit calcuated using the Luhn algorithm
+///               applied to the rightmost six digits of the date of birth and
+///               the birth serial number.
+///            </description>
+///         </item>
+///      </list>
+///   </para>
+///      The only difference between a personummer and a samordningsnummer is
+///      that the samordningsnummer adds 60 to the day of a person's date of
+///      birth (i.e. 950123 would become 950183).
+///   <para>
 ///   </para>
 ///   <para>
-///      A valid Swedish coordination number (samordningsnummer) uses the same
-///      format as a personnummer, but in the date of birth section, 60 is added
-///      to the day. For example a date of birth Jan, 23, 1995 would be "950123"
-///      for a YYMMDD format personnummer, but would be "951283" for a YYMMDD
-///      format samordningsnummer.
+///      Example values:
+///      <list type="bullet">
+///         <item>
+///            <term>890201-3286</term>
+///            <description>
+///               Personnummer, date of birth 890201, less than 100 years old,
+///               gender = female, check digit = 6.
+///            </description>
+///         </item>
+///         <item>
+///            <term>19890201-3286</term>
+///            <description>
+///               Personnummer, date of birth 19890201, less than 100 years old,
+///               gender = female, check digit = 6.
+///            </description>
+///         </item>
+///         <item>
+///            <term>811228+9874</term>
+///            <description>
+///               Personnummer, date of birth 811228, greater than 100 years old,
+///               gender = male, check digit = 4.
+///            </description>
+///         </item>
+///         <item>
+///            <term>890261-3283</term>
+///            <description>
+///               Samordningsnummer, date of birth 890261 (actual date of birth
+///               = 890201), less than 100 years old, gender = female, check
+///               digit = 3.
+///            </description>
+///         </item>
+///         <item>
+///            <term>19890261-3283</term>
+///            <description>
+///               Samordningsnummer, date of birth 19890261 (actual date of birth
+///               = 890201), less than 100 years old, gender = female, check digit
+///               = 3.
+///            </description>
+///         </item>
+///         <item>
+///            <term>811288+9871</term>
+///            <description>
+///               Samordningsnummer, date of birth 811288 (actual date of birth
+///               = 811228), greater than 100 years old, gender = male, check
+///               digit = 1.
+///            </description>
+///         </item>
+///      </list>
 ///   </para>
 ///   <para>
-///      Not all combinations of digits are valid, as the date of birth must be
-///      a valid date and the checksum must be correct according to the Luhn
-///      algorithm. When creating a new <see cref="SePersonnummer"/>, the
-///      following validation rules are applied:
+///      When creating a new <see cref="SePersonnummer"/>, the following
+///      validation rules are applied:
 ///      <list type="bullet">
 ///         <item>
 ///            <description>
@@ -50,23 +128,20 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               A valid separator must be present in position 6 (zero based,
-///               for YYMMDD format) or position 8 (zero based, for YYYYMMDD
-///               format). The separator must be either a hyphen (-) or a plus
+///               The date of birth must be followed by a valid separator
+///               character. The separator must be either a dash (-) or a plus
 ///               sign (+).
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               Character positions 7 to 9 (zero based, YYMMDD format) or
-///               positions 9 to 11 (zero based, YYYYMMDD format) must be
-///               digits representing the birth serial number.
+///               The separator must be followed by a three digit birth serial
+///               number.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               Character position 10 (zero based, YYMMDD format) or position
-///               12 (zero based, YYYYMMDD format) must be a valid checksum
+///               The birth serial number must be followed by a  valid checksum
 ///               calculated using the Luhn algorithm based on the six digit
 ///               date of birth and the three-digit birth serial number. (The
 ///               leading two digits of an eight digit date of birth are
@@ -74,6 +149,12 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            </description>
 ///         </item>
 ///      </list>
+///   </para>
+///      Note that the encoded date of birth may not be the person's actual
+///      date of birth. It is possible to run out of birth serial numbers for
+///      a particular day and in this case a day close to the actual date of
+///      birth is substituted in its stead.
+///   <para>
 ///   </para>
 ///   <para>
 ///      When determining if a date of birth is valid, YYMMDD format dates are
@@ -84,6 +165,11 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      considered invalid because 1900 is not a leap year. (The opposite
 ///      would be true if "00" represented the year 2000, which is a leap
 ///      year because of the century divisible by 400 rule for leap years).
+///   </para>
+///   <para>
+///      For samordningsnummer values, the value returned by the
+///      <see cref="DateOfBirth"/> property is an actual date calculated by
+///      subtracting 60 from the encoded date of birth.
 ///   </para>
 ///   <para>
 ///      See https://en.wikipedia.org/wiki/Personal_identity_number_(Sweden)
@@ -119,25 +205,26 @@ public record SePersonnummer
    ///   <paramref name="personnummer"/> is not length 11 or 13.
    ///   - or -
    ///   <paramref name="personnummer"/> contains an invalid date of birth in
-   ///   positions 0-5 (zero-based, YYMMDD format) or positions 0-7 (zero-based,
-   ///   YYYYMMDD format).
+   ///   positions 0-5 (11 character values) or positions 0-7 (13 character
+   ///   values).
    ///   - or -
    ///   <paramref name="personnummer"/> contains an invalid separator character
-   ///   in position 6 (zero-based, YYMMDD format) or position 8 (zero-based,
-   ///   YYYYMMDD format). Valid separator characters are dash ('-') and plus
-   ///   ('+').
+   ///   in position 6 (11 character values) or position 8 (13 character values).
+   ///   Valid separator characters are dash ('-') and plus ('+').
    ///   - or -
    ///   <paramref name="personnummer"/> contains an invalid birth serial number
-   ///   (i.e. one or more non-digit characters) in positions 7-9 (zero-based,
-   ///   YYMMDD format) or positions 9-11 (zero-based, YYYYMMDD format).
+   ///   (i.e. one or more non-digit characters) in positions 7-9 (11 character
+   ///   values) or positions 9-11 (13 character values).
    ///   - or -
    ///   <paramref name="personnummer"/> contains an invalid check digit in 
-   ///   position 10 (zero-based, YYMMDD format) or position 12 (zero-based,
-   ///   YYYYMMDD format). The check digit is calculated using the Luhn algorithm
-   ///   based on the six digit date of birth and the three-digit birth serial
-   ///   number. (The leading two digits of an eight digit date of birth are
-   ///   ignored.)
+   ///   position 10 (11 character values) or position 12 (13 character values).
+   ///   The check digit is calculated using the Luhn algorithm based on the six
+   ///   digit date of birth and the three-digit birth serial number. (The
+   ///   leading two digits of an eight digit date of birth are ignored.)
    /// </exception>
+   /// <remarks>
+   ///   The indices given in the exception description are all zero-based.
+   /// </remarks>
    public SePersonnummer(String? personnummer)
       : this(personnummer, ValidationMode.ValidationRequired) { }
 
