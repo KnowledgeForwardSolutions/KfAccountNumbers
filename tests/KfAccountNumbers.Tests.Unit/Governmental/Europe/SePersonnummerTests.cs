@@ -482,6 +482,50 @@ public class SePersonnummerTests
 
    #endregion
 
+   #region IdentifierType Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData("890301")]
+   [InlineData("890311")]
+   [InlineData("890321")]
+   [InlineData("890331")]
+   [InlineData("20050301")]
+   [InlineData("20050311")]
+   [InlineData("20050321")]
+   [InlineData("20050331")]
+   public void SePersonnummer_IdentifierType_ShouldReturnExpectedValue_WhenValueIsPersonnummer(String dateOfBirth)
+   {
+      // Arrange.
+      var personnummer = GetPersonnummerWithValidCheckDigit(dateOfBirth: dateOfBirth);
+      var sut = new SePersonnummer(personnummer);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(SeIdentifierType.Personnummer);
+   }
+
+   [Theory]
+   [InlineData("890361")]
+   [InlineData("890371")]
+   [InlineData("890381")]
+   [InlineData("890391")]
+   [InlineData("20050361")]
+   [InlineData("20050371")]
+   [InlineData("20050381")]
+   [InlineData("20050391")]
+   public void SePersonnummer_IdentifierType_ShouldReturnExpectedValue_WhenValueIsSamordningsnummer(String dateOfBirth)
+   {
+      // Arrange.
+      var personnummer = GetPersonnummerWithValidCheckDigit(dateOfBirth: dateOfBirth);
+      var sut = new SePersonnummer(personnummer);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(SeIdentifierType.Samordningsnummer);
+   }
+
+   #endregion
+
    #region IsCentenarian Property Tests
    // ==========================================================================
    // ==========================================================================

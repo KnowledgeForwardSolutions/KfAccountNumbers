@@ -1,4 +1,4 @@
-// Ignore Spelling: Json Personnummer
+// Ignore Spelling: Json Personnummer Samordningsnummer
 
 namespace KfAccountNumbers.Governmental.Europe;
 
@@ -21,7 +21,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      years old or older.
 ///   </para>
 ///   <para>
-///      A valid Swedish coordination umber (samordningsnummer) uses the same
+///      A valid Swedish coordination number (samordningsnummer) uses the same
 ///      format as a personnummer, but in the date of birth section, 60 is added
 ///      to the day. For example a date of birth Jan, 23, 1995 would be "950123"
 ///      for a YYMMDD format personnummer, but would be "951283" for a YYMMDD
@@ -42,8 +42,10 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            <description>
 ///               For 11-character strings, the first 6 characters must represent
 ///               a valid date in the format YYMMDD. For 13-character strings,
-///               the first 8 characters must represent a valid date in the format
-///               YYYYMMDD.
+///               the first 8 characters must represent a valid date in the
+///               format YYYYMMDD. Future dates are specifically <b>NOT</b>
+///               tested for to avoid issues requiring <see cref="SePersonnummer"/>
+///               to be aware of the current time.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -194,6 +196,29 @@ public record SePersonnummer
    }
 
    /// <summary>
+   ///   The type of Swedish identifier represented by this instance, indicating
+   ///   whether it is a personal identity number (personnummer) or a coordination
+   ///   number (samordningsnummer).
+   /// </summary>
+   /// <remarks>
+   ///   A personummer will have a date of birth with a day component in the normal
+   ///   range (1-31) while a samordningsnummer will add 60 to the day component
+   ///   of the day of birth resulting in values from 61-91.
+   /// </remarks>
+   public SeIdentifierType IdentifierType
+   {
+      get
+      {
+         var day = Value.Length == ShortFormatLength 
+            ? Value.AsSpan()[4..6].ParseTwoDigits() 
+            : Value.AsSpan()[6..8].ParseTwoDigits();
+         return (day > SamordningsnummerDayOffset)
+            ? SeIdentifierType.Samordningsnummer
+            : SeIdentifierType.Personnummer;
+      }
+   }
+
+   /// <summary>
    ///   Indicates if the person is 100 years of age or older as indicated by
    ///   the separator value. A dash ('-') separator indicates a person less
    ///   than 100 years of age, while a plus sign ('+') indicates a person 100
@@ -205,7 +230,7 @@ public record SePersonnummer
    ///   The person's gender, as indicated by the third character of the birth
    ///   sequence number. Odd digits = Male; even digits = Female.
    /// </summary>
-   public BinaryGender Gender => Value[^GenderOffset] % 2 == 0
+   public BinaryGender Gender => Value[^GenderOffset] % 2 == 0       // This works because the ASCII character values for digits have the same odd/even pattern
       ? BinaryGender.Female
       : BinaryGender.Male;
 
