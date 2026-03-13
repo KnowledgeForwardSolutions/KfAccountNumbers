@@ -396,6 +396,10 @@ public class SePersonnummerTests
 
    #endregion
 
+   #region DateOfBirth Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
    [Theory]
    [InlineData("000101", "19000101")]     // Jan 1, 1900
    [InlineData("991231", "19991231")]     // Dec 31, 1999
@@ -445,6 +449,8 @@ public class SePersonnummerTests
       sut.DateOfBirth.Should().Be(expected);
    }
 
+   #endregion
+
    #region Gender Property Tests
    // ==========================================================================
    // ==========================================================================
@@ -471,6 +477,32 @@ public class SePersonnummerTests
 
       // Act/assert.
       sut.Gender.Should().Be(expectedGender);
+   }
+
+   #endregion
+
+   #region IsCentenarian Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Valid11CharacterDashPersonnummer, false)]
+   [InlineData(Valid11CharacterPlusPersonnummer, true)]
+   [InlineData(Valid13CharacterDashPersonnummer, false)]
+   [InlineData(Valid13CharacterPlusPersonnummer, true)]
+   [InlineData(Valid11CharacterDashPersonnummer, false)]
+   [InlineData(Valid11CharacterPlusSamordningsnummer, true)]
+   [InlineData(Valid13CharacterDashSamordningsnummer, false)]
+   [InlineData(Valid13CharacterPlusSamordningsnummer, true)]
+   public void SePersonnummer_IsCentenarian_ShouldReturnExpectedValue(
+      String personnummer,
+      Boolean expected)
+   {
+      // Arrange.
+      var sut = new SePersonnummer(personnummer);
+
+      // Act/assert.
+      sut.IsCentenarian.Should().Be(expected);
    }
 
    #endregion

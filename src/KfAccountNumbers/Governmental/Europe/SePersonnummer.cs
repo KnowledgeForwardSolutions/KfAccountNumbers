@@ -1,4 +1,4 @@
-// Ignore Spelling: Personnummer
+// Ignore Spelling: Json Personnummer
 
 namespace KfAccountNumbers.Governmental.Europe;
 
@@ -84,13 +84,18 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      year because of the century divisible by 400 rule for leap years).
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(SePersonnummerJsonConverter))]
 public record SePersonnummer
 {
    private const Int32 ShortFormatLength = 11;
    private const Int32 LongFormatLength = 13;
 
-   private const Int32 SeparatorOffsetSixDigitDateOfBirthLength = 6;
-   private const Int32 SeparatorOffsetEightDigitDateOfBirthLength = 8;
+   // These offsets are measured from the end of the string instead of the start
+   // because the date of birth has variable length.
+   private const Int32 DateOfBirthOffset = 5;                  // Range end index is exclusive so -1 from expected offset from end
+   private const Int32 SeparatorOffset = 5;
+   private const Int32 BirthSerialNumberStartOffset = 4;
+   private const Int32 BirthSerialNumberEndOffset = 1;         // Range end index is exclusive
 
    private const Int32 SamordningsnummerDayOffset = 60;
 
@@ -188,6 +193,14 @@ public record SePersonnummer
    }
 
    /// <summary>
+   ///   Indicates if the person is 100 years of age or older as indicated by
+   ///   the separator value. A dash ('-') separator indicates a person less
+   ///   than 100 years of age, while a plus sign ('+') indicates a person 100
+   ///   years of age or older.
+   /// </summary>
+   public Boolean IsCentenarian => Value[^SeparatorOffset] == Chars.Plus; 
+
+   /// <summary>
    ///   The person's gender, as indicated by the third character of the birth
    ///   sequence number. Odd digits = Female; even digits = Male.
    /// </summary>
@@ -280,20 +293,17 @@ public record SePersonnummer
       return SePersonnummerValidationResult.ValidationPassed;
    }
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static ReadOnlySpan<Char> GetBirthSerialNumber(ReadOnlySpan<Char> personnummer)
-      => personnummer.Length == ShortFormatLength
-         ? personnummer[7..10]
-         : personnummer[9..12];
+      => personnummer[^BirthSerialNumberStartOffset..^BirthSerialNumberEndOffset];
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static ReadOnlySpan<Char> GetDateOfBirth(ReadOnlySpan<Char> personnummer)
-      => personnummer.Length == ShortFormatLength
-         ? personnummer[..6]
-         : personnummer[..8];
+      => personnummer[..^DateOfBirthOffset];
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Char GetSeparator(ReadOnlySpan<Char> personnummer)
-      => personnummer.Length == ShortFormatLength
-         ? personnummer[SeparatorOffsetSixDigitDateOfBirthLength]
-         : personnummer[SeparatorOffsetEightDigitDateOfBirthLength];
+      => personnummer[^SeparatorOffset];
 
    private static (Int32 year, Int32 month, Int32 day) GetYearMonthDay(ReadOnlySpan<Char> personnummer)
    {
@@ -374,4 +384,21 @@ public record SePersonnummer
 
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);
    }
+}
+
+public class SePersonnummerJsonConverter : JsonConverter<SePersonnummer>
+{
+   public override SePersonnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var curpString = reader.GetString();
+      return new SePersonnummer(curpString);
+   }
+
+   public override void Write(Utf8JsonWriter writer, SePersonnummer value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }
