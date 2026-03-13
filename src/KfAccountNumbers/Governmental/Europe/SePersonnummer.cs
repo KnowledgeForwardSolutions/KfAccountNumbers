@@ -147,6 +147,14 @@ public record SePersonnummer
    }
 
    /// <summary>
+   ///   The person's gender, as indicated by the third character of the birth
+   ///   sequence number. Odd digits = Female; even digits = Male.
+   /// </summary>
+   public BinaryGender Gender => Value[^2] % 2 == 0
+      ? BinaryGender.Female
+      : BinaryGender.Male;
+
+   /// <summary>
    ///   The raw personnummer value.
    /// </summary>
    public String Value { get; private init; }

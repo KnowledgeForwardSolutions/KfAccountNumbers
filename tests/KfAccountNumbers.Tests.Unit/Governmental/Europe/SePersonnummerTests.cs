@@ -396,6 +396,36 @@ public class SePersonnummerTests
 
    #endregion
 
+   #region Gender Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData('0', BinaryGender.Female)]
+   [InlineData('1', BinaryGender.Male)]
+   [InlineData('2', BinaryGender.Female)]
+   [InlineData('3', BinaryGender.Male)]
+   [InlineData('4', BinaryGender.Female)]
+   [InlineData('5', BinaryGender.Male)]
+   [InlineData('6', BinaryGender.Female)]
+   [InlineData('7', BinaryGender.Male)]
+   [InlineData('8', BinaryGender.Female)]
+   [InlineData('9', BinaryGender.Male)]
+   public void SePersonnummer_Gender_ShouldReturnExpectedValue(
+      Char digit,
+      BinaryGender expectedGender)
+   {
+      // Arrange.
+      var birthSerialNumber = $"54{digit}";
+      var personnummer = GetPersonnummerWithValidCheckDigit(birthSerialNumber: birthSerialNumber);
+      var sut = new SePersonnummer(personnummer);
+
+      // Act/assert.
+      sut.Gender.Should().Be(expectedGender);
+   }
+
+   #endregion
+
    #region Value Property Tests
    // ==========================================================================
    // ==========================================================================
@@ -403,7 +433,7 @@ public class SePersonnummerTests
    [Theory]
    [MemberData(nameof(ValidPersonnummerValues))]
    [MemberData(nameof(ValidSamordningsnummerValues))]
-   public void SePersonnummer_Value_ShouldValidatedPersonnummer(String personnummer)
+   public void SePersonnummer_Value_ShouldReturnValidatedPersonnummer(String personnummer)
    {
       // Arrange.
       var sut = new SePersonnummer(personnummer);
