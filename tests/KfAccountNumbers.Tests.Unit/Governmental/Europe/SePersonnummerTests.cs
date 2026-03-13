@@ -1,6 +1,7 @@
-// Ignore Spelling: Kf Personnummer Samordningsnummer
+// Ignore Spelling: Deserialize Deserialization Json Kf Personnummer Samordningsnummer
 
 #pragma warning disable IDE0008 // Use explicit type
+#pragma warning disable IDE0058 // Expression value is never used
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -29,7 +30,7 @@ public class SePersonnummerTests
       String birthSerialNumber = "987")
    {
       var partialPersonnummer = $"{dateOfBirth[^6..]}{birthSerialNumber}";
-      CheckDigits.Net.Algorithms.Luhn.TryCalculateCheckDigit(partialPersonnummer, out var checkDigit);
+      _ = CheckDigits.Net.Algorithms.Luhn.TryCalculateCheckDigit(partialPersonnummer, out var checkDigit);
 
       return $"{dateOfBirth}{separator}{birthSerialNumber}{checkDigit}";
    }
@@ -490,7 +491,7 @@ public class SePersonnummerTests
    [InlineData(Valid11CharacterPlusPersonnummer, true)]
    [InlineData(Valid13CharacterDashPersonnummer, false)]
    [InlineData(Valid13CharacterPlusPersonnummer, true)]
-   [InlineData(Valid11CharacterDashPersonnummer, false)]
+   [InlineData(Valid11CharacterDashSamordningsnummer, false)]
    [InlineData(Valid11CharacterPlusSamordningsnummer, true)]
    [InlineData(Valid13CharacterDashSamordningsnummer, false)]
    [InlineData(Valid13CharacterPlusSamordningsnummer, true)]
@@ -1138,6 +1139,103 @@ public class SePersonnummerTests
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void SePersonnummer_Validate_ShouldReturnInvalidCheckDigit_WhenValueHasInvalidCheckDigit(String personnummer)
       => SePersonnummer.Validate(personnummer).Should().Be(SePersonnummerValidationResult.InvalidCheckDigit);
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void SePersonnummer_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new SePersonnummer(Valid11CharacterDashPersonnummer);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<SePersonnummer>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void SePersonnummer_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{Valid11CharacterDashSamordningsnummer}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public SePersonnummer Personnummer { get; set; } = null!;
+   }
+
+   [Fact]
+   public void SePersonnummer_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { Personnummer = new SePersonnummer(Valid13CharacterDashPersonnummer) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void SePersonnummer_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"Personnummer\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void SePersonnummer_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"Personnummer\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.Personnummer.Should().BeNull();
+   }
+
+   [Fact]
+   public void SePersonnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenPersonnummerIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"Personnummer\":\"811228-987\"}";  // Invalid length
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should()
+         .ThrowExactly<KfValidationException<SePersonnummerValidationResult>>()
+         .WithMessage(Messages.SePersonnummerInvalidLength + "*")
+         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidLength);
+   }
 
    #endregion
 }

@@ -83,6 +83,10 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      would be true if "00" represented the year 2000, which is a leap
 ///      year because of the century divisible by 400 rule for leap years).
 ///   </para>
+///   <para>
+///      See https://en.wikipedia.org/wiki/Personal_identity_number_(Sweden)
+///      for more details.
+///   </para>
 /// </remarks>
 [JsonConverter(typeof(SePersonnummerJsonConverter))]
 public record SePersonnummer
@@ -96,6 +100,7 @@ public record SePersonnummer
    private const Int32 SeparatorOffset = 5;
    private const Int32 BirthSerialNumberStartOffset = 4;
    private const Int32 BirthSerialNumberEndOffset = 1;         // Range end index is exclusive
+   private const Int32 GenderOffset = 2;
 
    private const Int32 SamordningsnummerDayOffset = 60;
 
@@ -180,13 +185,9 @@ public record SePersonnummer
    {
       get
       {
+#pragma warning disable IDE0008 // Use explicit type
          var (year, month, day) = GetYearMonthDay(Value);
-
-         // Handle samordningsnummer, which adds 60 to the date of birth.
-         if (day > SamordningsnummerDayOffset)
-         {
-            day -= SamordningsnummerDayOffset;
-         }
+#pragma warning restore IDE0008 // Use explicit type
 
          return new DateOnly(year, month, day);
       }
@@ -198,13 +199,13 @@ public record SePersonnummer
    ///   than 100 years of age, while a plus sign ('+') indicates a person 100
    ///   years of age or older.
    /// </summary>
-   public Boolean IsCentenarian => Value[^SeparatorOffset] == Chars.Plus; 
+   public Boolean IsCentenarian => Value[^SeparatorOffset] == Chars.Plus;
 
    /// <summary>
    ///   The person's gender, as indicated by the third character of the birth
-   ///   sequence number. Odd digits = Female; even digits = Male.
+   ///   sequence number. Odd digits = Male; even digits = Female.
    /// </summary>
-   public BinaryGender Gender => Value[^2] % 2 == 0
+   public BinaryGender Gender => Value[^GenderOffset] % 2 == 0
       ? BinaryGender.Female
       : BinaryGender.Male;
 
@@ -267,13 +268,11 @@ public record SePersonnummer
       {
          return SePersonnummerValidationResult.Empty;
       }
-      else if (personnummer.Length != ShortFormatLength
-            && personnummer.Length != LongFormatLength)
+      else if (personnummer.Length is not ShortFormatLength and not LongFormatLength)
       {
          return SePersonnummerValidationResult.InvalidLength;
       }
-      else if (GetSeparator(personnummer) != Chars.Dash
-            && GetSeparator(personnummer) != Chars.Plus)
+      else if (GetSeparator(personnummer) is not Chars.Dash and not Chars.Plus)
       {
          return SePersonnummerValidationResult.InvalidSeparator;
       }
@@ -327,6 +326,12 @@ public record SePersonnummer
          day = personnummer[6..].ParseTwoDigits();
       }
 
+      // Handle samordningsnummer, which adds 60 to the date of birth.
+      if (day > SamordningsnummerDayOffset)
+      {
+         day -= SamordningsnummerDayOffset;
+      }
+
       return (year, month, day);
    }
    private static Boolean ValidateBirthSerialNumber(ReadOnlySpan<Char> personnummer)
@@ -367,19 +372,13 @@ public record SePersonnummer
       var (year, month, day) = GetYearMonthDay(personnummer);
 #pragma warning restore IDE0008 // Use explicit type
 
-      if (year < 1900 || year > 2099)
+      if (year is < 1900 or > 2099)
       {
          return false;
       }
-      else if (month < 1 || month > 12)
+      else if (month is < 1 or > 12)
       {
          return false;
-      }
-
-      // Handle samordningsnummer, which adds 60 to the date of birth.
-      if (day > SamordningsnummerDayOffset)
-      {
-         day -= SamordningsnummerDayOffset;
       }
 
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);

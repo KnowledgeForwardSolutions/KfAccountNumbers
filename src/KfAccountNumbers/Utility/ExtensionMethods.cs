@@ -62,10 +62,10 @@ public static class ExtensionMethods
       var maskIndex = 0;
       var outputIndex = 0;
 
-      while(maskIndex < mask.Length)
+      while (maskIndex < mask.Length)
       {
          var maskChar = mask[maskIndex];
-         switch(maskChar)
+         switch (maskChar)
          {
             case Chars.Backslash:
                maskIndex++;
@@ -141,8 +141,8 @@ public static class ExtensionMethods
       [CallerArgumentExpression(nameof(str))] String callerArgumentName = null!)
       => str is null
          ? throw new ArgumentNullException(callerArgumentName, message)
-         : String.IsNullOrWhiteSpace(str) 
-            ? throw new ArgumentException(message, callerArgumentName) 
+         : String.IsNullOrWhiteSpace(str)
+            ? throw new ArgumentException(message, callerArgumentName)
             : str;
 
    /// <summary>
