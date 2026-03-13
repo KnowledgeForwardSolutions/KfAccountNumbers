@@ -396,6 +396,55 @@ public class SePersonnummerTests
 
    #endregion
 
+   [Theory]
+   [InlineData("000101", "19000101")]     // Jan 1, 1900
+   [InlineData("991231", "19991231")]     // Dec 31, 1999
+   [InlineData("000228", "19000228")]     // Max day of month February (non leap year)
+   [InlineData("040229", "19040229")]     // Max day of month February (leap year)
+
+   [InlineData("19000101", "19000101")]   // Jan 1, 1900
+   [InlineData("19991231", "19991231")]   // Dec 31, 1999
+   [InlineData("20000101", "20000101")]   // Jan 1, 2000
+   [InlineData("20991231", "20991231")]   // Dec 31, 2099
+
+   [InlineData("19000228", "19000228")]     // Max day of month February (non leap year)
+   [InlineData("19040229", "19040229")]     // Max day of month February (leap year)
+   [InlineData("20000229", "20000229")]     // Max day of month February (leap year because century divisible by 400)
+   [InlineData("20010228", "20010228")]     // Max day of month February (non leap year)
+   [InlineData("20040229", "20040229")]     // Max day of month February (leap year)
+
+   // Samordningsnummer values
+   [InlineData("000161", "19000101")]     // Jan 1, 1900
+   [InlineData("991291", "19991231")]     // Dec 31, 1999
+   [InlineData("000288", "19000228")]     // Max day of month February (non leap year)
+   [InlineData("040289", "19040229")]     // Max day of month February (leap year)
+
+   [InlineData("19000161", "19000101")]   // Jan 1, 1900
+   [InlineData("19991291", "19991231")]   // Dec 31, 1999
+   [InlineData("20000161", "20000101")]   // Jan 1, 2000
+   [InlineData("20991291", "20991231")]   // Dec 31, 2099
+
+   [InlineData("19000288", "19000228")]     // Max day of month February (non leap year)
+   [InlineData("19040289", "19040229")]     // Max day of month February (leap year)
+   [InlineData("20000289", "20000229")]     // Max day of month February (leap year because century divisible by 400)
+   [InlineData("20010288", "20010228")]     // Max day of month February (non leap year)
+   [InlineData("20040289", "20040229")]     // Max day of month February (leap year)
+   public void SePersonnummer_DateOfBirth_ShouldReturnExpectedValue(
+      String dateOfBirth,
+      String expectedDateOfBirth)
+   {
+      // Arrange.
+      var personnummer = GetPersonnummerWithValidCheckDigit(dateOfBirth: dateOfBirth);
+      var sut = new SePersonnummer(personnummer);
+      var expected = DateOnly.ParseExact(
+         expectedDateOfBirth,
+         "yyyyMMdd",
+         System.Globalization.CultureInfo.InvariantCulture);
+
+      // Act/assert.
+      sut.DateOfBirth.Should().Be(expected);
+   }
+
    #region Gender Property Tests
    // ==========================================================================
    // ==========================================================================

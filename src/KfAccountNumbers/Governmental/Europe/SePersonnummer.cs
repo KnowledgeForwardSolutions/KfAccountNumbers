@@ -92,6 +92,8 @@ public record SePersonnummer
    private const Int32 SeparatorOffsetSixDigitDateOfBirthLength = 6;
    private const Int32 SeparatorOffsetEightDigitDateOfBirthLength = 8;
 
+   private const Int32 SamordningsnummerDayOffset = 60;
+
    /// <summary>
    ///   Initialize a new instance of the <see cref="SePersonnummer"/> class.
    /// </summary>
@@ -144,6 +146,45 @@ public record SePersonnummer
       }
 
       Value = personnummer!;
+   }
+
+   /// <summary>
+   ///   The person's date of birth, derived from the date of birth portion of
+   ///   the personnummer (either the first six digits for 11 character values
+   ///   or the first eight digits for 13 character values).
+   /// </summary>
+   /// <remarks>
+   ///   <para>
+   ///   An 11 character value (i.e. YYMMDD format) assumes that the year of
+   ///   birth will be between 1900 and 1999.
+   ///   </para>
+   ///   <para>
+   ///   Note that the indicated date of birth may not be the person's exact
+   ///   date of birth as it is possible that a day may run out of birth
+   ///   serial numbers. In that case, a date close to the actual date of
+   ///   birth is used instead.
+   ///   </para>
+   ///   <para>
+   ///   Note also that samordningsnummer values encode the date of birth by
+   ///   adding 60 to the day (i.e. "950123" encodes as "950183"). If the
+   ///   personnummer is actually a samordningsnummer, then 60 will be
+   ///   subtracted from the day to get the actual numeric day.
+   ///   </para>
+   /// </remarks>
+   public DateOnly DateOfBirth
+   {
+      get
+      {
+         var (year, month, day) = GetYearMonthDay(Value);
+
+         // Handle samordningsnummer, which adds 60 to the date of birth.
+         if (day > SamordningsnummerDayOffset)
+         {
+            day -= SamordningsnummerDayOffset;
+         }
+
+         return new DateOnly(year, month, day);
+      }
    }
 
    /// <summary>
@@ -326,9 +367,9 @@ public record SePersonnummer
       }
 
       // Handle samordningsnummer, which adds 60 to the date of birth.
-      if (day > 60)
+      if (day > SamordningsnummerDayOffset)
       {
-         day -= 60;
+         day -= SamordningsnummerDayOffset;
       }
 
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);
