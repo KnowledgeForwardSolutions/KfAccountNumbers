@@ -191,7 +191,7 @@ public record CaSocialInsuranceNumber
 
       // Validate the check digit and province code.
       var validCheckDigit = IsFormattedSin(sin)
-         ? CheckDigitAlgorithms.Luhn.Validate(sin, CheckDigitMasks.CaSocialInsuranceNumberMask)
+         ? CheckDigitAlgorithms.Luhn.Validate(sin, CaSocialInsuranceNumberMask.Instance)
          : CheckDigitAlgorithms.Luhn.Validate(sin);
       if (!validCheckDigit)
       {

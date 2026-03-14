@@ -234,4 +234,22 @@
   <data name="UsItinInvalidGroupNumber" xml:space="preserve">
     <value>US Individual Taxpayer Identification Number group number segment (xxx-GG-xxxx) must not be 00-49, 66-69, 89 or 93</value>
   </data>
+  <data name="SePersonnummerEmpty" xml:space="preserve">
+    <value>SE Personnummer may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="SePersonnummerInvalidLength" xml:space="preserve">
+    <value>SE Personnummer must have length 11 (YYMMDD format) or 13 (YYYYMMDD format)</value>
+  </data>
+  <data name="SePersonnummerInvalidDateOfBirth" xml:space="preserve">
+    <value>SE Personnummer requires valid six digit date of birth (YYMMDD) in character positions 0-5 (zero-based) or a valid eight digit date of birth (YYYYMMDD) in character positions 0-7 (zero-based)</value>
+  </data>
+  <data name="SePersonnummerInvalidSeparator" xml:space="preserve">
+    <value>SE Personnummer must have a valid separator character (either '-' or '+') in character position 6 (zero-based, YYMMDD format) or character position 8 (zero-based, YYYYMMDD format)</value>
+  </data>
+  <data name="SePersonnummerInvalidBirthSerialNumber" xml:space="preserve">
+    <value>SE Personnummer must have a three digit birth serial number in character positions 7-9 (YYMMDD format) or character positions 9-11 (YYYYMMDD format)</value>
+  </data>
+  <data name="SePersonnummerInvalidCheckDigit" xml:space="preserve">
+    <value>SE Personnummer must have a valid Luhn algorithm check digit in character position 10 (YYMMDD format) or character position 12 (YYYYMMDD format)</value>
+  </data>
 </root>

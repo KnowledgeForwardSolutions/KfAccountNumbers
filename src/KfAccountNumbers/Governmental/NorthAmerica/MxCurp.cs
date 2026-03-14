@@ -1,7 +1,5 @@
 // Ignore Spelling: Curp Json Mx
 
-#pragma warning disable IDE0008 // Use explicit type
-
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
 /// <summary>
@@ -132,7 +130,7 @@ public record MxCurp
    ///   String representation of a CURP.
    /// </param>
    /// <remarks>
-   ///   Validation if <paramref name="curp"/> is performed in a case-insensitive
+   ///   Validation of <paramref name="curp"/> is performed in a case-insensitive
    ///   manner. However, the <see cref="Value"/> property will normalize the
    ///   CURP to upper-case.
    /// </remarks>
@@ -313,24 +311,6 @@ public record MxCurp
       return MxCurpValidationResult.ValidationPassed;
    }
 
-   private static Int32 GetFebruaryDays(Int32 yearTwoDigit, Char homoclave)
-   {
-      // Leap year rules:
-      // - Non-century year (YY != 00) divisible by 4 is leap year
-      // - Century year (YY == 00) divisible by 400 is leap year
-      //   (homoclave letter = 2000s = divisible by 400)
-      //   (homoclave digit = 1900s = NOT divisible by 400)
-
-      if (yearTwoDigit == 0)
-      {
-         // Century year: 1900 or 2000
-         return Char.IsAsciiLetter(homoclave) ? 29 : 28;  // 2000 is leap, 1900 is not
-      }
-
-      // Non-century year: divisible by 4 is leap year
-      return yearTwoDigit % 4 == 0 ? 29 : 28;
-   }
-
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static ReadOnlySpan<Char> GetSectionSpan(ReadOnlySpan<Char> curp, CurpSection section)
       => section switch
@@ -348,15 +328,11 @@ public record MxCurp
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static (Int32 year, Int32 month, Int32 day) GetYearMonthDay(ReadOnlySpan<Char> dateOfBirthSpan)
    {
-      var year = ParseTwoDigits(dateOfBirthSpan[0], dateOfBirthSpan[1]);
-      var month = ParseTwoDigits(dateOfBirthSpan[2], dateOfBirthSpan[3]);
-      var day = ParseTwoDigits(dateOfBirthSpan[4], dateOfBirthSpan[5]);
+      var year = dateOfBirthSpan.ParseTwoDigits();
+      var month = dateOfBirthSpan[2..].ParseTwoDigits();
+      var day = dateOfBirthSpan[4..].ParseTwoDigits();
       return (year, month, day);
    }
-
-   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static Int32 ParseTwoDigits(Char tens, Char ones)
-      => ((tens - Chars.DigitZero) * 10) + (ones - Chars.DigitZero);
 
    private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> curp)
    {
@@ -382,23 +358,12 @@ public record MxCurp
          return false;
       }
 
-      var maxDaysInMonth = month switch
-      {
-         1 => 31,
-         2 => GetFebruaryDays(year, curp[HomoclaveOffset]),
-         3 => 31,
-         4 => 30,
-         5 => 31,
-         6 => 30,
-         7 => 31,
-         8 => 31,
-         9 => 30,
-         10 => 31,
-         11 => 30,
-         12 => 31,
-         _ => throw new SwitchExpressionException()
-      };
-      return day >= 1 && day <= maxDaysInMonth;
+      // Use homoclave value to adjust the year century.
+      year += curp[HomoclaveOffset].IsAsciiDigit()
+         ? 1900
+         : 2000;
+
+      return day >= 1 && day <= DateTime.DaysInMonth(year, month);
    }
 
    private static Boolean ValidateGenderCode(ReadOnlySpan<Char> curp)

@@ -1,4 +1,4 @@
-﻿namespace KfAccountNumbers.Utility;
+namespace KfAccountNumbers.Utility;
 
 public static class ExtensionMethods
 {
@@ -62,10 +62,10 @@ public static class ExtensionMethods
       var maskIndex = 0;
       var outputIndex = 0;
 
-      while(maskIndex < mask.Length)
+      while (maskIndex < mask.Length)
       {
          var maskChar = mask[maskIndex];
-         switch(maskChar)
+         switch (maskChar)
          {
             case Chars.Backslash:
                maskIndex++;
@@ -141,9 +141,30 @@ public static class ExtensionMethods
       [CallerArgumentExpression(nameof(str))] String callerArgumentName = null!)
       => str is null
          ? throw new ArgumentNullException(callerArgumentName, message)
-         : String.IsNullOrWhiteSpace(str) 
-            ? throw new ArgumentException(message, callerArgumentName) 
+         : String.IsNullOrWhiteSpace(str)
+            ? throw new ArgumentException(message, callerArgumentName)
             : str;
+
+   /// <summary>
+   ///   Parses a two-digit integer value from the specified read-only character
+   ///   span.
+   /// </summary>
+   /// <remarks>
+   ///   The method does not perform validation on the input span. Supplying a
+   ///   span that does not contain at least two valid digit characters results
+   ///   in undefined behavior.
+   /// </remarks>
+   /// <param name="span">
+   ///   A read-only span of characters that must contain at least two consecutive
+   ///   ASCII digit characters representing the number to parse.
+   /// </param>
+   /// <returns>
+   ///   An integer value in the range 0 to 99 corresponding to the two-digit
+   ///   number represented by the input span.
+   /// </returns>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   public static Int32 ParseTwoDigits(this ReadOnlySpan<Char> span)
+      => ((span[0] - Chars.DigitZero) * 10) + (span[1] - Chars.DigitZero);
 
    /// <summary>
    ///   Validate that String value is not <see langword="null"/>, 

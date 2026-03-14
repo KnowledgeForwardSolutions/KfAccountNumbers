@@ -1,4 +1,4 @@
-﻿namespace KfAccountNumbers.Utility;
+namespace KfAccountNumbers.Utility;
 
 /// <summary>
 ///   Character constants and helper methods.
@@ -9,6 +9,7 @@ public static class Chars
 
    public const Char HashMark = '#';
    public const Char Asterisk = '*';
+   public const Char Plus = '+';
    public const Char Dash = '-';
 
    public const Char DigitZero = '0';
