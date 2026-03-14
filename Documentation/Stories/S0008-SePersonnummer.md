@@ -85,7 +85,6 @@ Personnummer are commonly formatted with either a dash (-) or plus (+) separator
 **When** calling the static `Create` method  
 **Then** it shall:
 - Accept a `String?` parameter for the personnummer value
-- Accept an optional `Char` parameter for the separator character (default: `-`)
 - Return a `CreateResult<SePersonnummer, SePersonnummerValidationResult>`
 - Return a successful result containing the `SePersonnummer` instance if validation passes
 - Return a failed result containing the `SePersonnummerValidationResult` if validation fails
@@ -126,23 +125,22 @@ Personnummer are commonly formatted with either a dash (-) or plus (+) separator
 **When** implicitly converting to `String`  
 **Then** it shall:
 - Return the `Value` property (unformatted personnummer)
-- Throw `ArgumentNullException` if the `SePersonnummer` instance is `null`
+- String.Empty if the `SePersonnummer` instance is `null`
 
 **Operator signature:**
 `public static implicit operator String(SePersonnummer personnummer)`
 
 
-### 7. Implicit Conversion from String
+### 7. Explicit Conversion from String
 
 **Given** a personnummer string representation  
-**When** implicitly converting from `String` to `SePersonnummer`  
+**When** explicitly converting from `String` to `SePersonnummer`  
 **Then** it shall:
-- Create a new `SePersonnummer` instance using the default separator (`-`)
-- Behave identically to calling the constructor with default separator
+- Behave identically to calling the constructor
 - Throw the same exceptions as the constructor
 
 **Operator signature:**
-`public static implicit operator SePersonnummer(String? personnummer)`
+`public static explicit operator SePersonnummer(String? personnummer)`
 
 ### 8. SePersonnummerValidationResult Enumeration
 
@@ -162,8 +160,8 @@ public enum SePersonnummerValidationResult {
   Empty,
   
   /// <summary> 
-  ///   Personnummer value has incorrect length. Must be either 11 characters (10 digits with separator) for short format, 
-  ///   or 13 characters (12 digits with separator) for long format. 
+  ///   Personnummer value has incorrect length. Must be either 11 characters for short format, 
+  ///   or 13 characters for long format. 
   /// </summary> 
   InvalidLength,
   

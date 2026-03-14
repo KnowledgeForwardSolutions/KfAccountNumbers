@@ -1,23 +1,23 @@
 namespace KfAccountNumbers.Governmental.Europe;
 
-internal class SePersonNumberShortFormatCheckDigitMasks : ICheckDigitMask
+internal class SePersonNumberShortFormatCheckDigitMask : ICheckDigitMask
 {
-   private static readonly Lazy<SePersonNumberShortFormatCheckDigitMasks> _instance =
-      new(() => new SePersonNumberShortFormatCheckDigitMasks());
+   private static readonly Lazy<SePersonNumberShortFormatCheckDigitMask> _instance =
+      new(() => new SePersonNumberShortFormatCheckDigitMask());
 
-   public static SePersonNumberShortFormatCheckDigitMasks Instance => _instance.Value;
+   public static SePersonNumberShortFormatCheckDigitMask Instance => _instance.Value;
 
    public Boolean ExcludeCharacter(Int32 index) => index == 6;
 
    public Boolean IncludeCharacter(Int32 index) => index != 6;
 }
 
-internal class SePersonNumberLongFormatCheckDigitMasks : ICheckDigitMask
+internal class SePersonNumberLongFormatCheckDigitMask : ICheckDigitMask
 {
-   private static readonly Lazy<SePersonNumberLongFormatCheckDigitMasks> _instance =
-      new(() => new SePersonNumberLongFormatCheckDigitMasks());
+   private static readonly Lazy<SePersonNumberLongFormatCheckDigitMask> _instance =
+      new(() => new SePersonNumberLongFormatCheckDigitMask());
 
-   public static SePersonNumberLongFormatCheckDigitMasks Instance => _instance.Value;
+   public static SePersonNumberLongFormatCheckDigitMask Instance => _instance.Value;
 
    public Boolean ExcludeCharacter(Int32 index)
       => index == 0 || index == 1 || index == 8;

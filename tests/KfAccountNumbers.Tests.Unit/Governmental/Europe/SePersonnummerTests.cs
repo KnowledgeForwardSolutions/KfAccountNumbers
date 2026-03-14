@@ -268,14 +268,14 @@ public class SePersonnummerTests
       "821228-9874",       // 811228-9874 with single digit transcription error 1 -> 2
       "181228-9874",       // 811228-9874 with two digit transcription error 81 -> 18
       "811228-9847",       // 811228-9874 with two digit transcription error 74 -> 47
-      "880422+1238",       // 880411+1238 wtih two digit twin error 11 -> 22
+      "880422+1238",       // 880411+1238 with two digit twin error 11 -> 22
       "880411+3328",       // 880411+2228 with two digit twin error 22 -> 33
       "19811228-9875",     // 19811228-9874 with invalid check digit 4 -> 5
       "19811227-9874",     // 19811228-9874 with single digit transcription error 8 -> 7
       "20821228-9874",     // 20811228-9874 with single digit transcription error 1 -> 2
       "20181228-9874",     // 20811228-9874 with two digit transcription error 81 -> 18
       "19811228-9847",     // 19811228-9874 with two digit transcription error 74 -> 47
-      "19880422+1238",     // 19880411+1238 wtih two digit twin error 11 -> 22
+      "19880422+1238",     // 19880411+1238 with two digit twin error 11 -> 22
       "19880411+3328",     // 19880411+2228 with two digit twin error 22 -> 33
    ];
 

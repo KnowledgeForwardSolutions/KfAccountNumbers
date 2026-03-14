@@ -177,7 +177,7 @@ Example Values:
 * 811288+9871 - Samordningsnummer, date of birth 811288 (actual date of birth = 811228), greater than 100 years old, gender =
  male, check digit = 1.
 
-See [Wikipedia - Personal identity number (Sweden)](https://en.wikipedia.org/wiki/Personal_identity_number_(Sweden%29) for more info.
+See [Wikipedia - Personal identity number (Sweden)](https://en.wikipedia.org/wiki/Personal_identity_number_%28Sweden%29) for more info.
 
 ## UsIndividualTaxpayerIdentificationNumber
 

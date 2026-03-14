@@ -15,7 +15,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      Swedish personummer and samordningsnummer values are both 11 or 13
+///      Swedish personnummer and samordningsnummer values are both 11 or 13
 ///      character strings. The only difference between the two lengths are
 ///      the number of digits used to represent the date of birth, either
 ///      six or eight. The format of personnummer and samordningsnummer are
@@ -295,7 +295,7 @@ public record SePersonnummer
    ///   number (samordningsnummer).
    /// </summary>
    /// <remarks>
-   ///   A personummer will have a date of birth with a day component in the normal
+   ///   A personnummer will have a date of birth with a day component in the normal
    ///   range (1-31) while a samordningsnummer will add 60 to the day component
    ///   of the day of birth resulting in values from 61-91.
    /// </remarks>
@@ -337,7 +337,7 @@ public record SePersonnummer
       => personnummer?.Value ?? String.Empty;     // Handle null personnummer object gracefully by returning empty string
 
    // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
-   public static explicit operator SePersonnummer(String personnummer) => new(personnummer);
+   public static explicit operator SePersonnummer(String? personnummer) => new(personnummer);
 
    /// <summary>
    ///   Get a string representation of the personnummer.
@@ -467,8 +467,8 @@ public record SePersonnummer
    private static Boolean ValidateCheckDigit(String personnummer)
    {
       ICheckDigitMask checkDigitMask = personnummer.Length == ShortFormatLength
-         ? SePersonNumberShortFormatCheckDigitMasks.Instance
-         : SePersonNumberLongFormatCheckDigitMasks.Instance;
+         ? SePersonNumberShortFormatCheckDigitMask.Instance
+         : SePersonNumberLongFormatCheckDigitMask.Instance;
       return CheckDigitAlgorithms.Luhn.Validate(personnummer, checkDigitMask);
    }
 
@@ -510,8 +510,8 @@ public class SePersonnummerJsonConverter : JsonConverter<SePersonnummer>
          return null!;
       }
 
-      var curpString = reader.GetString();
-      return new SePersonnummer(curpString);
+      var personnummerString = reader.GetString();
+      return new SePersonnummer(personnummerString);
    }
 
    public override void Write(Utf8JsonWriter writer, SePersonnummer value, JsonSerializerOptions options)
