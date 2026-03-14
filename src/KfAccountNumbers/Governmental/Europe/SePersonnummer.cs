@@ -9,13 +9,15 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   (personnummer) is issued to persons born in Sweden or who are residents
 ///   of Sweden for 12 months or longer. The second, the coordination number
 ///   (samordningsnummer) is issued to persons who reside in Sweden for less
-///   than a year.
+///   than a year. The <see cref="IdentifierType"/> property will indicate
+///   the exact type of identifier represented by an instance of
+///   <see cref="SePersonnummer"/>.
 /// </summary>
 /// <remarks>
 ///   <para>
 ///      Swedish personummer and samordningsnummer values are both 11 or 13
-///      character strings with the only difference between the two lengths
-///      are the number of digits used to represent the date of birth, either
+///      character strings. The only difference between the two lengths are
+///      the number of digits used to represent the date of birth, either
 ///      six or eight. The format of personnummer and samordningsnummer are
 ///      the same and consist of the following fields/sections:
 ///      <list type="bullet">
@@ -45,17 +47,17 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               A single check digit calcuated using the Luhn algorithm
+///               A single check digit calculated using the Luhn algorithm
 ///               applied to the rightmost six digits of the date of birth and
-///               the birth serial number.
+///               to the birth serial number.
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
-///      The only difference between a personummer and a samordningsnummer is
+///   <para>
+///      The only difference between a personnummer and a samordningsnummer is
 ///      that the samordningsnummer adds 60 to the day of a person's date of
 ///      birth (i.e. 950123 would become 950183).
-///   <para>
 ///   </para>
 ///   <para>
 ///      Example values:
@@ -93,7 +95,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            <term>19890261-3283</term>
 ///            <description>
 ///               Samordningsnummer, date of birth 19890261 (actual date of birth
-///               = 890201), less than 100 years old, gender = female, check digit
+///               = 19890201), less than 100 years old, gender = female, check digit
 ///               = 3.
 ///            </description>
 ///         </item>
@@ -111,6 +113,11 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      When creating a new <see cref="SePersonnummer"/>, the following
 ///      validation rules are applied:
 ///      <list type="bullet">
+///         <item>
+///            <description>
+///               The value may not be null, empty or all whitespace characters.
+///            </description>
+///         </item>
 ///         <item>
 ///            <description>
 ///               The string must be either 11 or 13 characters long.
@@ -150,11 +157,11 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///      </list>
 ///   </para>
+///   <para>
 ///      Note that the encoded date of birth may not be the person's actual
 ///      date of birth. It is possible to run out of birth serial numbers for
 ///      a particular day and in this case a day close to the actual date of
 ///      birth is substituted in its stead.
-///   <para>
 ///   </para>
 ///   <para>
 ///      When determining if a date of birth is valid, YYMMDD format dates are
@@ -371,9 +378,6 @@ public record SePersonnummer
    ///   value that indicates if the <paramref name="personnummer"/> passed
    ///   validation or what validation error was encountered.
    /// </returns>
-   /// <remarks>
-   ///   Validation is case-insensitive.
-   /// </remarks>
    public static SePersonnummerValidationResult Validate(String? personnummer)
    {
       if (String.IsNullOrWhiteSpace(personnummer))

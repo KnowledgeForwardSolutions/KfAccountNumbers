@@ -56,6 +56,7 @@ public class SePersonnummerTests
       "811228-987",        // Length 10
       "811228-98745",      // Length 12
       "19811228-98745",    // Length 14
+      new String('1', 100) // Very long string
    ];
 
    public static TheoryData<String> ValidPersonnummerDateOfBirthValues =>
