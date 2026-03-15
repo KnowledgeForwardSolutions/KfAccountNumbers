@@ -33,6 +33,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Asia (future)
 	- Australia (future)
 	- Europe
+        - [NoFodselsnummer](#nofodselsnummer) 
         - [SePersonnummer](#sepersonnummer)
 	- NorthAmerica
 		- [CaSocialInsuranceNumber](#casocialinsurancenumber) 
@@ -111,6 +112,12 @@ be considered valid if it meets all of the other validation rules.
 
 See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/Unique_Population_Registry_Code) and
 [Wikipedia - Clave Única de Registro de Población](https://es.wikipedia.org/wiki/Clave_%C3%9Anica_de_Registro_de_Poblaci%C3%B3n) for more info.
+
+## NoFodselsnummer
+
+NoFodselsnummer represents either a Norwegian Fødselsnummer (Birth Number), issued to residents and citizens of Norway
+or a D-nummer, issued to foreign individuals who do not have a Fødselsnummer. NoFodselsnummer includes an `IdentifierType`
+property which returns a `NoIdentifierType` enumeration value that indicates the exact type of identifier represented.
 
 ## SePersonnummer
 
