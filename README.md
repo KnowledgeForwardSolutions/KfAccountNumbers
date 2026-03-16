@@ -23,6 +23,13 @@ and implicit string to business object operator will only accept strings that co
 characters of the account number. Nor will the business object implement a Format method since there
 is no formatting to be done.
 
+Note that many of the national identifiers supported by KfAccountNumbers embed the person's date of
+birth in the identifier. KfAccountNumbers will always validate these dates, but only that the date
+exists, and specifically will **NOT** check for future dates. This is to prevent any of the
+business objects being required to be aware of the current date/time. If preventing future dates is
+a business requirement then you should perform your own validation of the business object's DateOfBirth
+property and reject it if the date is in the future.
+
 # Namespace Hierarchy
 
 KfAccountNumbers groups business objects into two broad categories: Commercial and Governmental. The Commercial namespace will contain common types (such as credit card numbers) that are international in scope. The Governmental namespace will contain types for account numbers issued by government authorities (such as US Social Security Numbers, etc.). The Governmental namespace is further subdivided by continent (Africa, Asia, Australia, Europe, North America and South America). The types are named using the two letter ISO country code and the account number name (ex. UsSocialSecurityNumber).
@@ -143,7 +150,8 @@ space, between the date of birth and the identity digits, i.e. DDMMYY IIICC.
  * All characters (except the optional separator character) must be ASCII digits (0-9).
  * The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as separator.
  * The date of birth, calculated after applying the century indicator (and if the value is a D-nummer, after subtracting
-  the D-nummer offset) must be a valid date.
+  the D-nummer offset) must be a valid date.  Note that the validation specifically does **NOT** check for future dates,
+  only that the date exist.
  * The trailing two characters must be valid weighted modulus 11 check digits. 
 
  Example values:
@@ -188,8 +196,8 @@ A valid personnummer or samordningsnummer must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
 * The value must be either 11 or 13 characters long.
 * For 11-character strings, the first 6 characters must represent a valid date in the format YYMMDD. For 13-character
- strings, the first 8 characters must represent a valid date in the format YYYYMMDD. Future dates are specifically **NOT**
- tested for to avoid issues requiring the SePersonummer class to be aware of the current time.
+ strings, the first 8 characters must represent a valid date in the format YYYYMMDD. Note that the validation specifically
+ does **NOT** check for future dates, only that the date exist.
 * The date of birth must be followed by a valid separator character. The separator must be either a dash (-) or a plus
  sign (+).
 * The separator must be followed by a three digit birth serial number.
