@@ -133,7 +133,7 @@ indicates the exact type of identifier represented.
 Fødselsnummer and D-nummer are both 11 digit numbers formatted as DDMMYYIIICC, with the following elements:
 * DDMMYY - the person's date of birth in DDMMYY format. The only difference between a fødselsnummer and a D-nummer is
  that 4 is added to the first digit of the person's date of birth (i.e. 130585 becomes 530485).
-* III - three assigned identity digits. The first digit indicates the person's the century of birth and the last digit
+* III - three digit individual number. The first digit indicates the person's the century of birth and the last digit
  indicates the person's gender, with odd digits assigned to males and even digits assigned to females. See the Wikipedia
  article linked below for the exact definition of the century indicator.
 * CC - two separate check digits calculated using a weighted modulus 11 algorithm. The first check digit is calculated
