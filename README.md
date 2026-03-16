@@ -115,9 +115,47 @@ See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/
 
 ## NoFodselsnummer
 
-NoFodselsnummer represents either a Norwegian Fødselsnummer (Birth Number), issued to residents and citizens of Norway
-or a D-nummer, issued to foreign individuals who do not have a Fødselsnummer. NoFodselsnummer includes an `IdentifierType`
-property which returns a `NoIdentifierType` enumeration value that indicates the exact type of identifier represented.
+The `NoFodselsnummer` class represents a Norwegian national identity number. Like a number of other countries, Norway has
+two different identity numbers with identical format, the fødselsnummer (birth number), which is issued to citizens and
+long-term residents of Norway and the D-nummer, which is issued to foreign individuals who are not eligible for a
+fødselsnummer. (The term "D-nummer" originates from the Norwegian Directorate of Sailors, when the primary group of foreign
+born individuals needing an identifier when paying Norwegian taxes were sailors working on Norwegian ships.) The
+NoFodselsnummer class includes an `IdentifierType` property which returns a `NoIdentifierType` enumeration value that
+indicates the exact type of identifier represented.
+
+Fødselsnummer and D-nummer are both 11 digit numbers formatted as DDMMYYIIICC, with the following elements:
+* DDMMYY - the person's date of birth in DDMMYY format. The only difference between a fødselsnummer and a D-nummer is
+ that 4 is added to the first digit of the person's date of birth (i.e. 130585 becomes 530485).
+* III - three assigned identity digits. The first digit indicates the person's the century of birth and the last digit
+ indicates the person's gender, with odd digits assigned to males and even digits assigned to females. See the Wikipedia
+ article linked below for the exact definition of the century indicator.
+* CC - two separate check digits calculated using a weighted modulus 11 algorithm. The first check digit is calculated
+ for the first nine digits (date of birth and identity digits) and the second check digit is calculated for the preceding
+ ten digits. The use of two different check digits drops the error rate encountered during data entry to approximately
+ 1 in 100,000, a figure unattainable by single-digit check algorithms available when the fødselsnummer was introduced.
+
+The 11 character value is sometimes formatted for greater readability by inserting a separator character, generally a
+space, between the date of birth and the identity digits, i.e. DDMMYY IIICC.
+
+ A valid fødselsnummer or D-nummer must meet all of the following rules:
+ * The value may not be null, empty or all whitespace characters.
+ * The value must be either 11 or 12 characters in length.
+ * All characters (except the optional separator character) must be ASCII digits (0-9).
+ * The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as separator.
+ * The date of birth, calculated after applying the century indicator (and if the value is a D-nummer, after subtracting
+  the D-nummer offset) must be a valid date.
+ * The trailing two characters must be valid weighted modulus 11 check digits. 
+
+ Example values:
+ * 010289158CC - fødselsnummer, date of birth February 1, 1989, gender = female, check digits CC
+ * 010289 158CC - fødselsnummer, date of birth February 1, 1989, gender = female, check digits CC
+ * 521050035CC - D-nummer, date of birth October 12, 1950, gender = male, check digits CC
+ * 521050-035CC - D-nummer, date of birth October 12, 1950, gender = male, check digits CC
+
+ Norway plans changes to fødselsnummer values in 2032 due to the expected depletion of available numbers under the
+ current scheme.
+
+See [Wikipedia - National identity number (Norway)](https://en.wikipedia.org/wiki/National_identity_number_%28Norway%29) for more info.
 
 ## SePersonnummer
 
