@@ -128,9 +128,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///               For 11-character strings, the first 6 characters must represent
 ///               a valid date in the format YYMMDD. For 13-character strings,
 ///               the first 8 characters must represent a valid date in the
-///               format YYYYMMDD. Future dates are specifically <b>NOT</b>
-///               tested for to avoid issues requiring <see cref="SePersonnummer"/>
-///               to be aware of the current time.
+///               format YYYYMMDD. Note that the validation specifically does
+///               <b>NOT</b> check for future dates, only that the date exists.
 ///            </description>
 ///         </item>
 ///         <item>

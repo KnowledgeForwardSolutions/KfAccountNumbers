@@ -151,7 +151,7 @@ space, between the date of birth and the identity digits, i.e. DDMMYY IIICC.
  * The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as separator.
  * The date of birth, calculated after applying the century indicator (and if the value is a D-nummer, after subtracting
   the D-nummer offset) must be a valid date.  Note that the validation specifically does **NOT** check for future dates,
-  only that the date exist.
+  only that the date exists.
  * The trailing two characters must be valid weighted modulus 11 check digits. 
 
  Example values:
@@ -197,7 +197,7 @@ A valid personnummer or samordningsnummer must meet all of the following rules:
 * The value must be either 11 or 13 characters long.
 * For 11-character strings, the first 6 characters must represent a valid date in the format YYMMDD. For 13-character
  strings, the first 8 characters must represent a valid date in the format YYYYMMDD. Note that the validation specifically
- does **NOT** check for future dates, only that the date exist.
+ does **NOT** check for future dates, only that the date exists.
 * The date of birth must be followed by a valid separator character. The separator must be either a dash (-) or a plus
  sign (+).
 * The separator must be followed by a three digit birth serial number.
