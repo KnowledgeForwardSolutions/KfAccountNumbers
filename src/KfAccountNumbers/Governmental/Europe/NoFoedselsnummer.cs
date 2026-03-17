@@ -1,4 +1,4 @@
-// Ignore Spelling: Fodselsnummer
+// Ignore Spelling: Foedselsnummer
 
 namespace KfAccountNumbers.Governmental.Europe;
 
@@ -81,7 +81,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      </list>
 ///   </para>
 ///   <para>
-///      When creating a new <see cref="NoFodselsnummer"/>, the following
+///      When creating a new <see cref="NoFoedselsnummer"/>, the following
 ///      validation rules are applied:
 ///      <list type="bullet">
 ///         <item>
@@ -128,8 +128,79 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      See https://en.wikipedia.org/wiki/National_identity_number_(Norway) for more info.
 ///   </para>
 /// </remarks>
-public class NoFodselsnummer
+public class NoFoedselsnummer
 {
    private const Int32 NoSeparatorLength = 11;
    private const Int32 SeparatorLength = 12;
+
+   private const Int32 SeparatorOffset = 6;
+
+   private static readonly Int32[] _c1Weights = [3, 7, 6, 1, 8, 9, 4, 5, 2, 1, 0];
+   private static readonly Int32[] _c2Weights = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2, 1];
+
+   /// <summary>
+   ///   Check the <paramref name="foedselsnummer"/> to determine if it contains a
+   ///   valid Norwegien national identity number (fødselsnummer) value.
+   /// </summary>
+   /// <param name="foedselsnummer">
+   ///   String representation of a Norwegien national identity number (fødselsnummer).
+   /// </param>
+   /// <returns>
+   ///   A <see cref="NoFoedselsnummerValidationResult"/> enumeration 
+   ///   value that indicates if the <paramref name="foedselsnummer"/> passed
+   ///   validation or what validation error was encountered.
+   /// </returns>
+   public static NoFoedselsnummerValidationResult Validate(String? foedselsnummer)
+   {
+      if (String.IsNullOrWhiteSpace(foedselsnummer))
+      {
+         return NoFoedselsnummerValidationResult.Empty;
+      }
+      else if (foedselsnummer.Length is not NoSeparatorLength and not SeparatorLength)
+      {
+         return NoFoedselsnummerValidationResult.InvalidLength;
+      }
+      NoFoedselsnummerValidationResult validationResult = ValidateCheckDigits(foedselsnummer);
+      if (validationResult != NoFoedselsnummerValidationResult.ValidationPassed)
+      {
+         // Could be either InvalidCharacter or InvalidCheckDigits.
+         return validationResult;
+      }
+
+      throw new NotImplementedException();
+   }
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean IsFormatted(ReadOnlySpan<Char> foedselsnummer)
+      => foedselsnummer.Length == SeparatorLength;
+
+   private static NoFoedselsnummerValidationResult ValidateCheckDigits(ReadOnlySpan<Char> foedselsnummer)
+   {
+      var isFormatted = IsFormatted(foedselsnummer);
+      var c1Sum = 0;
+      var c2Sum = 0;
+      var weightIndex = 0;
+      var processLength = foedselsnummer.Length;
+      for(var charIndex = 0; charIndex < processLength; charIndex ++)
+      {
+         if (isFormatted && charIndex == SeparatorOffset)
+         {
+            continue;
+         }
+
+         var num = foedselsnummer[charIndex] - Chars.DigitZero;
+         if (num < 0 || num > 9)
+         {
+            return NoFoedselsnummerValidationResult.InvalidCharacter;
+         }
+
+         c1Sum += num * _c1Weights[weightIndex];
+         c2Sum += num * _c2Weights[weightIndex];
+         weightIndex ++;
+      }
+
+      return (c1Sum % 11) == 0 && (c2Sum % 11) == 0
+         ? NoFoedselsnummerValidationResult.ValidationPassed
+         : NoFoedselsnummerValidationResult.InvalidCheckDigits;
+   }
 }

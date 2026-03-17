@@ -40,7 +40,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Asia (future)
 	- Australia (future)
 	- Europe
-        - [NoFodselsnummer](#nofodselsnummer) 
+        - [NoFoedselsnummer](#nofoedselsnummer) 
         - [SePersonnummer](#sepersonnummer)
 	- NorthAmerica
 		- [CaSocialInsuranceNumber](#casocialinsurancenumber) 
@@ -120,9 +120,9 @@ be considered valid if it meets all of the other validation rules.
 See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/Unique_Population_Registry_Code) and
 [Wikipedia - Clave Única de Registro de Población](https://es.wikipedia.org/wiki/Clave_%C3%9Anica_de_Registro_de_Poblaci%C3%B3n) for more info.
 
-## NoFodselsnummer
+## NoFoedselsnummer
 
-The `NoFodselsnummer` class represents a Norwegian national identity number. Like a number of other countries, Norway has
+The `NoFoedselsnummer` class represents a Norwegian national identity number. Like a number of other countries, Norway has
 two different identity numbers with identical format, the fødselsnummer (birth number), which is issued to citizens and
 long-term residents of Norway and the D-nummer, which is issued to foreign individuals who are not eligible for a
 fødselsnummer. (The term "D-nummer" originates from the Norwegian Directorate of Sailors, when the primary group of foreign

@@ -232,56 +232,65 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NO Fodselsnummer may not be null, empty or all whitespace characters.
+        ///   Looks up a localized string similar to NO Foedselsnummer may not be null, empty or all whitespace characters.
         /// </summary>
-        internal static string NoFodselsnummerEmpty {
+        internal static string NoFoedselsnummerEmpty {
             get {
-                return ResourceManager.GetString("NoFodselsnummerEmpty", resourceCulture);
+                return ResourceManager.GetString("NoFoedselsnummerEmpty", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NO Fodselsnummer must have two valid check digit characters in the trailing (right-most) positions.
+        ///   Looks up a localized string similar to NO Foedselsnummer contains a non-digit character where a digit was expected.
         /// </summary>
-        internal static string NoFodselsnummerInvalidCheckDigits {
+        internal static string NoFoedselsnummerInvalidCharacter {
             get {
-                return ResourceManager.GetString("NoFodselsnummerInvalidCheckDigits", resourceCulture);
+                return ResourceManager.GetString("NoFoedselsnummerInvalidCharacter", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NO Fodselsnummer requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based).
+        ///   Looks up a localized string similar to NO Foedselsnummer must have two valid check digit characters in the trailing (right-most) positions.
         /// </summary>
-        internal static string NoFodselsnummerInvalidDateOfBirth {
+        internal static string NoFoedselsnummerInvalidCheckDigits {
             get {
-                return ResourceManager.GetString("NoFodselsnummerInvalidDateOfBirth", resourceCulture);
+                return ResourceManager.GetString("NoFoedselsnummerInvalidCheckDigits", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NO Fodselsnummer individual number (character positions 6-8 or 7-9, depending on if a separator character is used) must be all digit characters.
+        ///   Looks up a localized string similar to NO Foedselsnummer requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based).
         /// </summary>
-        internal static string NoFodselsnummerInvalidIndividualNumber {
+        internal static string NoFoedselsnummerInvalidDateOfBirth {
             get {
-                return ResourceManager.GetString("NoFodselsnummerInvalidIndividualNumber", resourceCulture);
+                return ResourceManager.GetString("NoFoedselsnummerInvalidDateOfBirth", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NO Fodselsnummer must have length 11 (no separator character) or 12 (separator character).
+        ///   Looks up a localized string similar to NO Foedselsnummer individual number (character positions 6-8 or 7-9, depending on if a separator character is used) must be all digit characters.
         /// </summary>
-        internal static string NoFodselsnummerInvalidLength {
+        internal static string NoFoedselsnummerInvalidIndividualNumber {
             get {
-                return ResourceManager.GetString("NoFodselsnummerInvalidLength", resourceCulture);
+                return ResourceManager.GetString("NoFoedselsnummerInvalidIndividualNumber", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NO Fodselsnummer separator character must not be a digit.
+        ///   Looks up a localized string similar to NO Foedselsnummer must have length 11 (no separator character) or 12 (separator character).
         /// </summary>
-        internal static string NoFodselsnummerInvalidSeparator {
+        internal static string NoFoedselsnummerInvalidLength {
             get {
-                return ResourceManager.GetString("NoFodselsnummerInvalidSeparator", resourceCulture);
+                return ResourceManager.GetString("NoFoedselsnummerInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Foedselsnummer separator character must not be a digit.
+        /// </summary>
+        internal static string NoFoedselsnummerInvalidSeparator {
+            get {
+                return ResourceManager.GetString("NoFoedselsnummerInvalidSeparator", resourceCulture);
             }
         }
         

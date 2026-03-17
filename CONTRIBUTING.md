@@ -15,6 +15,17 @@ Some basic guidelines to promote code uniformity.
    of usage.
 * Include benchmarks and include results in README.
 
+## Validation
+
+When writing validation methods for business objects, the validation should generally
+proceed in the following order:
+
+* Test for null, empty or all whitespace characters
+* Test for length
+* If the business object uses a check digit, then test the check digit next since
+ that will detect the most common data entry errors
+* Test other elements specific to the business object
+
 ## Unit Tests/Naming Conventions
 
 * Tests use xUnit framework.
