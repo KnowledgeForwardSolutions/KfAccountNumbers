@@ -1,4 +1,4 @@
-// Ignore Spelling: Foedselsnummer Nummer
+// Ignore Spelling: Foedselsnummer Kf Nummer
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -13,6 +13,11 @@ public class NoFoedselsnummerTests
    private const String AltValid11CharacterDNummer = "60055029566";
    private const String Valid12CharacterDNummer = "530295 97134";
    private const String AltValid12CharacterDNummer = "600550-29566";
+
+   private static String GetRawFoedselsnummer(String foedselsnummer)
+      => foedselsnummer.Length == 11
+         ? foedselsnummer
+         : foedselsnummer[..6] + foedselsnummer[7..];
 
    private static String GetFoedselsnummerWithValidCheckDigits(
       String dateOfBirth = "130295",
@@ -300,6 +305,134 @@ public class NoFoedselsnummerTests
       { "711104", "500" },       // Invalid day of for November, any year
       { "721204", "500" },       // Invalid day of for December, any year
    };
+
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidFoedselsnummerValues))]
+   [MemberData(nameof(ValidDNummerValues))]
+   public void NoFoedselsnummer_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawFoedselsnummer(value);
+
+      // Act.
+      var sut = new NoFoedselsnummer(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSeparators))]
+   public void NoFoedselsnummer_Constructor_ShouldCreateInstance_WhenValueHasValidSeparator(String separator)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
+      var expected = GetRawFoedselsnummer(value);
+
+      // Act.
+      var sut = new NoFoedselsnummer(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDateOfBirthValues))]
+   public void NoFoedselsnummer_Constructor_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
+      String dateOfBirth,
+      String individualNumber)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         individualNumber: individualNumber);
+      var expected = GetRawFoedselsnummer(value);
+
+      // Act.
+      var sut = new NoFoedselsnummer(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => new NoFoedselsnummer(value))
+         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
+         .WithMessage(Messages.NoFoedselsnummerEmpty + "*")
+         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => new NoFoedselsnummer(value))
+         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
+         .WithMessage(Messages.NoFoedselsnummerInvalidLength + "*")
+         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(String value)
+      => FluentActions
+         .Invoking(() => new NoFoedselsnummer(value))
+         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
+         .WithMessage(Messages.NoFoedselsnummerInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasCheckDigits(String value)
+      => FluentActions
+         .Invoking(() => new NoFoedselsnummer(value))
+         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
+         .WithMessage(Messages.NoFoedselsnummerInvalidCheckDigits + "*")
+         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidCheckDigits);
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparators))]
+   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasSeparator(String separator)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new NoFoedselsnummer(value))
+         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
+         .WithMessage(Messages.NoFoedselsnummerInvalidSeparator + "*")
+         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidSeparator);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      String individualNumber)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         individualNumber: individualNumber);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new NoFoedselsnummer(value))
+         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
+         .WithMessage(Messages.NoFoedselsnummerInvalidDateOfBirth + "*")
+         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidDateOfBirth);
+   }
+
+   #endregion
 
    #region Validate Method Tests
    // ==========================================================================

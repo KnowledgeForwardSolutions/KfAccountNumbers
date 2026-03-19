@@ -129,32 +129,39 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      The century of the date of birth has somewhat complicated rules due to
 ///      several overlapping ranges of years. The rules used in <see cref="NoFoedselsnummer"/>
 ///      are taken from https://blog.variant.no/ssns-and-pattern-matching-in-c-9-498f96aa71d4.
-///      The rules are:
+///      Because of the overlapping ranges (the individual number 500  matches two
+///      different rules), the rules must be evaluated in order to arrive at the
+///      correct century.  The rules are:
 ///      <list type="bullet">
 ///         <item>
+///            <term>Rule 1</term>
 ///            <description>
 ///               If the individual number is &ge; 500 and &le; 749 AND the
 ///               two digit year is &ge; 54 then the century = 1800.
 ///            </description>
 ///         </item>
 ///         <item>
+///            <term>Rule 2</term>
 ///            <description>
 ///               If the individual number is &lt; 500 then the century = 1900.
 ///            </description>
 ///         </item>
 ///         <item>
+///            <term>Rule 3</term>
 ///            <description>
 ///               If the individual number is &ge; 900 AND the two digit year
 ///               is &ge; 40 then the century = 1900.
 ///            </description>
 ///         </item>
 ///         <item>
+///            <term>Rule 4</term>
 ///            <description>
 ///               If the individual number is &ge; 500 AND the two digit year
-///               is &lt; 39 then the century =2000.
+///               is &le; 39 then the century =2000.
 ///            </description>
 ///         </item>
 ///         <item>
+///            <term>Rule 5</term>
 ///            <description>
 ///               Otherwise invalid. Validation will return invalid date of birth.
 ///            </description>
@@ -177,7 +184,7 @@ public record NoFoedselsnummer
 
    // Offsets measured from end of value to avoid needing to account for the
    // presence or absence of a separator.
-   private const Int32 CenturyIndicatorOffset = 5;
+   private const Int32 IndividualNumberOffset = 5;
    private const Int32 GenderIndicatorOffset = 3;
 
    // D-nummer adds 40 to the day portion of date of birth.
@@ -185,6 +192,59 @@ public record NoFoedselsnummer
 
    private static readonly Int32[] _c1Weights = [3, 7, 6, 1, 8, 9, 4, 5, 2, 1, 0];
    private static readonly Int32[] _c2Weights = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2, 1];
+
+   /// <summary>
+   ///   Initialize a new instance of the <see cref="NoFoedselsnummer"/> class.
+   /// </summary>
+   /// <param name="foedselsnummer">
+   ///   String representation of a fødselsnummer.
+   /// </param>
+   /// <exception cref="KfValidationException{NoFoedselsnummerValidationResult}">
+   ///   <paramref name="foedselsnummer"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="foedselsnummer"/> is not length 11 (or 12 if a separator
+   ///   character is used).
+   ///   - or -
+   ///   <paramref name="foedselsnummer"/> contains a non-digit character in
+   ///   any position other than the separator location.
+   ///   - or -
+   ///   <paramref name="foedselsnummer"/> contains an invalid weighted modulus
+   ///   11 check digit in one or both trailing positions.
+   ///   - or -
+   ///   <paramref name="foedselsnummer"/> contains a digit character in position
+   ///   6 (zero-based). Valid separator characters are any non-digit character,
+   ///   though space (' ') and dash ('-') are the most common values.
+   ///   - or -
+   ///   <paramref name="foedselsnummer"/> contains an invalid date of birth in
+   ///   positions 0-5 (zero-based).
+   /// </exception>
+   public NoFoedselsnummer(String? foedselsnummer)
+      : this(foedselsnummer, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private NoFoedselsnummer(String? foedselsnummer, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         NoFoedselsnummerValidationResult validationResult = Validate(foedselsnummer);
+         if (validationResult != NoFoedselsnummerValidationResult.ValidationPassed)
+         {
+            throw validationResult.ToValidationException();
+         }
+      }
+
+      Value = GetRawFoedselsnummer(foedselsnummer!);
+   }
+
+   /// <summary>
+   ///   The raw fødselsnummer value.
+   /// </summary>
+   public String Value { get; private init; }
 
    /// <summary>
    ///   Check the <paramref name="foedselsnummer"/> to determine if it contains a
@@ -264,9 +324,37 @@ public record NoFoedselsnummer
    }
 
    private static Int32 GetIntegerIndividualNumber(ReadOnlySpan<Char> foedselsnummer)
-      => (foedselsnummer[^CenturyIndicatorOffset] - Chars.DigitZero) * 100
-         + (foedselsnummer[^(CenturyIndicatorOffset - 1)] - Chars.DigitZero) * 10         // Subtract to get next character because measuring from end of string
-         + (foedselsnummer[^(CenturyIndicatorOffset - 2)] - Chars.DigitZero);
+      => (foedselsnummer[^IndividualNumberOffset] - Chars.DigitZero) * 100
+         + (foedselsnummer[^(IndividualNumberOffset - 1)] - Chars.DigitZero) * 10         // Subtract to get next character because measuring from end of string
+         + (foedselsnummer[^(IndividualNumberOffset - 2)] - Chars.DigitZero);
+
+   private static String GetRawFoedselsnummer(String foedselsnummer)
+   {
+      if (foedselsnummer.Length == NoSeparatorLength)
+      {
+         return foedselsnummer;
+      }
+
+      var buffer = ArrayPool<Char>.Shared.Rent(NoSeparatorLength);
+      try
+      {
+         var span = new Span<Char>(buffer);
+
+         ReadOnlySpan<Char> dateOfBirthSpan = foedselsnummer.AsSpan()[..SeparatorOffset];
+         Span<Char> targetSpan = span[..SeparatorOffset];
+         dateOfBirthSpan.CopyTo(targetSpan);
+
+         ReadOnlySpan<Char> remainderSpan = foedselsnummer.AsSpan()[(SeparatorOffset + 1)..];
+         targetSpan = span[SeparatorOffset..];
+         remainderSpan.CopyTo(targetSpan);
+
+         return span[..NoSeparatorLength].ToString();
+      }
+      finally
+      {
+         ArrayPool<Char>.Shared.Return(buffer);
+      }
+   }
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean IsFormatted(ReadOnlySpan<Char> foedselsnummer)

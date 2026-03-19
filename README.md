@@ -133,9 +133,9 @@ indicates the exact type of identifier represented.
 Fødselsnummer and D-nummer are both 11 digit numbers formatted as DDMMYYIIICC, with the following elements:
 * DDMMYY - the person's date of birth in DDMMYY format. The only difference between a fødselsnummer and a D-nummer is
  that 4 is added to the first digit of the person's date of birth (i.e. 130585 becomes 530485).
-* III - three digit individual number. The first digit indicates the person's the century of birth and the last digit
- indicates the person's gender, with odd digits assigned to males and even digits assigned to females. See the Wikipedia
- article linked below for the exact definition of the century indicator.
+* III - three digit individual number. All three digits of the individual number are used to derive the century of the
+ date of birth and the last digit of the individual number indicates the person's gender, with odd digits assigned to
+ males and even digits assigned to females. See below for details on the derivation of the century of the date of birth.
 * CC - two separate check digits calculated using a weighted modulus 11 algorithm. The first check digit is calculated
  for the first nine digits (date of birth and identity digits) and the second check digit is calculated for the preceding
  ten digits. The use of two different check digits drops the error rate encountered during data entry to approximately
@@ -144,24 +144,38 @@ Fødselsnummer and D-nummer are both 11 digit numbers formatted as DDMMYYIIICC, 
 The 11 character value is sometimes formatted for greater readability by inserting a separator character, generally a
 space, between the date of birth and the identity digits, i.e. DDMMYY IIICC.
 
- A valid fødselsnummer or D-nummer must meet all of the following rules:
- * The value may not be null, empty or all whitespace characters.
- * The value must be either 11 or 12 characters in length.
- * All characters (except the optional separator character) must be ASCII digits (0-9).
- * The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as separator.
- * The date of birth, calculated after applying the century indicator (and if the value is a D-nummer, after subtracting
-  the D-nummer offset) must be a valid date.  Note that the validation specifically does **NOT** check for future dates,
-  only that the date exists.
- * The trailing two characters must be valid weighted modulus 11 check digits. 
+A valid fødselsnummer or D-nummer must meet all of the following rules:
+* The value may not be null, empty or all whitespace characters.
+* The value must be either 11 or 12 characters in length.
+* All characters (except the optional separator character) must be ASCII digits (0-9).
+* The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as separator.
+* The date of birth, after deriving the century from the individual number (and if the value is a D-nummer,
+after subtracting the D-nummer offset) must be a valid date between January 1, 1854 and December 31 2039.
+* The trailing two characters must be valid weighted modulus 11 check digits.
 
- Example values:
- * 010289158CC - fødselsnummer, date of birth February 1, 1989, gender = female, check digits CC
- * 010289 158CC - fødselsnummer, date of birth February 1, 1989, gender = female, check digits CC
- * 521050035CC - D-nummer, date of birth October 12, 1950, gender = male, check digits CC
- * 521050-035CC - D-nummer, date of birth October 12, 1950, gender = male, check digits CC
+Example values:
+* 13029597140 - fødselsnummer, date of birth February 13, 1995, gender = female, check digits 40
+* 130295 97140 - fødselsnummer, date of birth February 13, 1995, gender = female, check digits 40
+* 60055029566 - D-nummer, date of birth May 20, 1950, gender = male, check digits 66
+* 60055-029566 - D-nummer, date of birth May 20, 1950, gender = male, check digits 66
 
- Norway plans changes to fødselsnummer values in 2032 due to the expected depletion of available numbers under the
- current scheme.
+The rules for deriving the century of birth are somewhat complicated due to additional requirements being layered
+upon the individual number element over time. `NoFoedselsnummer` uses rules described in this
+[article](https://blog.variant.no/ssns-and-pattern-matching-in-c-9-498f96aa71d4) published on Medium.com. The rules
+are:
+* Rule 1 - If the individual number is >= 500 and <= 749 **AND** the two digit year is >= 54 then the century = 1800.
+* Rule 2 - If the individual number is < 500 then the century = 1900.
+* Rule 3 - If the individual number is >= 900 **AND** the two digit year is >= 40 then the century = 1900.
+* Rule 4 - If the individual number is>= 500 **AND** the two digit year is <= 39 then the century =2000.
+* Rule 5 - Otherwise invalid. Validation will report an invalid date of birth.
+
+According to these rules, the valid range for a date of birth is January 1, 1854 to December 31 2039.
+
+Note that since the rules have overlapping ranges of values (individual number 500 is valid for two different
+rules) they must be applied in order to derive the correct century.
+
+Norway plans changes to fødselsnummer values in 2032 due to the expected depletion of available numbers under the
+current scheme.
 
 See [Wikipedia - National identity number (Norway)](https://en.wikipedia.org/wiki/National_identity_number_%28Norway%29) for more info.
 
