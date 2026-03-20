@@ -247,6 +247,28 @@ public record NoFoedselsnummer
    public String Value { get; private init; }
 
    /// <summary>
+   ///   Create a new <see cref="NoFoedselsnummer"/>.
+   /// </summary>
+   /// <param name="foedselsnummer">
+   ///   String representation of a Norwegian National Identity Number (fødselsnummer).
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{NoFoedselsnummer, NoFoedselsnummerValidationResult}"/>.
+   ///   Will contain the new <see cref="NoFoedselsnummerValidationResult"/> if 
+   ///   <paramref name="foedselsnummer"/> is valid or 
+   ///   <see cref="NoFoedselsnummerValidationResult"/> that identifies
+   ///   the validation rule that was failed if <paramref name="foedselsnummer"/> is 
+   ///   invalid.
+   /// </returns>
+   public static CreateResult<NoFoedselsnummer, NoFoedselsnummerValidationResult> Create(String? foedselsnummer)
+   {
+      NoFoedselsnummerValidationResult validationResult = Validate(foedselsnummer);
+      return validationResult == NoFoedselsnummerValidationResult.ValidationPassed
+         ? new NoFoedselsnummer(foedselsnummer, validationMode: ValidationMode.BypassValidation)
+         : validationResult;
+   }
+
+   /// <summary>
    ///   Check the <paramref name="foedselsnummer"/> to determine if it contains a
    ///   valid Norwegian national identity number (fødselsnummer) value.
    /// </summary>

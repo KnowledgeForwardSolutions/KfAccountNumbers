@@ -1,5 +1,7 @@
 // Ignore Spelling: Foedselsnummer Kf Nummer
 
+#pragma warning disable IDE0008 // Use explicit type
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class NoFoedselsnummerTests
@@ -434,6 +436,264 @@ public class NoFoedselsnummerTests
 
    #endregion
 
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Valid11CharacterFoedselsnummer, Valid11CharacterFoedselsnummer)]
+   [InlineData(Valid12CharacterFoedselsnummer, Valid11CharacterFoedselsnummer)]
+   [InlineData(Valid11CharacterDNummer, Valid11CharacterDNummer)]
+   [InlineData(Valid12CharacterDNummer, Valid11CharacterDNummer)]
+   public void NoFoedselsnummer_Value_ShouldReturnValidatedFoedselsnummer(
+      String value,
+      String expected)
+   {
+      // Arrange.
+      var sut = new NoFoedselsnummer(value);
+
+      // Act/assert.
+      sut.Value.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void NoFoedselsnummer_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var foedselsnummer2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+
+      // Act/assert.
+      (foedselsnummer1 == foedselsnummer2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var foedselsnummer2 = new NoFoedselsnummer(AltValid11CharacterFoedselsnummer);
+
+      // Act/assert.
+      (foedselsnummer1 == foedselsnummer2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 11 and 12 character versions for same person should still be equal.
+      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var foedselsnummer2 = new NoFoedselsnummer(Valid12CharacterFoedselsnummer);
+
+      // Act/assert.
+      (foedselsnummer1 == foedselsnummer2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void NoFoedselsnummer_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var foedselsnummer2 = new NoFoedselsnummer(AltValid11CharacterFoedselsnummer);
+
+      // Act/assert.
+      (foedselsnummer1 != foedselsnummer2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 11 and 12 character versions for same person should still be equal.
+      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var foedselsnummer2 = new NoFoedselsnummer(Valid12CharacterFoedselsnummer);
+
+      // Act/assert.
+      (foedselsnummer1 != foedselsnummer2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var foedselsnummer2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+
+      // Act/assert.
+      (foedselsnummer1 != foedselsnummer2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidFoedselsnummerValues))]
+   [MemberData(nameof(ValidDNummerValues))]
+   public void NoFoedselsnummer_Create_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expectedValue = new NoFoedselsnummer(value);
+
+      // Act.
+      var result = NoFoedselsnummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSeparators))]
+   public void NoFoedselsnummer_Create_ShouldCreateInstance_WhenValueHasValidSeparator(String separator)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
+      var expectedValue = new NoFoedselsnummer(value);
+
+      // Act.
+      var result = NoFoedselsnummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDateOfBirthValues))]
+   public void NoFoedselsnummer_Create_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
+      String dateOfBirth,
+      String individualNumber)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         individualNumber: individualNumber);
+      var expectedValue = new NoFoedselsnummer(value);
+
+      // Act.
+      var result = NoFoedselsnummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void NoFoedselsnummer_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
+   {
+      // Act.
+      var result = NoFoedselsnummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(NoFoedselsnummerValidationResult.Empty);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void NoFoedselsnummer_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   {
+      // Act.
+      var result = NoFoedselsnummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(NoFoedselsnummerValidationResult.InvalidLength);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void NoFoedselsnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacter(String value)
+   {
+      // Act.
+      var result = NoFoedselsnummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(NoFoedselsnummerValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void NoFoedselsnummer_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigits(String value)
+   {
+      // Act.
+      var result = NoFoedselsnummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(NoFoedselsnummerValidationResult.InvalidCheckDigits);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparators))]
+   public void NoFoedselsnummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidCSeparator(String separator)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
+
+      // Act.
+      var result = NoFoedselsnummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(NoFoedselsnummerValidationResult.InvalidSeparator);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void NoFoedselsnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      String individualNumber)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         individualNumber: individualNumber);
+
+      // Act.
+      var result = NoFoedselsnummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(NoFoedselsnummerValidationResult.InvalidDateOfBirth);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -511,7 +771,6 @@ public class NoFoedselsnummerTests
       var value = GetFoedselsnummerWithValidCheckDigits(
          dateOfBirth: dateOfBirth,
          individualNumber: individualNumber);
-
 
       // Act/assert.
       NoFoedselsnummer.Validate(value).Should().Be(NoFoedselsnummerValidationResult.InvalidDateOfBirth);
