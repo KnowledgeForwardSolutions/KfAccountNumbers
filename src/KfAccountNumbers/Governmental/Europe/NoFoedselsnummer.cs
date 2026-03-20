@@ -20,7 +20,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///               DDMMYY - the person's date of birth in DDMMYY format. The
 ///               only difference between a fødselsnummer and a D-nummer is that
 ///               4 is added to the first digit of the person's date of birth
-///               (i.e. 130585 becomes 530485).
+///               (i.e. 130585 becomes 530485). Day values between 41 and 71
+///               are considered D-nummers.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -189,6 +190,8 @@ public record NoFoedselsnummer
 
    // D-nummer adds 40 to the day portion of date of birth.
    private const Int32 DNummerDayAdjustment = 40;
+   private const Int32 DNummerMinimumDay = 41;
+   private const Int32 DNummerMaximumDay = 71;
 
    private static readonly Int32[] _c1Weights = [3, 7, 6, 1, 8, 9, 4, 5, 2, 1, 0];
    private static readonly Int32[] _c2Weights = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2, 1];
@@ -249,7 +252,7 @@ public record NoFoedselsnummer
    /// <remarks>
    ///   Note that D-nummer values add 40 to the leading two digits (the DD
    ///   portion of the DDMMYY date of birth). The date of birth property
-   ///   
+   ///   automatically adjusts for this offset.
    /// </remarks>
    public DateOnly DateOfBirth
    {
@@ -270,6 +273,20 @@ public record NoFoedselsnummer
    public BinaryGender Gender => Value[^GenderOffset] % 2 == 0       // This works because the ASCII character values for digits have the same odd/even pattern
       ? BinaryGender.Female
       : BinaryGender.Male;
+
+   /// <summary>
+   ///   The type of Norwegian identifier represented by this instance,
+   ///   indicating if this is a fødselsnummer or a D-nummer.
+   /// </summary>
+   /// <remarks>
+   ///   The first two digits of the value determine the type of identifier.
+   ///   D-nummers add 40 to the first two digits of the date of birth (DDMMYY
+   ///   format) so any day of birth between 41 and 71 is considered a D-nummer.
+   /// </remarks>
+   public NoIdentifierType IdentifierType
+      => Value.AsSpan().ParseTwoDigits() is >= DNummerMinimumDay and <= DNummerMaximumDay
+         ? NoIdentifierType.DNummer
+         : NoIdentifierType.Foedselsnummer;
 
    /// <summary>
    ///   The raw fødselsnummer value.
@@ -349,7 +366,7 @@ public record NoFoedselsnummer
       var year = foedselsnummer[4..].ParseTwoDigits();
 
       // Adjust day for possible D-nummer.
-      if (day > DNummerDayAdjustment)
+      if (day >= DNummerMinimumDay && day <= DNummerMaximumDay)
       {
          day -= DNummerDayAdjustment;
       }

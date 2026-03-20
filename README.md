@@ -132,7 +132,8 @@ indicates the exact type of identifier represented.
 
 Fødselsnummer and D-nummer are both 11 digit numbers formatted as DDMMYYIIICC, with the following elements:
 * DDMMYY - the person's date of birth in DDMMYY format. The only difference between a fødselsnummer and a D-nummer is
- that 4 is added to the first digit of the person's date of birth (i.e. 130585 becomes 530485).
+ that 4 is added to the first digit of the person's date of birth (i.e. 130585 becomes 530485). Day values between 41
+ and 71 are considered D-nummers.
 * III - three digit individual number. All three digits of the individual number are used to derive the century of the
  date of birth and the last digit of the individual number indicates the person's gender, with odd digits assigned to
  males and even digits assigned to females. See below for details on the derivation of the century of the date of birth.

@@ -306,6 +306,13 @@ public class NoFoedselsnummerTests
       { "721004", "500" },       // Invalid day of for October, any year
       { "711104", "500" },       // Invalid day of for November, any year
       { "721204", "500" },       // Invalid day of for December, any year
+
+      // H nummer (40 added to month) not currently supported
+      { "014154", "500" },
+
+      // FH nummer (starts with 8 or 9) not currently supported
+      { "810100", "501" },
+      { "910100", "501" },
    };
 
    #region Constructor Tests
@@ -514,6 +521,46 @@ public class NoFoedselsnummerTests
 
       // Act/assert.
       sut.Gender.Should().Be(expectedGender);
+   }
+
+   #endregion
+
+   #region IdentifierType Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData("010154", "500")]
+   [InlineData("311239", "999")]
+   public void NoFoedselsnummer_IdentifierType_ShouldReturnExpectedValue_WhenValueIsFoedselsnummer(
+      String dateOfBirth,
+      String individualNumber)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         individualNumber: individualNumber);
+      var sut = new NoFoedselsnummer(value);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(NoIdentifierType.Foedselsnummer);
+   }
+
+   [Theory]
+   [InlineData("410154", "500")]
+   [InlineData("711239", "999")]
+   public void NoFoedselsnummer_IdentifierType_ShouldReturnExpectedValue_WhenValueIsDNummer(
+      String dateOfBirth,
+      String individualNumber)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         individualNumber: individualNumber);
+      var sut = new NoFoedselsnummer(value);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(NoIdentifierType.DNummer);
    }
 
    #endregion
