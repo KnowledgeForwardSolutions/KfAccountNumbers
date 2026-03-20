@@ -436,6 +436,59 @@ public class NoFoedselsnummerTests
 
    #endregion
 
+   #region DateOfBirth Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   // See ValidDateOfBirthValues property for rules associated with the individual numbers
+   [InlineData("010154", "500", "18540101")]       // Rule 1, January 1, 1854
+   [InlineData("311299", "748", "18991231")]       // Rule 1, December 31, 1899
+   [InlineData("010100", "001", "19000101")]       // Rule 2, January 1, 1900
+   [InlineData("311299", "499", "19991231")]       // Rule 2, December 31, 1999
+   [InlineData("010140", "900", "19400101")]       // Rule 3, January 1, 1940
+   [InlineData("311299", "998", "19991231")]       // Rule 3, December 31, 1999
+   [InlineData("010100", "500", "20000101")]       // Rule 4, January 1, 2000
+   [InlineData("311239", "999", "20391231")]       // Rule 4, December 31, 2039
+   [InlineData("290296", "501", "18960229")]       // Feburary 29, 1896 - leap year
+   [InlineData("280200", "235", "19000228")]       // Feburary 28, 1900 - non leap year
+   [InlineData("290248", "318", "19480229")]       // Feburary 29, 1948 - leap year
+   [InlineData("290200", "601", "20000229")]       // Feburary 29, 2000 - leap year
+
+   // D-nummer values
+   [InlineData("410154", "500", "18540101")]       // Rule 1, January 1, 1854
+   [InlineData("711299", "748", "18991231")]       // Rule 1, December 31, 1899
+   [InlineData("410100", "001", "19000101")]       // Rule 2, January 1, 1900
+   [InlineData("711299", "499", "19991231")]       // Rule 2, December 31, 1999
+   [InlineData("410140", "900", "19400101")]       // Rule 3, January 1, 1940
+   [InlineData("711299", "998", "19991231")]       // Rule 3, December 31, 1999
+   [InlineData("410100", "500", "20000101")]       // Rule 4, January 1, 2000
+   [InlineData("711239", "999", "20391231")]       // Rule 4, December 31, 2039
+   [InlineData("690296", "501", "18960229")]       // Feburary 29, 1896 - leap year
+   [InlineData("680200", "235", "19000228")]       // Feburary 28, 1900 - non leap year
+   [InlineData("690248", "318", "19480229")]       // Feburary 29, 1948 - leap year
+   [InlineData("690200", "601", "20000229")]       // Feburary 29, 2000 - leap year
+   public void NoFoedselsnummer_DateOfBirth_ShouldReturnExpectedValue(
+      String dateOfBirth,
+      String individualNumber,
+      String expectedDateOfBirth)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         individualNumber: individualNumber);
+      var sut = new NoFoedselsnummer(value);
+      var expected = DateOnly.ParseExact(
+         expectedDateOfBirth,
+         "yyyyMMdd",
+         System.Globalization.CultureInfo.InvariantCulture);
+
+      // Act/assert.
+      sut.DateOfBirth.Should().Be(expected);
+   }
+
+   #endregion
+
    #region Value Property Tests
    // ==========================================================================
    // ==========================================================================
