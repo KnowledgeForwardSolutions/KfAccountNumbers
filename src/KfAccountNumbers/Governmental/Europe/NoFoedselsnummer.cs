@@ -185,7 +185,7 @@ public record NoFoedselsnummer
    // Offsets measured from end of value to avoid needing to account for the
    // presence or absence of a separator.
    private const Int32 IndividualNumberOffset = 5;
-   private const Int32 GenderIndicatorOffset = 3;
+   private const Int32 GenderOffset = 3;              // Gender indicated by odd/even-ness of individual number, but only need to examine the last digit
 
    // D-nummer adds 40 to the day portion of date of birth.
    private const Int32 DNummerDayAdjustment = 40;
@@ -262,6 +262,14 @@ public record NoFoedselsnummer
          return new DateOnly(year, month, day);
       }
    }
+
+   /// <summary>
+   ///   The person's gender, as indicated by the individual number. Odd
+   ///   numbers = Male; even numbers = Female.
+   /// </summary>
+   public BinaryGender Gender => Value[^GenderOffset] % 2 == 0       // This works because the ASCII character values for digits have the same odd/even pattern
+      ? BinaryGender.Female
+      : BinaryGender.Male;
 
    /// <summary>
    ///   The raw fødselsnummer value.

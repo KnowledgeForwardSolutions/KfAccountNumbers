@@ -489,6 +489,35 @@ public class NoFoedselsnummerTests
 
    #endregion
 
+   #region Gender Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData("540", BinaryGender.Female)]
+   [InlineData("541", BinaryGender.Male)]
+   [InlineData("542", BinaryGender.Female)]
+   [InlineData("543", BinaryGender.Male)]
+   [InlineData("544", BinaryGender.Female)]
+   [InlineData("545", BinaryGender.Male)]
+   [InlineData("546", BinaryGender.Female)]
+   [InlineData("547", BinaryGender.Male)]
+   [InlineData("648", BinaryGender.Female)]     // 5 changed to 6 because of modulus 11 check digits
+   [InlineData("549", BinaryGender.Male)]
+   public void NoFoedselsnummer_Gender_ShouldReturnExpectedValue(
+      String individualNumber,
+      BinaryGender expectedGender)
+   {
+      // Arrange.
+      var personnummer = GetFoedselsnummerWithValidCheckDigits(individualNumber: individualNumber);
+      var sut = new NoFoedselsnummer(personnummer);
+
+      // Act/assert.
+      sut.Gender.Should().Be(expectedGender);
+   }
+
+   #endregion
+
    #region Value Property Tests
    // ==========================================================================
    // ==========================================================================
