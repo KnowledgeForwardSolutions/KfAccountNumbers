@@ -132,15 +132,16 @@ indicates the exact type of identifier represented.
 
 Fødselsnummer and D-nummer are both 11 digit numbers formatted as DDMMYYIIICC, with the following elements:
 * DDMMYY - the person's date of birth in DDMMYY format. The only difference between a fødselsnummer and a D-nummer is
- that 4 is added to the first digit of the person's date of birth (i.e. 130585 becomes 530485). Day values between 41
- and 71 are considered D-nummers.
+ that 4 is added to the first digit of the person's date of birth (i.e. 130585 becomes 530485). Day values in the range
+ 41-71 (inclusive) are considered D-nummers.
 * III - three digit individual number. All three digits of the individual number are used to derive the century of the
  date of birth and the last digit of the individual number indicates the person's gender, with odd digits assigned to
  males and even digits assigned to females. See below for details on the derivation of the century of the date of birth.
 * CC - two separate check digits calculated using a weighted modulus 11 algorithm. The first check digit is calculated
- for the first nine digits (date of birth and identity digits) and the second check digit is calculated for the preceding
- ten digits. The use of two different check digits drops the error rate encountered during data entry to approximately
- 1 in 100,000, a figure unattainable by single-digit check algorithms available when the fødselsnummer was introduced.
+ for the first nine digits (date of birth and individual number) and the second check digit is calculated for the date of
+ birth, individual number and first check digit. The use of two different check digits drops the error rate encountered
+ during data entry to approximately 1 in 100,000, a figure unattainable by single-digit check algorithms available when
+ the fødselsnummer was introduced.
 
 The 11 character value is sometimes formatted for greater readability by inserting a separator character, generally a
 space, between the date of birth and the identity digits, i.e. DDMMYY IIICC.

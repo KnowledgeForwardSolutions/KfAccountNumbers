@@ -972,7 +972,7 @@ public class NoFoedselsnummerTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparators))]
-   public void NoFoedselsnummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidCSeparator(String separator)
+   public void NoFoedselsnummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(String separator)
    {
       // Arrange.
       var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
@@ -1045,6 +1045,73 @@ public class NoFoedselsnummerTests
 
       // Act/assert.
       foedselsnummer1.Equals(foedselsnummer2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Format Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void NoFoedselsnummer_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var expected = Valid12CharacterFoedselsnummer;
+
+      // Act.
+      var str = sut.Format();
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new NoFoedselsnummer(AltValid11CharacterFoedselsnummer);
+      var mask = "______-______";
+      var expected = AltValid12CharacterFoedselsnummer;
+
+      // Act.
+      var str = sut.Format(mask);
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
+   {
+      // Arrange.
+      var sut = new NoFoedselsnummer(Valid11CharacterDNummer);
+      String mask = null!;
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = sut.Format(mask))
+         .Should()
+         .ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(Messages.FormatMaskEmpty + "*");
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void NoFoedselsnummer_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
+   {
+      // Arrange.
+      var sut = new NoFoedselsnummer(AltValid11CharacterDNummer);
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+      var act = () => _ = sut.Format(mask);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
    }
 
    #endregion

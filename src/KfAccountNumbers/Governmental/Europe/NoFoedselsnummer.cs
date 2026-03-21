@@ -1,4 +1,4 @@
-// Ignore Spelling: Foedselsnummer
+// Ignore Spelling: Foedselsnummer Json
 
 namespace KfAccountNumbers.Governmental.Europe;
 
@@ -20,8 +20,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///               DDMMYY - the person's date of birth in DDMMYY format. The
 ///               only difference between a fødselsnummer and a D-nummer is that
 ///               4 is added to the first digit of the person's date of birth
-///               (i.e. 130585 becomes 530485). Day values between 41 and 71
-///               are considered D-nummers.
+///               (i.e. 130585 becomes 530485). Day values in the range 41-71
+///               (inclusive)  are considered D-nummers.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -38,9 +38,9 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            <description>
 ///               CC - two separate check digits calculated using a weighted
 ///               modulus 11 algorithm. The first check digit is calculated
-///               for the first nine digits (date of birth and individual digits)
-///               and the second check digit is calculated for the preceding
-///               ten digits.
+///               for the first nine digits (date of birth and individual number)
+///               and the second check digit is calculated for the date of birth,
+///               individual number and first check digit.
 ///            </description>
 ///         </item>
 ///      </list>
@@ -48,7 +48,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   <para>
 ///      The 11 character value is sometimes formatted for greater readability
 ///      by inserting a separator character, generally a space, between the date
-///      of birth and the individual digits, i.e. DDMMYY IIICC.
+///      of birth and the individual number, i.e. DDMMYY IIICC.
 ///   </para>
 ///   <para>
 ///      Example values:
@@ -323,6 +323,28 @@ public record NoFoedselsnummer
    }
 
    /// <summary>
+   ///   Format the fødselsnummer using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   The mask that specified the final output.
+   /// </param>
+   /// <returns>
+   ///   A formatted fødselsnummer.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the fødselsnummer.
+   /// </remarks>
+   public String Format(String mask = "______ _____") => Value.FormatWithMask(mask);
+
+   /// <summary>
    ///   Get a string representation of the fødselsnummer.
    /// </summary>
    /// <remarks>
@@ -409,7 +431,7 @@ public record NoFoedselsnummer
 
    private static Int32 GetIntegerIndividualNumber(ReadOnlySpan<Char> foedselsnummer)
       => (foedselsnummer[^IndividualNumberOffset] - Chars.DigitZero) * 100
-         + (foedselsnummer[^(IndividualNumberOffset - 1)] - Chars.DigitZero) * 10         // Subtract to get next character because measuring from end of string
+         + (foedselsnummer[^(IndividualNumberOffset - 1)] - Chars.DigitZero) * 10         // Decrement offset value (measuring from end, so subtract to move right)
          + (foedselsnummer[^(IndividualNumberOffset - 2)] - Chars.DigitZero);
 
    private static String GetRawFoedselsnummer(String foedselsnummer)
@@ -419,25 +441,9 @@ public record NoFoedselsnummer
          return foedselsnummer;
       }
 
-      var buffer = ArrayPool<Char>.Shared.Rent(NoSeparatorLength);
-      try
-      {
-         var span = new Span<Char>(buffer);
-
-         ReadOnlySpan<Char> dateOfBirthSpan = foedselsnummer.AsSpan()[..SeparatorOffset];
-         Span<Char> targetSpan = span[..SeparatorOffset];
-         dateOfBirthSpan.CopyTo(targetSpan);
-
-         ReadOnlySpan<Char> remainderSpan = foedselsnummer.AsSpan()[(SeparatorOffset + 1)..];
-         targetSpan = span[SeparatorOffset..];
-         remainderSpan.CopyTo(targetSpan);
-
-         return span[..NoSeparatorLength].ToString();
-      }
-      finally
-      {
-         ArrayPool<Char>.Shared.Return(buffer);
-      }
+      return String.Concat(
+         foedselsnummer.AsSpan(0, SeparatorOffset),
+         foedselsnummer.AsSpan(SeparatorOffset + 1));
    }
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
