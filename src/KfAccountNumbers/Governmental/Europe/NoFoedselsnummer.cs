@@ -176,6 +176,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      See https://en.wikipedia.org/wiki/National_identity_number_(Norway) for more info.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(NoFoedselsnummerJsonConverter))]
 public record NoFoedselsnummer
 {
    private const Int32 NoSeparatorLength = 11;
@@ -497,4 +498,21 @@ public record NoFoedselsnummer
 
    private static Boolean ValidateSeparator(ReadOnlySpan<Char> foedselsnummer)
       => !IsFormatted(foedselsnummer) || !foedselsnummer[SeparatorOffset].IsAsciiDigit();
+}
+
+public class NoFoedselsnummerJsonConverter : JsonConverter<NoFoedselsnummer>
+{
+   public override NoFoedselsnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var foedselsnummerString = reader.GetString();
+      return new NoFoedselsnummer(foedselsnummerString);
+   }
+
+   public override void Write(Utf8JsonWriter writer, NoFoedselsnummer value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }

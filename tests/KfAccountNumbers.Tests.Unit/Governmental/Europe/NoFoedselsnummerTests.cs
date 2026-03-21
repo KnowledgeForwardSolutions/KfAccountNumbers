@@ -1,4 +1,4 @@
-// Ignore Spelling: Foedselsnummer Kf Nummer
+// Ignore Spelling: Deserialize Deserialization Foedselsnummer Json Kf Nummer
 
 #pragma warning disable IDE0008 // Use explicit type
 
@@ -1221,6 +1221,104 @@ public class NoFoedselsnummerTests
 
       // Act/assert.
       NoFoedselsnummer.Validate(value).Should().Be(NoFoedselsnummerValidationResult.InvalidDateOfBirth);
+   }
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void NoFoedselsnummer_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<NoFoedselsnummer>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new NoFoedselsnummer(Valid12CharacterDNummer);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public NoFoedselsnummer Foedselsnummer { get; set; } = null!;
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { Foedselsnummer = new NoFoedselsnummer(Valid12CharacterFoedselsnummer) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"Foedselsnummer\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"Foedselsnummer\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.Foedselsnummer.Should().BeNull();
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenFoedselsnummerIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"Foedselsnummer\":\"100612-707079\"}";  // Invalid length
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should()
+         .ThrowExactly<KfValidationException<NoFoedselsnummerValidationResult>>()
+         .WithMessage(Messages.NoFoedselsnummerInvalidLength + "*")
+         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidLength);
    }
 
    #endregion
