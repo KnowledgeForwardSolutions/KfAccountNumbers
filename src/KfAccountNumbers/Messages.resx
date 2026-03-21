@@ -252,4 +252,22 @@
   <data name="SePersonnummerInvalidCheckDigit" xml:space="preserve">
     <value>SE Personnummer must have a valid Luhn algorithm check digit in character position 10 (YYMMDD format) or character position 12 (YYYYMMDD format)</value>
   </data>
+  <data name="NoFoedselsnummerInvalidLength" xml:space="preserve">
+    <value>NO Foedselsnummer must have length 11 (no separator character) or 12 (separator character)</value>
+  </data>
+  <data name="NoFoedselsnummerEmpty" xml:space="preserve">
+    <value>NO Foedselsnummer may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="NoFoedselsnummerInvalidDateOfBirth" xml:space="preserve">
+    <value>NO Foedselsnummer requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based)</value>
+  </data>
+  <data name="NoFoedselsnummerInvalidSeparator" xml:space="preserve">
+    <value>NO Foedselsnummer separator character must not be a digit</value>
+  </data>
+  <data name="NoFoedselsnummerInvalidCheckDigits" xml:space="preserve">
+    <value>NO Foedselsnummer must have two valid check digit characters in the trailing (right-most) positions</value>
+  </data>
+  <data name="NoFoedselsnummerInvalidCharacter" xml:space="preserve">
+    <value>NO Foedselsnummer contains a non-digit character where a digit was expected</value>
+  </data>
 </root>

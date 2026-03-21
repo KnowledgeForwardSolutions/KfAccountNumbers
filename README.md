@@ -23,6 +23,13 @@ and implicit string to business object operator will only accept strings that co
 characters of the account number. Nor will the business object implement a Format method since there
 is no formatting to be done.
 
+Note that many of the national identifiers supported by KfAccountNumbers embed the person's date of
+birth in the identifier. KfAccountNumbers will always validate these dates, but only that the date
+exists, and specifically will **NOT** check for future dates. This is to prevent any of the
+business objects being required to be aware of the current date/time. If preventing future dates is
+a business requirement then you should perform your own validation of the business object's DateOfBirth
+property and reject it if the date is in the future.
+
 # Namespace Hierarchy
 
 KfAccountNumbers groups business objects into two broad categories: Commercial and Governmental. The Commercial namespace will contain common types (such as credit card numbers) that are international in scope. The Governmental namespace will contain types for account numbers issued by government authorities (such as US Social Security Numbers, etc.). The Governmental namespace is further subdivided by continent (Africa, Asia, Australia, Europe, North America and South America). The types are named using the two letter ISO country code and the account number name (ex. UsSocialSecurityNumber).
@@ -33,6 +40,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Asia (future)
 	- Australia (future)
 	- Europe
+        - [NoFoedselsnummer](#nofoedselsnummer) 
         - [SePersonnummer](#sepersonnummer)
 	- NorthAmerica
 		- [CaSocialInsuranceNumber](#casocialinsurancenumber) 
@@ -112,6 +120,67 @@ be considered valid if it meets all of the other validation rules.
 See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/Unique_Population_Registry_Code) and
 [Wikipedia - Clave Única de Registro de Población](https://es.wikipedia.org/wiki/Clave_%C3%9Anica_de_Registro_de_Poblaci%C3%B3n) for more info.
 
+## NoFoedselsnummer
+
+The `NoFoedselsnummer` class represents a Norwegian national identity number. Like a number of other countries, Norway has
+two different identity numbers with identical format, the fødselsnummer (birth number), which is issued to citizens and
+long-term residents of Norway and the D-nummer, which is issued to foreign individuals who are not eligible for a
+fødselsnummer. (The term "D-nummer" originates from the Norwegian Directorate of Sailors, when the primary group of foreign
+born individuals needing an identifier when paying Norwegian taxes were sailors working on Norwegian ships.) The
+NoFoedselsnummer class includes an `IdentifierType` property which returns a `NoIdentifierType` enumeration value that
+indicates the exact type of identifier represented.
+
+Fødselsnummer and D-nummer are both 11 digit numbers formatted as DDMMYYIIICC, with the following elements:
+* DDMMYY - the person's date of birth in DDMMYY format. The only difference between a fødselsnummer and a D-nummer is
+ that 4 is added to the first digit of the person's date of birth (i.e. 130585 becomes 530585). Day values in the range
+ 41-71 (inclusive) are considered D-nummers.
+* III - three digit individual number. All three digits of the individual number are used to derive the century of the
+ date of birth and the last digit of the individual number indicates the person's gender, with odd digits assigned to
+ males and even digits assigned to females. See below for details on the derivation of the century of the date of birth.
+* CC - two separate check digits calculated using a weighted modulus 11 algorithm. The first check digit is calculated
+ for the first nine digits (date of birth and individual number) and the second check digit is calculated for the date of
+ birth, individual number and first check digit. The use of two different check digits drops the error rate encountered
+ during data entry to approximately 1 in 100,000, a figure unattainable by single-digit check algorithms available when
+ the fødselsnummer was introduced.
+
+The 11 character value is sometimes formatted for greater readability by inserting a separator character, generally a
+space, between the date of birth and the identity digits, i.e. DDMMYY IIICC.
+
+A valid fødselsnummer or D-nummer must meet all of the following rules:
+* The value may not be null, empty or all whitespace characters.
+* The value must be either 11 or 12 characters in length.
+* All characters (except the optional separator character) must be ASCII digits (0-9).
+* The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as separator.
+* The date of birth, after deriving the century from the individual number (and if the value is a D-nummer,
+after subtracting the D-nummer offset) must be a valid date between January 1, 1854 and December 31 2039.
+* The trailing two characters must be valid weighted modulus 11 check digits.
+
+Example values:
+* 13029597140 - fødselsnummer, date of birth February 13, 1995, gender = female, check digits 40
+* 130295 97140 - fødselsnummer, date of birth February 13, 1995, gender = female, check digits 40
+* 60055029566 - D-nummer, date of birth May 20, 1950, gender = male, check digits 66
+* 600550-29566 - D-nummer, date of birth May 20, 1950, gender = male, check digits 66
+
+The rules for deriving the century of birth are somewhat complicated due to additional requirements being layered
+upon the individual number element over time. `NoFoedselsnummer` uses rules described in this
+[article](https://blog.variant.no/ssns-and-pattern-matching-in-c-9-498f96aa71d4) published on Medium.com. The rules
+are:
+* Rule 1 - If the individual number is >= 500 and <= 749 **AND** the two digit year is >= 54 then the century = 1800.
+* Rule 2 - If the individual number is < 500 then the century = 1900.
+* Rule 3 - If the individual number is >= 900 **AND** the two digit year is >= 40 then the century = 1900.
+* Rule 4 - If the individual number is>= 500 **AND** the two digit year is <= 39 then the century =2000.
+* Rule 5 - Otherwise invalid. Validation will report an invalid date of birth.
+
+According to these rules, the valid range for a date of birth is January 1, 1854 to December 31 2039.
+
+Note that since the rules have overlapping ranges of values (individual number 500 is valid for two different
+rules) they must be applied in order to derive the correct century.
+
+Norway plans changes to fødselsnummer values in 2032 due to the expected depletion of available numbers under the
+current scheme.
+
+See [Wikipedia - National identity number (Norway)](https://en.wikipedia.org/wiki/National_identity_number_%28Norway%29) for more info.
+
 ## SePersonnummer
 
 SePersonnummer represents either of two identifiers issued by the Swedish Tax Agency that have the
@@ -143,8 +212,8 @@ A valid personnummer or samordningsnummer must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
 * The value must be either 11 or 13 characters long.
 * For 11-character strings, the first 6 characters must represent a valid date in the format YYMMDD. For 13-character
- strings, the first 8 characters must represent a valid date in the format YYYYMMDD. Future dates are specifically **NOT**
- tested for to avoid issues requiring the SePersonummer class to be aware of the current time.
+ strings, the first 8 characters must represent a valid date in the format YYYYMMDD. Note that the validation specifically
+ does **NOT** check for future dates, only that the date exists.
 * The date of birth must be followed by a valid separator character. The separator must be either a dash (-) or a plus
  sign (+).
 * The separator must be followed by a three digit birth serial number.

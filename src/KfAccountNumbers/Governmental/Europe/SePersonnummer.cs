@@ -128,9 +128,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///               For 11-character strings, the first 6 characters must represent
 ///               a valid date in the format YYMMDD. For 13-character strings,
 ///               the first 8 characters must represent a valid date in the
-///               format YYYYMMDD. Future dates are specifically <b>NOT</b>
-///               tested for to avoid issues requiring <see cref="SePersonnummer"/>
-///               to be aware of the current time.
+///               format YYYYMMDD. Note that the validation specifically does
+///               <b>NOT</b> check for future dates, only that the date exists.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -290,6 +289,14 @@ public record SePersonnummer
    }
 
    /// <summary>
+   ///   The person's gender, as indicated by the third character of the birth
+   ///   sequence number. Odd digits = Male; even digits = Female.
+   /// </summary>
+   public BinaryGender Gender => Value[^GenderOffset] % 2 == 0       // This works because the ASCII character values for digits have the same odd/even pattern
+      ? BinaryGender.Female
+      : BinaryGender.Male;
+
+   /// <summary>
    ///   The type of Swedish identifier represented by this instance, indicating
    ///   whether it is a personal identity number (personnummer) or a coordination
    ///   number (samordningsnummer).
@@ -319,14 +326,6 @@ public record SePersonnummer
    ///   years of age or older.
    /// </summary>
    public Boolean IsCentenarian => Value[^SeparatorOffset] == Chars.Plus;
-
-   /// <summary>
-   ///   The person's gender, as indicated by the third character of the birth
-   ///   sequence number. Odd digits = Male; even digits = Female.
-   /// </summary>
-   public BinaryGender Gender => Value[^GenderOffset] % 2 == 0       // This works because the ASCII character values for digits have the same odd/even pattern
-      ? BinaryGender.Female
-      : BinaryGender.Male;
 
    /// <summary>
    ///   The raw personnummer value.
