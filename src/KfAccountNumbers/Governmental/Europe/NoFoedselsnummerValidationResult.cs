@@ -54,7 +54,7 @@ public enum NoFoedselsnummerValidationResult
 /// <summary>
 ///   Additional methods for type <see cref="NoFoedselsnummerValidationResult"/>.
 /// </summary>
-public static class NoFodselsnummerValidationResultResultExtensions
+public static class NoFodselsnummerValidationResultExtensions
 {
    public static String ToErrorDescription(this NoFoedselsnummerValidationResult errorType)
       => errorType switch
@@ -63,7 +63,7 @@ public static class NoFodselsnummerValidationResultResultExtensions
          NoFoedselsnummerValidationResult.InvalidLength => Messages.NoFoedselsnummerInvalidLength,
          NoFoedselsnummerValidationResult.InvalidCharacter => Messages.NoFoedselsnummerInvalidCharacter,
          NoFoedselsnummerValidationResult.InvalidCheckDigits => Messages.NoFoedselsnummerInvalidCheckDigits,
-         NoFoedselsnummerValidationResult.InvalidSeparator => Messages. NoFoedselsnummerInvalidSeparator,
+         NoFoedselsnummerValidationResult.InvalidSeparator => Messages.NoFoedselsnummerInvalidSeparator,
          NoFoedselsnummerValidationResult.InvalidDateOfBirth => Messages.NoFoedselsnummerInvalidDateOfBirth,
          NoFoedselsnummerValidationResult.ValidationPassed => Messages.ValidationPassed,
          _ => throw new SwitchExpressionException()

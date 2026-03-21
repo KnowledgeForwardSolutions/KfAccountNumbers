@@ -268,15 +268,6 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NO Foedselsnummer individual number (character positions 6-8 or 7-9, depending on if a separator character is used) must be all digit characters.
-        /// </summary>
-        internal static string NoFoedselsnummerInvalidIndividualNumber {
-            get {
-                return ResourceManager.GetString("NoFoedselsnummerInvalidIndividualNumber", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to NO Foedselsnummer must have length 11 (no separator character) or 12 (separator character).
         /// </summary>
         internal static string NoFoedselsnummerInvalidLength {

@@ -15,7 +15,7 @@ public enum NoIdentifierType
    /// <summary>
    ///   Identifier issued to foreign individuals not eligible for fødselsnummer.
    ///   Same format as a fødselsnummer, except 40 is added to the day component
-   ///   of the day of birth (i.e. 130585 becomes 530485).
+   ///   of the day of birth (i.e. 130585 becomes 530585).
    /// </summary>
    DNummer = 1
 }

@@ -1,7 +1,7 @@
 # S0015-SePersonnummer Updates
 
 ## Overview
-Update SePersonnummer object to correct several deficiences in original implementation
+Update SePersonnummer object to correct several deficiencies in original implementation
 
 ## Background
 * Change handling of 6 digit date format. Currently assumes 1900. Change to use century cutoff threshold   similar to how SQL Server handles 6 digit dates (49 is century cutoff - 0-49 = 2000's, 50-99 = 1900's). If separator = '+' then 0-49 = 1900's, 50-99 = 1800's

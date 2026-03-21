@@ -118,9 +118,9 @@ public class NoFoedselsnummerTests
       { "311239", "999" },       // maximum 6 digit date and maximum individual number
 
       { "310104", "501" },       // maximum days for January, any year
-      { "280201", "234" },       // maximum days for Feburary, non-leap year
-      { "290204", "234" },       // maximum days for Feburary, leap year
-      { "290200", "500" },       // maximum days for Feburary, leap year (2000 is leap-year)
+      { "280201", "234" },       // maximum days for February, non-leap year
+      { "290204", "234" },       // maximum days for February, leap year
+      { "290200", "500" },       // maximum days for February, leap year (2000 is leap-year)
       { "310304", "501" },       // maximum days for March, any year
       { "300404", "499" },       // maximum days for April, any year
       { "310504", "501" },       // maximum days for May, any year
@@ -159,9 +159,9 @@ public class NoFoedselsnummerTests
       { "711239", "999" },       // maximum 6 digit date and maximum individual number
 
       { "710104", "501" },       // maximum days for January, any year
-      { "680201", "234" },       // maximum days for Feburary, non-leap year
-      { "690204", "234" },       // maximum days for Feburary, leap year
-      { "690200", "500" },       // maximum days for Feburary, leap year (2000 is leap-year)
+      { "680201", "234" },       // maximum days for February, non-leap year
+      { "690204", "234" },       // maximum days for February, leap year
+      { "690200", "500" },       // maximum days for February, leap year (2000 is leap-year)
       { "710304", "500" },       // maximum days for March, any year
       { "700404", "499" },       // maximum days for April, any year
       { "710504", "501" },       // maximum days for May, any year
@@ -643,7 +643,7 @@ public class NoFoedselsnummerTests
       NoFoedselsnummer foedselsnummer = null!;
 
       // Act.
-      String str = foedselsnummer;
+      var str = (String)foedselsnummer;
 
       // Act/assert.
       str.Should().NotBeNull();
@@ -1153,7 +1153,7 @@ public class NoFoedselsnummerTests
    [Fact]
    public void NoFoedselsnummer_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
    {
-      // Arrange. 11 and 13 character versions for same person should still be equal.
+      // Arrange. 11 and 12 character versions for same person should still be equal.
       var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
       var foedselsnummer2 = new NoFoedselsnummer(Valid12CharacterFoedselsnummer);
 

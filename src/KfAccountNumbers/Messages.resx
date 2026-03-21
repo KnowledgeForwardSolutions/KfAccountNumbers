@@ -264,9 +264,6 @@
   <data name="NoFoedselsnummerInvalidSeparator" xml:space="preserve">
     <value>NO Foedselsnummer separator character must not be a digit</value>
   </data>
-  <data name="NoFoedselsnummerInvalidIndividualNumber" xml:space="preserve">
-    <value>NO Foedselsnummer individual number (character positions 6-8 or 7-9, depending on if a separator character is used) must be all digit characters</value>
-  </data>
   <data name="NoFoedselsnummerInvalidCheckDigits" xml:space="preserve">
     <value>NO Foedselsnummer must have two valid check digit characters in the trailing (right-most) positions</value>
   </data>

@@ -626,7 +626,7 @@ public class SePersonnummerTests
       SePersonnummer personnummer = null!;
 
       // Act.
-      String str = personnummer;
+      var str = (String)personnummer;
 
       // Act/assert.
       str.Should().NotBeNull();

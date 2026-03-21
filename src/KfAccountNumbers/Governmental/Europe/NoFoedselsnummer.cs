@@ -20,7 +20,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///               DDMMYY - the person's date of birth in DDMMYY format. The
 ///               only difference between a fødselsnummer and a D-nummer is that
 ///               4 is added to the first digit of the person's date of birth
-///               (i.e. 130585 becomes 530485). Day values in the range 41-71
+///               (i.e. 130585 becomes 530585). Day values in the range 41-71
 ///               (inclusive)  are considered D-nummers.
 ///            </description>
 ///         </item>

@@ -127,12 +127,12 @@ two different identity numbers with identical format, the fødselsnummer (birth 
 long-term residents of Norway and the D-nummer, which is issued to foreign individuals who are not eligible for a
 fødselsnummer. (The term "D-nummer" originates from the Norwegian Directorate of Sailors, when the primary group of foreign
 born individuals needing an identifier when paying Norwegian taxes were sailors working on Norwegian ships.) The
-NoFodselsnummer class includes an `IdentifierType` property which returns a `NoIdentifierType` enumeration value that
+NoFoedselsnummer class includes an `IdentifierType` property which returns a `NoIdentifierType` enumeration value that
 indicates the exact type of identifier represented.
 
 Fødselsnummer and D-nummer are both 11 digit numbers formatted as DDMMYYIIICC, with the following elements:
 * DDMMYY - the person's date of birth in DDMMYY format. The only difference between a fødselsnummer and a D-nummer is
- that 4 is added to the first digit of the person's date of birth (i.e. 130585 becomes 530485). Day values in the range
+ that 4 is added to the first digit of the person's date of birth (i.e. 130585 becomes 530585). Day values in the range
  41-71 (inclusive) are considered D-nummers.
 * III - three digit individual number. All three digits of the individual number are used to derive the century of the
  date of birth and the last digit of the individual number indicates the person's gender, with odd digits assigned to
@@ -159,7 +159,7 @@ Example values:
 * 13029597140 - fødselsnummer, date of birth February 13, 1995, gender = female, check digits 40
 * 130295 97140 - fødselsnummer, date of birth February 13, 1995, gender = female, check digits 40
 * 60055029566 - D-nummer, date of birth May 20, 1950, gender = male, check digits 66
-* 60055-029566 - D-nummer, date of birth May 20, 1950, gender = male, check digits 66
+* 600550-29566 - D-nummer, date of birth May 20, 1950, gender = male, check digits 66
 
 The rules for deriving the century of birth are somewhat complicated due to additional requirements being layered
 upon the individual number element over time. `NoFoedselsnummer` uses rules described in this
