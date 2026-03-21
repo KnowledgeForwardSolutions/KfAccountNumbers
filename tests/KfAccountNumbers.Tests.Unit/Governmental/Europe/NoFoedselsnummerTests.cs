@@ -587,6 +587,193 @@ public class NoFoedselsnummerTests
 
    #endregion
 
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void NoFoedselsnummer_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid11CharacterFoedselsnummer;
+      var sut = new NoFoedselsnummer(value);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(value);
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid12CharacterDNummer;
+      var sut = new NoFoedselsnummer(value);
+      var expected = GetRawFoedselsnummer(value);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      NoFoedselsnummer foedselsnummer = null!;
+
+      // Act.
+      String str = foedselsnummer;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      NoFoedselsnummer foedselsnummer = null!;
+
+      // Act.
+      String str = foedselsnummer;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidFoedselsnummerValues))]
+   [MemberData(nameof(ValidDNummerValues))]
+   public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawFoedselsnummer(value);
+
+      // Act.
+      var sut = (NoFoedselsnummer)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSeparators))]
+   public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldCreateInstance_WhenValueHasValidSeparator(String separator)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
+      var expected = GetRawFoedselsnummer(value);
+
+      // Act.
+      var sut = (NoFoedselsnummer)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDateOfBirthValues))]
+   public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
+      String dateOfBirth,
+      String individualNumber)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         individualNumber: individualNumber);
+      var expected = GetRawFoedselsnummer(value);
+
+      // Act.
+      var sut = (NoFoedselsnummer)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => _ = (NoFoedselsnummer)value)
+         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
+         .WithMessage(Messages.NoFoedselsnummerEmpty + "*")
+         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => _ = (NoFoedselsnummer)value)
+         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
+         .WithMessage(Messages.NoFoedselsnummerInvalidLength + "*")
+         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidNonDigitCharacter(String value)
+      => FluentActions
+         .Invoking(() => _ = (NoFoedselsnummer)value)
+         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
+         .WithMessage(Messages.NoFoedselsnummerInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
+      => FluentActions
+         .Invoking(() => _ = (NoFoedselsnummer)value)
+         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
+         .WithMessage(Messages.NoFoedselsnummerInvalidCheckDigits + "*")
+         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidCheckDigits);
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparators))]
+   public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String separator)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (NoFoedselsnummer)value)
+         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
+         .WithMessage(Messages.NoFoedselsnummerInvalidSeparator + "*")
+         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidSeparator);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      String individualNumber)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         individualNumber: individualNumber);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (NoFoedselsnummer)value)
+         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
+         .WithMessage(Messages.NoFoedselsnummerInvalidDateOfBirth + "*")
+         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidDateOfBirth);
+   }
+
+   #endregion
+
    #region Equality Operator Tests
    // ==========================================================================
    // ==========================================================================

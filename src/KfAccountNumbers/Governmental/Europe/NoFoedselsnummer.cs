@@ -293,6 +293,12 @@ public record NoFoedselsnummer
    /// </summary>
    public String Value { get; private init; }
 
+   public static implicit operator String(NoFoedselsnummer foedselsnummer)
+      => foedselsnummer?.Value ?? String.Empty;     // Handle null foedselsnummer object gracefully by returning empty string
+
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator NoFoedselsnummer(String? foedselsnummer) => new(foedselsnummer);
+
    /// <summary>
    ///   Create a new <see cref="NoFoedselsnummer"/>.
    /// </summary>
