@@ -224,14 +224,24 @@ A valid personnummer or samordningsnummer must meet all of the following rules:
 Note that the encoded date of birth may not be the person's actual date of birth. It is possible to run out of birth
 serial numbers for a particular day and in this case a day close to the actual date of birth is substituted in its stead.
 
-When determining if a date of birth is valid, YYMMDD format dates are assumed to be in the 20th century (1900-1999). The
-reason for this assumption is that the YYYYMMDD format was introduced in 1997, presumably as part of Y2K preparations.
-The practical impact of this assumption is that the YYMMDD format date "000229" will always be considered invalid because
-1900 is not a leap year. (The opposite would be true if "00" represented the year 2000, which is a leap year because of
-the century divisible by 400 rule for leap years).
+When determining if a date of birth is valid, values with six digit dates of birth use the separator character to derive
+the full four digit year. Year values between 00 and 49 are assumed to be 2000 to 2049 and year values between 50 and 99
+are assumed to be 1950 to 1999. If the separator character indicates that the person is at least 100 years of age, then
+100 is subtracted from the year, resulting in 00 to 40 meaning 1900 to 1949 and 50 to 99 meaning 1850 to 1899.
 
 For samordningsnummer values, the value returned by the `DateOfBirth` property is an actual date calculated by
 subtracting 60 from the encoded date of birth.
+
+Internally, `SePersonnummer` only stores the 12 digits of the date of birth (in YYYYMMDD format), the birth serial number
+and the check digit. The `Value` property and the `ToString` method will only return those 12 digits. `SePersonnummer`
+also exposes `ToShortFormat` and `ToLongFormat` methods that will return 11 and 13 character strings including a '-'
+separator character. The `ToShortFormat` and `ToLongFormat` methods also allow an optional parameter of type `System.TimeProvider`
+that can be used to ensure that the separator character used is either a '-' or a '+', depending on the age of the
+person according to the time provider.
+
+When comparing two `SePersonnummer` objects for equality, the internal 12 digit representation is used. This means that
+two `SePersonnummer` objects representing the same person will be considered equal, even if one was created using a six
+digit date of birth and the other an eight digit date of birth.
 
 Example Values:
 * 890201-3286 - Personnummer, date of birth 890201, less than 100 years old, gender = female, check digit = 6.
