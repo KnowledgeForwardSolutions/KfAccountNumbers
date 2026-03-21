@@ -322,6 +322,14 @@ public record NoFoedselsnummer
    }
 
    /// <summary>
+   ///   Get a string representation of the fødselsnummer.
+   /// </summary>
+   /// <remarks>
+   ///   Will return the raw fødselsnummer, without a separator character.
+   /// </remarks>
+   public override String ToString() => Value;
+
+   /// <summary>
    ///   Check the <paramref name="foedselsnummer"/> to determine if it contains a
    ///   valid Norwegian national identity number (fødselsnummer) value.
    /// </summary>

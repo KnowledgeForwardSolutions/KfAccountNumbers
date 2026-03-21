@@ -1010,6 +1010,137 @@ public class NoFoedselsnummerTests
 
    #endregion
 
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void NoFoedselsnummer_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var foedselsnummer2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+
+      // Act/assert.
+      foedselsnummer1.Equals(foedselsnummer2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var foedselsnummer2 = new NoFoedselsnummer(AltValid11CharacterFoedselsnummer);
+
+      // Act/assert.
+      foedselsnummer1.Equals(foedselsnummer2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 11 and 12 character versions for same person should still be equal.
+      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var foedselsnummer2 = new NoFoedselsnummer(Valid12CharacterFoedselsnummer);
+
+      // Act/assert.
+      foedselsnummer1.Equals(foedselsnummer2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void NoFoedselsnummer_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var foedselsnummer2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+
+      // Act.
+      var hash1 = foedselsnummer1.GetHashCode();
+      var hash2 = foedselsnummer2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterDNummer);
+      var foedselsnummer2 = new NoFoedselsnummer(AltValid11CharacterDNummer);
+
+      // Act.
+      var hash1 = foedselsnummer1.GetHashCode();
+      var hash2 = foedselsnummer2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   [Fact]
+   public void NoFoedselsnummer_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 11 and 13 character versions for same person should still be equal.
+      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var foedselsnummer2 = new NoFoedselsnummer(Valid12CharacterFoedselsnummer);
+
+      // Act.
+      var hash1 = foedselsnummer1.GetHashCode();
+      var hash2 = foedselsnummer2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // NoFoedselsnummer does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void NoFoedselsnummer_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var foedselsnummer2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+
+      // Act/assert.
+      (foedselsnummer1 == foedselsnummer2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(foedselsnummer1, foedselsnummer2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidFoedselsnummerValues))]
+   [MemberData(nameof(ValidDNummerValues))]
+   public void NoFoedselsnummer_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new NoFoedselsnummer(value);
+      var expected = GetRawFoedselsnummer(value);
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
