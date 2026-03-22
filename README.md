@@ -229,6 +229,9 @@ the full four digit year. Year values between 00 and 49 are assumed to be 2000 t
 are assumed to be 1950 to 1999. If the separator character indicates that the person is at least 100 years of age, then
 100 is subtracted from the year, resulting in 00 to 40 meaning 1900 to 1949 and 50 to 99 meaning 1850 to 1899.
 
+The valid range for a date of birth is January 1, 1800 to December 31, 2099. However, when using a six digit date of
+birth, the above rule limits the valid range to January 1, 1850 to December 31 2049.
+
 For samordningsnummer values, the value returned by the `DateOfBirth` property is an actual date calculated by
 subtracting 60 from the encoded date of birth.
 

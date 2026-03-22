@@ -163,14 +163,18 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      birth is substituted in its stead.
 ///   </para>
 ///   <para>
-///      When determining if a date of birth is valid, YYMMDD format dates are
-///      assumed to be in the 20th century (1900-1999). The reason for this
-///      assumption is that the YYYYMMDD format was introduced in 1997,
-///      presumably as part of Y2K preparations. The practical impact of this
-///      assumption is that the YYMMDD format date "000229" will always be
-///      considered invalid because 1900 is not a leap year. (The opposite
-///      would be true if "00" represented the year 2000, which is a leap
-///      year because of the century divisible by 400 rule for leap years).
+///      When validating the date of birth, 13 character strings only use the
+///      initial eight characters in YYYYMMDD format to determine the date.
+///      For 11 character strings the initial six characters in YYMMDD format
+///      plus the separator character are used to determine the date. Two digit
+///      years are assumed to be between 1950 and 2049. If the separator
+///      character indicates that the person is 100 years of age or older, then
+///      the year is assumed to be between 1850 and 1949.
+///   </para>
+///   <para>
+///      The valid range for a date of birth is January 1, 1800 to
+///      December 31, 2099. However, if a six digit date if birth is supplied
+///      then the valid range will be between January 1, 1850 to December 31, 2049.
 ///   </para>
 ///   <para>
 ///      For samordningsnummer values, the value returned by the
@@ -192,10 +196,9 @@ public record SePersonnummer
    // because the date of birth has variable length.
    private const Int32 DateOfBirthOffset = 5;                  // Range end index is exclusive so -1 from expected offset from end
    private const Int32 SeparatorOffset = 5;
-   private const Int32 BirthSerialNumberStartOffset = 4;
-   private const Int32 BirthSerialNumberEndOffset = 1;         // Range end index is exclusive
    private const Int32 GenderOffset = 2;
 
+   private const Int32 CenturyCutoff = 49;                     // Values < 50 considered 2000's, >= 50 considered 1900's
    private const Int32 SamordningsnummerDayOffset = 60;
 
    /// <summary>
@@ -387,6 +390,23 @@ public record SePersonnummer
       {
          return SePersonnummerValidationResult.InvalidLength;
       }
+
+      // After performing basic checks, validate the check digit because the
+      // most common source of errors will be data entry errors. Then validate
+      // the subcomponents of the value.
+      if (!ValidateCheckDigit(personnummer))
+      {
+         return ValidateAllDigits(personnummer)
+            ? SePersonnummerValidationResult.InvalidCheckDigit
+            : SePersonnummerValidationResult.InvalidCharacter;
+      }
+      else if (personnummer.Length == LongFormatLength
+               && (!personnummer[0].IsAsciiDigit() || !personnummer[1].IsAsciiDigit()))
+      {
+         // Check digit does not consider leading two digits for 13 character strings.
+         // So validate here.
+         return SePersonnummerValidationResult.InvalidCharacter;
+      }
       else if (GetSeparator(personnummer) is not Chars.Dash and not Chars.Plus)
       {
          return SePersonnummerValidationResult.InvalidSeparator;
@@ -395,21 +415,9 @@ public record SePersonnummer
       {
          return SePersonnummerValidationResult.InvalidDateOfBirth;
       }
-      else if (!ValidateBirthSerialNumber(personnummer))
-      {
-         return SePersonnummerValidationResult.InvalidBirthSerialNumber;
-      }
-      else if (!ValidateCheckDigit(personnummer))
-      {
-         return SePersonnummerValidationResult.InvalidCheckDigit;
-      }
 
       return SePersonnummerValidationResult.ValidationPassed;
    }
-
-   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static ReadOnlySpan<Char> GetBirthSerialNumber(ReadOnlySpan<Char> personnummer)
-      => personnummer[^BirthSerialNumberStartOffset..^BirthSerialNumberEndOffset];
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static ReadOnlySpan<Char> GetDateOfBirth(ReadOnlySpan<Char> personnummer)
@@ -426,15 +434,20 @@ public record SePersonnummer
       Int32 day;
       if (personnummer.Length == ShortFormatLength)
       {
-         // Assume that short format personnummer values are for people born in
-         // the 20th century, as long format personnummer was introduced in 1997,
-         // presumably as part of Y2K preparations.
-         year = 1900 + personnummer.ParseTwoDigits();
+         // Refer to class XML comments for details of 2 digit year calculations.
+         year = personnummer.ParseTwoDigits();
+         year += year > CenturyCutoff ? 1900 : 2000;
+         if (GetSeparator(personnummer) == Chars.Plus)
+         {
+            year -= 100;
+         }
          month = personnummer[2..].ParseTwoDigits();
          day = personnummer[4..].ParseTwoDigits();
       }
       else
       {
+         // This works for both 13 character values with separator and 12 character
+         // all digit internal representation.
          var century = personnummer.ParseTwoDigits() * 100;
          year = century + personnummer[2..].ParseTwoDigits();
          month = personnummer[4..].ParseTwoDigits();
@@ -449,16 +462,34 @@ public record SePersonnummer
 
       return (year, month, day);
    }
-   private static Boolean ValidateBirthSerialNumber(ReadOnlySpan<Char> personnummer)
+
+   /// <summary>
+   ///   If <see cref="ValidateCheckDigit(String)"/> returns false, determine
+   ///   if the reason was an invalid character or an invalid check digit.
+   /// </summary>
+   private static Boolean ValidateAllDigits(ReadOnlySpan<Char> personnummer)
    {
-      ReadOnlySpan<Char> birthSerialNumberSpan = GetBirthSerialNumber(personnummer);
-      foreach (var ch in birthSerialNumberSpan)
+      const Int32 yymmddLength = 6;
+      const Int32 yyyymmddLength = 8;
+
+      var processLength = personnummer.Length;
+      var separatorIndex = processLength == ShortFormatLength
+         ? yymmddLength
+         : yyyymmddLength;
+
+      for(var index = 0; index < processLength; index ++)
       {
-         if (!Char.IsAsciiDigit(ch))
+         if (index == separatorIndex)
+         {
+            continue;
+         }
+
+         if (!personnummer[index].IsAsciiDigit())
          {
             return false;
          }
       }
+
 
       return true;
    }
@@ -473,6 +504,9 @@ public record SePersonnummer
 
    private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> personnummer)
    {
+      const Int32 minimumValidYear = 1800;
+      const Int32 maximumValidYear = 2099;
+
       ReadOnlySpan<Char> dateOfBirthSpan = GetDateOfBirth(personnummer);
       foreach (var ch in dateOfBirthSpan)
       {
@@ -487,7 +521,7 @@ public record SePersonnummer
       var (year, month, day) = GetYearMonthDay(personnummer);
 #pragma warning restore IDE0008 // Use explicit type
 
-      if (year is < 1900 or > 2099)
+      if (year < minimumValidYear || year > maximumValidYear)
       {
          return false;
       }

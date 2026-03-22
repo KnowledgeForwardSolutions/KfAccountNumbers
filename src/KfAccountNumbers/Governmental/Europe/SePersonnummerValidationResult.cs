@@ -25,11 +25,16 @@ public enum SePersonnummerValidationResult
    InvalidLength,
 
    /// <summary>
-   ///   Character positions 0-5 (zero-based, for YYMMDD format) are not a
-   ///   valid 6 digit date of birth or character positions 0-7 (zero-based,
-   ///   for YYYYMMDD format) are not a valid 8 digit date of birth.
+   ///   The value contains a non-digit character in where a digit was expected.
    /// </summary>
-   InvalidDateOfBirth,
+   InvalidCharacter,
+
+   /// <summary>
+   ///   Character position 10 (zero-based, for YYMMDD format) or position 12
+   ///   (zero-based, for YYYYMMDD format) is not a valid check digit character
+   ///   according to the Luhn algorithm.
+   /// </summary>
+   InvalidCheckDigit,
 
    /// <summary>
    ///   Character position 6 (zero-based, for YYMMDD format) or position 8
@@ -39,17 +44,11 @@ public enum SePersonnummerValidationResult
    InvalidSeparator,
 
    /// <summary>
-   ///   Character positions 7-9 (zero-based, for YYMMDD format) or positions
-   ///   9-11 (zero-based, for YYYYMMDD format) contain a non-digit character.
+   ///   Character positions 0-5 (zero-based, for YYMMDD format) are not a
+   ///   valid 6 digit date of birth or character positions 0-7 (zero-based,
+   ///   for YYYYMMDD format) are not a valid 8 digit date of birth.
    /// </summary>
-   InvalidBirthSerialNumber,
-
-   /// <summary>
-   ///   Character position 10 (zero-based, for YYMMDD format) or position 12
-   ///   (zero-based, for YYYYMMDD format) is not a valid check digit character
-   ///   according to the Luhn algorithm.
-   /// </summary>
-   InvalidCheckDigit
+   InvalidDateOfBirth,
 }
 
 /// <summary>
@@ -62,10 +61,10 @@ public static class SePersonnummerValidationResultExtensions
       {
          SePersonnummerValidationResult.Empty => Messages.SePersonnummerEmpty,
          SePersonnummerValidationResult.InvalidLength => Messages.SePersonnummerInvalidLength,
-         SePersonnummerValidationResult.InvalidDateOfBirth => Messages.SePersonnummerInvalidDateOfBirth,
-         SePersonnummerValidationResult.InvalidSeparator => Messages.SePersonnummerInvalidSeparator,
-         SePersonnummerValidationResult.InvalidBirthSerialNumber => Messages.SePersonnummerInvalidBirthSerialNumber,
+         SePersonnummerValidationResult.InvalidCharacter => Messages.SePersonnummerInvalidCharacter,
          SePersonnummerValidationResult.InvalidCheckDigit => Messages.SePersonnummerInvalidCheckDigit,
+         SePersonnummerValidationResult.InvalidSeparator => Messages.SePersonnummerInvalidSeparator,
+         SePersonnummerValidationResult.InvalidDateOfBirth => Messages.SePersonnummerInvalidDateOfBirth,
          SePersonnummerValidationResult.ValidationPassed => Messages.ValidationPassed,
          _ => throw new SwitchExpressionException()
       };

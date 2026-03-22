@@ -430,21 +430,16 @@ public record NoFoedselsnummer
    }
 
    private static Int32 GetIntegerIndividualNumber(ReadOnlySpan<Char> foedselsnummer)
-      => (foedselsnummer[^IndividualNumberOffset] - Chars.DigitZero) * 100
-         + (foedselsnummer[^(IndividualNumberOffset - 1)] - Chars.DigitZero) * 10         // Decrement offset value (measuring from end, so subtract to move right)
+      => ((foedselsnummer[^IndividualNumberOffset] - Chars.DigitZero) * 100)
+         + ((foedselsnummer[^(IndividualNumberOffset - 1)] - Chars.DigitZero) * 10)         // Decrement offset value (measuring from end, so subtract to move right)
          + (foedselsnummer[^(IndividualNumberOffset - 2)] - Chars.DigitZero);
 
    private static String GetRawFoedselsnummer(String foedselsnummer)
-   {
-      if (foedselsnummer.Length == NoSeparatorLength)
-      {
-         return foedselsnummer;
-      }
-
-      return String.Concat(
-         foedselsnummer.AsSpan(0, SeparatorOffset),
-         foedselsnummer.AsSpan(SeparatorOffset + 1));
-   }
+      => foedselsnummer.Length == NoSeparatorLength
+         ? foedselsnummer
+         : String.Concat(
+            foedselsnummer.AsSpan(0, SeparatorOffset),
+            foedselsnummer.AsSpan(SeparatorOffset + 1));
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean IsFormatted(ReadOnlySpan<Char> foedselsnummer)
@@ -488,7 +483,9 @@ public record NoFoedselsnummer
       const Int32 minimumValidYear = 1854;      // Per rules on the effect of the individual number on century
       const Int32 maximumValidYear = 2039;      // "
 
+#pragma warning disable IDE0008 // Use explicit type
       var (day, month, year) = GetDayMonthYear(foedselsnummer);
+#pragma warning restore IDE0008 // Use explicit type
 
       if (year < minimumValidYear || year > maximumValidYear)
       {
