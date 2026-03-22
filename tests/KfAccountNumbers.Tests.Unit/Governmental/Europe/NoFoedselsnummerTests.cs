@@ -1,6 +1,8 @@
 // Ignore Spelling: Deserialize Deserialization Foedselsnummer Json Kf Nummer
 
 #pragma warning disable IDE0008 // Use explicit type
+#pragma warning disable IDE0058 // Expression value is never used
+#pragma warning disable CA2211 // Non-constant fields should not be visible
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 

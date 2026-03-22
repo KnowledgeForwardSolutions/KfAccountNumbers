@@ -2,6 +2,7 @@
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
+#pragma warning disable CA2211 // Non-constant fields should not be visible
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -16,13 +17,6 @@ public class SePersonnummerTests
    private const String Valid11CharacterPlusSamordningsnummer = "811288+9871";
    private const String Valid13CharacterDashSamordningsnummer = "19670979-9537";
    private const String Valid13CharacterPlusSamordningsnummer = "20670979+9537"; // Future date, but valid format and checksum
-
-   private static String GetPersonnummer(
-      String dateOfBirth = "811228",
-      Char separator = '-',
-      String birthSerialNumber = "987",
-      Char checkDigit = '4')
-      => $"{dateOfBirth}{separator}{birthSerialNumber}{checkDigit}";
 
    private static String GetPersonnummerWithValidCheckDigit(
       String dateOfBirth = "811228",
@@ -51,12 +45,17 @@ public class SePersonnummerTests
       Valid13CharacterPlusSamordningsnummer
    ];
 
-   public static TheoryData<String> InvalidLengthValues =>
+   public static TheoryData<String> UndetectableCheckDigitErrors =>
    [
-      "811228-987",        // Length 10
-      "811228-98745",      // Length 12
-      "19811228-98745",    // Length 14
-      new String('1', 100) // Very long string
+      "010430-0918",       // 010430-9018 with two digit transposition 90 -> 09
+      "880411+2558",       // 880411+2228 with two digit twin error 22 -> 55
+      "20010430-0918",     // 20010430-9018 with two digit transposition 90 -> 09
+      "19880411-2558",     // 19880411+2228 with two digit twin error 22 -> 55
+
+      "010490-0915",       // 010490-9015 with two digit transposition 90 -> 09
+      "880471+2555",       // 880471+2225 with two digit twin error 22 -> 55
+      "20010490-0915",     // 20010490-9015 with two digit transposition 90 -> 09
+      "19880471-2555",     // 19880471+2225 with two digit twin error 22 -> 55
    ];
 
    public static TheoryData<String, Char> ValidDateOfBirthValues = new()
@@ -163,6 +162,14 @@ public class SePersonnummerTests
       { "20121291", '-' },       // Max day of month December 2012
    };
 
+   public static TheoryData<String> InvalidLengthValues =>
+   [
+      "811228-987",        // Length 10
+      "811228-98745",      // Length 12
+      "19811228-98745",    // Length 14
+      new String('1', 100) // Very long string
+   ];
+
    public static TheoryData<String> InvalidCharacterValues =>
    [
       "A11228-9874",          // Non-digit character 'A'
@@ -190,6 +197,112 @@ public class SePersonnummerTests
       "19811228-987~",        // Non-digit character '~'
    ];
 
+   public static TheoryData<String> InvalidCheckDigitValues =>
+   [
+      "811228-9875",       // 811228-9874 with invalid check digit 4 -> 5
+      "811227-9874",       // 811228-9874 with single digit transcription error 8 -> 7
+      "821228-9874",       // 811228-9874 with single digit transcription error 1 -> 2
+      "181228-9874",       // 811228-9874 with two digit transcription error 81 -> 18
+      "811228-9847",       // 811228-9874 with two digit transcription error 74 -> 47
+      "880422+1238",       // 880411+1238 with two digit twin error 11 -> 22
+      "880411+3328",       // 880411+2228 with two digit twin error 22 -> 33
+      "19811228-9875",     // 19811228-9874 with invalid check digit 4 -> 5
+      "19811227-9874",     // 19811228-9874 with single digit transcription error 8 -> 7
+      "20821228-9874",     // 20811228-9874 with single digit transcription error 1 -> 2
+      "20181228-9874",     // 20811228-9874 with two digit transcription error 81 -> 18
+      "19811228-9847",     // 19811228-9874 with two digit transcription error 74 -> 47
+      "19880422+1238",     // 19880411+1238 with two digit twin error 11 -> 22
+      "19880411+3328",     // 19880411+2228 with two digit twin error 22 -> 33
+   ];
+
+   public static TheoryData<String> InvalidSeparatorValues =>
+   [
+      "811228*9874",
+      "19811228*9874"
+   ];
+
+   public static TheoryData<String, Char> InvalidDateOfBirthValues = new()
+   {
+      { "010001", '+' },      // Invalid month (too low)
+      { "011301", '-' },      // Invalid month (too high)
+      { "010100", '+' },      // Invalid day of month (too low)
+      { "010132", '-' },      // Invalid day of month January
+      { "010229", '+' },      // Invalid day of month February (non leap year)
+      { "000229", '+' },      // Invalid day of month February (1900 is not a leap year)
+      { "040230", '+' },      // Invalid day of month February (leap year)
+      { "010332", '-' },      // Invalid day of month March
+      { "010431", '+' },      // Invalid day of month April
+      { "010532", '-' },      // Invalid day of month May
+      { "010631", '+' },      // Invalid day of month June
+      { "010732", '-' },      // Invalid day of month July
+      { "010832", '+' },      // Invalid day of month August
+      { "010931", '-' },      // Invalid day of month September
+      { "011032", '+' },      // Invalid day of month October
+      { "011131", '-' },      // Invalid day of month November
+      { "011232", '+' },      // Invalid day of month December
+
+      { "17991232", '+' },    // Invalid year (too low)
+      { "21010101", '-' },    // Invalid year (too high)
+
+      { "19010001", '+' },    // Invalid month (too low)
+      { "20011301", '-' },    // Invalid month (too high)
+      { "19010100", '+' },    // Invalid day of month (too low)
+      { "20010132", '-' },    // Invalid day of month January
+      { "19010229", '+' },    // Invalid day of month February (non leap year)
+      { "19000229", '+' },    // Invalid day of month February (1900 is not a leap year)
+      { "19040230", '+' },    // Invalid day of month February (leap year)
+      { "20010332", '-' },    // Invalid day of month March
+      { "19010431", '+' },    // Invalid day of month April
+      { "20010532", '-' },    // Invalid day of month May
+      { "19010631", '+' },    // Invalid day of month June
+      { "20010732", '-' },    // Invalid day of month July
+      { "19010832", '+' },    // Invalid day of month August
+      { "20010931", '-' },    // Invalid day of month September
+      { "19011032", '+' },    // Invalid day of month October
+      { "20011131", '-' },    // Invalid day of month November
+      { "19011232", '+' },    // Invalid day of month December
+
+      // Repeat for samordningsnummer.
+      { "010061", '+' },      // Invalid month (too low)
+      { "011361", '-' },      // Invalid month (too high)
+      { "010160", '+' },      // Invalid day of month (too low)
+      { "010192", '-' },      // Invalid day of month January
+      { "010289", '+' },      // Invalid day of month February (non leap year)
+      { "000289", '+' },      // Invalid day of month February (1900 is not a leap year)
+      { "040290", '+' },      // Invalid day of month February (leap year)
+      { "010392", '-' },      // Invalid day of month March
+      { "010491", '+' },      // Invalid day of month April
+      { "010592", '-' },      // Invalid day of month May
+      { "010691", '+' },      // Invalid day of month June
+      { "010792", '-' },      // Invalid day of month July
+      { "010892", '+' },      // Invalid day of month August
+      { "010991", '-' },      // Invalid day of month September
+      { "011092", '+' },      // Invalid day of month October
+      { "011191", '-' },      // Invalid day of month November
+      { "011292", '+' },      // Invalid day of month December
+
+      { "17991292", '+' },    // Invalid year (too low)
+      { "21010161", '-' },    // Invalid year (too high)
+
+      { "19010061", '+' },    // Invalid month (too low)
+      { "20011361", '-' },    // Invalid month (too high)
+      { "19010160", '+' },    // Invalid day of month (too low)
+      { "20010192", '-' },    // Invalid day of month January
+      { "19010289", '+' },    // Invalid day of month February (non leap year)
+      { "19000289", '+' },    // Invalid day of month February (1900 is not a leap year)
+      { "19040290", '+' },    // Invalid day of month February (leap year)
+      { "20010392", '-' },    // Invalid day of month March
+      { "19010491", '+' },    // Invalid day of month April
+      { "20010592", '-' },    // Invalid day of month May
+      { "19010691", '+' },    // Invalid day of month June
+      { "20010792", '-' },    // Invalid day of month July
+      { "19010892", '+' },    // Invalid day of month August
+      { "20010991", '-' },    // Invalid day of month September
+      { "19011092", '+' },    // Invalid day of month October
+      { "20011191", '-' },    // Invalid day of month November
+      { "19011292", '+' },    // Invalid day of month December
+   };
+
    public static TheoryData<String> InvalidSixDigitPersonnummerDateOfBirthValues =>
    [
       "010001",            // Invalid month (too low)
@@ -211,112 +324,35 @@ public class SePersonnummerTests
       "011232",            // Invalid day of month December
    ];
 
-   public static TheoryData<String> InvalidSixDigitSamordningsnummerDateOfBirthValues =>
-   [
-      "010160",            // Invalid day of month (too low)
-      "010192",            // Invalid day of month January
-      "010289",            // Invalid day of month February (non leap year)
-      "000289",            // Invalid day of month February (1900 is not a leap year)
-      "040290",            // Invalid day of month February (leap year)
-      "010392",            // Invalid day of month March
-      "010491",            // Invalid day of month April
-      "010592",            // Invalid day of month May
-      "010691",            // Invalid day of month June
-      "010792",            // Invalid day of month July
-      "010892",            // Invalid day of month August
-      "010991",            // Invalid day of month September
-      "011092",            // Invalid day of month October
-      "011191",            // Invalid day of month November
-      "011292",            // Invalid day of month December
-   ];
+   #region Constants Tests
+   // ==========================================================================
+   // ==========================================================================
 
-   public static TheoryData<String> InvalidEightDigitPersonnummerDateOfBirthValues =>
-   [
-      "18811228",          // Invalid century (too low)
-      "21811228",          // Invalid century (too high)
-      "19810028",          // Invalid month (too low)
-      "19811328",          // Invalid month (too high)
-      "19810100",          // Invalid day of month (too low)
-      "19810132",          // Invalid day of month January
-      "19810229",          // Invalid day of month February (non leap year)
-      "19000229",          // Invalid day of month February (1900 is not a leap year)
-      "20040230",          // Invalid day of month February (leap year)
-      "19810332",          // Invalid day of month March
-      "19810431",          // Invalid day of month April
-      "19810532",          // Invalid day of month May
-      "20810631",          // Invalid day of month June
-      "20810732",          // Invalid day of month July
-      "20810832",          // Invalid day of month August
-      "20810931",          // Invalid day of month September
-      "20811032",          // Invalid day of month October
-      "20811131",          // Invalid day of month November
-      "20811232",          // Invalid day of month December
-   ];
+   [Fact]
+   public void SePersonnummer_AboveCutoffCentury_ShouldHaveExpectedValue()
+      => SePersonnummer.AboveCutoffCentury.Should().Be(1900);
 
-   public static TheoryData<String> InvalidEightDigitSamordningsnummerDateOfBirthValues =>
-   [
-      "19010160",          // Invalid day of month (too low)
-      "19010192",          // Invalid day of month January
-      "19010289",          // Invalid day of month February (non leap year)
-      "19000289",          // Invalid day of month February (1900 is not a leap year)
-      "19040290",          // Invalid day of month February (leap year)
-      "19010392",          // Invalid day of month March
-      "19010491",          // Invalid day of month April
-      "19010592",          // Invalid day of month May
-      "20010691",          // Invalid day of month June
-      "20010792",          // Invalid day of month July
-      "20010892",          // Invalid day of month August
-      "20010991",          // Invalid day of month September
-      "20011092",          // Invalid day of month October
-      "20011191",          // Invalid day of month November
-      "20011292",          // Invalid day of month December
-   ];
+   [Fact]
+   public void SePersonnummer_BelowCutoffCentury_ShouldHaveExpectedValue()
+      => SePersonnummer.BelowCutoffCentury.Should().Be(2000);
 
-   public static TheoryData<String> InvalidSeparatorValues =>
-   [
-      "811228*9874",
-      "19811228*9874"
-   ];
+   [Fact]
+   public void SePersonnummer_CenturyCutoff_ShouldHaveExpectedValue()
+      => SePersonnummer.CenturyCutoff.Should().Be(49);
 
-   public static TheoryData<String> InvalidBirthSerialNumberValues =>
-   [
-      "A87",               // Non-digit character 'A'
-      "9B7",               // Non-digit character 'B'
-      "98!",               // Non-digit character '!'
-      "98 ",               // Non-digit character ' '
-      "98\u2153",          // Non-digit character Unicode fraction 1/3
-   ];
+   [Fact]
+   public void SePersonnummer_MinimumValidYearOfBirth_ShouldHaveExpectedValue()
+      => SePersonnummer.MinimumValidYearOfBirth.Should().Be(1800);
 
-   public static TheoryData<String> UndetectableCheckDigitErrors =>
-   [
-      "010430-0918",       // 010430-9018 with two digit transposition 90 -> 09
-      "880411+2558",       // 880411+2228 with two digit twin error 22 -> 55
-      "20010430-0918",     // 20010430-9018 with two digit transposition 90 -> 09
-      "19880411-2558",     // 19880411+2228 with two digit twin error 22 -> 55
+   [Fact]
+   public void SePersonnummer_MaximumValidYearOfBirth_ShouldHaveExpectedValue()
+      => SePersonnummer.MaximumValidYearOfBirth.Should().Be(2099);
 
-      "010490-0915",       // 010490-9015 with two digit transposition 90 -> 09
-      "880471+2555",       // 880471+2225 with two digit twin error 22 -> 55
-      "20010490-0915",     // 20010490-9015 with two digit transposition 90 -> 09
-      "19880471-2555",     // 19880471+2225 with two digit twin error 22 -> 55
-   ];
+   [Fact]
+   public void SePersonnummer_SamordningsnummerOffset_ShouldHaveExpectedValue()
+      => SePersonnummer.SamordningsnummerDayOffset.Should().Be(60);
 
-   public static TheoryData<String> InvalidCheckDigitValues =>
-   [
-      "811228-9875",       // 811228-9874 with invalid check digit 4 -> 5
-      "811227-9874",       // 811228-9874 with single digit transcription error 8 -> 7
-      "821228-9874",       // 811228-9874 with single digit transcription error 1 -> 2
-      "181228-9874",       // 811228-9874 with two digit transcription error 81 -> 18
-      "811228-9847",       // 811228-9874 with two digit transcription error 74 -> 47
-      "880422+1238",       // 880411+1238 with two digit twin error 11 -> 22
-      "880411+3328",       // 880411+2228 with two digit twin error 22 -> 33
-      "19811228-9875",     // 19811228-9874 with invalid check digit 4 -> 5
-      "19811227-9874",     // 19811228-9874 with single digit transcription error 8 -> 7
-      "20821228-9874",     // 20811228-9874 with single digit transcription error 1 -> 2
-      "20181228-9874",     // 20811228-9874 with two digit transcription error 81 -> 18
-      "19811228-9847",     // 19811228-9874 with two digit transcription error 74 -> 47
-      "19880422+1238",     // 19880411+1238 with two digit twin error 11 -> 22
-      "19880411+3328",     // 19880411+2228 with two digit twin error 22 -> 33
-   ];
+   #endregion
 
    #region Constructor Tests
    // ==========================================================================
@@ -412,18 +448,19 @@ public class SePersonnummerTests
          .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidSeparator);
 
    [Theory]
-   [MemberData(nameof(InvalidSixDigitPersonnummerDateOfBirthValues))]
-   [MemberData(nameof(InvalidEightDigitPersonnummerDateOfBirthValues))]
-   [MemberData(nameof(InvalidSixDigitSamordningsnummerDateOfBirthValues))]
-   [MemberData(nameof(InvalidEightDigitSamordningsnummerDateOfBirthValues))]
-   public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(String dateOfBirth)
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      Char separator)
    {
       // Arrange.
-      var personnummer = GetPersonnummerWithValidCheckDigit(dateOfBirth: dateOfBirth);
+      var value = GetPersonnummerWithValidCheckDigit(
+         dateOfBirth: dateOfBirth,
+         separator: separator);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new SePersonnummer(personnummer))
+         .Invoking(() => new SePersonnummer(value))
          .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
          .WithMessage(Messages.SePersonnummerInvalidDateOfBirth + "*")
          .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidDateOfBirth);
@@ -436,45 +473,76 @@ public class SePersonnummerTests
    // ==========================================================================
 
    [Theory]
-   [InlineData("000101", "19000101")]     // Jan 1, 1900
-   [InlineData("991231", "19991231")]     // Dec 31, 1999
-   [InlineData("000228", "19000228")]     // Max day of month February (non leap year)
-   [InlineData("040229", "19040229")]     // Max day of month February (leap year)
+   [InlineData("500101", '+', "18500101")]      // Minimum six digit date of birth, January 1, 1850
+   [InlineData("491231", '-', "20491231")]      // Maximum six digit date of birth, December 31, 2049
 
-   [InlineData("19000101", "19000101")]   // Jan 1, 1900
-   [InlineData("19991231", "19991231")]   // Dec 31, 1999
-   [InlineData("20000101", "20000101")]   // Jan 1, 2000
-   [InlineData("20991231", "20991231")]   // Dec 31, 2099
+   [InlineData("991231", '+', "18991231")]      // December 31, 1899
+   [InlineData("000101", '+', "19000101")]      // January 1, 1900
+   [InlineData("991231", '-', "19991231")]      // December 31, 1999
+   [InlineData("000101", '-', "20000101")]      // January 1, 2000
 
-   [InlineData("19000228", "19000228")]     // Max day of month February (non leap year)
-   [InlineData("19040229", "19040229")]     // Max day of month February (leap year)
-   [InlineData("20000229", "20000229")]     // Max day of month February (leap year because century divisible by 400)
-   [InlineData("20010228", "20010228")]     // Max day of month February (non leap year)
-   [InlineData("20040229", "20040229")]     // Max day of month February (leap year)
+   [InlineData("910228", '+', "18910228")]      // Max day of month February 1891 (non-leap year)
+   [InlineData("960229", '+', "18960229")]      // Max day of month February 1896 (leap year)
+   [InlineData("000228", '+', "19000228")]      // Max day of month February 1900 (non-leap year)
+   [InlineData("520229", '-', "19520229")]      // Max day of month February 1952 (leap year)
+   [InlineData("000229", '-', "20000229")]      // Max day of month February 2000 (leap year, century divisible by 400)
+   [InlineData("010228", '-', "20010228")]      // Max day of month February 2001 (non-leap year)
+
+   [InlineData("18000101", '+', "18000101")]    // Minimum eight digit date of birth, January 1, 1800
+   [InlineData("20991231", '+', "20991231")]    // Maximum eight digit date of birth, December 31, 2099
+
+   [InlineData("18991231", '+', "18991231")]    // December 31, 1899
+   [InlineData("19000101", '+', "19000101")]    // January 1, 1900
+   [InlineData("19991231", '-', "19991231")]    // December 31, 1999
+   [InlineData("20000101", '-', "20000101")]    // January 1, 2000
+
+   [InlineData("18910228", '+', "18910228")]    // Max day of month February 1891 (non-leap year)
+   [InlineData("18960229", '+', "18960229")]    // Max day of month February 1896 (leap year)
+   [InlineData("19000228", '+', "19000228")]    // Max day of month February 1900 (non-leap year)
+   [InlineData("19520229", '-', "19520229")]    // Max day of month February 1952 (leap year)
+   [InlineData("20000229", '-', "20000229")]    // Max day of month February 2000 (leap year, century divisible by 400)
+   [InlineData("20010228", '-', "20010228")]    // Max day of month February 2001 (non-leap year)
 
    // Samordningsnummer values
-   [InlineData("000161", "19000101")]     // Jan 1, 1900
-   [InlineData("991291", "19991231")]     // Dec 31, 1999
-   [InlineData("000288", "19000228")]     // Max day of month February (non leap year)
-   [InlineData("040289", "19040229")]     // Max day of month February (leap year)
+   [InlineData("500161", '+', "18500101")]      // Minimum six digit date of birth, January 1, 1850
+   [InlineData("491291", '-', "20491231")]      // Maximum six digit date of birth, December 31, 2049
 
-   [InlineData("19000161", "19000101")]   // Jan 1, 1900
-   [InlineData("19991291", "19991231")]   // Dec 31, 1999
-   [InlineData("20000161", "20000101")]   // Jan 1, 2000
-   [InlineData("20991291", "20991231")]   // Dec 31, 2099
+   [InlineData("991291", '+', "18991231")]      // December 31, 1899
+   [InlineData("000161", '+', "19000101")]      // January 1, 1900
+   [InlineData("991291", '-', "19991231")]      // December 31, 1999
+   [InlineData("000161", '-', "20000101")]      // January 1, 2000
 
-   [InlineData("19000288", "19000228")]     // Max day of month February (non leap year)
-   [InlineData("19040289", "19040229")]     // Max day of month February (leap year)
-   [InlineData("20000289", "20000229")]     // Max day of month February (leap year because century divisible by 400)
-   [InlineData("20010288", "20010228")]     // Max day of month February (non leap year)
-   [InlineData("20040289", "20040229")]     // Max day of month February (leap year)
+   [InlineData("910288", '+', "18910228")]      // Max day of month February 1891 (non-leap year)
+   [InlineData("960289", '+', "18960229")]      // Max day of month February 1896 (leap year)
+   [InlineData("000288", '+', "19000228")]      // Max day of month February 1900 (non-leap year)
+   [InlineData("520289", '-', "19520229")]      // Max day of month February 1952 (leap year)
+   [InlineData("000289", '-', "20000229")]      // Max day of month February 2000 (leap year, century divisible by 400)
+   [InlineData("010288", '-', "20010228")]      // Max day of month February 2001 (non-leap year)
+
+   [InlineData("18000161", '+', "18000101")]    // Minimum eight digit date of birth, January 1, 1800
+   [InlineData("20991291", '+', "20991231")]    // Maximum eight digit date of birth, December 31, 2099
+
+   [InlineData("18991291", '+', "18991231")]    // December 31, 1899
+   [InlineData("19000161", '+', "19000101")]    // January 1, 1900
+   [InlineData("19991291", '-', "19991231")]    // December 31, 1999
+   [InlineData("20000161", '-', "20000101")]    // January 1, 2000
+
+   [InlineData("18910288", '+', "18910228")]    // Max day of month February 1891 (non-leap year)
+   [InlineData("18960289", '+', "18960229")]    // Max day of month February 1896 (leap year)
+   [InlineData("19000288", '+', "19000228")]    // Max day of month February 1900 (non-leap year)
+   [InlineData("19520289", '-', "19520229")]    // Max day of month February 1952 (leap year)
+   [InlineData("20000289", '-', "20000229")]    // Max day of month February 2000 (leap year, century divisible by 400)
+   [InlineData("20010288", '-', "20010228")]    // Max day of month February 2001 (non-leap year)
    public void SePersonnummer_DateOfBirth_ShouldReturnExpectedValue(
       String dateOfBirth,
+      Char separator,
       String expectedDateOfBirth)
    {
       // Arrange.
-      var personnummer = GetPersonnummerWithValidCheckDigit(dateOfBirth: dateOfBirth);
-      var sut = new SePersonnummer(personnummer);
+      var value = GetPersonnummerWithValidCheckDigit(
+         dateOfBirth: dateOfBirth,
+         separator: separator);
+      var sut = new SePersonnummer(value);
       var expected = DateOnly.ParseExact(
          expectedDateOfBirth,
          "yyyyMMdd",
@@ -754,18 +822,19 @@ public class SePersonnummerTests
          .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidSeparator);
 
    [Theory]
-   [MemberData(nameof(InvalidSixDigitPersonnummerDateOfBirthValues))]
-   [MemberData(nameof(InvalidEightDigitPersonnummerDateOfBirthValues))]
-   [MemberData(nameof(InvalidSixDigitSamordningsnummerDateOfBirthValues))]
-   [MemberData(nameof(InvalidEightDigitSamordningsnummerDateOfBirthValues))]
-   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(String dateOfBirth)
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      Char separator)
    {
       // Arrange.
-      var personnummer = GetPersonnummer(dateOfBirth: dateOfBirth);
+      var value = GetPersonnummerWithValidCheckDigit(
+         dateOfBirth: dateOfBirth,
+         separator: separator);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => _ = (SePersonnummer)personnummer)
+         .Invoking(() => _ = (SePersonnummer)value)
          .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
          .WithMessage(Messages.SePersonnummerInvalidDateOfBirth + "*")
          .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidDateOfBirth);
@@ -983,17 +1052,18 @@ public class SePersonnummerTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidSixDigitPersonnummerDateOfBirthValues))]
-   [MemberData(nameof(InvalidEightDigitPersonnummerDateOfBirthValues))]
-   [MemberData(nameof(InvalidSixDigitSamordningsnummerDateOfBirthValues))]
-   [MemberData(nameof(InvalidEightDigitSamordningsnummerDateOfBirthValues))]
-   public void SePersonnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasInvalidDateOfBirth(String dateOfBirth)
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void SePersonnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      Char separator)
    {
       // Arrange.
-      var personnummer = GetPersonnummer(dateOfBirth: dateOfBirth);
+      var value = GetPersonnummerWithValidCheckDigit(
+         dateOfBirth: dateOfBirth,
+         separator: separator);
 
       // Act.
-      var result = SePersonnummer.Create(personnummer);
+      var result = SePersonnummer.Create(value);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1200,17 +1270,18 @@ public class SePersonnummerTests
       => SePersonnummer.Validate(value).Should().Be(SePersonnummerValidationResult.InvalidCharacter);
 
    [Theory]
-   [MemberData(nameof(InvalidSixDigitPersonnummerDateOfBirthValues))]
-   [MemberData(nameof(InvalidEightDigitPersonnummerDateOfBirthValues))]
-   [MemberData(nameof(InvalidSixDigitSamordningsnummerDateOfBirthValues))]
-   [MemberData(nameof(InvalidEightDigitSamordningsnummerDateOfBirthValues))]
-   public void SePersonnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidDateOfBirth(String dateOfBirth)
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void SePersonnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      Char separator)
    {
       // Arrange.
-      var personnummer = GetPersonnummer(dateOfBirth: dateOfBirth);
+      var value = GetPersonnummerWithValidCheckDigit(
+         dateOfBirth: dateOfBirth,
+         separator: separator);
 
       // Act/assert.
-      SePersonnummer.Validate(personnummer).Should().Be(SePersonnummerValidationResult.InvalidDateOfBirth);
+      SePersonnummer.Validate(value).Should().Be(SePersonnummerValidationResult.InvalidDateOfBirth);
    }
 
    [Theory]

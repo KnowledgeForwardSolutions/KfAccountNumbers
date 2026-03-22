@@ -189,6 +189,63 @@ namespace KfAccountNumbers.Governmental.Europe;
 [JsonConverter(typeof(SePersonnummerJsonConverter))]
 public record SePersonnummer
 {
+   /// <summary>
+   ///   The assumed century for two digit years greater than or equal to the
+   ///   <see cref="CenturyCutoff"/>. 
+   /// </summary>
+   /// <remarks>
+   ///   <para>
+   ///   Two digit years between 50 and 99 (inclusive) are assumed to represent
+   ///   the years 1950 - 1999.
+   ///   </para>
+   ///   <para>
+   ///   In 2050, this constant and <see cref="BelowCutoffCentury"/> will need
+   ///   to be adjusted to support two digit dates of birth beyond 2049.
+   ///   </para>
+   /// </remarks>
+   public const Int32 AboveCutoffCentury = 1900;
+
+   /// <summary>
+   ///   The assumed century for two digit years below the <see cref="CenturyCutoff"/>. 
+   /// </summary>
+   /// <remarks>
+   ///   <para>
+   ///   Two digit years between 00 and 49 (inclusive) are assumed to represent
+   ///   the years 2000 - 2049.
+   ///   </para>
+   ///   <para>
+   ///   In 2050, this constant and <see cref="AboveCutoffCentury"/> will need
+   ///   to be adjusted to support two digit dates of birth beyond 2049.
+   ///   </para>
+   /// </remarks>
+   public const Int32 BelowCutoffCentury = 2000;
+
+   /// <summary>
+   ///   When interpreting two digit years, a value less than or equal to this
+   ///   constant are assumed to have a century of <see cref="BelowCutoffCentury"/>.
+   /// </summary>
+   public const Int32 CenturyCutoff = 49;
+
+   /// <summary>
+   ///   The latest year of birth supported by <see cref="SePersonnummer"/>.
+   /// </summary>
+   public const Int32 MaximumValidYearOfBirth = 2099;
+
+   /// <summary>
+   ///   The earliest year of birth supported by <see cref="SePersonnummer"/>.
+   /// </summary>
+   public const Int32 MinimumValidYearOfBirth = 1800;
+
+   /// <summary>
+   ///   Represents the day offset used to distinguish Swedish coordination numbers
+   ///   (samordningsnummer) from personnummers.
+   /// </summary>
+   /// <remarks>
+   ///   In Swedish personal identity numbers, a Samordningsnummer is indicated by
+   ///   adding 60 to the day component of the date of birth.
+   /// </remarks>
+   public const Int32 SamordningsnummerDayOffset = 60;
+
    private const Int32 ShortFormatLength = 11;
    private const Int32 LongFormatLength = 13;
 
@@ -197,9 +254,6 @@ public record SePersonnummer
    private const Int32 DateOfBirthOffset = 5;                  // Range end index is exclusive so -1 from expected offset from end
    private const Int32 SeparatorOffset = 5;
    private const Int32 GenderOffset = 2;
-
-   private const Int32 CenturyCutoff = 49;                     // Values < 50 considered 2000's, >= 50 considered 1900's
-   private const Int32 SamordningsnummerDayOffset = 60;
 
    /// <summary>
    ///   Initialize a new instance of the <see cref="SePersonnummer"/> class.
@@ -469,13 +523,8 @@ public record SePersonnummer
    /// </summary>
    private static Boolean ValidateAllDigits(ReadOnlySpan<Char> personnummer)
    {
-      const Int32 yymmddLength = 6;
-      const Int32 yyyymmddLength = 8;
-
       var processLength = personnummer.Length;
-      var separatorIndex = processLength == ShortFormatLength
-         ? yymmddLength
-         : yyyymmddLength;
+      var separatorIndex = processLength - SeparatorOffset;          // SeparatorOffset measures from end of value
 
       for(var index = 0; index < processLength; index ++)
       {
@@ -504,9 +553,6 @@ public record SePersonnummer
 
    private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> personnummer)
    {
-      const Int32 minimumValidYear = 1800;
-      const Int32 maximumValidYear = 2099;
-
       ReadOnlySpan<Char> dateOfBirthSpan = GetDateOfBirth(personnummer);
       foreach (var ch in dateOfBirthSpan)
       {
@@ -521,7 +567,7 @@ public record SePersonnummer
       var (year, month, day) = GetYearMonthDay(personnummer);
 #pragma warning restore IDE0008 // Use explicit type
 
-      if (year < minimumValidYear || year > maximumValidYear)
+      if (year < MinimumValidYearOfBirth || year > MaximumValidYearOfBirth)
       {
          return false;
       }
