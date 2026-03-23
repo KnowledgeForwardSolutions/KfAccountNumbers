@@ -29,6 +29,26 @@ public class SePersonnummerTests
       return $"{dateOfBirth}{separator}{birthSerialNumber}{checkDigit}";
    }
 
+   private static String GetInternalRepresentation(String personnummer)
+   {
+      if (personnummer.Length == 13)
+      {
+         return personnummer[..8] + personnummer[^4..];
+      }
+
+      var year = ((personnummer[0] - Chars.DigitZero) * 10)
+         + (personnummer[1] - Chars.DigitZero);
+      year += year <= SePersonnummer.CenturyCutoff
+         ? SePersonnummer.BelowCutoffCentury
+         : SePersonnummer.AboveCutoffCentury;
+      if (personnummer[6] == Chars.Plus)
+      {
+         year -= 100;
+      }
+
+      return $"{year}{personnummer[2..6]}{personnummer[^4..]}";
+   }
+
    public static TheoryData<String> ValidPersonnummerValues =>
    [
       Valid11CharacterDashPersonnummer,
@@ -303,27 +323,6 @@ public class SePersonnummerTests
       { "19011292", '+' },    // Invalid day of month December
    };
 
-   public static TheoryData<String> InvalidSixDigitPersonnummerDateOfBirthValues =>
-   [
-      "010001",            // Invalid month (too low)
-      "011301",            // Invalid month (too high)
-      "010100",            // Invalid day of month (too low)
-      "010132",            // Invalid day of month January
-      "010229",            // Invalid day of month February (non leap year)
-      "000229",            // Invalid day of month February (1900 is not a leap year)
-      "040230",            // Invalid day of month February (leap year)
-      "010332",            // Invalid day of month March
-      "010431",            // Invalid day of month April
-      "010532",            // Invalid day of month May
-      "010631",            // Invalid day of month June
-      "010732",            // Invalid day of month July
-      "010832",            // Invalid day of month August
-      "010931",            // Invalid day of month September
-      "011032",            // Invalid day of month October
-      "011131",            // Invalid day of month November
-      "011232",            // Invalid day of month December
-   ];
-
    #region Constants Tests
    // ==========================================================================
    // ==========================================================================
@@ -363,24 +362,30 @@ public class SePersonnummerTests
    [MemberData(nameof(ValidSamordningsnummerValues))]
    public void SePersonnummer_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
    {
+      // Arrange.
+      var expected = GetInternalRepresentation(value);
+
       // Act.
       var sut = new SePersonnummer(value);
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(value);
+      sut.Value.Should().Be(expected);
    }
 
    [Theory]
    [MemberData(nameof(UndetectableCheckDigitErrors))]
    public void SePersonnummer_Constructor_ShouldCreateInstance_WhenCheckDigitHasUndetectableError(String value)
    {
+      // Arrange.
+      var expected = GetInternalRepresentation(value);
+
       // Act.
       var sut = new SePersonnummer(value);
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(value);
+      sut.Value.Should().Be(expected);
    }
 
    [Theory]
@@ -393,13 +398,14 @@ public class SePersonnummerTests
       var value = GetPersonnummerWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
+      var expected = GetInternalRepresentation(value);
 
       // Act.
       var sut = new SePersonnummer(value);
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(value);
+      sut.Value.Should().Be(expected);
    }
 
    [Theory]
@@ -628,32 +634,6 @@ public class SePersonnummerTests
 
    #endregion
 
-   #region IsCentenarian Property Tests
-   // ==========================================================================
-   // ==========================================================================
-
-   [Theory]
-   [InlineData(Valid11CharacterDashPersonnummer, false)]
-   [InlineData(Valid11CharacterPlusPersonnummer, true)]
-   [InlineData(Valid13CharacterDashPersonnummer, false)]
-   [InlineData(Valid13CharacterPlusPersonnummer, true)]
-   [InlineData(Valid11CharacterDashSamordningsnummer, false)]
-   [InlineData(Valid11CharacterPlusSamordningsnummer, true)]
-   [InlineData(Valid13CharacterDashSamordningsnummer, false)]
-   [InlineData(Valid13CharacterPlusSamordningsnummer, true)]
-   public void SePersonnummer_IsCentenarian_ShouldReturnExpectedValue(
-      String personnummer,
-      Boolean expected)
-   {
-      // Arrange.
-      var sut = new SePersonnummer(personnummer);
-
-      // Act/assert.
-      sut.IsCentenarian.Should().Be(expected);
-   }
-
-   #endregion
-
    #region Value Property Tests
    // ==========================================================================
    // ==========================================================================
@@ -665,9 +645,10 @@ public class SePersonnummerTests
    {
       // Arrange.
       var sut = new SePersonnummer(personnummer);
+      var expected = GetInternalRepresentation(personnummer);
 
       // Act/assert.
-      sut.Value.Should().Be(personnummer);
+      sut.Value.Should().Be(expected);
    }
 
    #endregion
@@ -680,30 +661,32 @@ public class SePersonnummerTests
    public void SePersonnummer_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var personnummer = Valid11CharacterDashPersonnummer;
-      var sut = new SePersonnummer(personnummer);
+      var value = Valid11CharacterDashPersonnummer;
+      var sut = new SePersonnummer(value);
+      var expected = GetInternalRepresentation(value);
 
       // Act.
       String str = sut;
 
       // Assert.
       str.Should().NotBeNullOrEmpty();
-      str.Should().Be(personnummer);
+      str.Should().Be(expected);
    }
 
    [Fact]
    public void SePersonnummer_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var personnummer = Valid11CharacterDashPersonnummer;
-      var sut = new SePersonnummer(personnummer);
+      var value = Valid11CharacterDashPersonnummer;
+      var sut = new SePersonnummer(value);
+      var expected = GetInternalRepresentation(value);
 
       // Act.
       var str = (String)sut;
 
       // Assert.
       str.Should().NotBeNullOrEmpty();
-      str.Should().Be(personnummer);
+      str.Should().Be(expected);
    }
 
    [Fact]
@@ -739,24 +722,30 @@ public class SePersonnummerTests
    [MemberData(nameof(ValidSamordningsnummerValues))]
    public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldCreateInstance_WhenValueIsValid(String value)
    {
+      // Arrange.
+      var expected = GetInternalRepresentation(value);
+
       // Act.
       var sut = (SePersonnummer)value;
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(value);
+      sut.Value.Should().Be(expected);
    }
 
    [Theory]
    [MemberData(nameof(UndetectableCheckDigitErrors))]
    public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldCreateInstance_WhenCheckDigitHasUndetectableError(String value)
    {
+      // Arrange.
+      var expected = GetInternalRepresentation(value);
+
       // Act.
       var sut = (SePersonnummer)value;
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(value);
+      sut.Value.Should().Be(expected);
    }
 
    [Theory]
@@ -770,10 +759,12 @@ public class SePersonnummerTests
          dateOfBirth: dateOfBirth,
          separator: separator);
       var sut = (SePersonnummer)value;
+      var expected = GetInternalRepresentation(value);
+
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(value);
+      sut.Value.Should().Be(expected);
    }
 
    [Theory]
@@ -869,14 +860,14 @@ public class SePersonnummerTests
    }
 
    [Fact]
-   public void SePersonnummer_EqualityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   public void SePersonnummer_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
-      // Arrange. 11 and 13 character versions for same person should still not be equal.
+      // Arrange. 11 and 13 character versions for same person should still be equal.
       var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
       var personnummer2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
 
       // Act/assert.
-      (personnummer1 == personnummer2).Should().BeFalse();
+      (personnummer1 == personnummer2).Should().BeTrue();
    }
 
    #endregion
@@ -897,14 +888,14 @@ public class SePersonnummerTests
    }
 
    [Fact]
-   public void SePersonnummer_InequalityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   public void SePersonnummer_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
    {
-      // Arrange. 11 and 13 character versions for same person should still not be equal.
+      // Arrange. 11 and 13 character versions for same person should still be equal.
       var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
       var personnummer2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
 
       // Act/assert.
-      (personnummer1 != personnummer2).Should().BeTrue();
+      (personnummer1 != personnummer2).Should().BeFalse();
    }
 
    [Fact]
@@ -1101,14 +1092,14 @@ public class SePersonnummerTests
    }
 
    [Fact]
-   public void SePersonnummer_Equals_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   public void SePersonnummer_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
-      // Arrange. 11 and 13 character versions for same person should still not be equal.
+      // Arrange. 11 and 13 character versions for same person should still be equal.
       var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
       var personnummer2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
 
       // Act/assert.
-      personnummer1.Equals(personnummer2).Should().BeFalse();
+      personnummer1.Equals(personnummer2).Should().BeTrue();
    }
 
    [Fact]
@@ -1168,9 +1159,9 @@ public class SePersonnummerTests
    }
 
    [Fact]
-   public void SePersonnummer_GetHashCode_ShouldReturnDifferentValues_WhenValuesHaveDifferentLengths()
+   public void SePersonnummer_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
    {
-      // Arrange. 11 and 13 character versions for same person should still not be equal.
+      // Arrange. 11 and 13 character versions for same person should still be equal.
       var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
       var personnummer2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
 
@@ -1179,7 +1170,7 @@ public class SePersonnummerTests
       var hash2 = personnummer2.GetHashCode();
 
       // Assert.
-      hash1.Should().NotBe(hash2);
+      hash1.Should().Be(hash2);
    }
 
    #endregion
@@ -1206,6 +1197,44 @@ public class SePersonnummerTests
 
    #endregion
 
+   #region ToLongFormat Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidPersonnummerValues))]
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SePersonnummer_ToLongFormat_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new SePersonnummer(value);
+      var expected = sut.Value[..8] + '-' + sut.Value[^4..];
+
+      // Act/assert.
+      sut.ToLongFormatValue().Should().Be(expected);
+   }
+
+   #endregion
+
+   #region ToLongFormat Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidPersonnummerValues))]
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SePersonnummer_ToShortFormat_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new SePersonnummer(value);
+      var expected = sut.Value[2..8] + '-' + sut.Value[^4..];
+
+      // Act/assert.
+      sut.ToShortFormatValue().Should().Be(expected);
+   }
+
+   #endregion
+
    #region ToString Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -1217,9 +1246,10 @@ public class SePersonnummerTests
    {
       // Arrange.
       var sut = new SePersonnummer(value);
+      var expected = GetInternalRepresentation(value);
 
       // Act/assert.
-      sut.ToString().Should().Be(value);
+      sut.ToString().Should().Be(expected);
    }
 
    #endregion
@@ -1320,12 +1350,13 @@ public class SePersonnummerTests
    {
       // Arrange.
       var sut = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
+      var expected = sut.ToLongFormatValue();
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
 
       // Assert.
-      json.Should().Be($"\"{Valid11CharacterDashSamordningsnummer}\"");  // Simple string, not object
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
    }
 
    public class Foo

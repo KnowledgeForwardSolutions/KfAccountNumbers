@@ -1,5 +1,7 @@
 // Ignore Spelling: Json Personnummer Samordningsnummer
 
+using System.Globalization;
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -246,6 +248,7 @@ public record SePersonnummer
    /// </remarks>
    public const Int32 SamordningsnummerDayOffset = 60;
 
+   private const Int32 InternalRepresentationLength = 12;      // YYYYMMDD + birth serial number + check digit
    private const Int32 ShortFormatLength = 11;
    private const Int32 LongFormatLength = 13;
 
@@ -307,7 +310,7 @@ public record SePersonnummer
          }
       }
 
-      Value = personnummer!;
+      Value = GetInternalRepresentation(personnummer);
    }
 
    /// <summary>
@@ -377,14 +380,6 @@ public record SePersonnummer
    }
 
    /// <summary>
-   ///   Indicates if the person is 100 years of age or older as indicated by
-   ///   the separator value. A dash ('-') separator indicates a person less
-   ///   than 100 years of age, while a plus sign ('+') indicates a person 100
-   ///   years of age or older.
-   /// </summary>
-   public Boolean IsCentenarian => Value[^SeparatorOffset] == Chars.Plus;
-
-   /// <summary>
    ///   The raw personnummer value.
    /// </summary>
    public String Value { get; private init; }
@@ -421,6 +416,30 @@ public record SePersonnummer
          ? new SePersonnummer(personnummer, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
+
+   /// <summary>
+   ///   Returns a string representation of the value in a long format, combining
+   ///   the date of birth in YYYYMMDD format, a hyphen separator characer, the
+   ///   three digit birth serial number and the check digit.
+   /// </summary>
+   /// <remarks>
+   ///   Without an enternally supplied <see cref="TimeProvider"/>, the separator
+   ///   character defaults to '-'.
+   /// </remarks>
+   public String ToLongFormatValue()
+      => Value[..8] + '-' + Value[^4..];
+
+   /// <summary>
+   ///   Returns a string representation of the value in a long format, combining
+   ///   the date of birth in YYMMDD format, a hyphen separator characer, the
+   ///   three digit birth serial number and the check digit.
+   /// </summary>
+   /// <remarks>
+   ///   Without an enternally supplied <see cref="TimeProvider"/>, the separator
+   ///   character defaults to '-'.
+   /// </remarks>
+   public String ToShortFormatValue()
+      => Value[2..8] + '-' + Value[^4..];
 
    /// <summary>
    ///   Check the <paramref name="personnummer"/> to determine if it contains a
@@ -477,11 +496,48 @@ public record SePersonnummer
    private static ReadOnlySpan<Char> GetDateOfBirth(ReadOnlySpan<Char> personnummer)
       => personnummer[..^DateOfBirthOffset];
 
+   /// <summary>
+   ///   Given a validated personnummer, get the internal representation which
+   ///   converts six digit date of birth to eight digits and strips out the
+   ///   separator character.
+   /// </summary>
+   private static String GetInternalRepresentation(ReadOnlySpan<Char> personnummer)
+   {
+      var buffer = ArrayPool<Char>.Shared.Rent(InternalRepresentationLength);
+      try
+      {
+#pragma warning disable IDE0008 // Use explicit type
+         var (year, month, day) = GetYearMonthDay(personnummer, applySamordningsnummerOffset: false);
+#pragma warning restore IDE0008 // Use explicit type
+
+         var span = new Span<Char>(buffer);
+
+         Span<Char> work = span[..4];
+         year.TryFormat(work, out _, format: "D4");
+         work = span[4..6];
+         month.TryFormat(work, out _, format: "D2");
+         work = span[6..8];
+         day.TryFormat(work, out _, format: "D2");
+
+         work = span[8..12];
+         ReadOnlySpan<Char> remainder = personnummer[^4..];
+         remainder.CopyTo(work);
+
+         return span[..InternalRepresentationLength].ToString();
+      }
+      finally
+      {
+         ArrayPool<Char>.Shared.Return(buffer);
+      }
+   }
+
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Char GetSeparator(ReadOnlySpan<Char> personnummer)
       => personnummer[^SeparatorOffset];
 
-   private static (Int32 year, Int32 month, Int32 day) GetYearMonthDay(ReadOnlySpan<Char> personnummer)
+   private static (Int32 year, Int32 month, Int32 day) GetYearMonthDay(
+      ReadOnlySpan<Char> personnummer,
+      Boolean applySamordningsnummerOffset = true)
    {
       Int32 year;
       Int32 month;
@@ -509,7 +565,7 @@ public record SePersonnummer
       }
 
       // Handle samordningsnummer, which adds 60 to the date of birth.
-      if (day > SamordningsnummerDayOffset)
+      if (applySamordningsnummerOffset && day > SamordningsnummerDayOffset)
       {
          day -= SamordningsnummerDayOffset;
       }
@@ -594,5 +650,5 @@ public class SePersonnummerJsonConverter : JsonConverter<SePersonnummer>
    }
 
    public override void Write(Utf8JsonWriter writer, SePersonnummer value, JsonSerializerOptions options)
-      => writer.WriteStringValue(value.Value);
+      => writer.WriteStringValue(value.ToLongFormatValue());
 }
