@@ -1253,6 +1253,60 @@ public class SePersonnummerTests
 
    #endregion
 
+   #region ToShortFormat Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidPersonnummerValues))]
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SePersonnummer_ToShortFormat_ShouldReturnExpectedValue_WhenTimeProviderIsNull(String value)
+   {
+      // Arrange.
+      var sut = new SePersonnummer(value);
+      var expected = sut.Value[2..8] + '-' + sut.Value[^4..];
+
+      // Act/assert.
+      sut.ToShortFormatValue().Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData(Valid11CharacterDashPersonnummer, -150, 0, '-')]
+   [InlineData(Valid11CharacterDashPersonnummer, -50, 0, '-')]
+   [InlineData(Valid11CharacterDashPersonnummer, 50, 0, '-')]
+   [InlineData(Valid11CharacterDashPersonnummer, 100, -1, '-')]
+   [InlineData(Valid11CharacterDashPersonnummer, 100, 0, '+')]
+   [InlineData(Valid11CharacterDashPersonnummer, 100, 1, '+')]
+   [InlineData(Valid13CharacterDashPersonnummer, 100, -1, '-')]
+   [InlineData(Valid13CharacterDashPersonnummer, 100, 0, '+')]
+   [InlineData(Valid13CharacterDashPersonnummer, 100, 1, '+')]
+   [InlineData(Valid11CharacterDashSamordningsnummer, 100, -1, '-')]
+   [InlineData(Valid11CharacterDashSamordningsnummer, 100, 0, '+')]
+   [InlineData(Valid11CharacterDashSamordningsnummer, 100, 1, '+')]
+   [InlineData(Valid13CharacterDashSamordningsnummer, 100, -1, '-')]
+   [InlineData(Valid13CharacterDashSamordningsnummer, 100, 0, '+')]
+   [InlineData(Valid13CharacterDashSamordningsnummer, 100, 1, '+')]
+   public void SePersonnummer_ToShortFormat_ShouldReturnExpectedValue_WhenTimeProviderIsSupplied(
+      String value,
+      Int32 years,
+      Int32 days,
+      Char expectedSeparator)
+   {
+      // Arrange.
+      var sut = new SePersonnummer(value);
+      var currentDate = sut.DateOfBirth.AddYears(years).AddDays(days).ToDateTime(TimeOnly.MinValue);
+      var timeProvider = new FakeTimeProvider(currentDate);
+      var expected = $"{sut.Value[2..8]}{expectedSeparator}{sut.Value[^4..]}";
+
+      // Arrange.
+      var result = sut.ToShortFormatValue(timeProvider);
+
+      // Assert.
+      result.Should().Be(expected);
+   }
+
+   #endregion
+
    #region ToLongFormat Method Tests
    // ==========================================================================
    // ==========================================================================

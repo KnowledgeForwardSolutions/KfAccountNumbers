@@ -420,26 +420,41 @@ public record SePersonnummer
    ///   digit birth serial number and the check digit.
    /// </summary>
    /// <param name="timeProvider">
-   ///   Optional. <see cref="TimeProvider"/> used to determine the exact age of
-   ///   the person. Persons 100 years of older will have a plus ('+') as a
-   ///   separator; otherwise a dash ('-') is used as the separator. If the
-   ///   <paramref name="timeProvider"/> is <see langword="null"/> then the
-   ///   separator character will default to a dash ('-').
+   ///   Optional. <see cref="TimeProvider"/> instance used to determine the
+   ///   exact age of the person. Persons 100 years of older will have a plus
+   ///   ('+') as a separator; otherwise a dash ('-') is used as the separator.
+   ///   If the <paramref name="timeProvider"/> is <see langword="null"/> then
+   ///   the separator character will default to a dash ('-').
    /// </param>
    public String ToLongFormatValue(TimeProvider? timeProvider = null)
-      => Value[..8] + GetCorrectSeparatorForAgeOfPerson(timeProvider) + Value[^4..];
+   {
+      var separator = timeProvider is not null
+         ? GetCorrectSeparatorForAgeOfPerson(timeProvider)
+         : Chars.Dash;
+
+      return Value[..8] + separator + Value[^4..];
+   }
 
    /// <summary>
    ///   Returns a string representation of the value in a long format, combining
-   ///   the date of birth in YYMMDD format, a hyphen separator characer, the
-   ///   three digit birth serial number and the check digit.
+   ///   the date of birth in YYMMDD format, a separator characer, the three
+   ///   digit birth serial number and the check digit.
    /// </summary>
-   /// <remarks>
-   ///   Without an enternally supplied <see cref="TimeProvider"/>, the separator
-   ///   character defaults to '-'.
-   /// </remarks>
-   public String ToShortFormatValue()
-      => Value[2..8] + '-' + Value[^4..];
+   /// <param name="timeProvider">
+   ///   Optional. <see cref="TimeProvider"/> instance used to determine the
+   ///   exact age of the person. Persons 100 years of older will have a plus
+   ///   ('+') as a separator; otherwise a dash ('-') is used as the separator.
+   ///   If the <paramref name="timeProvider"/> is <see langword="null"/> then
+   ///   the separator character will default to a dash ('-').
+   /// </param>
+   public String ToShortFormatValue(TimeProvider? timeProvider = null)
+   {
+      var separator = timeProvider is not null
+            ? GetCorrectSeparatorForAgeOfPerson(timeProvider)
+            : Chars.Dash;
+
+      return Value[2..8] + separator + Value[^4..];
+   }
 
    /// <summary>
    ///   Check the <paramref name="personnummer"/> to determine if it contains a
@@ -492,13 +507,8 @@ public record SePersonnummer
       return SePersonnummerValidationResult.ValidationPassed;
    }
 
-   private Char GetCorrectSeparatorForAgeOfPerson(TimeProvider? timeProvider)
+   private Char GetCorrectSeparatorForAgeOfPerson(TimeProvider timeProvider)
    {
-      if (timeProvider is null)
-      {
-         return Chars.Dash;
-      }
-
       DateOnly dateOfBirth = DateOfBirth;
       DateTime today = timeProvider.GetLocalNow().Date;
       var age = today.Year - dateOfBirth.Year;
