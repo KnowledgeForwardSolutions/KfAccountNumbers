@@ -315,13 +315,14 @@ public record SePersonnummer
 
    /// <summary>
    ///   The person's date of birth, derived from the date of birth portion of
-   ///   the personnummer (either the first six digits for 11 character values
-   ///   or the first eight digits for 13 character values).
+   ///   13 character personnummer (YYYYMMDD format) or from the date portion
+   ///   of an 11 character personnummer (YYMMDD format) and the separator
+   ///   character.
    /// </summary>
    /// <remarks>
    ///   <para>
-   ///   An 11 character value (i.e. YYMMDD format) assumes that the year of
-   ///   birth will be between 1900 and 1999.
+   ///   See the class comments for the rules for deriving the date of birth
+   ///   for an 11 character personnummer.
    ///   </para>
    ///   <para>
    ///   Note that the indicated date of birth may not be the person's exact
@@ -367,17 +368,9 @@ public record SePersonnummer
    ///   of the day of birth resulting in values from 61-91.
    /// </remarks>
    public SeIdentifierType IdentifierType
-   {
-      get
-      {
-         var day = Value.Length == ShortFormatLength 
-            ? Value.AsSpan()[4..6].ParseTwoDigits() 
-            : Value.AsSpan()[6..8].ParseTwoDigits();
-         return (day > SamordningsnummerDayOffset)
-            ? SeIdentifierType.Samordningsnummer
-            : SeIdentifierType.Personnummer;
-      }
-   }
+      => Value.AsSpan(6..8).ParseTwoDigits() > SamordningsnummerDayOffset
+         ? SeIdentifierType.Samordningsnummer
+         : SeIdentifierType.Personnummer;
 
    /// <summary>
    ///   The raw personnummer value.
@@ -393,7 +386,11 @@ public record SePersonnummer
    /// <summary>
    ///   Get a string representation of the personnummer.
    /// </summary>
-   public override String ToString() => Value;
+   /// <remarks>
+   ///   The value returned is the same as the <see cref="ToLongFormatValue"/>
+   ///   method.
+   /// </remarks>
+   public override String ToString() => ToLongFormatValue();
 
    /// <summary>
    ///   Create a new <see cref="SePersonnummer"/>.
@@ -419,15 +416,18 @@ public record SePersonnummer
 
    /// <summary>
    ///   Returns a string representation of the value in a long format, combining
-   ///   the date of birth in YYYYMMDD format, a hyphen separator characer, the
-   ///   three digit birth serial number and the check digit.
+   ///   the date of birth in YYYYMMDD format, a separator characer, the three
+   ///   digit birth serial number and the check digit.
    /// </summary>
-   /// <remarks>
-   ///   Without an enternally supplied <see cref="TimeProvider"/>, the separator
-   ///   character defaults to '-'.
-   /// </remarks>
-   public String ToLongFormatValue()
-      => Value[..8] + '-' + Value[^4..];
+   /// <param name="timeProvider">
+   ///   Optional. <see cref="TimeProvider"/> used to determine the exact age of
+   ///   the person. Persons 100 years of older will have a plus ('+') as a
+   ///   separator; otherwise a dash ('-') is used as the separator. If the
+   ///   <paramref name="timeProvider"/> is <see langword="null"/> then the
+   ///   separator character will default to a dash ('-').
+   /// </param>
+   public String ToLongFormatValue(TimeProvider? timeProvider = null)
+      => Value[..8] + GetCorrectSeparatorForAgeOfPerson(timeProvider) + Value[^4..];
 
    /// <summary>
    ///   Returns a string representation of the value in a long format, combining
@@ -490,6 +490,25 @@ public record SePersonnummer
       }
 
       return SePersonnummerValidationResult.ValidationPassed;
+   }
+
+   private Char GetCorrectSeparatorForAgeOfPerson(TimeProvider? timeProvider)
+   {
+      if (timeProvider is null)
+      {
+         return Chars.Dash;
+      }
+
+      DateOnly dateOfBirth = DateOfBirth;
+      DateTime today = timeProvider.GetLocalNow().Date;
+      var age = today.Year - dateOfBirth.Year;
+      if (today.Month < dateOfBirth.Month ||
+         (today.Month == dateOfBirth.Month && today.Day < dateOfBirth.Day))
+      {
+         age--;
+      }
+
+      return age >= 100 ? Chars.Plus : Chars.Dash;
    }
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -4,6 +4,8 @@
 #pragma warning disable IDE0058 // Expression value is never used
 #pragma warning disable CA2211 // Non-constant fields should not be visible
 
+using Microsoft.Extensions.Time.Testing;
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class SePersonnummerTests
@@ -1204,7 +1206,7 @@ public class SePersonnummerTests
    [Theory]
    [MemberData(nameof(ValidPersonnummerValues))]
    [MemberData(nameof(ValidSamordningsnummerValues))]
-   public void SePersonnummer_ToLongFormat_ShouldReturnExpectedValue(String value)
+   public void SePersonnummer_ToLongFormat_ShouldReturnExpectedValue_WhenTimeProviderIsNull(String value)
    {
       // Arrange.
       var sut = new SePersonnummer(value);
@@ -1212,6 +1214,41 @@ public class SePersonnummerTests
 
       // Act/assert.
       sut.ToLongFormatValue().Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData(Valid11CharacterDashPersonnummer, -150, 0, '-')]
+   [InlineData(Valid11CharacterDashPersonnummer, -50, 0, '-')]
+   [InlineData(Valid11CharacterDashPersonnummer, 50, 0, '-')]
+   [InlineData(Valid11CharacterDashPersonnummer, 100, -1, '-')]
+   [InlineData(Valid11CharacterDashPersonnummer, 100, 0, '+')]
+   [InlineData(Valid11CharacterDashPersonnummer, 100, 1, '+')]
+   [InlineData(Valid13CharacterDashPersonnummer, 100, -1, '-')]
+   [InlineData(Valid13CharacterDashPersonnummer, 100, 0, '+')]
+   [InlineData(Valid13CharacterDashPersonnummer, 100, 1, '+')]
+   [InlineData(Valid11CharacterDashSamordningsnummer, 100, -1, '-')]
+   [InlineData(Valid11CharacterDashSamordningsnummer, 100, 0, '+')]
+   [InlineData(Valid11CharacterDashSamordningsnummer, 100, 1, '+')]
+   [InlineData(Valid13CharacterDashSamordningsnummer, 100, -1, '-')]
+   [InlineData(Valid13CharacterDashSamordningsnummer, 100, 0, '+')]
+   [InlineData(Valid13CharacterDashSamordningsnummer, 100, 1, '+')]
+   public void SePersonnummer_ToLongFormat_ShouldReturnExpectedValue_WhenTimeProviderIsSupplied(
+      String value,
+      Int32 years,
+      Int32 days,
+      Char expectedSeparator)
+   {
+      // Arrange.
+      var sut = new SePersonnummer(value);
+      var currentDate = sut.DateOfBirth.AddYears(years).AddDays(days).ToDateTime(TimeOnly.MinValue);
+      var timeProvider = new FakeTimeProvider(currentDate);
+      var expected = $"{sut.Value[..8]}{expectedSeparator}{sut.Value[^4..]}";
+
+      // Arrange.
+      var result = sut.ToLongFormatValue(timeProvider);
+
+      // Assert.
+      result.Should().Be(expected);
    }
 
    #endregion
@@ -1246,7 +1283,7 @@ public class SePersonnummerTests
    {
       // Arrange.
       var sut = new SePersonnummer(value);
-      var expected = GetInternalRepresentation(value);
+      var expected = sut.ToLongFormatValue();
 
       // Act/assert.
       sut.ToString().Should().Be(expected);
