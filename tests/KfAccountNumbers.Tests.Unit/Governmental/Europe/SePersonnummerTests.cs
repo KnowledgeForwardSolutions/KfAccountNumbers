@@ -1004,7 +1004,7 @@ public class SePersonnummerTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void SePersonnummer_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasNonDigitCharacter(String value)
+   public void SePersonnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacter(String value)
    {
       // Act.
       var result = SePersonnummer.Create(value);
@@ -1303,25 +1303,6 @@ public class SePersonnummerTests
 
       // Assert.
       result.Should().Be(expected);
-   }
-
-   #endregion
-
-   #region ToLongFormat Method Tests
-   // ==========================================================================
-   // ==========================================================================
-
-   [Theory]
-   [MemberData(nameof(ValidPersonnummerValues))]
-   [MemberData(nameof(ValidSamordningsnummerValues))]
-   public void SePersonnummer_ToShortFormat_ShouldReturnExpectedValue(String value)
-   {
-      // Arrange.
-      var sut = new SePersonnummer(value);
-      var expected = sut.Value[2..8] + '-' + sut.Value[^4..];
-
-      // Act/assert.
-      sut.ToShortFormatValue().Should().Be(expected);
    }
 
    #endregion

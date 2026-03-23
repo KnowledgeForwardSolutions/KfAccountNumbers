@@ -384,15 +384,6 @@ public record SePersonnummer
    public static explicit operator SePersonnummer(String? personnummer) => new(personnummer);
 
    /// <summary>
-   ///   Get a string representation of the personnummer.
-   /// </summary>
-   /// <remarks>
-   ///   The value returned is the same as the <see cref="ToLongFormatValue"/>
-   ///   method.
-   /// </remarks>
-   public override String ToString() => ToLongFormatValue();
-
-   /// <summary>
    ///   Create a new <see cref="SePersonnummer"/>.
    /// </summary>
    /// <param name="personnummer">
@@ -455,6 +446,15 @@ public record SePersonnummer
 
       return Value[2..8] + separator + Value[^4..];
    }
+
+   /// <summary>
+   ///   Get a string representation of the personnummer.
+   /// </summary>
+   /// <remarks>
+   ///   The value returned is the same as the <see cref="ToLongFormatValue"/>
+   ///   method.
+   /// </remarks>
+   public override String ToString() => ToLongFormatValue();
 
    /// <summary>
    ///   Check the <paramref name="personnummer"/> to determine if it contains a
