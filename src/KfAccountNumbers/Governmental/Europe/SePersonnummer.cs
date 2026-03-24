@@ -163,19 +163,35 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      birth is substituted in its stead.
 ///   </para>
 ///   <para>
-///      When determining if a date of birth is valid, YYMMDD format dates are
-///      assumed to be in the 20th century (1900-1999). The reason for this
-///      assumption is that the YYYYMMDD format was introduced in 1997,
-///      presumably as part of Y2K preparations. The practical impact of this
-///      assumption is that the YYMMDD format date "000229" will always be
-///      considered invalid because 1900 is not a leap year. (The opposite
-///      would be true if "00" represented the year 2000, which is a leap
-///      year because of the century divisible by 400 rule for leap years).
+///      When determining if a date of birth is valid, values with six digit
+///      dates of birth use the separator character to derive the full four
+///      digit year. Year values between 00 and 49 are assumed to be 2000 to
+///      2049 and year values between 50 and 99 are assumed to be 1950 to 1999.
+///      If the separator character indicates that the person is at least 100
+///      years of age, then 100 is subtracted from the year, resulting in 00 to
+///      40 meaning 1900 to 1949 and 50 to 99 meaning 1850 to 1899.
+///   </para>
+///   <para>
+///      The valid range for a date of birth is January 1, 1800 to
+///      December 31, 2099. However, if a six digit date of birth is supplied
+///      then the valid range will be between January 1, 1850 to December 31, 2049.
 ///   </para>
 ///   <para>
 ///      For samordningsnummer values, the value returned by the
 ///      <see cref="DateOfBirth"/> property is an actual date calculated by
 ///      subtracting 60 from the encoded date of birth.
+///   </para>
+///   <para>
+///      Internally, <see cref="SePersonnummer"/> stores a 12-digit representation
+///      consisting of the date of birth in YYYYMMDD format followed by the birth
+///      serial number and check digit (no separator). The <see cref="Value"/>
+///      property returns this internal representation.
+///   </para>
+///   <para>
+///      When comparing <see cref="SePersonnummer"/> objects for equality, the
+///      internal 12-digit representation is used. This means two objects
+///      representing the same person will be considered equal regardless of
+///      whether they were created from 11-character or 13-character input strings.
 ///   </para>
 ///   <para>
 ///      See https://en.wikipedia.org/wiki/Personal_identity_number_(Sweden)
@@ -185,6 +201,64 @@ namespace KfAccountNumbers.Governmental.Europe;
 [JsonConverter(typeof(SePersonnummerJsonConverter))]
 public record SePersonnummer
 {
+   /// <summary>
+   ///   The assumed century for two digit years greater than the
+   ///   <see cref="CenturyCutoff"/>. 
+   /// </summary>
+   /// <remarks>
+   ///   <para>
+   ///   Two digit years between 50 and 99 (inclusive) are assumed to represent
+   ///   the years 1950 - 1999.
+   ///   </para>
+   ///   <para>
+   ///   In 2050, this constant and <see cref="BelowCutoffCentury"/> will need
+   ///   to be adjusted to support two digit dates of birth beyond 2049.
+   ///   </para>
+   /// </remarks>
+   public const Int32 AboveCutoffCentury = 1900;
+
+   /// <summary>
+   ///   The assumed century for two digit years below the <see cref="CenturyCutoff"/>. 
+   /// </summary>
+   /// <remarks>
+   ///   <para>
+   ///   Two digit years between 00 and 49 (inclusive) are assumed to represent
+   ///   the years 2000 - 2049.
+   ///   </para>
+   ///   <para>
+   ///   In 2050, this constant and <see cref="AboveCutoffCentury"/> will need
+   ///   to be adjusted to support two digit dates of birth beyond 2049.
+   ///   </para>
+   /// </remarks>
+   public const Int32 BelowCutoffCentury = 2000;
+
+   /// <summary>
+   ///   When interpreting two digit years, a value less than or equal to this
+   ///   constant are assumed to have a century of <see cref="BelowCutoffCentury"/>.
+   /// </summary>
+   public const Int32 CenturyCutoff = 49;
+
+   /// <summary>
+   ///   The latest year of birth supported by <see cref="SePersonnummer"/>.
+   /// </summary>
+   public const Int32 MaximumValidYearOfBirth = 2099;
+
+   /// <summary>
+   ///   The earliest year of birth supported by <see cref="SePersonnummer"/>.
+   /// </summary>
+   public const Int32 MinimumValidYearOfBirth = 1800;
+
+   /// <summary>
+   ///   Represents the day offset used to distinguish Swedish coordination numbers
+   ///   (samordningsnummer) from personnummers.
+   /// </summary>
+   /// <remarks>
+   ///   In Swedish personal identity numbers, a Samordningsnummer is indicated by
+   ///   adding 60 to the day component of the date of birth.
+   /// </remarks>
+   public const Int32 SamordningsnummerDayOffset = 60;
+
+   private const Int32 InternalRepresentationLength = 12;      // YYYYMMDD + birth serial number + check digit
    private const Int32 ShortFormatLength = 11;
    private const Int32 LongFormatLength = 13;
 
@@ -192,11 +266,7 @@ public record SePersonnummer
    // because the date of birth has variable length.
    private const Int32 DateOfBirthOffset = 5;                  // Range end index is exclusive so -1 from expected offset from end
    private const Int32 SeparatorOffset = 5;
-   private const Int32 BirthSerialNumberStartOffset = 4;
-   private const Int32 BirthSerialNumberEndOffset = 1;         // Range end index is exclusive
    private const Int32 GenderOffset = 2;
-
-   private const Int32 SamordningsnummerDayOffset = 60;
 
    /// <summary>
    ///   Initialize a new instance of the <see cref="SePersonnummer"/> class.
@@ -250,18 +320,19 @@ public record SePersonnummer
          }
       }
 
-      Value = personnummer!;
+      Value = GetInternalRepresentation(personnummer);
    }
 
    /// <summary>
    ///   The person's date of birth, derived from the date of birth portion of
-   ///   the personnummer (either the first six digits for 11 character values
-   ///   or the first eight digits for 13 character values).
+   ///   13 character personnummer (YYYYMMDD format) or from the date portion
+   ///   of an 11 character personnummer (YYMMDD format) and the separator
+   ///   character.
    /// </summary>
    /// <remarks>
    ///   <para>
-   ///   An 11 character value (i.e. YYMMDD format) assumes that the year of
-   ///   birth will be between 1900 and 1999.
+   ///   See the class comments for the rules for deriving the date of birth
+   ///   for an 11 character personnummer.
    ///   </para>
    ///   <para>
    ///   Note that the indicated date of birth may not be the person's exact
@@ -307,25 +378,9 @@ public record SePersonnummer
    ///   of the day of birth resulting in values from 61-91.
    /// </remarks>
    public SeIdentifierType IdentifierType
-   {
-      get
-      {
-         var day = Value.Length == ShortFormatLength 
-            ? Value.AsSpan()[4..6].ParseTwoDigits() 
-            : Value.AsSpan()[6..8].ParseTwoDigits();
-         return (day > SamordningsnummerDayOffset)
-            ? SeIdentifierType.Samordningsnummer
-            : SeIdentifierType.Personnummer;
-      }
-   }
-
-   /// <summary>
-   ///   Indicates if the person is 100 years of age or older as indicated by
-   ///   the separator value. A dash ('-') separator indicates a person less
-   ///   than 100 years of age, while a plus sign ('+') indicates a person 100
-   ///   years of age or older.
-   /// </summary>
-   public Boolean IsCentenarian => Value[^SeparatorOffset] == Chars.Plus;
+      => Value.AsSpan(6..8).ParseTwoDigits() > SamordningsnummerDayOffset
+         ? SeIdentifierType.Samordningsnummer
+         : SeIdentifierType.Personnummer;
 
    /// <summary>
    ///   The raw personnummer value.
@@ -337,11 +392,6 @@ public record SePersonnummer
 
    // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
    public static explicit operator SePersonnummer(String? personnummer) => new(personnummer);
-
-   /// <summary>
-   ///   Get a string representation of the personnummer.
-   /// </summary>
-   public override String ToString() => Value;
 
    /// <summary>
    ///   Create a new <see cref="SePersonnummer"/>.
@@ -366,6 +416,57 @@ public record SePersonnummer
    }
 
    /// <summary>
+   ///   Returns a string representation of the value in a long 13 character format,
+   ///   combining the date of birth in YYYYMMDD format, a separator character, the
+   ///   three digit birth serial number and the check digit.
+   /// </summary>
+   /// <param name="timeProvider">
+   ///   Optional. <see cref="TimeProvider"/> instance used to determine the
+   ///   exact age of the person. Persons 100 years or older will have a plus
+   ///   ('+') as a separator; otherwise a dash ('-') is used as the separator.
+   ///   If the <paramref name="timeProvider"/> is <see langword="null"/> then
+   ///   the separator character will default to a dash ('-').
+   /// </param>
+   public String ToLongFormatValue(TimeProvider? timeProvider = null)
+   {
+      var separator = timeProvider is not null
+         ? GetCorrectSeparatorForAgeOfPerson(timeProvider)
+         : Chars.Dash;
+
+      return Value[..8] + separator + Value[^4..];
+   }
+
+   /// <summary>
+   ///   Returns a string representation of the value in a short 11 character format,
+   ///   combining the date of birth in YYMMDD format, a separator character, the
+   ///   three digit birth serial number and the check digit.
+   /// </summary>
+   /// <param name="timeProvider">
+   ///   Optional. <see cref="TimeProvider"/> instance used to determine the
+   ///   exact age of the person. Persons 100 years or older will have a plus
+   ///   ('+') as a separator; otherwise a dash ('-') is used as the separator.
+   ///   If the <paramref name="timeProvider"/> is <see langword="null"/> then
+   ///   the separator character will default to a dash ('-').
+   /// </param>
+   public String ToShortFormatValue(TimeProvider? timeProvider = null)
+   {
+      var separator = timeProvider is not null
+            ? GetCorrectSeparatorForAgeOfPerson(timeProvider)
+            : Chars.Dash;
+
+      return Value[2..8] + separator + Value[^4..];
+   }
+
+   /// <summary>
+   ///   Get a string representation of the personnummer.
+   /// </summary>
+   /// <remarks>
+   ///   The value returned is the same as the <see cref="ToLongFormatValue"/>
+   ///   method.
+   /// </remarks>
+   public override String ToString() => ToLongFormatValue();
+
+   /// <summary>
    ///   Check the <paramref name="personnummer"/> to determine if it contains a
    ///   valid Swedish Personal Identity Number (Personnummer) value.
    /// </summary>
@@ -387,6 +488,23 @@ public record SePersonnummer
       {
          return SePersonnummerValidationResult.InvalidLength;
       }
+
+      // After performing basic checks, validate the check digit because the
+      // most common source of errors will be data entry errors. Then validate
+      // the subcomponents of the value.
+      if (!ValidateCheckDigit(personnummer))
+      {
+         return ValidateAllDigits(personnummer)
+            ? SePersonnummerValidationResult.InvalidCheckDigit
+            : SePersonnummerValidationResult.InvalidCharacter;
+      }
+      else if (personnummer.Length == LongFormatLength
+               && (!personnummer[0].IsAsciiDigit() || !personnummer[1].IsAsciiDigit()))
+      {
+         // Check digit does not consider leading two digits for 13 character strings.
+         // So validate here.
+         return SePersonnummerValidationResult.InvalidCharacter;
+      }
       else if (GetSeparator(personnummer) is not Chars.Dash and not Chars.Plus)
       {
          return SePersonnummerValidationResult.InvalidSeparator;
@@ -395,46 +513,90 @@ public record SePersonnummer
       {
          return SePersonnummerValidationResult.InvalidDateOfBirth;
       }
-      else if (!ValidateBirthSerialNumber(personnummer))
-      {
-         return SePersonnummerValidationResult.InvalidBirthSerialNumber;
-      }
-      else if (!ValidateCheckDigit(personnummer))
-      {
-         return SePersonnummerValidationResult.InvalidCheckDigit;
-      }
 
       return SePersonnummerValidationResult.ValidationPassed;
    }
 
-   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static ReadOnlySpan<Char> GetBirthSerialNumber(ReadOnlySpan<Char> personnummer)
-      => personnummer[^BirthSerialNumberStartOffset..^BirthSerialNumberEndOffset];
+   private Char GetCorrectSeparatorForAgeOfPerson(TimeProvider timeProvider)
+   {
+      DateOnly dateOfBirth = DateOfBirth;
+      DateTime today = timeProvider.GetLocalNow().Date;
+      var age = today.Year - dateOfBirth.Year;
+      if (today.Month < dateOfBirth.Month ||
+         (today.Month == dateOfBirth.Month && today.Day < dateOfBirth.Day))
+      {
+         age--;
+      }
+
+      return age >= 100 ? Chars.Plus : Chars.Dash;
+   }
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static ReadOnlySpan<Char> GetDateOfBirth(ReadOnlySpan<Char> personnummer)
       => personnummer[..^DateOfBirthOffset];
 
+   /// <summary>
+   ///   Given a validated personnummer, get the internal representation which
+   ///   converts six digit date of birth to eight digits and strips out the
+   ///   separator character.
+   /// </summary>
+   private static String GetInternalRepresentation(ReadOnlySpan<Char> personnummer)
+   {
+      var buffer = ArrayPool<Char>.Shared.Rent(InternalRepresentationLength);
+      try
+      {
+#pragma warning disable IDE0008 // Use explicit type
+         var (year, month, day) = GetYearMonthDay(personnummer, applySamordningsnummerOffset: false);
+#pragma warning restore IDE0008 // Use explicit type
+
+         var span = new Span<Char>(buffer);
+
+         Span<Char> work = span[..4];
+         year.TryFormat(work, out _, format: "D4");
+         work = span[4..6];
+         month.TryFormat(work, out _, format: "D2");
+         work = span[6..8];
+         day.TryFormat(work, out _, format: "D2");
+
+         work = span[8..12];
+         ReadOnlySpan<Char> remainder = personnummer[^4..];
+         remainder.CopyTo(work);
+
+         return span[..InternalRepresentationLength].ToString();
+      }
+      finally
+      {
+         ArrayPool<Char>.Shared.Return(buffer);
+      }
+   }
+
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Char GetSeparator(ReadOnlySpan<Char> personnummer)
       => personnummer[^SeparatorOffset];
 
-   private static (Int32 year, Int32 month, Int32 day) GetYearMonthDay(ReadOnlySpan<Char> personnummer)
+   private static (Int32 year, Int32 month, Int32 day) GetYearMonthDay(
+      ReadOnlySpan<Char> personnummer,
+      Boolean applySamordningsnummerOffset = true)
    {
       Int32 year;
       Int32 month;
       Int32 day;
       if (personnummer.Length == ShortFormatLength)
       {
-         // Assume that short format personnummer values are for people born in
-         // the 20th century, as long format personnummer was introduced in 1997,
-         // presumably as part of Y2K preparations.
-         year = 1900 + personnummer.ParseTwoDigits();
+         // Refer to class XML comments for details of 2 digit year calculations.
+         year = personnummer.ParseTwoDigits();
+         year += year > CenturyCutoff ? 1900 : 2000;
+         if (GetSeparator(personnummer) == Chars.Plus)
+         {
+            year -= 100;
+         }
          month = personnummer[2..].ParseTwoDigits();
          day = personnummer[4..].ParseTwoDigits();
       }
       else
       {
+         // This works for both 13 character values with separator and 12 character
+         // all digit internal representation.
          var century = personnummer.ParseTwoDigits() * 100;
          year = century + personnummer[2..].ParseTwoDigits();
          month = personnummer[4..].ParseTwoDigits();
@@ -442,23 +604,36 @@ public record SePersonnummer
       }
 
       // Handle samordningsnummer, which adds 60 to the date of birth.
-      if (day > SamordningsnummerDayOffset)
+      if (applySamordningsnummerOffset && day > SamordningsnummerDayOffset)
       {
          day -= SamordningsnummerDayOffset;
       }
 
       return (year, month, day);
    }
-   private static Boolean ValidateBirthSerialNumber(ReadOnlySpan<Char> personnummer)
+
+   /// <summary>
+   ///   If <see cref="ValidateCheckDigit(String)"/> returns false, determine
+   ///   if the reason was an invalid character or an invalid check digit.
+   /// </summary>
+   private static Boolean ValidateAllDigits(ReadOnlySpan<Char> personnummer)
    {
-      ReadOnlySpan<Char> birthSerialNumberSpan = GetBirthSerialNumber(personnummer);
-      foreach (var ch in birthSerialNumberSpan)
+      var processLength = personnummer.Length;
+      var separatorIndex = processLength - SeparatorOffset;          // SeparatorOffset measures from end of value
+
+      for(var index = 0; index < processLength; index ++)
       {
-         if (!Char.IsAsciiDigit(ch))
+         if (index == separatorIndex)
+         {
+            continue;
+         }
+
+         if (!personnummer[index].IsAsciiDigit())
          {
             return false;
          }
       }
+
 
       return true;
    }
@@ -487,7 +662,7 @@ public record SePersonnummer
       var (year, month, day) = GetYearMonthDay(personnummer);
 #pragma warning restore IDE0008 // Use explicit type
 
-      if (year is < 1900 or > 2099)
+      if (year < MinimumValidYearOfBirth || year > MaximumValidYearOfBirth)
       {
          return false;
       }
@@ -514,5 +689,5 @@ public class SePersonnummerJsonConverter : JsonConverter<SePersonnummer>
    }
 
    public override void Write(Utf8JsonWriter writer, SePersonnummer value, JsonSerializerOptions options)
-      => writer.WriteStringValue(value.Value);
+      => writer.WriteStringValue(value.ToLongFormatValue());
 }

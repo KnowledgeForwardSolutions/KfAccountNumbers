@@ -1,6 +1,8 @@
 // Ignore Spelling: Deserialize Deserialization Foedselsnummer Json Kf Nummer
 
 #pragma warning disable IDE0008 // Use explicit type
+#pragma warning disable IDE0058 // Expression value is never used
+#pragma warning disable CA2211 // Non-constant fields should not be visible
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -314,6 +316,24 @@ public class NoFoedselsnummerTests
       { "810100", "501" },
       { "910100", "501" },
    };
+
+   #region Constants Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void NoFoedselsnummer_MinimumValidYearOfBirth_ShouldHaveExpectedValue()
+      => NoFoedselsnummer.MinimumValidYearOfBirth.Should().Be(1854);
+
+   [Fact]
+   public void NoFoedselsnummer_MaximumValidYearOfBirth_ShouldHaveExpectedValue()
+      => NoFoedselsnummer.MaximumValidYearOfBirth.Should().Be(2039);
+
+   [Fact]
+   public void NoFoedselsnummer_DNummerDayOffset_ShouldHaveExpectedValue()
+      => NoFoedselsnummer.DNummerDayOffset.Should().Be(40);
+
+   #endregion
 
    #region Constructor Tests
    // ==========================================================================

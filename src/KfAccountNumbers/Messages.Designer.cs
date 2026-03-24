@@ -295,11 +295,11 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SE Personnummer must have a three digit birth serial number in character positions 7-9 (YYMMDD format) or character positions 9-11 (YYYYMMDD format).
+        ///   Looks up a localized string similar to SE Personnummer contains a non-digit character where a digit was expected.
         /// </summary>
-        internal static string SePersonnummerInvalidBirthSerialNumber {
+        internal static string SePersonnummerInvalidCharacter {
             get {
-                return ResourceManager.GetString("SePersonnummerInvalidBirthSerialNumber", resourceCulture);
+                return ResourceManager.GetString("SePersonnummerInvalidCharacter", resourceCulture);
             }
         }
         

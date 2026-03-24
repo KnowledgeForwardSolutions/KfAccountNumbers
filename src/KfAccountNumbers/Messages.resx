@@ -246,9 +246,6 @@
   <data name="SePersonnummerInvalidSeparator" xml:space="preserve">
     <value>SE Personnummer must have a valid separator character (either '-' or '+') in character position 6 (zero-based, YYMMDD format) or character position 8 (zero-based, YYYYMMDD format)</value>
   </data>
-  <data name="SePersonnummerInvalidBirthSerialNumber" xml:space="preserve">
-    <value>SE Personnummer must have a three digit birth serial number in character positions 7-9 (YYMMDD format) or character positions 9-11 (YYYYMMDD format)</value>
-  </data>
   <data name="SePersonnummerInvalidCheckDigit" xml:space="preserve">
     <value>SE Personnummer must have a valid Luhn algorithm check digit in character position 10 (YYMMDD format) or character position 12 (YYYYMMDD format)</value>
   </data>
@@ -269,5 +266,8 @@
   </data>
   <data name="NoFoedselsnummerInvalidCharacter" xml:space="preserve">
     <value>NO Foedselsnummer contains a non-digit character where a digit was expected</value>
+  </data>
+  <data name="SePersonnummerInvalidCharacter" xml:space="preserve">
+    <value>SE Personnummer contains a non-digit character where a digit was expected</value>
   </data>
 </root>
