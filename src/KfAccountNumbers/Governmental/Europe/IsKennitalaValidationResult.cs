@@ -33,7 +33,7 @@ public enum IsKennitalaValidationResult
    ///   The check digit in the second position from the right of the number is
    ///   not a valid weighted modulus 11 check digit character.
    /// </summary>
-   InvalidCheckDigits,
+   InvalidCheckDigit,
 
    /// <summary>
    ///   Eleven character value contains a digit character (0-9) in position 6
@@ -67,7 +67,7 @@ public static class IsKennitalaValidationResultExtensions
          IsKennitalaValidationResult.Empty => Messages.IsKennitalaEmpty,
          IsKennitalaValidationResult.InvalidLength => Messages.IsKennitalaInvalidLength,
          IsKennitalaValidationResult.InvalidCharacter => Messages.IsKennitalaInvalidCharacter,
-         IsKennitalaValidationResult.InvalidCheckDigits => Messages.IsKennitalaInvalidCheckDigit,
+         IsKennitalaValidationResult.InvalidCheckDigit => Messages.IsKennitalaInvalidCheckDigit,
          IsKennitalaValidationResult.InvalidSeparator => Messages.IsKennitalaInvalidSeparator,
          IsKennitalaValidationResult.InvalidCentury => Messages.IsKennitalaInvalidCentury,
          IsKennitalaValidationResult.InvalidDateOfBirth => Messages.IsKennitalaInvalidDateOfBirth,
