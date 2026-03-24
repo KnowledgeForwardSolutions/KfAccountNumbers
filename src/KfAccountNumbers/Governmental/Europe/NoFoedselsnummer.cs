@@ -1,4 +1,4 @@
-// Ignore Spelling: Foedselsnummer Json
+// Ignore Spelling: Foedselsnummer Json Nummer
 
 namespace KfAccountNumbers.Governmental.Europe;
 
@@ -19,7 +19,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            <description>
 ///               DDMMYY - the person's date of birth in DDMMYY format. The
 ///               only difference between a fødselsnummer and a D-nummer is that
-///               4 is added to the first digit of the person's date of birth
+///               40 is added to the day component of the person's date of birth
 ///               (i.e. 130585 becomes 530585). Day values in the range 41-71
 ///               (inclusive)  are considered D-nummers.
 ///            </description>
@@ -54,31 +54,29 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      Example values:
 ///      <list type="bullet">
 ///         <item>
-///            <term>010289158CC</term>
+///            <term>13029597140</term>
 ///            <description>
-///               fødselsnummer, date of birth February 1, 1989, gender = female,
-///               check digits CC
+///               fødselsnummer, date of birth February 13, 1995, gender = female,
+///               check digits 40
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>010289 158CC</term>
+///            <term>130295 97140</term>
 ///            <description>
-///               fødselsnummer, date of birth February 1, 1989, gender = female,
-///               check digits CC
+///               fødselsnummer, date of birth February 13, 1995, gender = female,
+///               check digits 40
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>521050035CC</term>
+///            <term>60055029566</term>
 ///            <description>
-///               D-nummer, date of birth October 12, 1950, gender = male, check
-///               digits CC
+///               D-nummer, date of birth May 20, 1950, gender = male, check digits 66
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>521050-035CC</term>
+///            <term>600550-29566</term>
 ///            <description>
-///               D-nummer, date of birth October 12, 1950, gender = male, check
-///               digits CC
+///               D-nummer, date of birth May 20, 1950, gender = male, check digits 66
 ///            </description>
 ///         </item>
 ///      </list>
@@ -179,6 +177,25 @@ namespace KfAccountNumbers.Governmental.Europe;
 [JsonConverter(typeof(NoFoedselsnummerJsonConverter))]
 public record NoFoedselsnummer
 {
+   /// <summary>
+   ///   Represents the day offset used to distinguish D-nummers from fødselsnummers.
+   /// </summary>
+   /// <remarks>
+   ///   In Norwegian identity numbers, a D-nummer is indicated by
+   ///   adding 40 to the day component of the date of birth.
+   /// </remarks>
+   public const Int32 DNummerDayOffset = 40;
+
+   /// <summary>
+   ///   The latest year of birth supported by <see cref="NoFoedselsnummer"/>.
+   /// </summary>
+   public const Int32 MaximumValidYearOfBirth = 2039;
+
+   /// <summary>
+   ///   The earliest year of birth supported by <see cref="NoFoedselsnummer"/>.
+   /// </summary>
+   public const Int32 MinimumValidYearOfBirth = 1854;
+
    private const Int32 NoSeparatorLength = 11;
    private const Int32 SeparatorLength = 12;
 
@@ -190,7 +207,6 @@ public record NoFoedselsnummer
    private const Int32 GenderOffset = 3;              // Gender indicated by odd/even-ness of individual number, but only need to examine the last digit
 
    // D-nummer adds 40 to the day portion of date of birth.
-   private const Int32 DNummerDayAdjustment = 40;
    private const Int32 DNummerMinimumDay = 41;
    private const Int32 DNummerMaximumDay = 71;
 
@@ -405,7 +421,7 @@ public record NoFoedselsnummer
       // Adjust day for possible D-nummer.
       if (day >= DNummerMinimumDay && day <= DNummerMaximumDay)
       {
-         day -= DNummerDayAdjustment;
+         day -= DNummerDayOffset;
       }
 
       // Adjust the year according to the value of the individual number.

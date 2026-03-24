@@ -317,6 +317,24 @@ public class NoFoedselsnummerTests
       { "910100", "501" },
    };
 
+   #region Constants Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void NoFoedselsnummer_MinimumValidYearOfBirth_ShouldHaveExpectedValue()
+      => NoFoedselsnummer.MinimumValidYearOfBirth.Should().Be(1854);
+
+   [Fact]
+   public void NoFoedselsnummer_MaximumValidYearOfBirth_ShouldHaveExpectedValue()
+      => NoFoedselsnummer.MaximumValidYearOfBirth.Should().Be(2039);
+
+   [Fact]
+   public void NoFoedselsnummer_DNummerDayOffset_ShouldHaveExpectedValue()
+      => NoFoedselsnummer.DNummerDayOffset.Should().Be(40);
+
+   #endregion
+
    #region Constructor Tests
    // ==========================================================================
    // ==========================================================================

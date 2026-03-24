@@ -132,7 +132,7 @@ indicates the exact type of identifier represented.
 
 Fødselsnummer and D-nummer are both 11 digit numbers formatted as DDMMYYIIICC, with the following elements:
 * DDMMYY - the person's date of birth in DDMMYY format. The only difference between a fødselsnummer and a D-nummer is
- that 4 is added to the first digit of the person's date of birth (i.e. 130585 becomes 530585). Day values in the range
+ that 40 is added to the day component of the person's date of birth (i.e. 130585 becomes 530585). Day values in the range
  41-71 (inclusive) are considered D-nummers.
 * III - three digit individual number. All three digits of the individual number are used to derive the century of the
  date of birth and the last digit of the individual number indicates the person's gender, with odd digits assigned to
@@ -144,7 +144,7 @@ Fødselsnummer and D-nummer are both 11 digit numbers formatted as DDMMYYIIICC, 
  the fødselsnummer was introduced.
 
 The 11 character value is sometimes formatted for greater readability by inserting a separator character, generally a
-space, between the date of birth and the identity digits, i.e. DDMMYY IIICC.
+space, between the date of birth and the individual number, i.e. DDMMYY IIICC.
 
 A valid fødselsnummer or D-nummer must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
@@ -236,11 +236,12 @@ For samordningsnummer values, the value returned by the `DateOfBirth` property i
 subtracting 60 from the encoded date of birth.
 
 Internally, `SePersonnummer` only stores the 12 digits of the date of birth (in YYYYMMDD format), the birth serial number
-and the check digit. The `Value` property and the `ToString` method will only return those 12 digits. `SePersonnummer`
-also exposes `ToShortFormat` and `ToLongFormat` methods that will return 11 and 13 character strings including a '-'
-separator character. The `ToShortFormat` and `ToLongFormat` methods also allow an optional parameter of type `System.TimeProvider`
+and the check digit. The `Value` property will only return those 12 digits. `SePersonnummer`
+also exposes `ToShortFormatValue` and `ToLongFormatValue` methods that will return 11 and 13 character strings including a
+separator character. The `ToShortFormatValue` and `ToLongFormatValue` methods allow an optional parameter of type `System.TimeProvider`
 that can be used to ensure that the separator character used is either a '-' or a '+', depending on the age of the
-person according to the time provider.
+person according to the time provider. If the time provider parameter is null, then the default separator of dash ('-') is used.
+The `ToString` method will return the same result as `ToLongFormatValue` with a null time provider parameter.
 
 When comparing two `SePersonnummer` objects for equality, the internal 12 digit representation is used. This means that
 two `SePersonnummer` objects representing the same person will be considered equal, even if one was created using a six

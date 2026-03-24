@@ -1,7 +1,5 @@
 // Ignore Spelling: Json Personnummer Samordningsnummer
 
-using System.Globalization;
-
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -165,13 +163,13 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      birth is substituted in its stead.
 ///   </para>
 ///   <para>
-///      When validating the date of birth, 13 character strings only use the
-///      initial eight characters in YYYYMMDD format to determine the date.
-///      For 11 character strings the initial six characters in YYMMDD format
-///      plus the separator character are used to determine the date. Two digit
-///      years are assumed to be between 1950 and 2049. If the separator
-///      character indicates that the person is 100 years of age or older, then
-///      the year is assumed to be between 1850 and 1949.
+///      When determining if a date of birth is valid, values with six digit
+///      dates of birth use the separator character to derive the full four
+///      digit year. Year values between 00 and 49 are assumed to be 2000 to
+///      2049 and year values between 50 and 99 are assumed to be 1950 to 1999.
+///      If the separator character indicates that the person is at least 100
+///      years of age, then 100 is subtracted from the year, resulting in 00 to
+///      40 meaning 1900 to 1949 and 50 to 99 meaning 1850 to 1899.
 ///   </para>
 ///   <para>
 ///      The valid range for a date of birth is January 1, 1800 to
@@ -182,6 +180,18 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      For samordningsnummer values, the value returned by the
 ///      <see cref="DateOfBirth"/> property is an actual date calculated by
 ///      subtracting 60 from the encoded date of birth.
+///   </para>
+///   <para>
+///      Internally, <see cref="SePersonnummer"/> stores a 12-digit representation
+///      consisting of the date of birth in YYYYMMDD format followed by the birth
+///      serial number and check digit (no separator). The <see cref="Value"/>
+///      property returns this internal representation.
+///   </para>
+///   <para>
+///      When comparing <see cref="SePersonnummer"/> objects for equality, the
+///      internal 12-digit representation is used. This means two objects
+///      representing the same person will be considered equal regardless of
+///      whether they were created from 11-character or 13-character input strings.
 ///   </para>
 ///   <para>
 ///      See https://en.wikipedia.org/wiki/Personal_identity_number_(Sweden)
