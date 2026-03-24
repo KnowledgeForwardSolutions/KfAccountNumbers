@@ -40,6 +40,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Asia (future)
 	- Australia (future)
 	- Europe
+        - [IsKennitala](#iskennitala) 
         - [NoFoedselsnummer](#nofoedselsnummer) 
         - [SePersonnummer](#sepersonnummer)
 	- NorthAmerica
@@ -55,7 +56,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 
 ## CaSocialInsuranceNumber
 
-CaSocialInsuranceNumber represents a Social Insurance Number (SIN) issued by the Government
+The `CaSocialInsuranceNumber` type represents a Social Insurance Number (SIN) issued by the Government
 of Canada.
 
 A Canadian SIN consists of 9 digits, typically formatted as AAA AAA AAA. The CaSocialInsuranceNumber
@@ -71,9 +72,47 @@ Not all 9 digit numbers are valid SINs. A valid SIN must meet all of the followi
 
 See [Wikipedia - Social Insurance Number](https://en.wikipedia.org/wiki/Social_Insurance_Number) for more info.
 
+## IsKennitala
+
+The `IsKennitala` type represents the national identification number used by Iceland. A kennitala may
+be issued to an individual or to a company (see below). `IsKennitala` includes an `IdentifierType`
+property which returns an `IsIdentifierType` enumeration value that indicates if the number is assigned
+to an individual (Einstaklingur) or to a company (Fyrirtæki).
+
+An Icelandic kennitala is a ten-digit number structured as DDMMYYRRPC, with the following elements:
+* DDMMYY - the person's date of birth (for individuals) or the date of registration (for companies) in DDMMYY format.
+ The only difference between an Einstaklingur kennitala and a Fyrirtæki kennitala is that 40 is added to the day
+ component of the date of birth for the Fyrirtæki kennitala (i.e. 130585 becomes 530585). Day values in the range
+ 41-71 (inclusive) indicate a Fyrirtæki kennitala.
+* RR - two random digits.
+* P - a check digit calculated for the DDMMYYRR digits using a weighted modulus 11 algorithm.
+* C - a single digit indicating the century of birth. Valid digits are 9 (1900's) and 0 (2000's).
+
+A kennitala may be formatted as a string of 10 consecutive digits (DDMMYYRRPC) or as 11 characters with a
+separator character, generally a dash ('-'), separating the date of birth and the remaining four digits (DDMMYY-RRPC).
+
+A valid kennitala must meet all of the following rules:
+* The value may not be null, empty or all whitespace characters.
+* The value must be either 10 or 11 characters in length.
+* All characters (except the optional separator character) must be ASCII digits (0-9).
+* The check digit must match the digit calculated using a weighted modulus 11 algorithm.
+* The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as a separator.
+* The century indicator must be the ASCII character nine ('9') or the ASCII character zero ('0').
+* The date of birth, after deriving the century from the century indicator (and if the value is a Fyrirtæki kennitala,
+ after subtracting the Fyrirtæki kennitala offset) must be a valid date between January 1, 1900 and December 31, 2099.
+
+Example values:
+* 1205854369 - Einstaklingur, date of birth May 12, 1985, check digit = 6
+* 120585-4369 - Einstaklingur, date of birth May 12, 1985, check digit = 6
+* 5311073810 - Fyrirtæki, date of registration November 13, 2007, check digit 1
+* 531107 3810 - Fyrirtæki, date of registration November 13, 2007, check digit 1
+
+See [Wikipedia - Icelandic identification number](https://en.wikipedia.org/wiki/Icelandic_identification_number)
+and [kennitala.com](https://kennitala.com/) for more info.
+
 ## MxCurp
 
-MxCurp represents a Clave Única de Registro de Población (CURP) issued by the Government of Mexico,
+The `MxCurp` type represents a Clave Única de Registro de Población (CURP) issued by the Government of Mexico,
 specifically the Registry Nacional de Poblacion (RENAPO).
 
 A Mexican CURP consists of 18 characters, in the form AAAADDDDDDGLLNNNHC (example: HEGG560427MVZRRL04,
@@ -122,12 +161,12 @@ See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/
 
 ## NoFoedselsnummer
 
-The `NoFoedselsnummer` class represents a Norwegian national identity number. Like a number of other countries, Norway has
+The `NoFoedselsnummer` type represents a Norwegian national identity number. Like a number of other countries, Norway has
 two different identity numbers with identical format, the fødselsnummer (birth number), which is issued to citizens and
 long-term residents of Norway and the D-nummer, which is issued to foreign individuals who are not eligible for a
 fødselsnummer. (The term "D-nummer" originates from the Norwegian Directorate of Sailors, when the primary group of foreign
 born individuals needing an identifier when paying Norwegian taxes were sailors working on Norwegian ships.) The
-NoFoedselsnummer class includes an `IdentifierType` property which returns a `NoIdentifierType` enumeration value that
+`NoFoedselsnummer` type includes an `IdentifierType` property which returns a `NoIdentifierType` enumeration value that
 indicates the exact type of identifier represented.
 
 Fødselsnummer and D-nummer are both 11 digit numbers formatted as DDMMYYIIICC, with the following elements:
@@ -150,9 +189,9 @@ A valid fødselsnummer or D-nummer must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
 * The value must be either 11 or 12 characters in length.
 * All characters (except the optional separator character) must be ASCII digits (0-9).
-* The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as separator.
+* The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as a separator.
 * The date of birth, after deriving the century from the individual number (and if the value is a D-nummer,
-after subtracting the D-nummer offset) must be a valid date between January 1, 1854 and December 31 2039.
+ after subtracting the D-nummer offset) must be a valid date between January 1, 1854 and December 31, 2039.
 * The trailing two characters must be valid weighted modulus 11 check digits.
 
 Example values:
@@ -183,11 +222,11 @@ See [Wikipedia - National identity number (Norway)](https://en.wikipedia.org/wik
 
 ## SePersonnummer
 
-SePersonnummer represents either of two identifiers issued by the Swedish Tax Agency that have the
+The `SePersonnummer` type represents either of two identifiers issued by the Swedish Tax Agency that have the
 same format and are used for similar purposes. The first, the Personal Identity Number (personnummer)
 is issued to persons born in Sweden or who are residents of Sweden for 12 months or longer. The second,
 the coordination number (samordningsnummer) is issued to persons who reside in Sweden for less than a year.
-SePersonnummer includes an `IdentifierType` property which returns a `SeIdentifierType` enumeration value
+`SePersonnummer` includes an `IdentifierType` property which returns a `SeIdentifierType` enumeration value
 that indicates the exact type of identifier represented.
 
 Personnummer and samordningsnummer values are both 11 or 13 character strings. The only difference
@@ -264,7 +303,7 @@ See [Wikipedia - Personal identity number (Sweden)](https://en.wikipedia.org/wik
 
 ## UsIndividualTaxpayerIdentificationNumber
 
-UsIndividualTaxpayerIdentificationNumber represents an Individual Taxpayer Identification Number (ITIN)
+The `UsIndividualTaxpayerIdentificationNumber` type represents an Individual Taxpayer Identification Number (ITIN)
 issued by the US Internal Revenue Service (IRS). ITINs are used for tax processing purposes for
 individuals who are not eligible for a Social Security Number (SSN) but who have a tax filing
 requirement in the United States.
@@ -290,7 +329,7 @@ See [Wikipedia - Individual Taxpayer Identification Number](https://en.wikipedia
 
 ## UsNationalProviderNumber
 
-UsNationalProviderNumber represents a National Provider Identifier (NPI) issued to health care
+The `UsNationalProviderNumber` type represents a National Provider Identifier (NPI) issued to health care
 providers by the US Centers for Medicare & Medicaid Services (CMS). The NPI is used in administrative
 and billing transactions within the U.S. healthcare system.
 
@@ -307,7 +346,7 @@ See [Wikipedia - National Provider Identifier](https://en.wikipedia.org/wiki/Nat
 
 ## UsSocialSecurityNumber
 
-UsSocialSecurityNumber represents a Social Security Number (SSN) issued by the US Social Security
+The `UsSocialSecurityNumber` type represents a Social Security Number (SSN) issued by the US Social Security
 Administration.
 
 A US SSN consists of 9 digits, arranged in three groups (AAA-GG-SSSS). The first three digits are the
