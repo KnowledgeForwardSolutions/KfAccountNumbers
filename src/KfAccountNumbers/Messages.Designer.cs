@@ -160,6 +160,69 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to IS Kennitala may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string IsKennitalaEmpty {
+            get {
+                return ResourceManager.GetString("IsKennitalaEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IS Kennitala century indicator must be either &apos;9&apos; or &apos;0&apos;.
+        /// </summary>
+        internal static string IsKennitalaInvalidCentury {
+            get {
+                return ResourceManager.GetString("IsKennitalaInvalidCentury", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IS Kennitala contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string IsKennitalaInvalidCharacter {
+            get {
+                return ResourceManager.GetString("IsKennitalaInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IS Kennitala must have a valid check digit character in the second character from the right of the value.
+        /// </summary>
+        internal static string IsKennitalaInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("IsKennitalaInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IS Kennitala requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based).
+        /// </summary>
+        internal static string IsKennitalaInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("IsKennitalaInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IS Kennitala must have length 10 (no separator character) or 11 (separator character).
+        /// </summary>
+        internal static string IsKennitalaInvalidLength {
+            get {
+                return ResourceManager.GetString("IsKennitalaInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IS Kennitala separator character must not be a digit.
+        /// </summary>
+        internal static string IsKennitalaInvalidSeparator {
+            get {
+                return ResourceManager.GetString("IsKennitalaInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MX CURP may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string MxCurpEmpty {

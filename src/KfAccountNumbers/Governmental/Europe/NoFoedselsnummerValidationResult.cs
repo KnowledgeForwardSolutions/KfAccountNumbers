@@ -54,7 +54,7 @@ public enum NoFoedselsnummerValidationResult
 /// <summary>
 ///   Additional methods for type <see cref="NoFoedselsnummerValidationResult"/>.
 /// </summary>
-public static class NoFodselsnummerValidationResultExtensions
+public static class NoFoedselsnummerValidationResultExtensions
 {
    public static String ToErrorDescription(this NoFoedselsnummerValidationResult errorType)
       => errorType switch
