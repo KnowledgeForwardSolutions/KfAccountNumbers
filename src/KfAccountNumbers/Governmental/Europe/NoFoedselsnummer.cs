@@ -496,14 +496,11 @@ public record NoFoedselsnummer
 
    private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> foedselsnummer)
    {
-      const Int32 minimumValidYear = 1854;      // Per rules on the effect of the individual number on century
-      const Int32 maximumValidYear = 2039;      // "
-
 #pragma warning disable IDE0008 // Use explicit type
       var (day, month, year) = GetDayMonthYear(foedselsnummer);
 #pragma warning restore IDE0008 // Use explicit type
 
-      if (year < minimumValidYear || year > maximumValidYear)
+      if (year < MinimumValidYearOfBirth || year > MaximumValidYearOfBirth)
       {
          return false;
       }

@@ -173,7 +173,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      The valid range for a date of birth is January 1, 1800 to
-///      December 31, 2099. However, if a six digit date if birth is supplied
+///      December 31, 2099. However, if a six digit date of birth is supplied
 ///      then the valid range will be between January 1, 1850 to December 31, 2049.
 ///   </para>
 ///   <para>
@@ -202,7 +202,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record SePersonnummer
 {
    /// <summary>
-   ///   The assumed century for two digit years greater than or equal to the
+   ///   The assumed century for two digit years greater than the
    ///   <see cref="CenturyCutoff"/>. 
    /// </summary>
    /// <remarks>
@@ -416,13 +416,13 @@ public record SePersonnummer
    }
 
    /// <summary>
-   ///   Returns a string representation of the value in a long format, combining
-   ///   the date of birth in YYYYMMDD format, a separator characer, the three
-   ///   digit birth serial number and the check digit.
+   ///   Returns a string representation of the value in a long 13 character format,
+   ///   combining the date of birth in YYYYMMDD format, a separator character, the
+   ///   three digit birth serial number and the check digit.
    /// </summary>
    /// <param name="timeProvider">
    ///   Optional. <see cref="TimeProvider"/> instance used to determine the
-   ///   exact age of the person. Persons 100 years of older will have a plus
+   ///   exact age of the person. Persons 100 years or older will have a plus
    ///   ('+') as a separator; otherwise a dash ('-') is used as the separator.
    ///   If the <paramref name="timeProvider"/> is <see langword="null"/> then
    ///   the separator character will default to a dash ('-').
@@ -437,13 +437,13 @@ public record SePersonnummer
    }
 
    /// <summary>
-   ///   Returns a string representation of the value in a long format, combining
-   ///   the date of birth in YYMMDD format, a separator characer, the three
-   ///   digit birth serial number and the check digit.
+   ///   Returns a string representation of the value in a short 11 character format,
+   ///   combining the date of birth in YYMMDD format, a separator character, the
+   ///   three digit birth serial number and the check digit.
    /// </summary>
    /// <param name="timeProvider">
    ///   Optional. <see cref="TimeProvider"/> instance used to determine the
-   ///   exact age of the person. Persons 100 years of older will have a plus
+   ///   exact age of the person. Persons 100 years or older will have a plus
    ///   ('+') as a separator; otherwise a dash ('-') is used as the separator.
    ///   If the <paramref name="timeProvider"/> is <see langword="null"/> then
    ///   the separator character will default to a dash ('-').

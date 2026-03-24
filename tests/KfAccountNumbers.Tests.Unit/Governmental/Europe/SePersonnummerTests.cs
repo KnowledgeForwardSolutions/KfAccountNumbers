@@ -1244,7 +1244,7 @@ public class SePersonnummerTests
       var timeProvider = new FakeTimeProvider(currentDate);
       var expected = $"{sut.Value[..8]}{expectedSeparator}{sut.Value[^4..]}";
 
-      // Arrange.
+      // Act.
       var result = sut.ToLongFormatValue(timeProvider);
 
       // Assert.
@@ -1298,7 +1298,7 @@ public class SePersonnummerTests
       var timeProvider = new FakeTimeProvider(currentDate);
       var expected = $"{sut.Value[2..8]}{expectedSeparator}{sut.Value[^4..]}";
 
-      // Arrange.
+      // Act.
       var result = sut.ToShortFormatValue(timeProvider);
 
       // Assert.
