@@ -321,7 +321,7 @@ public record NoFoedselsnummer
    public static explicit operator NoFoedselsnummer(String? foedselsnummer) => new(foedselsnummer);
 
    /// <summary>
-   ///   Create a new <see cref="NoFoedselsnummer"/>.
+   ///   Create a new <see cref="NoFoedselsnummer"/> using the Result pattern.
    /// </summary>
    /// <param name="foedselsnummer">
    ///   String representation of a Norwegian National Identity Number (fødselsnummer).

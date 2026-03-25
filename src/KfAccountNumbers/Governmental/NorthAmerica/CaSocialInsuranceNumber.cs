@@ -113,7 +113,7 @@ public record CaSocialInsuranceNumber
    public static explicit operator CaSocialInsuranceNumber(String? sin) => new(sin);
 
    /// <summary>
-   ///   Create a new <see cref="CaSocialInsuranceNumber"/>.
+   ///   Create a new <see cref="CaSocialInsuranceNumber"/> using the Result pattern.
    /// </summary>
    /// <param name="sin">
    ///   String representation of a Social Insurance Number.

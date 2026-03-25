@@ -124,7 +124,8 @@ public record UsIndividualTaxpayerIdentificationNumber
    public static explicit operator UsIndividualTaxpayerIdentificationNumber(String? itin) => new(itin);
 
    /// <summary>
-   ///   Create a new <see cref="UsIndividualTaxpayerIdentificationNumber"/>.
+   ///   Create a new <see cref="UsIndividualTaxpayerIdentificationNumber"/>
+   ///   using the Result pattern.
    /// </summary>
    /// <param name="itin">
    ///   String representation of an Individual Taxpayer Identification Number.

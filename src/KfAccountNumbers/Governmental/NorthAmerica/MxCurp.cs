@@ -235,7 +235,7 @@ public record MxCurp
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Create a new <see cref="MxCurp"/>.
+   ///   Create a new <see cref="MxCurp"/> using the Result pattern.
    /// </summary>
    /// <param name="curp">
    ///   String representation of a CURP.

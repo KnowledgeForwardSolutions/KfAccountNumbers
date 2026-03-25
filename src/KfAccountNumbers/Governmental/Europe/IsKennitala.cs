@@ -258,6 +258,28 @@ public record IsKennitala
    public static explicit operator IsKennitala(String? kennitala) => new(kennitala);
 
    /// <summary>
+   ///   Create a new <see cref="IsKennitala"/> using the Result pattern.
+   /// </summary>
+   /// <param name="kennitala">
+   ///   String representation of an Icelandic kennitala.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{IsKennitala, IsKennitalaValidationResult}"/>.
+   ///   Will contain the new <see cref="IsKennitalaValidationResult"/> if 
+   ///   <paramref name="kennitala"/> is valid or 
+   ///   <see cref="IsKennitalaValidationResult"/> that identifies
+   ///   the validation rule that was failed if <paramref name="kennitala"/> is 
+   ///   invalid.
+   /// </returns>
+   public static CreateResult<IsKennitala, IsKennitalaValidationResult> Create(String? kennitala)
+   {
+      IsKennitalaValidationResult validationResult = Validate(kennitala);
+      return validationResult == IsKennitalaValidationResult.ValidationPassed
+         ? new IsKennitala(kennitala, validationMode: ValidationMode.BypassValidation)
+         : validationResult;
+   }
+
+   /// <summary>
    ///   Check the <paramref name="kennitala"/> to determine if it contains a
    ///   valid Icelandic kennitala number.
    /// </summary>

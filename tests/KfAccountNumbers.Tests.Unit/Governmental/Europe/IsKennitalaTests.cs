@@ -1,5 +1,7 @@
 // Ignore Spelling: Fyrirtaeki Kennitala Kf
 
+#pragma warning disable IDE0008 // Use explicit type
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class IsKennitalaTests
@@ -699,6 +701,298 @@ public class IsKennitalaTests
          .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
          .WithMessage(Messages.IsKennitalaInvalidDateOfBirth + "*")
          .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidDateOfBirth);
+   }
+
+   #endregion
+
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void IsKennitala_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var foedselsnummer1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      var foedselsnummer2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+
+      // Act/assert.
+      (foedselsnummer1 == foedselsnummer2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IsKennitala_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var foedselsnummer1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      var foedselsnummer2 = new IsKennitala(AltValid11CharacterEinstaklingurKennitala);
+
+      // Act/assert.
+      (foedselsnummer1 == foedselsnummer2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void IsKennitala_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 11 character versions for same person should still be equal.
+      var foedselsnummer1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
+      var foedselsnummer2 = new IsKennitala(Valid11CharacterFyrirtaekiKennitala);
+
+      // Act/assert.
+      (foedselsnummer1 == foedselsnummer2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void IsKennitala_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var foedselsnummer1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
+      var foedselsnummer2 = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
+
+      // Act/assert.
+      (foedselsnummer1 != foedselsnummer2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IsKennitala_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 11 and 12 character versions for same person should still be equal.
+      var foedselsnummer1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var foedselsnummer2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+
+      // Act/assert.
+      (foedselsnummer1 != foedselsnummer2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void IsKennitala_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var foedselsnummer1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var foedselsnummer2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+
+      // Act/assert.
+      (foedselsnummer1 != foedselsnummer2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidKennitalaValues))]
+   public void IsKennitala_Create_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expectedValue = new IsKennitala(value);
+
+      // Act.
+      var result = IsKennitala.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSeparators))]
+   public void IsKennitala_Create_ShouldCreateInstance_WhenValueHasValidSeparator(String separator)
+   {
+      // Arrange.
+      var value = GetKennitaliaWithValidCheckDigits(separator: separator);
+      var expectedValue = new IsKennitala(value);
+
+      // Act.
+      var result = IsKennitala.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDateOfBirthValues))]
+   public void IsKennitala_Create_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
+      String dateOfBirth,
+      String randomDigits,
+      String centuryIndicator)
+   {
+      // Arrange.
+      var value = GetKennitaliaWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         randomDigits: randomDigits,
+         centuryIndicator: centuryIndicator);
+      var expectedValue = new IsKennitala(value);
+
+      // Act.
+      var result = IsKennitala.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void IsKennitala_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
+   {
+      // Act.
+      var result = IsKennitala.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(IsKennitalaValidationResult.Empty);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void IsKennitala_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   {
+      // Act.
+      var result = IsKennitala.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(IsKennitalaValidationResult.InvalidLength);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void IsKennitala_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacter(String value)
+   {
+      // Act.
+      var result = IsKennitala.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(IsKennitalaValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void IsKennitala_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Act.
+      var result = IsKennitala.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(IsKennitalaValidationResult.InvalidCheckDigit);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCenturyIndicatorValues))]
+   public void IsKennitala_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCenturyIndicator(String value)
+   {
+      // Act.
+      var result = IsKennitala.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(IsKennitalaValidationResult.InvalidCentury);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparators))]
+   public void IsKennitala_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(String separator)
+   {
+      // Arrange.
+      var value = GetKennitaliaWithValidCheckDigits(separator: separator);
+
+      // Act.
+      var result = IsKennitala.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(IsKennitalaValidationResult.InvalidSeparator);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void IsKennitala_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      String randomDigits,
+      String centuryIndicator)
+   {
+      // Arrange.
+      var value = GetKennitaliaWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         randomDigits: randomDigits,
+         centuryIndicator: centuryIndicator);
+
+      // Act.
+      var result = IsKennitala.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(IsKennitalaValidationResult.InvalidDateOfBirth);
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void IsKennitala_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var foedselsnummer1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var foedselsnummer2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+
+      // Act/assert.
+      foedselsnummer1.Equals(foedselsnummer2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IsKennitala_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var foedselsnummer1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
+      var foedselsnummer2 = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
+
+      // Act/assert.
+      foedselsnummer1.Equals(foedselsnummer2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void IsKennitala_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 11 and 12 character versions for same person should still be equal.
+      var foedselsnummer1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var foedselsnummer2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+
+      // Act/assert.
+      foedselsnummer1.Equals(foedselsnummer2).Should().BeTrue();
    }
 
    #endregion

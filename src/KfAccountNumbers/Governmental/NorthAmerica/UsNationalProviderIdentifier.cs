@@ -97,7 +97,8 @@ public record UsNationalProviderIdentifier
    public static explicit operator UsNationalProviderIdentifier(String? npi) => new(npi);
 
    /// <summary>
-   ///   Create a new <see cref="UsNationalProviderIdentifier"/>.
+   ///   Create a new <see cref="UsNationalProviderIdentifier"/> using the
+   ///   Result pattern.
    /// </summary>
    /// <param name="npi">
    ///   String representation of a US National Provider Identifier.
