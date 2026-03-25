@@ -420,7 +420,7 @@ public class NoFoedselsnummerTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasCheckDigits(String value)
+   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
       => FluentActions
          .Invoking(() => new NoFoedselsnummer(value))
          .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
@@ -429,7 +429,7 @@ public class NoFoedselsnummerTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparators))]
-   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasSeparator(String separator)
+   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String separator)
    {
       // Arrange.
       var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);

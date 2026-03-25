@@ -84,7 +84,7 @@ An Icelandic kennitala is a ten-digit number structured as DDMMYYRRPC, with the 
  The only difference between an Einstaklingur kennitala and a Fyrirtæki kennitala is that 40 is added to the day
  component of the date of birth for the Fyrirtæki kennitala (i.e. 130585 becomes 530585). Day values in the range
  41-71 (inclusive) indicate a Fyrirtæki kennitala.
-* RR - two random digits.
+* RR - two random digits used to differentiate between to persons born on the same date.
 * P - a check digit calculated for the DDMMYYRR digits using a weighted modulus 11 algorithm.
 * C - a single digit indicating the century of birth. Valid digits are 9 (1900's) and 0 (2000's).
 
@@ -93,8 +93,8 @@ separator character, generally a dash ('-'), separating the date of birth and th
 
 A valid kennitala must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
-* The value must be either 10 or 11 characters in length.
-* All characters (except the optional separator character) must be ASCII digits (0-9).
+* The value must be either 10 characters (without separator) or 11 characters (with separator) in length.
+* All characters (except the optional separator character) must be ASCII digits ('0'-'9').
 * The check digit must match the digit calculated using a weighted modulus 11 algorithm.
 * The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as a separator.
 * The century indicator must be the ASCII character nine ('9') or the ASCII character zero ('0').
@@ -187,7 +187,7 @@ space, between the date of birth and the individual number, i.e. DDMMYY IIICC.
 
 A valid fødselsnummer or D-nummer must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
-* The value must be either 11 or 12 characters in length.
+* The value must be either 11 characters (without separator) or 12 characters (with separator) in length.
 * All characters (except the optional separator character) must be ASCII digits (0-9).
 * The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as a separator.
 * The date of birth, after deriving the century from the individual number (and if the value is a D-nummer,

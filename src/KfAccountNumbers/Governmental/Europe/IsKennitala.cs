@@ -2,6 +2,126 @@
 
 namespace KfAccountNumbers.Governmental.Europe;
 
+/// <summary>
+///   Strongly typed business object that represents an Icelandic national
+///   identity number (kennitala). A kennitala may be issued to an individual
+///   or to a company. The <see cref="IdentityType"/> property returns an
+///   enum value that indicates if the kennitala number is assigned to an
+///   individual (Einstaklingur) or to a company (Fyrirtæki).
+/// </summary>
+/// <remarks>
+///   <para>
+///      A kennitala is a ten-digit number structured as DDMMYYRRPC, with the
+///      following elements:
+///      <list type="bullet">
+///         <item>
+///            <term>DDMMYY</term>
+///            <description>
+///               the person's date of birth (for individuals) or the date of
+///               registration (for companies) in DDMMYY format. The only difference
+///               between an Einstaklingur kennitala and a Fyrirtæki kennitala is
+///               that 40 is added to the day component of the date of birth for
+///               the Fyrirtæki kennitala (i.e. 130585 becomes 530585). Day values
+///               in the range 41-71 (inclusive) indicate a Fyrirtæki kennitala.
+///            </description>
+///         </item>
+///         <item>
+///            <term>RR</term>
+///            <description>
+///               Two random digits used to differentiate between to persons born
+///               on the same date.
+///            </description>
+///         </item>
+///         <item>
+///            <term>P</term>
+///            <description>
+///               A check digit calculated for the DDMMYYRR digits using a weighted
+///               modulus 11 algorithm.
+///            </description>
+///         </item>
+///         <item>
+///            <term>C</term>
+///            <description>
+///               A single digit indicating the century of birth. Valid digits are
+///               9 (1900's) and 0 (2000's).
+///            </description>
+///         </item>
+///      </list>
+///   </para>
+///   <para>
+///      A kennitala may be formatted as a string of 10 consecutive digits (DDMMYYRRPC)
+///      or as 11 characters with a separator character, generally a dash ('-'),
+///      separating the date of birth and the remaining four digits (DDMMYY-RRPC).
+///   </para>
+///   <para>
+///      Example values:
+///      <list type="bullet">
+///         <item>
+///            <term>1205854369</term>
+///            <description>
+///               Einstaklingur, date of birth May 12, 1985, check digit = 6
+///            </description>
+///         </item>
+///         <item>
+///            <term>120585-4369</term>
+///            <description>
+///               Einstaklingur, date of birth May 12, 1985, check digit = 6
+///            </description>
+///         </item>
+///         <item>
+///            <term>5311073810</term>
+///            <description>
+///               Fyrirtæki, date of registration November 13, 2007, check digit 1
+///            </description>
+///         </item>
+///         <item>
+///            <term>531107 3810</term>
+///            <description>
+///               Fyrirtæki, date of registration November 13, 2007, check digit 1
+///            </description>
+///         </item>
+///      </list>
+///   </para>
+///   <para>
+///      When creating a new <see cref="IsKennitala"/>, the following
+///      validation rules are applied:
+///      <list type="bullet">
+///         <description>
+///            The value may not be null, empty or all whitespace characters.
+///         </description>
+///         <description>
+///            The value must be either 10 characters (without separator) or 11
+///            characters (with separator) in length.
+///         </description>
+///         <description>
+///            All characters (except the optional separator character) must be
+///            ASCII digits ('0'-'9').
+///         </description>
+///         <description>
+///            The check digit must match the digit calculated using a weighted
+///            modulus 11 algorithm.
+///         </description>
+///         <description>
+///            The optional separator character, if included, may not be an ASCII
+///            digit. Any non-digit character is allowed as a separator.
+///         </description>
+///         <description>
+///            The century indicator must be the ASCII character nine ('9') or
+///            the ASCII character zero ('0').
+///         </description>
+///         <description>
+///            The date of birth, after deriving the century from the century
+///            indicator (and if the value is a Fyrirtæki kennitala, after
+///            subtracting the Fyrirtæki kennitala offset) must be a valid date
+///            between January 1, 1900 and December 31, 2099.
+///         </description>
+///      </list>
+///   </para>
+///   <para>
+///      See https://en.wikipedia.org/wiki/Icelandic_identification_number and
+///      https://kennitala.com/ for more info.
+///   </para>
+/// </remarks>
 public record IsKennitala
 {
    /// <summary>
@@ -34,6 +154,70 @@ public record IsKennitala
    private const Int32 CenturyIndicatorOffset = 1;
 
    private static readonly Int32[] _weights = [3, 2, 7, 6, 5, 4, 3, 2, 1];
+
+   /// <summary>
+   ///   Initialize a new instance of the <see cref="IsKennitala"/> class.
+   /// </summary>
+   /// <param name="kennitala">
+   ///   String representation of a kennitala.
+   /// </param>
+   /// <exception cref="KfValidationException{IsKennitalaValidationResult}">
+   ///   <paramref name="kennitala"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="kennitala"/> is not length 10 (or 11 if a separator
+   ///   character is used).
+   ///   - or -
+   ///   <paramref name="kennitala"/> contains a non-digit character in
+   ///   any position other than the separator location.
+   ///   - or -
+   ///   <paramref name="kennitala"/> contains an invalid weighted modulus
+   ///   11 check digit in one or both trailing positions.
+   ///   - or -
+   ///   <paramref name="kennitala"/> contains a digit character in position
+   ///   6 (zero-based). Valid separator characters are any non-digit character,
+   ///   though space (' ') and dash ('-') are the most common values.
+   ///   - or -
+   ///   <paramref name="kennitala"/> contains an invalid century indicator
+   ///   in the trailing (right-most) position. Valid century indicators are
+   ///   '9' (1900's) and '0' (2000's).
+   ///   - or -
+   ///   <paramref name="kennitala"/> contains an invalid date of birth in
+   ///   positions 0-5 (zero-based).
+   /// </exception>
+   public IsKennitala(String? kennitala)
+      : this(kennitala, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private IsKennitala(String? kennitala, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         IsKennitalaValidationResult validationResult = Validate(kennitala);
+         if (validationResult != IsKennitalaValidationResult.ValidationPassed)
+         {
+            throw validationResult.ToValidationException();
+         }
+      }
+
+      Value = GetRawValue(kennitala!);
+   }
+
+   /// <summary>
+   ///   The type of kennitala identifier represented by this instance,
+   ///   indicating if this is an Einstaklingur or a Fyrirtaeki.
+   /// </summary>
+   /// <remarks>
+   ///   The first two digits of the value determine the type of identifier.
+   ///   Fyrirtaekis add 40 to the first two digits of the date of birth (DDMMYY
+   ///   format) so any day of birth between 41 and 71 is considered a Fyrirtaeki.
+   /// </remarks>
+   public IsIdentifierType IdentifierType
+      => throw new NotImplementedException();
 
    /// <summary>
    ///   The raw kennitala value.
@@ -105,6 +289,13 @@ public record IsKennitala
 
       return (day, month, year);
    }
+
+   private static String GetRawValue(String kennitala)
+      => kennitala.Length == NoSeparatorLength
+         ? kennitala
+         : String.Concat(
+            kennitala.AsSpan(0, SeparatorOffset),
+            kennitala.AsSpan(SeparatorOffset + 1));
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean IsFormatted(ReadOnlySpan<Char> kennitala)

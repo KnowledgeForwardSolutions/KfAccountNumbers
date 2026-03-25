@@ -16,8 +16,9 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      DDMMYYIIICC, with the following elements:
 ///      <list type="bullet">
 ///         <item>
+///            <term>DDMMYY</term>
 ///            <description>
-///               DDMMYY - the person's date of birth in DDMMYY format. The
+///               The person's date of birth in DDMMYY format. The
 ///               only difference between a fødselsnummer and a D-nummer is that
 ///               40 is added to the day component of the person's date of birth
 ///               (i.e. 130585 becomes 530585). Day values in the range 41-71
@@ -25,8 +26,9 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            </description>
 ///         </item>
 ///         <item>
+///            <term>III</term>
 ///            <description>
-///               III - three digit individual number. All three digits of the
+///               Three digit individual number. All three digits of the
 ///               individual number are used to derive the century of the date
 ///               of birth and the last digit of the individual number indicates
 ///               the person's gender, with odd digits assigned to males and even
@@ -35,8 +37,9 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            </description>
 ///         </item>
 ///         <item>
+///            <term>CC</term>
 ///            <description>
-///               CC - two separate check digits calculated using a weighted
+///               Two separate check digits calculated using a weighted
 ///               modulus 11 algorithm. The first check digit is calculated
 ///               for the first nine digits (date of birth and individual number)
 ///               and the second check digit is calculated for the date of birth,
@@ -92,7 +95,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The string must be either 11 or 12 characters long.
+///               The string must be either 11 (without separator) or 12 characters
+///               (with separator) long.
 ///            </description>
 ///         </item>
 ///         <item>
