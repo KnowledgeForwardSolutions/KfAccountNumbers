@@ -438,6 +438,72 @@ public class IsKennitalaTests
 
    #endregion
 
+   #region IdentifierType Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData("010154", "15", "9")]
+   [InlineData("311239", "15", "9")]
+   public void IsKennitala_IdentifierType_ShouldReturnExpectedValue_WhenValueIsEinstaklingur(
+      String dateOfBirth,
+      String randomDigits,
+      String centuryIndicator)
+   {
+      // Arrange.
+      var value = GetKennitaliaWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         randomDigits: randomDigits,
+         centuryIndicator: centuryIndicator);
+      var sut = new IsKennitala(value);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(IsIdentifierType.Einstaklingur);
+   }
+
+   [Theory]
+   [InlineData("410154", "15", "0")]
+   [InlineData("711239", "15", "0")]
+   public void IsKennitala_IdentifierType_ShouldReturnExpectedValue_WhenValueIsFyrirtaeki(
+      String dateOfBirth,
+      String randomDigits,
+      String centuryIndicator)
+   {
+      // Arrange.
+      var value = GetKennitaliaWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         randomDigits: randomDigits,
+         centuryIndicator: centuryIndicator);
+      var sut = new IsKennitala(value);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(IsIdentifierType.Fyrirtaeki);
+   }
+
+   #endregion
+
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Valid10CharacterEinstaklingurKennitala, Valid10CharacterEinstaklingurKennitala)]
+   [InlineData(Valid11CharacterEinstaklingurKennitala, Valid10CharacterEinstaklingurKennitala)]
+   [InlineData(Valid10CharacterFyrirtaekiKennitala, Valid10CharacterFyrirtaekiKennitala)]
+   [InlineData(Valid11CharacterFyrirtaekiKennitala, Valid10CharacterFyrirtaekiKennitala)]
+   public void IsKennitala_Value_ShouldReturnValidatedKennitala(
+      String value,
+      String expected)
+   {
+      // Arrange.
+      var sut = new IsKennitala(value);
+
+      // Act/assert.
+      sut.Value.Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================

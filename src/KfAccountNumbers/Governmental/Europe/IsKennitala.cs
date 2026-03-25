@@ -153,6 +153,10 @@ public record IsKennitala
    private const Int32 CheckDigitOffset = 2;
    private const Int32 CenturyIndicatorOffset = 1;
 
+   // Fyrirtæki adds 40 to the day portion of date of birth.
+   private const Int32 FyrirtaekiMinimumDay = 41;
+   private const Int32 FyrirtaekiMaximumDay = 71;
+
    private static readonly Int32[] _weights = [3, 2, 7, 6, 5, 4, 3, 2, 1];
 
    /// <summary>
@@ -238,7 +242,9 @@ public record IsKennitala
    ///   format) so any day of birth between 41 and 71 is considered a Fyrirtaeki.
    /// </remarks>
    public IsIdentifierType IdentifierType
-      => throw new NotImplementedException();
+      => Value.AsSpan().ParseTwoDigits() is >= FyrirtaekiMinimumDay and <= FyrirtaekiMaximumDay
+         ? IsIdentifierType.Fyrirtaeki
+         : IsIdentifierType.Einstaklingur;
 
    /// <summary>
    ///   The raw kennitala value.
