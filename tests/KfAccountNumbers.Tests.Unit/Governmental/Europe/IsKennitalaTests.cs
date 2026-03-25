@@ -394,6 +394,50 @@ public class IsKennitalaTests
 
    #endregion
 
+   #region DateOfBirth Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData("010100", "73", "9", "19000101")]      // January 1, 1900
+   [InlineData("311299", "73", "9", "19991231")]      // December 31, 1999
+   [InlineData("010100", "73", "0", "20000101")]      // January 1, 2000
+   [InlineData("311299", "73", "0", "20991231")]      // December 31, 2099
+   [InlineData("280200", "73", "9", "19000228")]      // Feburary 28, 1900 - non leap year
+   [InlineData("290248", "73", "9", "19480229")]      // Feburary 29, 1948 - leap year
+   [InlineData("290200", "73", "0", "20000229")]      // Feburary 29, 2000 - leap year
+
+   // fyrirtaeki values
+   [InlineData("410100", "73", "9", "19000101")]      // January 1, 1900
+   [InlineData("711299", "73", "9", "19991231")]      // December 31, 1999
+   [InlineData("410100", "73", "0", "20000101")]      // January 1, 2000
+   [InlineData("711299", "73", "0", "20991231")]      // December 31, 2099
+   [InlineData("680200", "73", "9", "19000228")]      // Feburary 28, 1900 - non leap year
+   [InlineData("690248", "73", "9", "19480229")]      // Feburary 29, 1948 - leap year
+   [InlineData("690200", "73", "0", "20000229")]      // Feburary 29, 2000 - leap year
+   public void IsKennitala_DateOfBirth_ShouldReturnExpectedValue(
+      String dateOfBirth,
+      String randomDigits,
+      String centuryIndicator,
+      String expectedDateOfBirth)
+   {
+      // Arrange.
+      var value = GetKennitaliaWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         randomDigits: randomDigits,
+         centuryIndicator: centuryIndicator);
+      var sut = new IsKennitala(value);
+      var expected = DateOnly.ParseExact(
+         expectedDateOfBirth,
+         "yyyyMMdd",
+         System.Globalization.CultureInfo.InvariantCulture);
+
+      // Act/assert.
+      sut.DateOfBirth.Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================

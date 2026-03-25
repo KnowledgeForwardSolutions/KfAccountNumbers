@@ -208,6 +208,27 @@ public record IsKennitala
    }
 
    /// <summary>
+   ///   The person's date of birth, derived from the first six digits in DDMMYY
+   ///   format and the exact century of birth derived from the century indicator.
+   /// </summary>
+   /// <remarks>
+   ///   Note that fyrirtaeki kennitala values add 40 to the leading two digits
+   ///   (the DD portion of the DDMMYY date of birth). The date of birth property
+   ///   automatically adjusts for this offset.
+   /// </remarks>
+   public DateOnly DateOfBirth
+   {
+      get
+      {
+#pragma warning disable IDE0008 // Use explicit type
+         var (day, month, year) = GetDayMonthYear(Value);
+#pragma warning restore IDE0008 // Use explicit type
+
+         return new DateOnly(year, month, day);
+      }
+   }
+
+   /// <summary>
    ///   The type of kennitala identifier represented by this instance,
    ///   indicating if this is an Einstaklingur or a Fyrirtaeki.
    /// </summary>

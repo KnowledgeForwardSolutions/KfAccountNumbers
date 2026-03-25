@@ -346,7 +346,8 @@ public record NoFoedselsnummer
    ///   Format the fødselsnummer using the supplied <paramref name="mask"/>.
    /// </summary>
    /// <param name="mask">
-   ///   The mask that specified the final output.
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then the default mask "______ _____" will be used instead.
    /// </param>
    /// <returns>
    ///   A formatted fødselsnummer.
