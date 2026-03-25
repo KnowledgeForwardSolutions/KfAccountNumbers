@@ -1,4 +1,4 @@
-// Ignore Spelling: Kennitala
+// Ignore Spelling: Json Kennitala
 
 namespace KfAccountNumbers.Governmental.Europe;
 
@@ -122,6 +122,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      https://kennitala.com/ for more info.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(IsKennitalaJsonConverter))]
 public record IsKennitala
 {
    /// <summary>
@@ -280,6 +281,37 @@ public record IsKennitala
    }
 
    /// <summary>
+   ///   Format the kennitala using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then the default mask "______-____" will be used instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted kennitala.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the fødselsnummer.
+   /// </remarks>
+   public String Format(String mask = "______-____") => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Get a string representation of the kennitala.
+   /// </summary>
+   /// <remarks>
+   ///   Will return the raw kennitala, without a separator character.
+   /// </remarks>
+   public override String ToString() => Value;
+
+   /// <summary>
    ///   Check the <paramref name="kennitala"/> to determine if it contains a
    ///   valid Icelandic kennitala number.
    /// </summary>
@@ -421,4 +453,21 @@ public record IsKennitala
          ? IsKennitalaValidationResult.ValidationPassed
          : IsKennitalaValidationResult.InvalidCheckDigit;
    }
+}
+
+public class IsKennitalaJsonConverter : JsonConverter<IsKennitala>
+{
+   public override IsKennitala Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var kennitalaString = reader.GetString();
+      return new IsKennitala(kennitalaString);
+   }
+
+   public override void Write(Utf8JsonWriter writer, IsKennitala value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }

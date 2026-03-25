@@ -1,4 +1,4 @@
-// Ignore Spelling: Fyrirtaeki Kennitala Kf
+// Ignore Spelling: Deserialize Deserialization Fyrirtaeki Json Kennitala Kf
 
 #pragma warning disable IDE0008 // Use explicit type
 
@@ -997,6 +997,164 @@ public class IsKennitalaTests
 
    #endregion
 
+   #region Format Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void IsKennitala_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var expected = Valid11CharacterEinstaklingurKennitala;
+
+      // Act.
+      var str = sut.Format();
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void IsKennitala_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
+      var mask = "______ ____";
+      var expected = AltValid11CharacterFyrirtaekiKennitala;
+
+      // Act.
+      var str = sut.Format(mask);
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void IsKennitala_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
+   {
+      // Arrange.
+      var sut = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      String mask = null!;
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = sut.Format(mask))
+         .Should()
+         .ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(Messages.FormatMaskEmpty + "*");
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void IsKennitala_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
+   {
+      // Arrange.
+      var sut = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+      var act = () => _ = sut.Format(mask);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void IsKennitala_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var foedselsnummer1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var foedselsnummer2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+
+      // Act.
+      var hash1 = foedselsnummer1.GetHashCode();
+      var hash2 = foedselsnummer2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void IsKennitala_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var foedselsnummer1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      var foedselsnummer2 = new IsKennitala(AltValid11CharacterEinstaklingurKennitala);
+
+      // Act.
+      var hash1 = foedselsnummer1.GetHashCode();
+      var hash2 = foedselsnummer2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   [Fact]
+   public void IsKennitala_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 11 and 12 character versions for same person should still be equal.
+      var foedselsnummer1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
+      var foedselsnummer2 = new IsKennitala(Valid11CharacterFyrirtaekiKennitala);
+
+      // Act.
+      var hash1 = foedselsnummer1.GetHashCode();
+      var hash2 = foedselsnummer2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // IsKennitala does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void IsKennitala_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var foedselsnummer1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var foedselsnummer2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+
+      // Act/assert.
+      (foedselsnummer1 == foedselsnummer2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(foedselsnummer1, foedselsnummer2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidKennitalaValues))]
+   public void IsKennitala_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new IsKennitala(value);
+      var expected = GetRawKennitala(value);
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -1085,6 +1243,104 @@ public class IsKennitalaTests
 
       // Act/assert.
       IsKennitala.Validate(value).Should().Be(IsKennitalaValidationResult.InvalidDateOfBirth);
+   }
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void IsKennitala_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<IsKennitala>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void IsKennitala_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new IsKennitala(Valid11CharacterFyrirtaekiKennitala);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public IsKennitala Kennitala { get; set; } = null!;
+   }
+
+   [Fact]
+   public void IsKennitala_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { Kennitala = new IsKennitala(Valid11CharacterEinstaklingurKennitala) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void IsKennitala_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"Kennitala\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void IsKennitala_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"Kennitala\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.Kennitala.Should().BeNull();
+   }
+
+   [Fact]
+   public void IsKennitala_JsonDeserialization_ShouldThrowKfValidationException_WhenKennitalaIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"Kennitala\":\"100612-707079\"}";  // Invalid length
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should()
+         .ThrowExactly<KfValidationException<IsKennitalaValidationResult>>()
+         .WithMessage(Messages.IsKennitalaInvalidLength + "*")
+         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidLength);
    }
 
    #endregion
