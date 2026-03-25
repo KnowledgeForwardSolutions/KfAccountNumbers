@@ -251,6 +251,12 @@ public record IsKennitala
    /// </summary>
    public String Value { get; private init; }
 
+   public static implicit operator String(IsKennitala kennitala)
+      => kennitala?.Value ?? String.Empty;      // Handle null kennitala object gracefully by returning empty string
+
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator IsKennitala(String? kennitala) => new(kennitala);
+
    /// <summary>
    ///   Check the <paramref name="kennitala"/> to determine if it contains a
    ///   valid Icelandic kennitala number.

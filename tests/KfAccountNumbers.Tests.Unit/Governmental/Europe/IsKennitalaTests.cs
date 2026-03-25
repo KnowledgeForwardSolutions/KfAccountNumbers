@@ -504,6 +504,205 @@ public class IsKennitalaTests
 
    #endregion
 
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void IsKennitala_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid10CharacterEinstaklingurKennitala;
+      var sut = new IsKennitala(value);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(value);
+   }
+
+   [Fact]
+   public void IsKennitala_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid11CharacterEinstaklingurKennitala;
+      var sut = new IsKennitala(value);
+      var expected = GetRawKennitala(value);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void IsKennitala_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      IsKennitala kennitala = null!;
+
+      // Act.
+      String str = kennitala;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void IsKennitala_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      IsKennitala kennitala = null!;
+
+      // Act.
+      var str = (String)kennitala;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidKennitalaValues))]
+   public void IsKennitala_ExplicitCastToIsKennitala_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawKennitala(value);
+
+      // Act.
+      var sut = (IsKennitala)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSeparators))]
+   public void IsKennitala_ExplicitCastToIsKennitala_ShouldCreateInstance_WhenValueHasValidSeparator(String separator)
+   {
+      // Arrange.
+      var value = GetKennitaliaWithValidCheckDigits(separator: separator);
+      var expected = GetRawKennitala(value);
+
+      // Act.
+      var sut = (IsKennitala)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDateOfBirthValues))]
+   public void IsKennitala_ExplicitCastToIsKennitala_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
+      String dateOfBirth,
+      String randomDigits,
+      String centuryIndicator)
+   {
+      // Arrange.
+      var value = GetKennitaliaWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         randomDigits: randomDigits,
+         centuryIndicator: centuryIndicator);
+      var expected = GetRawKennitala(value);
+
+      // Act.
+      var sut = (IsKennitala)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => _ = (IsKennitala)value)
+         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
+         .WithMessage(Messages.IsKennitalaEmpty + "*")
+         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => _ = (IsKennitala)value)
+         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
+         .WithMessage(Messages.IsKennitalaInvalidLength + "*")
+         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueHasInvalidNonDigitCharacter(String value)
+      => FluentActions
+         .Invoking(() => _ = (IsKennitala)value)
+         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
+         .WithMessage(Messages.IsKennitalaInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
+      => FluentActions
+         .Invoking(() => _ = (IsKennitala)value)
+         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
+         .WithMessage(Messages.IsKennitalaInvalidCheckDigit + "*")
+         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidCheckDigit);
+
+   [Theory]
+   [MemberData(nameof(InvalidCenturyIndicatorValues))]
+   public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueHasInvalidCenturyIndicator(String value)
+      => FluentActions
+         .Invoking(() => _ = (IsKennitala)value)
+         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
+         .WithMessage(Messages.IsKennitalaInvalidCentury + "*")
+         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidCentury);
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparators))]
+   public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String separator)
+   {
+      // Arrange.
+      var value = GetKennitaliaWithValidCheckDigits(separator: separator);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (IsKennitala)value)
+         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
+         .WithMessage(Messages.IsKennitalaInvalidSeparator + "*")
+         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidSeparator);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      String randomDigits,
+      String centuryIndicator)
+   {
+      // Arrange.
+      var value = GetKennitaliaWithValidCheckDigits(
+         dateOfBirth: dateOfBirth,
+         randomDigits: randomDigits,
+         centuryIndicator: centuryIndicator);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (IsKennitala)value)
+         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
+         .WithMessage(Messages.IsKennitalaInvalidDateOfBirth + "*")
+         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidDateOfBirth);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
