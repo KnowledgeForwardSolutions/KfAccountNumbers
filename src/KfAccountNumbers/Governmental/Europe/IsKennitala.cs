@@ -33,7 +33,12 @@ public record IsKennitala
    private const Int32 CheckDigitOffset = 2;
    private const Int32 CenturyIndicatorOffset = 1;
 
-   private static readonly Int32[] _weights = [2, 3, 4, 5, 6, 7, 2, 3];
+   private static readonly Int32[] _weights = [3, 2, 7, 6, 5, 4, 3, 2, 1];
+
+   /// <summary>
+   ///   The raw kennitala value.
+   /// </summary>
+   public String Value { get; private init; }
 
    /// <summary>
    ///   Check the <paramref name="kennitala"/> to determine if it contains a
@@ -73,26 +78,83 @@ public record IsKennitala
          // Could be either InvalidCharacter or InvalidCentury.
          return validationResult;
       }
+      else if (!ValidateSeparator(kennitala))
+      {
+         return IsKennitalaValidationResult.InvalidSeparator;
+      }
+      else if (!ValidateDateOfBirth(kennitala))
+      {
+         return IsKennitalaValidationResult.InvalidDateOfBirth;
+      }
 
-      throw new NotImplementedException();
+      return IsKennitalaValidationResult.ValidationPassed;
    }
 
-   private static IsKennitalaValidationResult ValidateCenturyIndicator(ReadOnlySpan<Char> kennitalia)
+   private static (Int32 day, Int32 month, Int32 year) GetDayMonthYear(ReadOnlySpan<Char> kennitala)
    {
-      var num = kennitalia[^CenturyIndicatorOffset] - Chars.DigitZero;
+      var day = kennitala.ParseTwoDigits();
+      var month = kennitala[2..].ParseTwoDigits();
+      var year = kennitala[4..].ParseTwoDigits();
+      year += kennitala[^CenturyIndicatorOffset] == Chars.DigitNine ? 1900 : 2000;
+
+      // Adjust day for possible Fyrirtaeki.
+      if (day > FyrirtaekiDayOffset)
+      {
+         day -= FyrirtaekiDayOffset;
+      }
+
+      return (day, month, year);
+   }
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean IsFormatted(ReadOnlySpan<Char> kennitala)
+      => kennitala.Length == SeparatorLength;
+
+   private static IsKennitalaValidationResult ValidateCenturyIndicator(ReadOnlySpan<Char> kennitala)
+   {
+      var ch = kennitala[^CenturyIndicatorOffset];
+      if (!ch.IsAsciiDigit())                         // Check for ASCII digit because check digit validation doesn't evaluate century indicator
+      {
+         return IsKennitalaValidationResult.InvalidCharacter;
+      }
+
+      var num = kennitala[^CenturyIndicatorOffset] - Chars.DigitZero;
       return (num < 0 || num > 9)
-         ? IsKennitalaValidationResult.InvalidCharacter           // Check here because check digit doesn't cover century indicator
+         ? IsKennitalaValidationResult.InvalidCharacter           // Check here because check digit doesn't evaluate century indicator
          : (num == 0 || num == 9)                                 // Valid century indicators are 0 and 9
             ? IsKennitalaValidationResult.ValidationPassed
             : IsKennitalaValidationResult.InvalidCentury;
    }
 
+   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> foedselsnummer)
+   {
+#pragma warning disable IDE0008 // Use explicit type
+      var (day, month, year) = GetDayMonthYear(foedselsnummer);
+#pragma warning restore IDE0008 // Use explicit type
+
+      if (month < 1 || month > 12)
+      {
+         return false;
+      }
+
+      return day >= 1 && day <= DateTime.DaysInMonth(year, month);
+   }
+
+   private static Boolean ValidateSeparator(ReadOnlySpan<Char> kennitala)
+      => !IsFormatted(kennitala) || !kennitala[SeparatorOffset].IsAsciiDigit();
+
    private static IsKennitalaValidationResult ValidateCheckDigit(ReadOnlySpan<Char> kennitala)
    {
+      // Note that while the documentation in the linked articles does not
+      // explicitly state it, it appears that values that would result in a
+      // check digit of 10 are not issued. This is consistent with other
+      // modulus 11 check digit examples such as Norwegian fødselsnummer.
+
       var sum = 0;
       var weightIndex = 0;
-      var isFormatted = kennitala.Length == SeparatorLength;
-      for(var index = kennitala.Length - 3; index >= 0; index --)       // exclude both century indicator and check digit
+      var isFormatted = IsFormatted(kennitala);
+      var processLength = kennitala.Length - 1;
+      for(var index = 0; index < processLength; index++)
       {
          if (isFormatted && index == SeparatorOffset)
          {
@@ -109,16 +171,7 @@ public record IsKennitala
          weightIndex++;
       }
 
-      var remainder = sum % 11;
-      var calculatedCheckDigit = remainder == 0 ? 0 : 11 - remainder;
-
-      var checkDigit = kennitala[^CheckDigitOffset] - Chars.DigitZero;
-      if (checkDigit < 0 || checkDigit > 9)
-      {
-         return IsKennitalaValidationResult.InvalidCharacter;
-      }
-
-      return calculatedCheckDigit == checkDigit
+      return (sum % 11) == 0
          ? IsKennitalaValidationResult.ValidationPassed
          : IsKennitalaValidationResult.InvalidCheckDigit;
    }
