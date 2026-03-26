@@ -60,3 +60,27 @@ use
 ```
 	CheckDigitAlgirithm_Validate_ShouldApplyCorrectWeightsToEachCharacter
 ```
+
+Use the name "value" for a string being passed to the object's constructor, Create or Validate method.
+Use the term "sut" (for system under test) for the item being tested.
+```
+public void SePersonNummer_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+{
+    // Act.
+    var sut = new SePersonnummer(value);
+
+    // Assert.
+    sut.Should().NotBeNull();
+    ...
+}
+
+public void CaSocialInsuranceNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+{
+    // Arrange.
+    var sut1 = new CaSocialInsuranceNumber(ValidNineCharSin);
+    var sut2 = new CaSocialInsuranceNumber(AltValidNineCharSin);
+
+    // Act/assert.
+    (sut1 == sut2).Should().BeFalse();
+}
+```

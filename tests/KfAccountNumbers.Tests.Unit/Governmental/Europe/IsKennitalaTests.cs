@@ -199,7 +199,10 @@ public class IsKennitalaTests
 
    public static TheoryData<String, String, String> InvalidDateOfBirthValues = new()
    {
-      // Note random digits adjusted as necessary to ensure that value has valid check digit
+      // Note that dates of birth < 1900 or > 2099 will return invalid century result
+      // and are not checked here.
+
+      // Note random digits adjusted as necessary to ensure that value has valid check digit.
       { "010004", "24", "9" },      // month = 0
       { "011304", "25", "0" },      // month = 13
       { "000104", "25", "9" },      // days = 0
@@ -713,33 +716,33 @@ public class IsKennitalaTests
    public void IsKennitala_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var foedselsnummer1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
-      var foedselsnummer2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      var sut2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
 
       // Act/assert.
-      (foedselsnummer1 == foedselsnummer2).Should().BeTrue();
+      (sut1 == sut2).Should().BeTrue();
    }
 
    [Fact]
    public void IsKennitala_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var foedselsnummer1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
-      var foedselsnummer2 = new IsKennitala(AltValid11CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      var sut2 = new IsKennitala(AltValid11CharacterEinstaklingurKennitala);
 
       // Act/assert.
-      (foedselsnummer1 == foedselsnummer2).Should().BeFalse();
+      (sut1 == sut2).Should().BeFalse();
    }
 
    [Fact]
    public void IsKennitala_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 11 character versions for same person should still be equal.
-      var foedselsnummer1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
-      var foedselsnummer2 = new IsKennitala(Valid11CharacterFyrirtaekiKennitala);
+      var sut1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
+      var sut2 = new IsKennitala(Valid11CharacterFyrirtaekiKennitala);
 
       // Act/assert.
-      (foedselsnummer1 == foedselsnummer2).Should().BeTrue();
+      (sut1 == sut2).Should().BeTrue();
    }
 
    #endregion
@@ -752,33 +755,33 @@ public class IsKennitalaTests
    public void IsKennitala_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var foedselsnummer1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
-      var foedselsnummer2 = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
+      var sut1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
+      var sut2 = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
 
       // Act/assert.
-      (foedselsnummer1 != foedselsnummer2).Should().BeTrue();
+      (sut1 != sut2).Should().BeTrue();
    }
 
    [Fact]
    public void IsKennitala_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
    {
-      // Arrange. 11 and 12 character versions for same person should still be equal.
-      var foedselsnummer1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var foedselsnummer2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      // Arrange. 10 and 11 character versions for same person should still be equal.
+      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
 
       // Act/assert.
-      (foedselsnummer1 != foedselsnummer2).Should().BeFalse();
+      (sut1 != sut2).Should().BeFalse();
    }
 
    [Fact]
    public void IsKennitala_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var foedselsnummer1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var foedselsnummer2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
 
       // Act/assert.
-      (foedselsnummer1 != foedselsnummer2).Should().BeFalse();
+      (sut1 != sut2).Should().BeFalse();
    }
 
    #endregion
@@ -966,33 +969,33 @@ public class IsKennitalaTests
    public void IsKennitala_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var foedselsnummer1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var foedselsnummer2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
 
       // Act/assert.
-      foedselsnummer1.Equals(foedselsnummer2).Should().BeTrue();
+      sut1.Equals(sut2).Should().BeTrue();
    }
 
    [Fact]
    public void IsKennitala_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var foedselsnummer1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
-      var foedselsnummer2 = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
+      var sut1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
+      var sut2 = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
 
       // Act/assert.
-      foedselsnummer1.Equals(foedselsnummer2).Should().BeFalse();
+      sut1.Equals(sut2).Should().BeFalse();
    }
 
    [Fact]
    public void IsKennitala_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
-      // Arrange. 11 and 12 character versions for same person should still be equal.
-      var foedselsnummer1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var foedselsnummer2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      // Arrange. 10 and 11 character versions for same person should still be equal.
+      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
 
       // Act/assert.
-      foedselsnummer1.Equals(foedselsnummer2).Should().BeTrue();
+      sut1.Equals(sut2).Should().BeTrue();
    }
 
    #endregion
@@ -1072,12 +1075,12 @@ public class IsKennitalaTests
    public void IsKennitala_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var foedselsnummer1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var foedselsnummer2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
 
       // Act.
-      var hash1 = foedselsnummer1.GetHashCode();
-      var hash2 = foedselsnummer2.GetHashCode();
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
 
       // Assert.
       hash1.Should().Be(hash2);
@@ -1087,12 +1090,12 @@ public class IsKennitalaTests
    public void IsKennitala_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var foedselsnummer1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
-      var foedselsnummer2 = new IsKennitala(AltValid11CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      var sut2 = new IsKennitala(AltValid11CharacterEinstaklingurKennitala);
 
       // Act.
-      var hash1 = foedselsnummer1.GetHashCode();
-      var hash2 = foedselsnummer2.GetHashCode();
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
 
       // Assert.
       hash1.Should().NotBe(hash2);
@@ -1101,13 +1104,13 @@ public class IsKennitalaTests
    [Fact]
    public void IsKennitala_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
    {
-      // Arrange. 11 and 12 character versions for same person should still be equal.
-      var foedselsnummer1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
-      var foedselsnummer2 = new IsKennitala(Valid11CharacterFyrirtaekiKennitala);
+      // Arrange. 10 and 11 character versions for same person should still be equal.
+      var sut1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
+      var sut2 = new IsKennitala(Valid11CharacterFyrirtaekiKennitala);
 
       // Act.
-      var hash1 = foedselsnummer1.GetHashCode();
-      var hash2 = foedselsnummer2.GetHashCode();
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
 
       // Assert.
       hash1.Should().Be(hash2);
@@ -1127,12 +1130,12 @@ public class IsKennitalaTests
    public void IsKennitala_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var foedselsnummer1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var foedselsnummer2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
 
       // Act/assert.
-      (foedselsnummer1 == foedselsnummer2).Should().BeTrue();                         // Value equality should be true
-      ReferenceEquals(foedselsnummer1, foedselsnummer2).Should().BeFalse();
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
    }
 
    #endregion

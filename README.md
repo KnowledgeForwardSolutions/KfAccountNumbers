@@ -84,9 +84,9 @@ An Icelandic kennitala is a ten-digit number structured as DDMMYYRRPC, with the 
  The only difference between an Einstaklingur kennitala and a Fyrirtæki kennitala is that 40 is added to the day
  component of the date of birth for the Fyrirtæki kennitala (i.e. 130585 becomes 530585). Day values in the range
  41-71 (inclusive) indicate a Fyrirtæki kennitala.
-* RR - two random digits used to differentiate between to persons born on the same date.
+* RR - two random digits used to differentiate between two persons born on the same date.
 * P - a check digit calculated for the DDMMYYRR digits using a weighted modulus 11 algorithm.
-* C - a single digit indicating the century of birth. Valid digits are 9 (1900's) and 0 (2000's).
+* C - a single digit indicating the century of birth. Valid digits are 9 (1900s) and 0 (2000s).
 
 A kennitala may be formatted as a string of 10 consecutive digits (DDMMYYRRPC) or as 11 characters with a
 separator character, generally a dash ('-'), separating the date of birth and the remaining four digits (DDMMYY-RRPC).

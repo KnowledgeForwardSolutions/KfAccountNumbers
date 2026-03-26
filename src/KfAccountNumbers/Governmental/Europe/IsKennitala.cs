@@ -1,11 +1,11 @@
-// Ignore Spelling: Json Kennitala
+// Ignore Spelling: Fyrirtaeki Json Kennitala
 
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
 ///   Strongly typed business object that represents an Icelandic national
 ///   identity number (kennitala). A kennitala may be issued to an individual
-///   or to a company. The <see cref="IdentityType"/> property returns an
+///   or to a company. The <see cref="IdentifierType"/> property returns an
 ///   enum value that indicates if the kennitala number is assigned to an
 ///   individual (Einstaklingur) or to a company (Fyrirtæki).
 /// </summary>
@@ -28,7 +28,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <term>RR</term>
 ///            <description>
-///               Two random digits used to differentiate between to persons born
+///               Two random digits used to differentiate between two persons born
 ///               on the same date.
 ///            </description>
 ///         </item>
@@ -43,7 +43,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            <term>C</term>
 ///            <description>
 ///               A single digit indicating the century of birth. Valid digits are
-///               9 (1900's) and 0 (2000's).
+///               9 (1900s) and 0 (2000s).
 ///            </description>
 ///         </item>
 ///      </list>
@@ -86,35 +86,49 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      When creating a new <see cref="IsKennitala"/>, the following
 ///      validation rules are applied:
 ///      <list type="bullet">
-///         <description>
-///            The value may not be null, empty or all whitespace characters.
-///         </description>
-///         <description>
-///            The value must be either 10 characters (without separator) or 11
-///            characters (with separator) in length.
-///         </description>
-///         <description>
-///            All characters (except the optional separator character) must be
-///            ASCII digits ('0'-'9').
-///         </description>
-///         <description>
-///            The check digit must match the digit calculated using a weighted
-///            modulus 11 algorithm.
-///         </description>
-///         <description>
-///            The optional separator character, if included, may not be an ASCII
-///            digit. Any non-digit character is allowed as a separator.
-///         </description>
-///         <description>
-///            The century indicator must be the ASCII character nine ('9') or
-///            the ASCII character zero ('0').
-///         </description>
-///         <description>
-///            The date of birth, after deriving the century from the century
-///            indicator (and if the value is a Fyrirtæki kennitala, after
-///            subtracting the Fyrirtæki kennitala offset) must be a valid date
-///            between January 1, 1900 and December 31, 2099.
-///         </description>
+///         <item>
+///            <description>
+///               The value may not be null, empty or all whitespace characters.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The value must be either 10 characters (without separator) or 11
+///               characters (with separator) in length.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               All characters (except the optional separator character) must be
+///               ASCII digits ('0'-'9').
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The check digit must match the digit calculated using a weighted
+///               modulus 11 algorithm.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The optional separator character, if included, may not be an ASCII
+///               digit. Any non-digit character is allowed as a separator.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The century indicator must be the ASCII character nine ('9') or
+///               the ASCII character zero ('0').
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The date of birth, after deriving the century from the century
+///               indicator (and if the value is a Fyrirtæki kennitala, after
+///               subtracting the Fyrirtæki kennitala offset) must be a valid date
+///               between January 1, 1900 and December 31, 2099.
+///            </description>
+///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
@@ -299,7 +313,7 @@ public record IsKennitala
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the fødselsnummer.
+   ///   details on creating a mask to format the kennitala.
    /// </remarks>
    public String Format(String mask = "______-____") => Value.FormatWithMask(mask);
 
@@ -396,19 +410,19 @@ public record IsKennitala
          return IsKennitalaValidationResult.InvalidCharacter;
       }
 
-      var num = kennitala[^CenturyIndicatorOffset] - Chars.DigitZero;
-      return (num < 0 || num > 9)
-         ? IsKennitalaValidationResult.InvalidCharacter           // Check here because check digit doesn't evaluate century indicator
-         : (num == 0 || num == 9)                                 // Valid century indicators are 0 and 9
-            ? IsKennitalaValidationResult.ValidationPassed
-            : IsKennitalaValidationResult.InvalidCentury;
+      return ch is Chars.DigitZero or Chars.DigitNine
+         ? IsKennitalaValidationResult.ValidationPassed
+         : IsKennitalaValidationResult.InvalidCentury;
    }
 
-   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> foedselsnummer)
+   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> kennitala)
    {
 #pragma warning disable IDE0008 // Use explicit type
-      var (day, month, year) = GetDayMonthYear(foedselsnummer);
+      var (day, month, year) = GetDayMonthYear(kennitala);
 #pragma warning restore IDE0008 // Use explicit type
+
+      // No need to validate year because validation has already confirmed that
+      // the kennitala is all digits and that the century indicator is valid.
 
       if (month < 1 || month > 12)
       {

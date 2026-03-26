@@ -843,33 +843,33 @@ public class SePersonnummerTests
    public void SePersonnummer_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var personnummer1 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
-      var personnummer2 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
+      var sut1 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
+      var sut2 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
 
       // Act/assert.
-      (personnummer1 == personnummer2).Should().BeTrue();
+      (sut1 == sut2).Should().BeTrue();
    }
 
    [Fact]
    public void SePersonnummer_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var personnummer1 = new SePersonnummer(Valid13CharacterDashPersonnummer);
-      var personnummer2 = new SePersonnummer(Valid13CharacterDashSamordningsnummer);
+      var sut1 = new SePersonnummer(Valid13CharacterDashPersonnummer);
+      var sut2 = new SePersonnummer(Valid13CharacterDashSamordningsnummer);
 
       // Act/assert.
-      (personnummer1 == personnummer2).Should().BeFalse();
+      (sut1 == sut2).Should().BeFalse();
    }
 
    [Fact]
    public void SePersonnummer_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 13 character versions for same person should still be equal.
-      var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
-      var personnummer2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
+      var sut1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var sut2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
 
       // Act/assert.
-      (personnummer1 == personnummer2).Should().BeTrue();
+      (sut1 == sut2).Should().BeTrue();
    }
 
    #endregion
@@ -882,33 +882,33 @@ public class SePersonnummerTests
    public void SePersonnummer_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var personnummer1 = new SePersonnummer(Valid13CharacterDashPersonnummer);
-      var personnummer2 = new SePersonnummer(Valid13CharacterDashSamordningsnummer);
+      var sut1 = new SePersonnummer(Valid13CharacterDashPersonnummer);
+      var sut2 = new SePersonnummer(Valid13CharacterDashSamordningsnummer);
 
       // Act/assert.
-      (personnummer1 != personnummer2).Should().BeTrue();
+      (sut1 != sut2).Should().BeTrue();
    }
 
    [Fact]
    public void SePersonnummer_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 13 character versions for same person should still be equal.
-      var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
-      var personnummer2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
+      var sut1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var sut2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
 
       // Act/assert.
-      (personnummer1 != personnummer2).Should().BeFalse();
+      (sut1 != sut2).Should().BeFalse();
    }
 
    [Fact]
    public void SePersonnummer_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var personnummer1 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
-      var personnummer2 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
+      var sut1 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
+      var sut2 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
 
       // Act/assert.
-      (personnummer1 != personnummer2).Should().BeFalse();
+      (sut1 != sut2).Should().BeFalse();
    }
 
    #endregion
@@ -1075,33 +1075,33 @@ public class SePersonnummerTests
    public void SePersonnummer_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var personnummer1 = new SePersonnummer(Valid13CharacterPlusPersonnummer);
-      var personnummer2 = new SePersonnummer(Valid13CharacterPlusPersonnummer);
+      var sut1 = new SePersonnummer(Valid13CharacterPlusPersonnummer);
+      var sut2 = new SePersonnummer(Valid13CharacterPlusPersonnummer);
 
       // Act/assert.
-      personnummer1.Equals(personnummer2).Should().BeTrue();
+      sut1.Equals(sut2).Should().BeTrue();
    }
 
    [Fact]
    public void SePersonnummer_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var personnummer1 = new SePersonnummer(Valid13CharacterPlusPersonnummer);     // +
-      var personnummer2 = new SePersonnummer(Valid13CharacterDashPersonnummer);     // -
+      var sut1 = new SePersonnummer(Valid13CharacterPlusPersonnummer);     // +
+      var sut2 = new SePersonnummer(Valid13CharacterDashPersonnummer);     // -
 
       // Act/assert.
-      personnummer1.Equals(personnummer2).Should().BeFalse();
+      sut1.Equals(sut2).Should().BeFalse();
    }
 
    [Fact]
    public void SePersonnummer_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 13 character versions for same person should still be equal.
-      var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
-      var personnummer2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
+      var sut1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var sut2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
 
       // Act/assert.
-      personnummer1.Equals(personnummer2).Should().BeTrue();
+      sut1.Equals(sut2).Should().BeTrue();
    }
 
    [Fact]
@@ -1134,12 +1134,12 @@ public class SePersonnummerTests
    public void SePersonnummer_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
-      var personnummer2 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var sut1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var sut2 = new SePersonnummer(Valid11CharacterDashPersonnummer);
 
       // Act.
-      var hash1 = personnummer1.GetHashCode();
-      var hash2 = personnummer2.GetHashCode();
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
 
       // Assert.
       hash1.Should().Be(hash2);
@@ -1149,12 +1149,12 @@ public class SePersonnummerTests
    public void SePersonnummer_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
-      var personnummer2 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
+      var sut1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var sut2 = new SePersonnummer(Valid11CharacterDashSamordningsnummer);
 
       // Act.
-      var hash1 = personnummer1.GetHashCode();
-      var hash2 = personnummer2.GetHashCode();
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
 
       // Assert.
       hash1.Should().NotBe(hash2);
@@ -1164,12 +1164,12 @@ public class SePersonnummerTests
    public void SePersonnummer_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 13 character versions for same person should still be equal.
-      var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
-      var personnummer2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
+      var sut1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var sut2 = new SePersonnummer("19" + Valid11CharacterDashPersonnummer);
 
       // Act.
-      var hash1 = personnummer1.GetHashCode();
-      var hash2 = personnummer2.GetHashCode();
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
 
       // Assert.
       hash1.Should().Be(hash2);
@@ -1189,12 +1189,12 @@ public class SePersonnummerTests
    public void SePersonnummer_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var personnummer1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
-      var personnummer2 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var sut1 = new SePersonnummer(Valid11CharacterDashPersonnummer);
+      var sut2 = new SePersonnummer(Valid11CharacterDashPersonnummer);
 
       // Act/assert.
-      (personnummer1 == personnummer2).Should().BeTrue();                         // Value equality should be true
-      ReferenceEquals(personnummer1, personnummer2).Should().BeFalse();
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
    }
 
    #endregion
