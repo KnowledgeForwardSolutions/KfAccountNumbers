@@ -6,8 +6,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   Strongly typed business object that represents an Icelandic national
 ///   identity number (kennitala). A kennitala may be issued to an individual
 ///   or to a company. The <see cref="IdentifierType"/> property returns an
-///   enum value that indicates if the kennitala number is assigned to an
-///   individual (Einstaklingur) or to a company (Fyrirtæki).
+///   <see cref="IsIdentifierType"/> value that indicates if the kennitala number
+///   is assigned to an individual (Einstaklingur) or to a company (Fyrirtæki).
 /// </summary>
 /// <remarks>
 ///   <para>
