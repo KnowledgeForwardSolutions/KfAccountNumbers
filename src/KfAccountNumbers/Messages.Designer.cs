@@ -142,6 +142,51 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to DK Personnummer may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string DkPersonnummerEmpty {
+            get {
+                return ResourceManager.GetString("DkPersonnummerEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DK Personnummer contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string DkPersonnummerInvalidCharacter {
+            get {
+                return ResourceManager.GetString("DkPersonnummerInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DK Personnummer requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based).
+        /// </summary>
+        internal static string DkPersonnummerInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("DkPersonnummerInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DK Personummer must have length 10 (no separator character) or 11 (separator character).
+        /// </summary>
+        internal static string DkPersonnummerInvalidLength {
+            get {
+                return ResourceManager.GetString("DkPersonnummerInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DK Personnummer separator character must be a dash (&apos;-&apos;).
+        /// </summary>
+        internal static string DkPersonnummerInvalidSeparator {
+            get {
+                return ResourceManager.GetString("DkPersonnummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to String formatting mask may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string FormatMaskEmpty {
