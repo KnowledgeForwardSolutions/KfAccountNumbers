@@ -394,7 +394,7 @@ public record SePersonnummer
    public static explicit operator SePersonnummer(String? personnummer) => new(personnummer);
 
    /// <summary>
-   ///   Create a new <see cref="SePersonnummer"/>.
+   ///   Create a new <see cref="SePersonnummer"/> using the Result pattern.
    /// </summary>
    /// <param name="personnummer">
    ///   String representation of a Swedish Personal Identity Number (Personnummer).

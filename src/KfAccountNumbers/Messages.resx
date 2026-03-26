@@ -270,4 +270,25 @@
   <data name="SePersonnummerInvalidCharacter" xml:space="preserve">
     <value>SE Personnummer contains a non-digit character where a digit was expected</value>
   </data>
+  <data name="IsKennitalaEmpty" xml:space="preserve">
+    <value>IS Kennitala may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="IsKennitalaInvalidCharacter" xml:space="preserve">
+    <value>IS Kennitala contains a non-digit character where a digit was expected</value>
+  </data>
+  <data name="IsKennitalaInvalidCheckDigit" xml:space="preserve">
+    <value>IS Kennitala must have a valid check digit character in the second character from the right of the value</value>
+  </data>
+  <data name="IsKennitalaInvalidLength" xml:space="preserve">
+    <value>IS Kennitala must have length 10 (no separator character) or 11 (separator character)</value>
+  </data>
+  <data name="IsKennitalaInvalidDateOfBirth" xml:space="preserve">
+    <value>IS Kennitala requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based)</value>
+  </data>
+  <data name="IsKennitalaInvalidSeparator" xml:space="preserve">
+    <value>IS Kennitala separator character must not be a digit</value>
+  </data>
+  <data name="IsKennitalaInvalidCentury" xml:space="preserve">
+    <value>IS Kennitala century indicator must be either '9' or '0'</value>
+  </data>
 </root>

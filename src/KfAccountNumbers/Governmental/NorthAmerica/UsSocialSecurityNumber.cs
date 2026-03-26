@@ -171,7 +171,7 @@ public record UsSocialSecurityNumber
    public static explicit operator UsSocialSecurityNumber(String? ssn) => new(ssn);
 
    /// <summary>
-   ///   Create a new <see cref="UsSocialSecurityNumber"/>.
+   ///   Create a new <see cref="UsSocialSecurityNumber"/> using the Result pattern.
    /// </summary>
    /// <param name="ssn">
    ///   String representation of a Social Security Number.

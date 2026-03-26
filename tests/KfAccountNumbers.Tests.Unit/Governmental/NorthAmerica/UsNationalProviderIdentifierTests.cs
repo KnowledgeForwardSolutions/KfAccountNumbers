@@ -58,21 +58,21 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_Constructor_ShouldCreateObject_WhenValueContainsValidNpi()
    {
       // Arrange.
-      var npi = ValidNpi;
+      var value = ValidNpi;
 
       // Act.
-      var sut = new UsNationalProviderIdentifier(npi);
+      var sut = new UsNationalProviderIdentifier(value);
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(npi);
+      sut.Value.Should().Be(value);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenValueIsEmpty(String? npi)
+   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenValueIsEmpty(String? value)
       => FluentActions
-         .Invoking(() => _ = new UsNationalProviderIdentifier(npi))
+         .Invoking(() => _ = new UsNationalProviderIdentifier(value))
          .Should()
          .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiEmpty + "*")
@@ -80,9 +80,9 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String? npi)
+   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String? value)
       => FluentActions
-         .Invoking(() => _ = new UsNationalProviderIdentifier(npi))
+         .Invoking(() => _ = new UsNationalProviderIdentifier(value))
          .Should()
          .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiInvalidLength + "*")
@@ -90,9 +90,9 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String npi)
+   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String value)
       => FluentActions
-         .Invoking(() => _ = new UsNationalProviderIdentifier(npi))
+         .Invoking(() => _ = new UsNationalProviderIdentifier(value))
          .Should()
          .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiInvalidCharacterEncountered + "*")
@@ -100,21 +100,21 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [MemberData(nameof(CheckDigitUndetectableErrorValues))]
-   public void UsNationalProviderIdentifier_Constructor_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String npi)
+   public void UsNationalProviderIdentifier_Constructor_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String value)
    {
       // Act.
-      var sut = new UsNationalProviderIdentifier(npi);
+      var sut = new UsNationalProviderIdentifier(value);
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(npi);
+      sut.Value.Should().Be(value);
    }
 
    [Theory]
    [MemberData(nameof(CheckDigitDetectableErrorValues))]
-   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenCheckDigitContainsDetectableError(String npi)
+   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenCheckDigitContainsDetectableError(String value)
       => FluentActions
-         .Invoking(() => _ = new UsNationalProviderIdentifier(npi))
+         .Invoking(() => _ = new UsNationalProviderIdentifier(value))
          .Should()
          .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiInvalidCheckDigit + "*")
@@ -129,13 +129,13 @@ public class UsNationalProviderIdentifierTests
    [Theory]
    [InlineData(ValidNpi)]
    [InlineData(AltValidNpi)]
-   public void UsNationalProviderIdentifier_Value_ShouldReturnRawNpi(String npi)
+   public void UsNationalProviderIdentifier_Value_ShouldReturnRawNpi(String value)
    {
       // Arrange.
-      var sut = new UsNationalProviderIdentifier(npi);
+      var sut = new UsNationalProviderIdentifier(value);
 
       // Act/assert.
-      sut.Value.Should().Be(npi);
+      sut.Value.Should().Be(value);
    }
 
    #endregion
@@ -148,30 +148,30 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var npi = ValidNpi;
-      var sut = new UsNationalProviderIdentifier(npi);
+      var value = ValidNpi;
+      var sut = new UsNationalProviderIdentifier(value);
 
       // Act.
       String str = sut;
 
       // Assert.
       str.Should().NotBeNullOrEmpty();
-      str.Should().Be(npi);
+      str.Should().Be(value);
    }
 
    [Fact]
    public void UsNationalProviderIdentifier_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var npi = ValidNpi;
-      var sut = new UsNationalProviderIdentifier(npi);
+      var value = ValidNpi;
+      var sut = new UsNationalProviderIdentifier(value);
 
       // Act.
       var str = (String)sut;
 
       // Assert.
       str.Should().NotBeNullOrEmpty();
-      str.Should().Be(npi);
+      str.Should().Be(value);
    }
 
    [Fact]
@@ -206,21 +206,21 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldCreateObject_WhenValueContainsValidNpi()
    {
       // Arrange.
-      var npi = ValidNpi;
+      var value = ValidNpi;
 
       // Act.
-      var sut = (UsNationalProviderIdentifier)npi;
+      var sut = (UsNationalProviderIdentifier)value;
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(npi);
+      sut.Value.Should().Be(value);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenValueIsEmpty(String str)
+   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenValueIsEmpty(String value)
       => FluentActions
-         .Invoking(() => _ = (UsNationalProviderIdentifier)str)
+         .Invoking(() => _ = (UsNationalProviderIdentifier)value)
          .Should()
          .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiEmpty + "*")
@@ -228,9 +228,9 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String str)
+   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
       => FluentActions
-         .Invoking(() => _ = (UsNationalProviderIdentifier)str)
+         .Invoking(() => _ = (UsNationalProviderIdentifier)value)
          .Should()
          .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiInvalidLength + "*")
@@ -238,9 +238,9 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String str)
+   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String value)
       => FluentActions
-         .Invoking(() => _ = (UsNationalProviderIdentifier)str)
+         .Invoking(() => _ = (UsNationalProviderIdentifier)value)
          .Should()
          .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiInvalidCharacterEncountered + "*")
@@ -248,21 +248,21 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [MemberData(nameof(CheckDigitUndetectableErrorValues))]
-   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String str)
+   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String value)
    {
       // Act.
-      var sut = (UsNationalProviderIdentifier)str;
+      var sut = (UsNationalProviderIdentifier)value;
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(str);
+      sut.Value.Should().Be(value);
    }
 
    [Theory]
    [MemberData(nameof(CheckDigitDetectableErrorValues))]
-   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenCheckDigitContainsDetectableError(String str)
+   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenCheckDigitContainsDetectableError(String value)
       => FluentActions
-         .Invoking(() => _ = (UsNationalProviderIdentifier)str)
+         .Invoking(() => _ = (UsNationalProviderIdentifier)value)
          .Should()
          .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
          .WithMessage(Messages.UsNpiInvalidCheckDigit + "*")
@@ -278,22 +278,22 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
-      var npi2 = new UsNationalProviderIdentifier(ValidNpi);
+      var sut1 = new UsNationalProviderIdentifier(ValidNpi);
+      var sut2 = new UsNationalProviderIdentifier(ValidNpi);
 
       // Act/assert.
-      (npi1 == npi2).Should().BeTrue();
+      (sut1 == sut2).Should().BeTrue();
    }
 
    [Fact]
    public void UsNationalProviderIdentifier_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
-      var npi2 = new UsNationalProviderIdentifier(AltValidNpi);
+      var sut1 = new UsNationalProviderIdentifier(ValidNpi);
+      var sut2 = new UsNationalProviderIdentifier(AltValidNpi);
 
       // Act/assert.
-      (npi1 == npi2).Should().BeFalse();
+      (sut1 == sut2).Should().BeFalse();
    }
 
    #endregion
@@ -306,22 +306,22 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
-      var npi2 = new UsNationalProviderIdentifier(AltValidNpi);
+      var sut1 = new UsNationalProviderIdentifier(ValidNpi);
+      var sut2 = new UsNationalProviderIdentifier(AltValidNpi);
 
       // Act/assert.
-      (npi1 != npi2).Should().BeTrue();
+      (sut1 != sut2).Should().BeTrue();
    }
 
    [Fact]
    public void UsNationalProviderIdentifier_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
-      var npi2 = new UsNationalProviderIdentifier(ValidNpi);
+      var sut1 = new UsNationalProviderIdentifier(ValidNpi);
+      var sut2 = new UsNationalProviderIdentifier(ValidNpi);
 
       // Act/assert.
-      (npi1 != npi2).Should().BeFalse();
+      (sut1 != sut2).Should().BeFalse();
    }
 
    #endregion
@@ -334,11 +334,11 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_Create_ShouldCreateObject_WhenValueContainsValidNpi()
    {
       // Arrange.
-      var npi = ValidNpi;
-      var expected = new UsNationalProviderIdentifier(npi);
+      var value = ValidNpi;
+      var expected = new UsNationalProviderIdentifier(value);
 
       // Act.
-      var result = UsNationalProviderIdentifier.Create(npi);
+      var result = UsNationalProviderIdentifier.Create(value);
 
       // Assert.
       result.Should().NotBeNull();
@@ -349,13 +349,13 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsNationalProviderIdentifier_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String npi)
+   public void UsNationalProviderIdentifier_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
    {
       // Arrange.
       var expected = UsNationalProviderIdentifierValidationResult.Empty;
 
       // Act.
-      var result = UsNationalProviderIdentifier.Create(npi);
+      var result = UsNationalProviderIdentifier.Create(value);
 
       // Assert.
       result.Should().NotBeNull();
@@ -366,13 +366,13 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsNationalProviderIdentifier_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String npi)
+   public void UsNationalProviderIdentifier_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
       var expected = UsNationalProviderIdentifierValidationResult.InvalidLength;
 
       // Act.
-      var result = UsNationalProviderIdentifier.Create(npi);
+      var result = UsNationalProviderIdentifier.Create(value);
 
       // Assert.
       result.Should().NotBeNull();
@@ -383,13 +383,13 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsNationalProviderIdentifier_Create_ShouldReturnInvalidCharacterEncounteredResult_WhenValueContainsNonAsciiDigit(String npi)
+   public void UsNationalProviderIdentifier_Create_ShouldReturnInvalidCharacterEncounteredResult_WhenValueContainsNonAsciiDigit(String value)
    {
       // Arrange.
       var expected = UsNationalProviderIdentifierValidationResult.InvalidCharacterEncountered;
 
       // Act.
-      var result = UsNationalProviderIdentifier.Create(npi);
+      var result = UsNationalProviderIdentifier.Create(value);
 
       // Assert.
       result.Should().NotBeNull();
@@ -400,13 +400,13 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [MemberData(nameof(CheckDigitUndetectableErrorValues))]
-   public void UsNationalProviderIdentifier_Create_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String npi)
+   public void UsNationalProviderIdentifier_Create_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String value)
    {
       // Arrange.
-      var expected = new UsNationalProviderIdentifier(npi);
+      var expected = new UsNationalProviderIdentifier(value);
 
       // Act.
-      var result = UsNationalProviderIdentifier.Create(npi);
+      var result = UsNationalProviderIdentifier.Create(value);
 
       // Assert.
       result.Should().NotBeNull();
@@ -417,13 +417,13 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [MemberData(nameof(CheckDigitDetectableErrorValues))]
-   public void UsNationalProviderIdentifier_Create_ShouldReturnInvalidCheckDigit_WhenCheckDigitContainsDetectableError(String npi)
+   public void UsNationalProviderIdentifier_Create_ShouldReturnInvalidCheckDigit_WhenCheckDigitContainsDetectableError(String value)
    {
       // Arrange.
       var expected = UsNationalProviderIdentifierValidationResult.InvalidCheckDigit;
 
       // Act.
-      var result = UsNationalProviderIdentifier.Create(npi);
+      var result = UsNationalProviderIdentifier.Create(value);
 
       // Assert.
       result.Should().NotBeNull();
@@ -442,22 +442,22 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
-      var npi2 = new UsNationalProviderIdentifier(ValidNpi);    // Same internal value
+      var sut1 = new UsNationalProviderIdentifier(ValidNpi);
+      var sut2 = new UsNationalProviderIdentifier(ValidNpi);    // Same internal value
 
       // Act/assert.
-      npi1.Equals(npi2).Should().BeTrue();
+      sut1.Equals(sut2).Should().BeTrue();
    }
 
    [Fact]
    public void UsNationalProviderIdentifier_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
-      var npi2 = new UsNationalProviderIdentifier(AltValidNpi);
+      var sut1 = new UsNationalProviderIdentifier(ValidNpi);
+      var sut2 = new UsNationalProviderIdentifier(AltValidNpi);
 
       // Act/assert.
-      npi1.Equals(npi2).Should().BeFalse();
+      sut1.Equals(sut2).Should().BeFalse();
    }
 
    [Fact]
@@ -490,12 +490,12 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
-      var npi2 = new UsNationalProviderIdentifier(ValidNpi);    // Same internal value
+      var sut1 = new UsNationalProviderIdentifier(ValidNpi);
+      var sut2 = new UsNationalProviderIdentifier(ValidNpi);    // Same internal value
 
       // Act.
-      var hash1 = npi1.GetHashCode();
-      var hash2 = npi2.GetHashCode();
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
 
       // Assert.
       hash1.Should().Be(hash2);
@@ -505,12 +505,12 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
-      var npi2 = new UsNationalProviderIdentifier(AltValidNpi);
+      var sut1 = new UsNationalProviderIdentifier(ValidNpi);
+      var sut2 = new UsNationalProviderIdentifier(AltValidNpi);
 
       // Act.
-      var hash1 = npi1.GetHashCode();
-      var hash2 = npi2.GetHashCode();
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
 
       // Assert.
       hash1.Should().NotBe(hash2);
@@ -530,12 +530,12 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var npi1 = new UsNationalProviderIdentifier(ValidNpi);
-      var npi2 = new UsNationalProviderIdentifier(ValidNpi);    // Same internal value
+      var sut1 = new UsNationalProviderIdentifier(ValidNpi);
+      var sut2 = new UsNationalProviderIdentifier(ValidNpi);    // Same internal value
 
       // Act/assert.
-      (npi1 == npi2).Should().BeTrue();                         // Value equality should be true
-      ReferenceEquals(npi1, npi2).Should().BeFalse();
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
    }
 
    #endregion
@@ -548,11 +548,11 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_ToString_ShouldReturnExpectedValue()
    {
       // Arrange.
-      var npi = ValidNpi;
-      var sut = new UsNationalProviderIdentifier(npi);
+      var value = ValidNpi;
+      var sut = new UsNationalProviderIdentifier(value);
 
       // Act/assert.
-      sut.ToString().Should().Be(npi);
+      sut.ToString().Should().Be(value);
    }
 
    #endregion
@@ -568,32 +568,32 @@ public class UsNationalProviderIdentifierTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsNationalProviderIdentifier_Validate_ShouldReturnEmpty_WhenValueIsEmpty(String? npi)
-      => UsNationalProviderIdentifier.Validate(npi)
+   public void UsNationalProviderIdentifier_Validate_ShouldReturnEmpty_WhenValueIsEmpty(String? value)
+      => UsNationalProviderIdentifier.Validate(value)
          .Should().Be(UsNationalProviderIdentifierValidationResult.Empty);
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsNationalProviderIdentifier_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String npi)
-      => UsNationalProviderIdentifier.Validate(npi)
+   public void UsNationalProviderIdentifier_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
+      => UsNationalProviderIdentifier.Validate(value)
          .Should().Be(UsNationalProviderIdentifierValidationResult.InvalidLength);
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsNationalProviderIdentifier_Validate_ShouldReturnInvalidCharacterEncountered_WhenValueContainsNonAsciiDigit(String npi)
-      => UsNationalProviderIdentifier.Validate(npi)
+   public void UsNationalProviderIdentifier_Validate_ShouldReturnInvalidCharacterEncountered_WhenValueContainsNonAsciiDigit(String value)
+      => UsNationalProviderIdentifier.Validate(value)
          .Should().Be(UsNationalProviderIdentifierValidationResult.InvalidCharacterEncountered);
 
    [Theory]
    [MemberData(nameof(CheckDigitUndetectableErrorValues))]
-   public void UsNationalProviderIdentifier_Validate_ShouldReturnValidationPassed_WhenCheckDigitContainsUndetectableError(String npi)
-      => UsNationalProviderIdentifier.Validate(npi)
+   public void UsNationalProviderIdentifier_Validate_ShouldReturnValidationPassed_WhenCheckDigitContainsUndetectableError(String value)
+      => UsNationalProviderIdentifier.Validate(value)
          .Should().Be(UsNationalProviderIdentifierValidationResult.ValidationPassed);
 
    [Theory]
    [MemberData(nameof(CheckDigitDetectableErrorValues))]
-   public void UsNationalProviderIdentifier_Validate_ShouldReturnInvalidCheckDigit_WhenCheckDigitContainsDetectableError(String npi)
-      => UsNationalProviderIdentifier.Validate(npi)
+   public void UsNationalProviderIdentifier_Validate_ShouldReturnInvalidCheckDigit_WhenCheckDigitContainsDetectableError(String value)
+      => UsNationalProviderIdentifier.Validate(value)
          .Should().Be(UsNationalProviderIdentifierValidationResult.InvalidCheckDigit);
 
    #endregion

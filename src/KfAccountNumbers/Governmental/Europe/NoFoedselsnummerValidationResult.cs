@@ -25,7 +25,7 @@ public enum NoFoedselsnummerValidationResult
    InvalidLength,
 
    /// <summary>
-   ///   The value contains a non-digit character in where a digit was expected.
+   ///   The value contains a non-digit character where a digit was expected.
    /// </summary>
    InvalidCharacter,
 
@@ -54,7 +54,7 @@ public enum NoFoedselsnummerValidationResult
 /// <summary>
 ///   Additional methods for type <see cref="NoFoedselsnummerValidationResult"/>.
 /// </summary>
-public static class NoFodselsnummerValidationResultExtensions
+public static class NoFoedselsnummerValidationResultExtensions
 {
    public static String ToErrorDescription(this NoFoedselsnummerValidationResult errorType)
       => errorType switch

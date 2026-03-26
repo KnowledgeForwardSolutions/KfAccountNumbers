@@ -420,7 +420,7 @@ public class NoFoedselsnummerTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasCheckDigits(String value)
+   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
       => FluentActions
          .Invoking(() => new NoFoedselsnummer(value))
          .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
@@ -429,7 +429,7 @@ public class NoFoedselsnummerTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparators))]
-   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasSeparator(String separator)
+   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String separator)
    {
       // Arrange.
       var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
@@ -802,33 +802,33 @@ public class NoFoedselsnummerTests
    public void NoFoedselsnummer_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
-      var foedselsnummer2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
 
       // Act/assert.
-      (foedselsnummer1 == foedselsnummer2).Should().BeTrue();
+      (sut1 == sut2).Should().BeTrue();
    }
 
    [Fact]
    public void NoFoedselsnummer_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
-      var foedselsnummer2 = new NoFoedselsnummer(AltValid11CharacterFoedselsnummer);
+      var sut1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut2 = new NoFoedselsnummer(AltValid11CharacterFoedselsnummer);
 
       // Act/assert.
-      (foedselsnummer1 == foedselsnummer2).Should().BeFalse();
+      (sut1 == sut2).Should().BeFalse();
    }
 
    [Fact]
    public void NoFoedselsnummer_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 12 character versions for same person should still be equal.
-      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
-      var foedselsnummer2 = new NoFoedselsnummer(Valid12CharacterFoedselsnummer);
+      var sut1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut2 = new NoFoedselsnummer(Valid12CharacterFoedselsnummer);
 
       // Act/assert.
-      (foedselsnummer1 == foedselsnummer2).Should().BeTrue();
+      (sut1 == sut2).Should().BeTrue();
    }
 
    #endregion
@@ -841,33 +841,33 @@ public class NoFoedselsnummerTests
    public void NoFoedselsnummer_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
-      var foedselsnummer2 = new NoFoedselsnummer(AltValid11CharacterFoedselsnummer);
+      var sut1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut2 = new NoFoedselsnummer(AltValid11CharacterFoedselsnummer);
 
       // Act/assert.
-      (foedselsnummer1 != foedselsnummer2).Should().BeTrue();
+      (sut1 != sut2).Should().BeTrue();
    }
 
    [Fact]
    public void NoFoedselsnummer_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 12 character versions for same person should still be equal.
-      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
-      var foedselsnummer2 = new NoFoedselsnummer(Valid12CharacterFoedselsnummer);
+      var sut1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut2 = new NoFoedselsnummer(Valid12CharacterFoedselsnummer);
 
       // Act/assert.
-      (foedselsnummer1 != foedselsnummer2).Should().BeFalse();
+      (sut1 != sut2).Should().BeFalse();
    }
 
    [Fact]
    public void NoFoedselsnummer_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
-      var foedselsnummer2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
 
       // Act/assert.
-      (foedselsnummer1 != foedselsnummer2).Should().BeFalse();
+      (sut1 != sut2).Should().BeFalse();
    }
 
    #endregion
@@ -1038,33 +1038,33 @@ public class NoFoedselsnummerTests
    public void NoFoedselsnummer_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
-      var foedselsnummer2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
 
       // Act/assert.
-      foedselsnummer1.Equals(foedselsnummer2).Should().BeTrue();
+      sut1.Equals(sut2).Should().BeTrue();
    }
 
    [Fact]
    public void NoFoedselsnummer_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
-      var foedselsnummer2 = new NoFoedselsnummer(AltValid11CharacterFoedselsnummer);
+      var sut1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut2 = new NoFoedselsnummer(AltValid11CharacterFoedselsnummer);
 
       // Act/assert.
-      foedselsnummer1.Equals(foedselsnummer2).Should().BeFalse();
+      sut1.Equals(sut2).Should().BeFalse();
    }
 
    [Fact]
    public void NoFoedselsnummer_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 12 character versions for same person should still be equal.
-      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
-      var foedselsnummer2 = new NoFoedselsnummer(Valid12CharacterFoedselsnummer);
+      var sut1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut2 = new NoFoedselsnummer(Valid12CharacterFoedselsnummer);
 
       // Act/assert.
-      foedselsnummer1.Equals(foedselsnummer2).Should().BeTrue();
+      sut1.Equals(sut2).Should().BeTrue();
    }
 
    #endregion
@@ -1144,12 +1144,12 @@ public class NoFoedselsnummerTests
    public void NoFoedselsnummer_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
-      var foedselsnummer2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
 
       // Act.
-      var hash1 = foedselsnummer1.GetHashCode();
-      var hash2 = foedselsnummer2.GetHashCode();
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
 
       // Assert.
       hash1.Should().Be(hash2);
@@ -1159,12 +1159,12 @@ public class NoFoedselsnummerTests
    public void NoFoedselsnummer_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterDNummer);
-      var foedselsnummer2 = new NoFoedselsnummer(AltValid11CharacterDNummer);
+      var sut1 = new NoFoedselsnummer(Valid11CharacterDNummer);
+      var sut2 = new NoFoedselsnummer(AltValid11CharacterDNummer);
 
       // Act.
-      var hash1 = foedselsnummer1.GetHashCode();
-      var hash2 = foedselsnummer2.GetHashCode();
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
 
       // Assert.
       hash1.Should().NotBe(hash2);
@@ -1174,12 +1174,12 @@ public class NoFoedselsnummerTests
    public void NoFoedselsnummer_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 12 character versions for same person should still be equal.
-      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
-      var foedselsnummer2 = new NoFoedselsnummer(Valid12CharacterFoedselsnummer);
+      var sut1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut2 = new NoFoedselsnummer(Valid12CharacterFoedselsnummer);
 
       // Act.
-      var hash1 = foedselsnummer1.GetHashCode();
-      var hash2 = foedselsnummer2.GetHashCode();
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
 
       // Assert.
       hash1.Should().Be(hash2);
@@ -1199,12 +1199,12 @@ public class NoFoedselsnummerTests
    public void NoFoedselsnummer_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var foedselsnummer1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
-      var foedselsnummer2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut1 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
+      var sut2 = new NoFoedselsnummer(Valid11CharacterFoedselsnummer);
 
       // Act/assert.
-      (foedselsnummer1 == foedselsnummer2).Should().BeTrue();                         // Value equality should be true
-      ReferenceEquals(foedselsnummer1, foedselsnummer2).Should().BeFalse();
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
    }
 
    #endregion

@@ -144,13 +144,13 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldCreateObject_WhenValueContainsValidItin(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldCreateObject_WhenValueContainsValidItin(String value)
    {
       // Arrange.
-      var expected = GetRawItin(itin);
+      var expected = GetRawItin(value);
 
       // Act.
-      var sut = new UsIndividualTaxpayerIdentificationNumber(itin);
+      var sut = new UsIndividualTaxpayerIdentificationNumber(value);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -159,9 +159,9 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueIsEmpty(String? itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueIsEmpty(String? value)
       => FluentActions
-         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
+         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(value))
          .Should()
          .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinEmpty + "*")
@@ -169,9 +169,9 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
       => FluentActions
-         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
+         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(value))
          .Should()
          .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidLength + "*")
@@ -179,9 +179,9 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidAreaNumberValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidAreaNumber(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidAreaNumber(String value)
       => FluentActions
-         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
+         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(value))
          .Should()
          .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidAreaNumber + "*")
@@ -189,9 +189,9 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_When11CharacterValueContainsInvalidSeparator(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_When11CharacterValueContainsInvalidSeparator(String value)
       => FluentActions
-         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
+         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(value))
          .Should()
          .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidSeparatorEncountered + "*")
@@ -199,9 +199,9 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String value)
       => FluentActions
-         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
+         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(value))
          .Should()
          .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidCharacterEncountered + "*")
@@ -209,9 +209,9 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidGroupNumber(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidGroupNumber(String value)
       => FluentActions
-         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(itin))
+         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(value))
          .Should()
          .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidGroupNumber + "*")
@@ -226,11 +226,11 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull(String value)
    {
       // Arrange.
-      var expected = GetRawItin(itin);
-      var sut = new UsIndividualTaxpayerIdentificationNumber(itin);
+      var expected = GetRawItin(value);
+      var sut = new UsIndividualTaxpayerIdentificationNumber(value);
 
       // Act.
       String str = sut;
@@ -242,11 +242,11 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(ValidValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull(String value)
    {
       // Arrange.
-      var expected = GetRawItin(itin);
-      var sut = new UsIndividualTaxpayerIdentificationNumber(itin);
+      var expected = GetRawItin(value);
+      var sut = new UsIndividualTaxpayerIdentificationNumber(value);
 
       // Act.
       var str = (String)sut;
@@ -287,13 +287,13 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldCreateObject_WhenValueContainsValidItin(String str)
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldCreateObject_WhenValueContainsValidItin(String value)
    {
       // Arrange.
-      var expected = GetRawItin(str);
+      var expected = GetRawItin(value);
 
       // Act.
-      var sut = (UsIndividualTaxpayerIdentificationNumber)str;
+      var sut = (UsIndividualTaxpayerIdentificationNumber)value;
 
       // Assert.
       sut.Should().NotBeNull();
@@ -302,9 +302,9 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueIsEmpty(String? str)
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueIsEmpty(String? value)
       => FluentActions
-         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)str)
+         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)value)
          .Should()
          .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinEmpty + "*")
@@ -312,9 +312,9 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String str)
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
       => FluentActions
-         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)str)
+         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)value)
          .Should()
          .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidLength + "*")
@@ -322,9 +322,9 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidAreaNumberValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueHasInvalidAreaNumber(String str)
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueHasInvalidAreaNumber(String value)
       => FluentActions
-         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)str)
+         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)value)
          .Should()
          .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidAreaNumber + "*")
@@ -332,9 +332,9 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_When11CharacterValueContainsInvalidSeparator(String str)
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_When11CharacterValueContainsInvalidSeparator(String value)
       => FluentActions
-         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)str)
+         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)value)
          .Should()
          .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidSeparatorEncountered + "*")
@@ -342,9 +342,9 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String str)
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String value)
       => FluentActions
-         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)str)
+         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)value)
          .Should()
          .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
          .WithMessage(Messages.UsItinInvalidCharacterEncountered + "*")
@@ -370,22 +370,22 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var itin1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var itin2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
 
       // Act/assert.
-      (itin1 == itin2).Should().BeTrue();
+      (sut1 == sut2).Should().BeTrue();
    }
 
    [Fact]
    public void UsIndividualTaxpayerIdentificationNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var itin1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var itin2 = new UsIndividualTaxpayerIdentificationNumber(AltValidNineCharItin);
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(AltValidNineCharItin);
 
       // Act/assert.
-      (itin1 == itin2).Should().BeFalse();
+      (sut1 == sut2).Should().BeFalse();
    }
 
    #endregion
@@ -398,22 +398,22 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var itin1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var itin2 = new UsIndividualTaxpayerIdentificationNumber(AltValidNineCharItin);
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(AltValidNineCharItin);
 
       // Act/assert.
-      (itin1 != itin2).Should().BeTrue();
+      (sut1 != sut2).Should().BeTrue();
    }
 
    [Fact]
    public void UsIndividualTaxpayerIdentificationNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var itin1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var itin2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
 
       // Act/assert.
-      (itin1 != itin2).Should().BeFalse();
+      (sut1 != sut2).Should().BeFalse();
    }
 
    #endregion
@@ -425,11 +425,11 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    [Theory]
    [InlineData(ValidNineCharItin)]
    [InlineData(ValidElevenCharItin)]
-   public void UsIndividualTaxpayerIdentificationNumber_Value_ShouldReturnRawItin(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Value_ShouldReturnRawItin(String value)
    {
       // Arrange.
-      var expected = GetRawItin(itin);
-      var sut = new UsIndividualTaxpayerIdentificationNumber(itin);
+      var expected = GetRawItin(value);
+      var sut = new UsIndividualTaxpayerIdentificationNumber(value);
 
       // Act/assert.
       sut.Value.Should().Be(expected);
@@ -444,14 +444,14 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldCreateObject_WhenValueContainsValidItin(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldCreateObject_WhenValueContainsValidItin(String value)
    {
       // Arrange.
-      var expected = GetRawItin(itin);
+      var expected = GetRawItin(value);
       var expectedValue = new UsIndividualTaxpayerIdentificationNumber(expected);
 
       // Act.
-      var result = UsIndividualTaxpayerIdentificationNumber.Create(itin);
+      var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
 
       // Assert.
       result.Should().NotBeNull();
@@ -462,13 +462,13 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String? itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String? value)
    {
       // Arrange.
       var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.Empty;
 
       // Act.
-      var result = UsIndividualTaxpayerIdentificationNumber.Create(itin);
+      var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
 
       // Assert.
       result.Should().NotBeNull();
@@ -479,13 +479,13 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
       var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidLength;
 
       // Act.
-      var result = UsIndividualTaxpayerIdentificationNumber.Create(itin);
+      var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
 
       // Assert.
       result.Should().NotBeNull();
@@ -496,13 +496,13 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidAreaNumberValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidAreaNumberValidationResult_WhenValueHasInvalidAreaNumber(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidAreaNumberValidationResult_WhenValueHasInvalidAreaNumber(String value)
    {
       // Arrange.
       var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidAreaNumber;
 
       // Act.
-      var result = UsIndividualTaxpayerIdentificationNumber.Create(itin);
+      var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
 
       // Assert.
       result.Should().NotBeNull();
@@ -513,13 +513,13 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidSeparatorCharacterValidationResult_When11CharacterValueContainsInvalidSeparator(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidSeparatorCharacterValidationResult_When11CharacterValueContainsInvalidSeparator(String value)
    {
       // Arrange.
       var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidSeparatorEncountered;
 
       // Act.
-      var result = UsIndividualTaxpayerIdentificationNumber.Create(itin);
+      var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
 
       // Assert.
       result.Should().NotBeNull();
@@ -530,13 +530,13 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueContainsNonAsciiDigit(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueContainsNonAsciiDigit(String value)
    {
       // Arrange.
       var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered;
 
       // Act.
-      var result = UsIndividualTaxpayerIdentificationNumber.Create(itin);
+      var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
 
       // Assert.
       result.Should().NotBeNull();
@@ -547,13 +547,13 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidGroupNumberValidationResult_WhenValueHasInvalidGroupNumber(String itin)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidGroupNumberValidationResult_WhenValueHasInvalidGroupNumber(String value)
    {
       // Arrange.
       var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber;
 
       // Act.
-      var result = UsIndividualTaxpayerIdentificationNumber.Create(itin);
+      var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
 
       // Assert.
       result.Should().NotBeNull();
@@ -572,22 +572,22 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var itin1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var itin2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
 
       // Act/assert.
-      itin1.Equals(itin2).Should().BeTrue();
+      sut1.Equals(sut2).Should().BeTrue();
    }
 
    [Fact]
    public void UsIndividualTaxpayerIdentificationNumber_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var itin1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var itin2 = new UsIndividualTaxpayerIdentificationNumber(AltValidNineCharItin);
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(AltValidNineCharItin);
 
       // Act/assert.
-      itin1.Equals(itin2).Should().BeFalse();
+      sut1.Equals(sut2).Should().BeFalse();
    }
 
    [Fact]
@@ -688,12 +688,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var itin1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var itin2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
 
       // Act.
-      var hash1 = itin1.GetHashCode();
-      var hash2 = itin2.GetHashCode();
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
 
       // Assert.
       hash1.Should().Be(hash2);
@@ -703,12 +703,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var itin1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var itin2 = new UsIndividualTaxpayerIdentificationNumber(AltValidNineCharItin);
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(AltValidNineCharItin);
 
       // Act.
-      var hash1 = itin1.GetHashCode();
-      var hash2 = itin2.GetHashCode();
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
 
       // Assert.
       hash1.Should().NotBe(hash2);
@@ -728,12 +728,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var itin1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var itin2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
 
       // Act/assert.
-      (itin1 == itin2).Should().BeTrue();                         // Value equality should be true
-      ReferenceEquals(itin1, itin2).Should().BeFalse();
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
    }
 
    #endregion
@@ -746,11 +746,11 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    [InlineData(ValidNineCharItin, ValidNineCharItin)]
    [InlineData(ValidElevenCharItin, ValidNineCharItin)]
    public void UsIndividualTaxpayerIdentificationNumber_ToString_ShouldReturnExpectedValue(
-      String itin,
+      String value,
       String expected)
    {
       // Arrange.
-      var sut = new UsIndividualTaxpayerIdentificationNumber(itin);
+      var sut = new UsIndividualTaxpayerIdentificationNumber(value);
 
       // Act/assert.
       sut.ToString().Should().Be(expected);
@@ -765,38 +765,38 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnValidationPassed_WhenValueContainsValidItin(String itin)
-      => UsIndividualTaxpayerIdentificationNumber.Validate(itin).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.ValidationPassed);
+   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnValidationPassed_WhenValueContainsValidItin(String value)
+      => UsIndividualTaxpayerIdentificationNumber.Validate(value).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.ValidationPassed);
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnEmpty_WhenValueIsEmpty(String? itin)
-      => UsIndividualTaxpayerIdentificationNumber.Validate(itin).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.Empty);
+   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnEmpty_WhenValueIsEmpty(String? value)
+      => UsIndividualTaxpayerIdentificationNumber.Validate(value).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.Empty);
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String itin)
-      => UsIndividualTaxpayerIdentificationNumber.Validate(itin).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidLength);
+   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
+      => UsIndividualTaxpayerIdentificationNumber.Validate(value).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidLength);
 
    [Theory]
    [MemberData(nameof(InvalidAreaNumberValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidAreaNumber_WhenValueHasInvalidAreaNumber(String itin)
-      => UsIndividualTaxpayerIdentificationNumber.Validate(itin).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidAreaNumber);
+   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidAreaNumber_WhenValueHasInvalidAreaNumber(String value)
+      => UsIndividualTaxpayerIdentificationNumber.Validate(value).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidAreaNumber);
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidSeparatorEncountered_When11CharacterValueContainsAnInvalidSeparator(String itin)
-      => UsIndividualTaxpayerIdentificationNumber.Validate(itin).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidSeparatorEncountered);
+   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidSeparatorEncountered_When11CharacterValueContainsAnInvalidSeparator(String value)
+      => UsIndividualTaxpayerIdentificationNumber.Validate(value).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidSeparatorEncountered);
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidCharacterEncountered_WhenValueContainsNonAsciiDigit(String itin)
-      => UsIndividualTaxpayerIdentificationNumber.Validate(itin).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered);
+   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidCharacterEncountered_WhenValueContainsNonAsciiDigit(String value)
+      => UsIndividualTaxpayerIdentificationNumber.Validate(value).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered);
 
    [Theory]
    [MemberData(nameof(InvalidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidGroupNumber_WhenValueHasInvalidGroupNumber(String itin)
-      => UsIndividualTaxpayerIdentificationNumber.Validate(itin).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber);
+   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidGroupNumber_WhenValueHasInvalidGroupNumber(String value)
+      => UsIndividualTaxpayerIdentificationNumber.Validate(value).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber);
 
    #endregion
 
