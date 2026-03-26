@@ -40,6 +40,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Asia (future)
 	- Australia (future)
 	- Europe
+        - [DkPersonnummer](#dkpersonnummer) 
         - [IsKennitala](#iskennitala) 
         - [NoFoedselsnummer](#nofoedselsnummer) 
         - [SePersonnummer](#sepersonnummer)
@@ -71,6 +72,54 @@ Not all 9 digit numbers are valid SINs. A valid SIN must meet all of the followi
 * May not start with the digits 8 or 0, which are reserved for Business Numbers (8) and tax numbers assigned by the Canada Revenue Agency (0).
 
 See [Wikipedia - Social Insurance Number](https://en.wikipedia.org/wiki/Social_Insurance_Number) for more info.
+
+## DkPersonnummer
+
+The `DkPersonnummer` type represents the national identification number used by Denmark. The Danish
+personnummer is often informally called a CPR-nummer.
+
+A Danish personnummer is a ten-digit number structured as DDMMYYSSSS, with the following elements:
+* DDMMYY - the person's date of birth in DDMMYY format.
+* SSSS - a four digit sequence number used to differentiate between two persons born on the same date.
+ The sequence number also encodes additional information. The first digit is used indicate the century
+ of birth (see below) and the final digit indicates the person's gender, with even numbers for females
+ and odd numbers for males.
+
+A Danish personummer may be formatted as a string of 10 consecutive digits (DDMMYYSSSS) or as 11 characters with a
+a dash ('-') as a separator character separating the date of birth and the remaining four digits (DDMMYY-SSSS).
+
+A Danish personnummer must meet all of the following rules:
+* The value may not be null, empty or all whitespace characters.
+* The value must be 11 characters (including the separator) in length.
+* All characters other than the optional separator character must be ASCII digits ('0'-'9').
+* The separator character, if included, must be a dash ('-').
+* The date of birth, after deriving the century from the century indicator must be a valid date
+ between January 1, 1858 and December 31, 2057.
+
+The trailing (right-most) digit of the personnummer was originally a modulus 11 check digit. However, in 2007
+the use of the check digit was discontinued since available numbers for several dates were exhausted
+(especially January 1, which was often used in cases where immigrants did not know their exact date of
+birth). `DkPersonnummer` does not validate a check digit since it is not possible to determine if the
+personnummer was issued pre- or post-2007.
+
+Example values:
+* 070761-4285 - Date of birth July 7, 1961, male
+* 010203-6234 - Date of birth February 1, 2003, female
+
+The digit in the seventh character position (zero-based) is used to determine the exact century of
+birth, but some digits can span more than one century. The following rules are defined:
+* Century indicator = 0-3, then century = 1900
+* Century indicator = 4 **AND** year <= 36, then century = 2000
+* Century indicator = 4 **AND** year >= 37, then century = 1900
+* Century indicator = 5-8 **AND** year <= 58, then century = 2000
+* Century indicator = 5-8 **AND** year >= 57, then century = 1800
+* Century indicator = 9 **AND** year <= 36, then century = 2000
+* Century indicator = 9 **AND** year >= 37, then century = 1900
+
+According to these rules, the valid range for a date of birth is January 1, 1858 to December 31 2057.
+
+See [Wikipedia - Personal identification number (Denmark)](https://en.wikipedia.org/wiki/Personal_identification_number_%28Denmark%29)
+and [CPR-nummer](https://da.wikipedia.org/wiki/CPR-nummer) for more info.
 
 ## IsKennitala
 

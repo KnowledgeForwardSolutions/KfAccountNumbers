@@ -262,9 +262,9 @@ public class NoFoedselsnummerTests
       { "011304", "500" },       // month = 13
       { "000104", "500" },       // days = 0
       { "320104", "500" },       // Invalid day of month for January, any year
-      { "290201", "502" },       // Invalid day of for Feburary, non-leap year
-      { "300204", "501" },       // Invalid day of for Feburary, leap year
-      { "300200", "500" },       // Invalid day of for Feburary, leap year (2000 is leap-year)
+      { "290201", "502" },       // Invalid day of for February, non-leap year
+      { "300204", "501" },       // Invalid day of for February, leap year
+      { "300200", "500" },       // Invalid day of for February, leap year (2000 is leap-year)
       { "320304", "500" },       // Invalid day of for March, any year
       { "310404", "502" },       // Invalid day of for April, any year
       { "320504", "500" },       // Invalid day of for May, any year
@@ -295,9 +295,9 @@ public class NoFoedselsnummerTests
       { "411304", "500" },       // Invalid month = 13
       { "400104", "500" },       // Invalid day = 0
       { "720104", "500" },       // Invalid day of month for January, any year
-      { "690201", "500" },       // Invalid day of for Feburary, non-leap year
-      { "700204", "500" },       // Invalid day of for Feburary, leap year
-      { "700200", "500" },       // Invalid day of for Feburary, leap year (2000 is leap-year)
+      { "690201", "500" },       // Invalid day of for February, non-leap year
+      { "700204", "500" },       // Invalid day of for February, leap year
+      { "700200", "500" },       // Invalid day of for February, leap year (2000 is leap-year)
       { "720304", "500" },       // Invalid day of for March, any year
       { "710404", "500" },       // Invalid day of for April, any year
       { "720504", "500" },       // Invalid day of for May, any year
@@ -477,10 +477,10 @@ public class NoFoedselsnummerTests
    [InlineData("311299", "998", "19991231")]       // Rule 3, December 31, 1999
    [InlineData("010100", "500", "20000101")]       // Rule 4, January 1, 2000
    [InlineData("311239", "999", "20391231")]       // Rule 4, December 31, 2039
-   [InlineData("290296", "501", "18960229")]       // Feburary 29, 1896 - leap year
-   [InlineData("280200", "235", "19000228")]       // Feburary 28, 1900 - non leap year
-   [InlineData("290248", "318", "19480229")]       // Feburary 29, 1948 - leap year
-   [InlineData("290200", "601", "20000229")]       // Feburary 29, 2000 - leap year
+   [InlineData("290296", "501", "18960229")]       // February 29, 1896 - leap year
+   [InlineData("280200", "235", "19000228")]       // February 28, 1900 - non leap year
+   [InlineData("290248", "318", "19480229")]       // February 29, 1948 - leap year
+   [InlineData("290200", "601", "20000229")]       // February 29, 2000 - leap year
 
    // D-nummer values
    [InlineData("410154", "500", "18540101")]       // Rule 1, January 1, 1854
@@ -491,10 +491,10 @@ public class NoFoedselsnummerTests
    [InlineData("711299", "998", "19991231")]       // Rule 3, December 31, 1999
    [InlineData("410100", "500", "20000101")]       // Rule 4, January 1, 2000
    [InlineData("711239", "999", "20391231")]       // Rule 4, December 31, 2039
-   [InlineData("690296", "501", "18960229")]       // Feburary 29, 1896 - leap year
-   [InlineData("680200", "235", "19000228")]       // Feburary 28, 1900 - non leap year
-   [InlineData("690248", "318", "19480229")]       // Feburary 29, 1948 - leap year
-   [InlineData("690200", "601", "20000229")]       // Feburary 29, 2000 - leap year
+   [InlineData("690296", "501", "18960229")]       // February 29, 1896 - leap year
+   [InlineData("680200", "235", "19000228")]       // February 28, 1900 - non leap year
+   [InlineData("690248", "318", "19480229")]       // February 29, 1948 - leap year
+   [InlineData("690200", "601", "20000229")]       // February 29, 2000 - leap year
    public void NoFoedselsnummer_DateOfBirth_ShouldReturnExpectedValue(
       String dateOfBirth,
       String individualNumber,

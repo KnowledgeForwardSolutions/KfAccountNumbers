@@ -84,9 +84,9 @@ public class IsKennitalaTests
       { "311299", "25", "0" },         // December 31, 2099
 
       { "310101", "25", "9" },         // maximum days for January, any year
-      { "280291", "25", "9" },         // maximum days for Feburary, non leap year
-      { "290296", "25", "9" },         // maximum days for Feburary, leap year
-      { "290200", "25", "0" },         // maximum days for Feburary, leap year (2000 is leap-year)
+      { "280291", "25", "9" },         // maximum days for February, non leap year
+      { "290296", "25", "9" },         // maximum days for February, leap year
+      { "290200", "25", "0" },         // maximum days for February, leap year (2000 is leap-year)
       { "310304", "25", "9" },         // maximum days for March, any year
       { "300404", "25", "0" },         // maximum days for April, any year
       { "310504", "25", "9" },         // maximum days for May, any year
@@ -105,9 +105,9 @@ public class IsKennitalaTests
       { "711299", "25", "0" },         // December 31, 2099
 
       { "710101", "25", "9" },         // maximum days for January, any year
-      { "680291", "24", "9" },         // maximum days for Feburary, non leap year
-      { "690296", "24", "9" },         // maximum days for Feburary, leap year
-      { "690200", "25", "0" },         // maximum days for Feburary, leap year (2000 is leap-year)
+      { "680291", "24", "9" },         // maximum days for February, non leap year
+      { "690296", "24", "9" },         // maximum days for February, leap year
+      { "690200", "25", "0" },         // maximum days for February, leap year (2000 is leap-year)
       { "710304", "25", "9" },         // maximum days for March, any year
       { "700404", "25", "0" },         // maximum days for April, any year
       { "710504", "25", "9" },         // maximum days for May, any year
@@ -207,9 +207,9 @@ public class IsKennitalaTests
       { "011304", "25", "0" },      // month = 13
       { "000104", "25", "9" },      // days = 0
       { "320104", "25", "0" },      // Invalid day of month for January, any year
-      { "290201", "24", "9" },      // Invalid day of for Feburary, non-leap year
-      { "300204", "25", "9" },      // Invalid day of for Feburary, leap year
-      { "300200", "25", "0" },      // Invalid day of for Feburary, leap year (2000 is leap-year)
+      { "290201", "24", "9" },      // Invalid day of for February, non-leap year
+      { "300204", "25", "9" },      // Invalid day of for February, leap year
+      { "300200", "25", "0" },      // Invalid day of for February, leap year (2000 is leap-year)
       { "320304", "25", "9" },      // Invalid day of for March, any year
       { "310404", "24", "0" },      // Invalid day of for April, any year
       { "320504", "25", "9" },      // Invalid day of for May, any year
@@ -226,9 +226,9 @@ public class IsKennitalaTests
       { "411304", "25", "0" },      // month = 13
       { "400104", "25", "9" },      // days = 0
       { "720104", "25", "0" },      // Invalid day of month for January, any year
-      { "690201", "24", "9" },      // Invalid day of for Feburary, non-leap year
-      { "700204", "25", "9" },      // Invalid day of for Feburary, leap year
-      { "700200", "25", "0" },      // Invalid day of for Feburary, leap year (2000 is leap-year)
+      { "690201", "24", "9" },      // Invalid day of for February, non-leap year
+      { "700204", "25", "9" },      // Invalid day of for February, leap year
+      { "700200", "25", "0" },      // Invalid day of for February, leap year (2000 is leap-year)
       { "720304", "25", "9" },      // Invalid day of for March, any year
       { "710404", "25", "0" },      // Invalid day of for April, any year
       { "720504", "25", "9" },      // Invalid day of for May, any year
@@ -408,18 +408,18 @@ public class IsKennitalaTests
    [InlineData("311299", "73", "9", "19991231")]      // December 31, 1999
    [InlineData("010100", "73", "0", "20000101")]      // January 1, 2000
    [InlineData("311299", "73", "0", "20991231")]      // December 31, 2099
-   [InlineData("280200", "73", "9", "19000228")]      // Feburary 28, 1900 - non leap year
-   [InlineData("290248", "73", "9", "19480229")]      // Feburary 29, 1948 - leap year
-   [InlineData("290200", "73", "0", "20000229")]      // Feburary 29, 2000 - leap year
+   [InlineData("280200", "73", "9", "19000228")]      // February 28, 1900 - non leap year
+   [InlineData("290248", "73", "9", "19480229")]      // February 29, 1948 - leap year
+   [InlineData("290200", "73", "0", "20000229")]      // February 29, 2000 - leap year
 
    // fyrirtaeki values
    [InlineData("410100", "73", "9", "19000101")]      // January 1, 1900
    [InlineData("711299", "73", "9", "19991231")]      // December 31, 1999
    [InlineData("410100", "73", "0", "20000101")]      // January 1, 2000
    [InlineData("711299", "73", "0", "20991231")]      // December 31, 2099
-   [InlineData("680200", "73", "9", "19000228")]      // Feburary 28, 1900 - non leap year
-   [InlineData("690248", "73", "9", "19480229")]      // Feburary 29, 1948 - leap year
-   [InlineData("690200", "73", "0", "20000229")]      // Feburary 29, 2000 - leap year
+   [InlineData("680200", "73", "9", "19000228")]      // February 28, 1900 - non leap year
+   [InlineData("690248", "73", "9", "19480229")]      // February 29, 1948 - leap year
+   [InlineData("690200", "73", "0", "20000229")]      // February 29, 2000 - leap year
    public void IsKennitala_DateOfBirth_ShouldReturnExpectedValue(
       String dateOfBirth,
       String randomDigits,
