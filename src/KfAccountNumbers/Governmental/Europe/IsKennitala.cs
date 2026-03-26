@@ -191,7 +191,7 @@ public record IsKennitala
    ///   any position other than the separator location.
    ///   - or -
    ///   <paramref name="kennitala"/> contains an invalid weighted modulus
-   ///   11 check digit in one or both trailing positions.
+   ///   11 check digit in the trailing (right-most) character position.
    ///   - or -
    ///   <paramref name="kennitala"/> contains a digit character in position
    ///   6 (zero-based). Valid separator characters are any non-digit character,
@@ -280,8 +280,8 @@ public record IsKennitala
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{IsKennitala, IsKennitalaValidationResult}"/>.
-   ///   Will contain the new <see cref="IsKennitalaValidationResult"/> if 
-   ///   <paramref name="kennitala"/> is valid or 
+   ///   Will contain the new <see cref="IsKennitala"/> if 
+   ///   <paramref name="kennitala"/> is valid or an
    ///   <see cref="IsKennitalaValidationResult"/> that identifies
    ///   the validation rule that was failed if <paramref name="kennitala"/> is 
    ///   invalid.
@@ -333,7 +333,7 @@ public record IsKennitala
    ///   String representation of an Icelandic kennitala number.
    /// </param>
    /// <returns>
-   ///   A <see cref="IsKennitala"/> enumeration 
+   ///   A <see cref="IsKennitalaValidationResult"/> enumeration 
    ///   value that indicates if the <paramref name="kennitala"/> passed
    ///   validation or what validation error was encountered.
    /// </returns>

@@ -47,7 +47,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 		- [CaSocialInsuranceNumber](#casocialinsurancenumber) 
 		- [MxCurp](#mxcurp)
         - [UsIndividualTaxpayerIdentificationNumber](#usindividualtaxpayeridentificationnumber)
-        - [UsNationalProviderNumber](#usnationalprovidernumber)
+        - [UsNationalProviderIdentifier](#usnationalprovideridentifier)
 		- [UsSocialSecurityNumber](#ussocialsecuritynumber)
 	- South America
 * Utility
@@ -327,9 +327,9 @@ Number (TIN) Matching Program or other IRS services.
 
 See [Wikipedia - Individual Taxpayer Identification Number](https://en.wikipedia.org/wiki/Individual_Taxpayer_Identification_Number) for more info.
 
-## UsNationalProviderNumber
+## UsNationalProviderIdentifier
 
-The `UsNationalProviderNumber` type represents a National Provider Identifier (NPI) issued to health care
+The `UsNationalProviderIdentifier` type represents a National Provider Identifier (NPI) issued to health care
 providers by the US Centers for Medicare & Medicaid Services (CMS). The NPI is used in administrative
 and billing transactions within the U.S. healthcare system.
 

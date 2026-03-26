@@ -12,7 +12,7 @@ public enum IsIdentifierType
    Einstaklingur  = 0,
 
    /// <summary>
-   ///   Company identifier. Same format as for Einstaklingur, except that 40
+   ///   Company identifier. Same format as for Einstaklingur, except that
    ///   40 is added to the day component of the day of birth (i.e. 130585
    ///   becomes 530585).
    /// </summary>

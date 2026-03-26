@@ -25,7 +25,7 @@ public enum IsKennitalaValidationResult
    InvalidLength,
 
    /// <summary>
-   ///   The value contains a non-digit character in where a digit was expected.
+   ///   The value contains a non-digit character where a digit was expected.
    /// </summary>
    InvalidCharacter,
 

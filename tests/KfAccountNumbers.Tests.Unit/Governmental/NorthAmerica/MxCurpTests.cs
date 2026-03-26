@@ -312,11 +312,11 @@ public class MxCurpTests
    public void MxCurp_Constructor_ShouldCreateInstance_WhenHomoclaveIsValid(Char homoclave)
    {
       // Arrange.
-      var cvalueurp = GetCurp(homoclave: homoclave);
-      var expected = cvalueurp.ToUpperInvariant();
+      var value = GetCurp(homoclave: homoclave);
+      var expected = value.ToUpperInvariant();
 
       // Act.
-      var sut = new MxCurp(cvalueurp);
+      var sut = new MxCurp(value);
 
       // Assert.
       sut.Should().NotBeNull();
