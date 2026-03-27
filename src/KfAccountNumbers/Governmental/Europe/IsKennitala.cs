@@ -159,8 +159,8 @@ public record IsKennitala
    /// </summary>
    public const Int32 MinimumValidYearOfBirth = 1900;
 
-   private const Int32 NoSeparatorLength = 10;
-   private const Int32 SeparatorLength = 11;
+   private const Int32 UnformattedLength = 10;
+   private const Int32 FormattedLength = 11;
 
    private const Int32 SeparatorOffset = 6;
 
@@ -342,7 +342,7 @@ public record IsKennitala
       {
          return IsKennitalaValidationResult.Empty;
       }
-      else if (kennitala.Length is not NoSeparatorLength and not SeparatorLength)
+      else if (kennitala.Length is not UnformattedLength and not FormattedLength)
       {
          return IsKennitalaValidationResult.InvalidLength;
       }
@@ -391,7 +391,7 @@ public record IsKennitala
    }
 
    private static String GetRawValue(String kennitala)
-      => kennitala.Length == NoSeparatorLength
+      => kennitala.Length == UnformattedLength
          ? kennitala
          : String.Concat(
             kennitala.AsSpan(0, SeparatorOffset),
@@ -399,7 +399,7 @@ public record IsKennitala
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean IsFormatted(ReadOnlySpan<Char> kennitala)
-      => kennitala.Length == SeparatorLength;
+      => kennitala.Length == FormattedLength;
 
    private static IsKennitalaValidationResult ValidateCenturyIndicator(ReadOnlySpan<Char> kennitala)
    {

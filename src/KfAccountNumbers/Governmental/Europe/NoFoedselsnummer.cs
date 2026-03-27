@@ -200,8 +200,8 @@ public record NoFoedselsnummer
    /// </summary>
    public const Int32 MinimumValidYearOfBirth = 1854;
 
-   private const Int32 NoSeparatorLength = 11;
-   private const Int32 SeparatorLength = 12;
+   private const Int32 UnformattedLength = 11;
+   private const Int32 FormattedLength = 12;
 
    private const Int32 SeparatorOffset = 6;
 
@@ -391,7 +391,7 @@ public record NoFoedselsnummer
       {
          return NoFoedselsnummerValidationResult.Empty;
       }
-      else if (foedselsnummer.Length is not NoSeparatorLength and not SeparatorLength)
+      else if (foedselsnummer.Length is not UnformattedLength and not FormattedLength)
       {
          return NoFoedselsnummerValidationResult.InvalidLength;
       }
@@ -456,7 +456,7 @@ public record NoFoedselsnummer
          + (foedselsnummer[^(IndividualNumberOffset - 2)] - Chars.DigitZero);
 
    private static String GetRawFoedselsnummer(String foedselsnummer)
-      => foedselsnummer.Length == NoSeparatorLength
+      => foedselsnummer.Length == UnformattedLength
          ? foedselsnummer
          : String.Concat(
             foedselsnummer.AsSpan(0, SeparatorOffset),
@@ -464,7 +464,7 @@ public record NoFoedselsnummer
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean IsFormatted(ReadOnlySpan<Char> foedselsnummer)
-      => foedselsnummer.Length == SeparatorLength;
+      => foedselsnummer.Length == FormattedLength;
 
    private static NoFoedselsnummerValidationResult ValidateCheckDigits(ReadOnlySpan<Char> foedselsnummer)
    {

@@ -169,14 +169,63 @@ public record DkPersonnummer
    /// </summary>
    public const Int32 MinimumValidYearOfBirth = 1858;
 
-   private const Int32 NoSeparatorLength = 10;
-   private const Int32 SeparatorLength = 11;
+   private const Int32 UnformattedLength = 10;
+   private const Int32 FormattedLength = 11;
 
    private const Int32 SeparatorOffset = 6;
 
    // These constants are measured from the end of the value;
    private const Int32 CenturyIndicatorOffset = 4;
    private const Int32 GenderOffset = 1;
+
+   /// <summary>
+   ///   Initialize a new instance of the <see cref="DkPersonnummer"/> class.
+   /// </summary>
+   /// <param name="personnummer">
+   ///   String representation of a Danish personnummer.
+   /// </param>
+   /// <exception cref="KfValidationException{DkPersonnummerValidationResult}">
+   ///   <paramref name="personnummer"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="personnummer"/> is not length 10 (or 11 if a separator
+   ///   character is used).
+   ///   - or -
+   ///   <paramref name="personnummer"/> contains a non-digit character in
+   ///   any position other than the separator location.
+   ///   - or -
+   ///   <paramref name="personnummer"/> is 11 characters in length and has a
+   ///   character other than dash ('-') as a separator.
+   ///   - or -
+   ///   <paramref name="personnummer"/> contains an invalid date of birth in
+   ///   positions 0-5 (zero-based).
+   /// </exception>
+   public DkPersonnummer(String? personnummer)
+      : this(personnummer, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private DkPersonnummer(String? personnummer, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         DkPersonnummerValidationResult validationResult = Validate(personnummer);
+         if (validationResult != DkPersonnummerValidationResult.ValidationPassed)
+         {
+            throw validationResult.ToValidationException();
+         }
+      }
+
+      Value = GetRawValue(personnummer!);
+   }
+
+   /// <summary>
+   ///   The raw personnummer value.
+   /// </summary>
+   public String Value { get; private init; }
 
    /// <summary>
    ///   Check the <paramref name="personnummer"/> to determine if it contains a
@@ -196,7 +245,7 @@ public record DkPersonnummer
       {
          return DkPersonnummerValidationResult.Empty;
       }
-      else if (personnummer.Length is not NoSeparatorLength and not SeparatorLength)
+      else if (personnummer.Length is not UnformattedLength and not FormattedLength)
       {
          return DkPersonnummerValidationResult.InvalidLength;
       }
@@ -241,15 +290,22 @@ public record DkPersonnummer
          (9, <= 36) => 2000,
          // Rule 7. Century indicator = 9, year >= 37 => 1900
          (9, >= 37) => 1900,
-         _ => throw new SwitchExpressionException()
+         _ => 0
       };
 
       return (day, month, year);
    }
 
+   private static String GetRawValue(String personnummer)
+      => personnummer.Length == UnformattedLength
+         ? personnummer
+         : String.Concat(
+            personnummer.AsSpan(0, SeparatorOffset),
+            personnummer.AsSpan(SeparatorOffset + 1));
+
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static Boolean IsFormatted(ReadOnlySpan<Char> kennitala)
-      => kennitala.Length == SeparatorLength;
+   private static Boolean IsFormatted(ReadOnlySpan<Char> personnummer)
+      => personnummer.Length == FormattedLength;
 
    private static Boolean ValidateAllDigits(ReadOnlySpan<Char> personnummer)
    {
@@ -277,7 +333,12 @@ public record DkPersonnummer
       var (day, month, year) = GetDayMonthYear(personnummer);
 #pragma warning restore IDE0008 // Use explicit type
 
-      // Not possible to generate invalid year so don't test for it.
+      if (year < MinimumValidYearOfBirth || year > MaximumValidYearOfBirth)
+      {
+         // Should be impossible to ever reach this point, but return false
+         // out of abundance of caution and to avoid throwing an exception.
+         return false;
+      }
 
       if (month < 1 || month > 12)
       {
@@ -288,5 +349,5 @@ public record DkPersonnummer
    }
 
    private static Boolean ValidateSeparator(ReadOnlySpan<Char> personnummer)
-      => personnummer.Length == NoSeparatorLength || personnummer[SeparatorOffset] == Chars.Dash;
+      => personnummer.Length == UnformattedLength || personnummer[SeparatorOffset] == Chars.Dash;
 }
