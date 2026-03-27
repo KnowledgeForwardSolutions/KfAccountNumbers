@@ -1,0 +1,292 @@
+// Ignore Spelling: Personnummer
+
+namespace KfAccountNumbers.Governmental.Europe;
+
+/// <summary>
+///   Strongly typed business object that represents a Danish Personnummer,
+///   often informally called a CPR-nummer.
+/// </summary>
+/// <remarks>
+///   <para>
+///      A Danish personnummer is a ten-digit number structured as DDMMYYSSSS,
+///      with the following elements:
+///      <list type="bullet">
+///         <item>
+///            <term>DDMMYY</term>
+///            <description>
+///               The person's date of birth in DDMMYY format.
+///            </description>
+///         </item>
+///         <item>
+///            <term>SSSS</term>
+///            <description>
+///               A four digit sequence number used to differentiate between two
+///               persons born on the same date. The sequence number also encodes
+///               additional information. The first digit is used indicate the
+///               century of birth (see below) and the final digit indicates the
+///               person's gender, with even numbers for female and odd numbers
+///               for males.
+///            </description>
+///         </item>
+///      </list>
+///   </para>
+///   <para>
+///      A Danish personummer may be formatted as a string of 10 consecutive digits
+///      (DDMMYYSSSS) or as 11 characters with a dash ('-') as a separator character
+///      separating the date of birth and the remaining four digits (DDMMYY-SSSS).
+///   </para>
+///   <para>
+///      Example values:
+///      <list type="bullet">
+///         <item>
+///            <term>070761-4285</term>
+///            <description>
+///               Date of birth July 7, 1961, gender = male
+///            </description>
+///         </item>
+///         <item>
+///            <term>0102036234</term>
+///            <description>
+///               Date of birth February 1, 2003, gender = female
+///            </description>
+///         </item>
+///      </list>
+///   </para>
+///   <para>
+///      When creating a new <see cref="DkPersonnummer"/>, the following
+///      validation rules are applied:
+///      <list type="bullet">
+///         <item>
+///            <description>
+///               The value may not be null, empty or all whitespace characters.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The value must be either 10 characters (without separator) or 11
+///               characters (with separator) in length.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               All characters (except the optional separator character) must be
+///               ASCII digits ('0'-'9').
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The optional separator character, if included, must be a dash ('-').
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The century indicator must be the ASCII character nine ('9') or
+///               the ASCII character zero ('0').
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The date of birth, after deriving the century from the century
+///               indicator must be a valid date between January 1, 1858 and
+///               December 31, 2057.
+///            </description>
+///         </item>
+///      </list>
+///   </para>
+///   <para>
+///      The trailing (right-most) digit of the personnummer was originally a
+///      modulus 11 check digit. However, in 2007 the use of the check digit was
+///      discontinued since available numbers for several dates were exhausted
+///      (especially January 1, which was often used in cases where immigrants
+///      did not know their exact date of birth). <see cref="DkPersonnummer"/>
+///      does not validate a check digit since it is not possible to determine
+///      if the personnummer was issued pre- or post-2007.
+///   </para>
+///   <para>
+///      The digit in the seventh character position (zero-based) is used to
+///      determine the exact century of birth, but some digits can span more
+///      than one century. The following rules are defined:
+///      <list type="bullet">
+///         <item>
+///            <description>
+///               If the century indicator = 0-3, then the century of birth = 1900
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               If the century indicator = 4 <b>AND</b> the two digit year of
+///               birth is &le; 36 then the century of birth = 2000.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               If the century indicator = 4 <b>AND</b> the two digit year of
+///               birth is &ge; 37 then the century of birth = 1900.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               If the century indicator = 5-8 <b>AND</b> the two digit year of
+///               birth is &le; 57 then the century of birth = 2000.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               If the century indicator = 5-8 <b>AND</b> the two digit year of
+///               birth is &ge; 58 then the century of birth = 1800.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               If the century indicator = 9 <b>AND</b> the two digit year of
+///               birth is &le; 36 then the century of birth = 2000.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               If the century indicator = 9 <b>AND</b> the two digit year of
+///               birth is &ge; 37 then the century of birth = 1900.
+///            </description>
+///         </item>
+///      </list>
+///      According to these rules, the valid range for a date of birth is
+///      January 1, 1858 to December 31 2057.
+///   </para>
+///   <para>
+///      See https://en.wikipedia.org/wiki/Personal_identification_number_(Denmark)
+///      and https://da.wikipedia.org/wiki/CPR-nummer for more info.
+///   </para>
+/// </remarks>
+public record DkPersonnummer
+{
+   /// <summary>
+   ///   The latest year of birth supported by <see cref="DkPersonnummer"/>.
+   /// </summary>
+   public const Int32 MaximumValidYearOfBirth = 2057;
+
+   /// <summary>
+   ///   The earliest year of birth supported by <see cref="DkPersonnummer"/>.
+   /// </summary>
+   public const Int32 MinimumValidYearOfBirth = 1858;
+
+   private const Int32 NoSeparatorLength = 10;
+   private const Int32 SeparatorLength = 11;
+
+   private const Int32 SeparatorOffset = 6;
+
+   // These constants are measured from the end of the value;
+   private const Int32 CenturyIndicatorOffset = 4;
+   private const Int32 GenderOffset = 1;
+
+   /// <summary>
+   ///   Check the <paramref name="personnummer"/> to determine if it contains a
+   ///   valid Danish personnummer.
+   /// </summary>
+   /// <param name="personnummer">
+   ///   String representation of a Danish personnummer.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="DkPersonnummerValidationResult"/> enumeration 
+   ///   value that indicates if the <paramref name="personnummer"/> passed
+   ///   validation or what validation error was encountered.
+   /// </returns>
+   public static DkPersonnummerValidationResult Validate(String? personnummer)
+   {
+      if (String.IsNullOrWhiteSpace(personnummer))
+      {
+         return DkPersonnummerValidationResult.Empty;
+      }
+      else if (personnummer.Length is not NoSeparatorLength and not SeparatorLength)
+      {
+         return DkPersonnummerValidationResult.InvalidLength;
+      }
+      else if (!ValidateAllDigits(personnummer))
+      {
+         return DkPersonnummerValidationResult.InvalidCharacter;
+      }
+      else if (!ValidateSeparator(personnummer))
+      {
+         return DkPersonnummerValidationResult.InvalidSeparator;
+      }
+      else if (!ValidateDateOfBirth(personnummer))
+      {
+         return DkPersonnummerValidationResult.InvalidDateOfBirth;
+      }
+
+      return DkPersonnummerValidationResult.ValidationPassed;
+   }
+
+   private static (Int32 day, Int32 month, Int32 year) GetDayMonthYear(ReadOnlySpan<Char> personnummer)
+   {
+      var day = personnummer.ParseTwoDigits();
+      var month = personnummer[2..].ParseTwoDigits();
+      var year = personnummer[4..].ParseTwoDigits();
+
+      // Adjust the year according to the value of the century indicator.
+      var centuryIndicator = personnummer[^CenturyIndicatorOffset] - Chars.DigitZero;
+
+      year += (centuryIndicator, year) switch
+      {
+         // Rule 1. Century indicator = 0-3 => 1900
+         (>= 0 and <=3, _) => 1900,
+         // Rule 2. Century indicator = 4, year <= 36 => 2000
+         (4, <= 36) => 2000,
+         // Rule 3. Century indicator = 4, year >= 37 => 1900
+         (4, >= 37) => 1900,
+         // Rule 4. Century indicator = 5-8, year <= 57 => 2000
+         (>= 5 and <= 8, <= 57) => 2000,
+         // Rule 5. Century indicator = 5-8, year >= 58 => 1800
+         (>= 5 and <= 8, >= 58) => 1800,
+         // Rule 6. Century indicator = 9, year <= 36 => 2000
+         (9, <= 36) => 2000,
+         // Rule 7. Century indicator = 9, year >= 37 => 1900
+         (9, >= 37) => 1900,
+         _ => throw new SwitchExpressionException()
+      };
+
+      return (day, month, year);
+   }
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean IsFormatted(ReadOnlySpan<Char> kennitala)
+      => kennitala.Length == SeparatorLength;
+
+   private static Boolean ValidateAllDigits(ReadOnlySpan<Char> personnummer)
+   {
+      var isFormatted = IsFormatted(personnummer);
+      var processLength = personnummer.Length;
+      for (var index = 0; index < processLength; index++)
+      {
+         if (isFormatted && index == SeparatorOffset)
+         {
+            continue;
+         }
+
+         if (!personnummer[index].IsAsciiDigit())
+         {
+            return false;
+         }
+      }
+
+      return true;
+   }
+
+   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> personnummer)
+   {
+#pragma warning disable IDE0008 // Use explicit type
+      var (day, month, year) = GetDayMonthYear(personnummer);
+#pragma warning restore IDE0008 // Use explicit type
+
+      // Not possible to generate invalid year so don't test for it.
+
+      if (month < 1 || month > 12)
+      {
+         return false;
+      }
+
+      return day >= 1 && day <= DateTime.DaysInMonth(year, month);
+   }
+
+   private static Boolean ValidateSeparator(ReadOnlySpan<Char> personnummer)
+      => personnummer.Length == NoSeparatorLength || personnummer[SeparatorOffset] == Chars.Dash;
+}

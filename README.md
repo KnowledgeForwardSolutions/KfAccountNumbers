@@ -81,11 +81,11 @@ personnummer is often informally called a CPR-nummer.
 A Danish personnummer is a ten-digit number structured as DDMMYYSSSS, with the following elements:
 * DDMMYY - the person's date of birth in DDMMYY format.
 * SSSS - a four digit sequence number used to differentiate between two persons born on the same date.
- The sequence number also encodes additional information. The first digit is used indicate the century
+ The sequence number also encodes additional information. The first digit is used to indicate the century
  of birth (see below) and the final digit indicates the person's gender, with even numbers for females
  and odd numbers for males.
 
-A Danish personummer may be formatted as a string of 10 consecutive digits (DDMMYYSSSS) or as 11 characters with a
+A Danish personnummer may be formatted as a string of 10 consecutive digits (DDMMYYSSSS) or as 11 characters with
 a dash ('-') as a separator character separating the date of birth and the remaining four digits (DDMMYY-SSSS).
 
 A Danish personnummer must meet all of the following rules:
@@ -103,16 +103,16 @@ birth). `DkPersonnummer` does not validate a check digit since it is not possibl
 personnummer was issued pre- or post-2007.
 
 Example values:
-* 070761-4285 - Date of birth July 7, 1961, male
-* 010203-6234 - Date of birth February 1, 2003, female
+* 070761-4285 - Date of birth July 7, 1961, gender = male
+* 0102036234 - Date of birth February 1, 2003, gender = female
 
 The digit in the seventh character position (zero-based) is used to determine the exact century of
 birth, but some digits can span more than one century. The following rules are defined:
 * Century indicator = 0-3, then century = 1900
 * Century indicator = 4 **AND** year <= 36, then century = 2000
 * Century indicator = 4 **AND** year >= 37, then century = 1900
-* Century indicator = 5-8 **AND** year <= 58, then century = 2000
-* Century indicator = 5-8 **AND** year >= 57, then century = 1800
+* Century indicator = 5-8 **AND** year <= 57, then century = 2000
+* Century indicator = 5-8 **AND** year >= 58, then century = 1800
 * Century indicator = 9 **AND** year <= 36, then century = 2000
 * Century indicator = 9 **AND** year >= 37, then century = 1900
 

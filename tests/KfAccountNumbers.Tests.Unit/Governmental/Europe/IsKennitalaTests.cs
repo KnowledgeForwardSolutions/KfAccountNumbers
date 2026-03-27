@@ -1,6 +1,7 @@
-// Ignore Spelling: Deserialize Deserialization Fyrirtaeki Json Kennitala Kf
+// Ignore Spelling: Deserialize Deserialization Einstaklingur Fyrirtaeki Json Kennitala Kf
 
 #pragma warning disable IDE0008 // Use explicit type
+#pragma warning disable IDE0058 // Expression value is never used
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -55,7 +56,7 @@ public class IsKennitalaTests
       AltValid11CharacterEinstaklingurKennitala,
       Valid10CharacterFyrirtaekiKennitala,
       Valid11CharacterFyrirtaekiKennitala,
-      AltValid10CharacterFyrirtaekiKennitala, 
+      AltValid10CharacterFyrirtaekiKennitala,
       AltValid11CharacterFyrirtaekiKennitala,
    ];
 

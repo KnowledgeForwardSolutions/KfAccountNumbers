@@ -165,7 +165,6 @@ public record IsKennitala
    private const Int32 SeparatorOffset = 6;
 
    // These offsets measure from the right side of the value.
-   private const Int32 CheckDigitOffset = 2;
    private const Int32 CenturyIndicatorOffset = 1;
 
    // Fyrirtæki adds 40 to the day portion of date of birth.
@@ -446,7 +445,7 @@ public record IsKennitala
       var weightIndex = 0;
       var isFormatted = IsFormatted(kennitala);
       var processLength = kennitala.Length - 1;
-      for(var index = 0; index < processLength; index++)
+      for (var index = 0; index < processLength; index++)
       {
          if (isFormatted && index == SeparatorOffset)
          {
