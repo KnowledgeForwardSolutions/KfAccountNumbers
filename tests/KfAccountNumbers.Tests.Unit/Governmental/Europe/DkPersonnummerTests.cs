@@ -490,6 +490,214 @@ public class DkPersonnummerTests
 
    #endregion
 
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void DkPersonnummer_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut2 = new DkPersonnummer(Valid10CharacterPersonnummer);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void DkPersonnummer_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut2 = new DkPersonnummer(AltValid10CharacterPersonnummer);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void DkPersonnummer_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 11 character versions for same person should still be equal.
+      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut2 = new DkPersonnummer(Valid11CharacterPersonnummer);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void DkPersonnummer_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut2 = new DkPersonnummer(AltValid10CharacterPersonnummer);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void DkPersonnummer_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 11 character versions for same person should still be equal.
+      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut2 = new DkPersonnummer(Valid11CharacterPersonnummer);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void DkPersonnummer_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new DkPersonnummer(AltValid10CharacterPersonnummer);
+      var sut2 = new DkPersonnummer(AltValid10CharacterPersonnummer);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void DkPersonnummer_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut2 = new DkPersonnummer(Valid10CharacterPersonnummer);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void DkPersonnummer_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut2 = new DkPersonnummer(AltValid10CharacterPersonnummer);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void DkPersonnummer_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 11 character versions for same person should still be equal.
+      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut2 = new DkPersonnummer(Valid11CharacterPersonnummer);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void DkPersonnummer_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut2 = new DkPersonnummer(Valid10CharacterPersonnummer);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void DkPersonnummer_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut2 = new DkPersonnummer(AltValid10CharacterPersonnummer);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   [Fact]
+   public void DkPersonnummer_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 11 character versions for same person should still be equal.
+      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut2 = new DkPersonnummer(Valid11CharacterPersonnummer);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // DkPersonnummer does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void DkPersonnummer_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut2 = new DkPersonnummer(Valid10CharacterPersonnummer);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidPersonnummerValues))]
+   public void DkPersonnummer_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new DkPersonnummer(value);
+      var expected = GetRawPersonnummer(value);
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================

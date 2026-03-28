@@ -250,6 +250,14 @@ public record DkPersonnummer
    public static explicit operator DkPersonnummer(String? personnummer) => new(personnummer);
 
    /// <summary>
+   ///   Get a string representation of the personnummer.
+   /// </summary>
+   /// <remarks>
+   ///   Will return the raw personnummer, without a separator character.
+   /// </remarks>
+   public override String ToString() => Value;
+
+   /// <summary>
    ///   Check the <paramref name="personnummer"/> to determine if it contains a
    ///   valid Danish personnummer.
    /// </summary>
@@ -299,7 +307,7 @@ public record DkPersonnummer
       year += (centuryIndicator, year) switch
       {
          // Rule 1. Century indicator = 0-3 => 1900
-         (>= 0 and <=3, _) => 1900,
+         (>= 0 and <= 3, _) => 1900,
          // Rule 2. Century indicator = 4, year <= 36 => 2000
          (4, <= 36) => 2000,
          // Rule 3. Century indicator = 4, year >= 37 => 1900
