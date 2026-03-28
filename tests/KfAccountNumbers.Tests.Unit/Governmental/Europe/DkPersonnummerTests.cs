@@ -1,4 +1,4 @@
-// Ignore Spelling: Kf Personnummer
+// Ignore Spelling: Dk Kf Personnummer
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -45,22 +45,22 @@ public class DkPersonnummerTests
       "311299-4123",          // December 31, 1999
 
       "010100-5123",          // January 1, 2000
-      "311258-5123",          // December 31, 2057
+      "311257-5123",          // December 31, 2057
       "010158-5123",          // January 1, 1858 - note century break between 57 and 58
       "311299-5123",          // December 31, 1899
 
       "010100-6123",          // January 1, 2000
-      "311258-6123",          // December 31, 2057
+      "311257-6123",          // December 31, 2057
       "010158-6123",          // January 1, 1858 - note century break between 57 and 58
       "311299-6123",          // December 31, 1899
 
       "010100-7123",          // January 1, 2000
-      "311258-7123",          // December 31, 2057
+      "311257-7123",          // December 31, 2057
       "010158-7123",          // January 1, 1858 - note century break between 57 and 58
       "311299-7123",          // December 31, 1899
 
       "010100-8123",          // January 1, 2000
-      "311258-8123",          // December 31, 2057
+      "311257-8123",          // December 31, 2057
       "010158-8123",          // January 1, 1858 - note century break between 57 and 58
       "311299-8123",          // December 31, 1899
 
@@ -241,6 +241,249 @@ public class DkPersonnummerTests
    public void DkPersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(String value)
       => FluentActions
          .Invoking(() => new DkPersonnummer(value))
+         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
+         .WithMessage(Messages.DkPersonnummerInvalidDateOfBirth + "*")
+         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidDateOfBirth);
+
+   #endregion
+
+   #region DateOfBirth Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData("010100-0123", "19000101")]      // January 1, 1900
+   [InlineData("311299-0123", "19991231")]      // December 31, 1999
+
+   [InlineData("010100-1123", "19000101")]      // January 1, 1900
+   [InlineData("311299-1123", "19991231")]      // December 31, 1999
+
+   [InlineData("010100-2123", "19000101")]      // January 1, 1900
+   [InlineData("311299-2123", "19991231")]      // December 31, 1999
+
+   [InlineData("010100-3123", "19000101")]      // January 1, 1900
+   [InlineData("311299-3123", "19991231")]      // December 31, 1999
+
+   [InlineData("010100-4123", "20000101")]      // January 1, 2000
+   [InlineData("311236-4123", "20361231")]      // December 31, 2036
+   [InlineData("010137-4123", "19370101")]      // January 1, 1937 - note century break between 36 and 37
+   [InlineData("311299-4123", "19991231")]      // December 31, 1999
+
+   [InlineData("010100-5123", "20000101")]      // January 1, 2000
+   [InlineData("311257-5123", "20571231")]      // December 31, 2057
+   [InlineData("010158-5123", "18580101")]      // January 1, 1858 - note century break between 57 and 58
+   [InlineData("311299-5123", "18991231")]      // December 31, 1899
+
+   [InlineData("010100-6123", "20000101")]      // January 1, 2000
+   [InlineData("311257-6123", "20571231")]      // December 31, 2057
+   [InlineData("010158-6123", "18580101")]      // January 1, 1858 - note century break between 57 and 58
+   [InlineData("311299-6123", "18991231")]      // December 31, 1899
+
+   [InlineData("010100-7123", "20000101")]      // January 1, 2000
+   [InlineData("311257-7123", "20571231")]      // December 31, 2057
+   [InlineData("010158-7123", "18580101")]      // January 1, 1858 - note century break between 57 and 58
+   [InlineData("311299-7123", "18991231")]      // December 31, 1899
+
+   [InlineData("010100-8123", "20000101")]      // January 1, 2000
+   [InlineData("311257-8123", "20571231")]      // December 31, 2057
+   [InlineData("010158-8123", "18580101")]      // January 1, 1858 - note century break between 57 and 58
+   [InlineData("311299-8123", "18991231")]      // December 31, 1899
+
+   [InlineData("010100-9123", "20000101")]      // January 1, 2000
+   [InlineData("311236-9123", "20361231")]      // December 31, 2036
+   [InlineData("010137-9123", "19370101")]      // January 1, 1937 - note century break between 36 and 37
+   [InlineData("311299-9123", "19991231")]      // December 31, 1999
+
+   [InlineData("2902040123",  "19040229")]      // February 29, leap year
+   [InlineData("2902041123",  "19040229")]      // February 29, leap year
+   [InlineData("2902042123",  "19040229")]      // February 29, leap year
+   [InlineData("2902043123",  "19040229")]      // February 29, leap year
+   [InlineData("2902044123",  "20040229")]      // February 29, leap year
+   [InlineData("2902045123",  "20040229")]      // February 29, leap year
+   [InlineData("2902046123",  "20040229")]      // February 29, leap year
+   [InlineData("2902047123",  "20040229")]      // February 29, leap year
+   [InlineData("2902048123",  "20040229")]      // February 29, leap year
+   [InlineData("2902049123",  "20040229")]      // February 29, leap year
+
+   [InlineData("2902004123",  "20000229")]      // February 29, 2000 (leap year because of century divisible by 400 rule)
+   [InlineData("2902005123",  "20000229")]      // February 29, 2000
+   [InlineData("2902006123",  "20000229")]      // February 29, 2000
+   [InlineData("2902007123",  "20000229")]      // February 29, 2000
+   [InlineData("2902008123",  "20000229")]      // February 29, 2000
+   [InlineData("2902009123",  "20000229")]      // February 29, 2000
+   public void DkPersonnummer_DateOfBirth_ShouldReturnExpectedValue(
+      String value,
+      String expectedDateOfBirth)
+   {
+      // Arrange.
+      var sut = new DkPersonnummer(value);
+      var expected = DateOnly.ParseExact(
+         expectedDateOfBirth,
+         "yyyyMMdd",
+         System.Globalization.CultureInfo.InvariantCulture);
+
+      // Act/assert.
+      sut.DateOfBirth.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Valid10CharacterPersonnummer, Valid10CharacterPersonnummer)]
+   [InlineData(Valid11CharacterPersonnummer, Valid10CharacterPersonnummer)]
+   [InlineData(AltValid10CharacterPersonnummer, AltValid10CharacterPersonnummer)]
+   [InlineData(AltValid11CharacterPersonnummer, AltValid10CharacterPersonnummer)]
+   public void DkPersonnummer_Value_ShouldReturnValidatedPersonnummer(
+      String value,
+      String expected)
+   {
+      // Arrange.
+      var sut = new DkPersonnummer(value);
+
+      // Act/assert.
+      sut.Value.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void DkPersonnummer_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid10CharacterPersonnummer;
+      var sut = new DkPersonnummer(value);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(value);
+   }
+
+   [Fact]
+   public void DkPersonnummer_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid11CharacterPersonnummer;
+      var sut = new DkPersonnummer(value);
+      var expected = GetRawPersonnummer(value);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void DkPersonnummer_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      DkPersonnummer kennitala = null!;
+
+      // Act.
+      String str = kennitala;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void DkPersonnummer_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      DkPersonnummer kennitala = null!;
+
+      // Act.
+      var str = (String)kennitala;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidPersonnummerValues))]
+   public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawPersonnummer(value);
+
+      // Act.
+      var sut = (DkPersonnummer)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDateOfBirthValues))]
+   public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldCreateInstance_WhenValueHasValidDateOfBirth(String value)
+   {
+      // Arrange.
+      var expected = GetRawPersonnummer(value);
+
+      // Act.
+      var sut = (DkPersonnummer)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => _ = (DkPersonnummer)value)
+         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
+         .WithMessage(Messages.DkPersonnummerEmpty + "*")
+         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => _ = (DkPersonnummer)value)
+         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
+         .WithMessage(Messages.DkPersonnummerInvalidLength + "*")
+         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidNonDigitCharacter(String value)
+      => FluentActions
+         .Invoking(() => _ = (DkPersonnummer)value)
+         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
+         .WithMessage(Messages.DkPersonnummerInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
+      => FluentActions
+         .Invoking(() => _ = (DkPersonnummer)value)
+         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
+         .WithMessage(Messages.DkPersonnummerInvalidSeparator + "*")
+         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidSeparator);
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(String value)
+      => FluentActions
+         .Invoking(() => _ = (DkPersonnummer)value)
          .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
          .WithMessage(Messages.DkPersonnummerInvalidDateOfBirth + "*")
          .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidDateOfBirth);

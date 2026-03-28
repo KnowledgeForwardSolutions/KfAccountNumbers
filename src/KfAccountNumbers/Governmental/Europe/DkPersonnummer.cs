@@ -223,9 +223,31 @@ public record DkPersonnummer
    }
 
    /// <summary>
+   ///   The person's date of birth, derived from the first six digits in DDMMYY
+   ///   format and the exact century of birth derived from the century indicator.
+   /// </summary>
+   public DateOnly DateOfBirth
+   {
+      get
+      {
+#pragma warning disable IDE0008 // Use explicit type
+         var (day, month, year) = GetDayMonthYear(Value);
+#pragma warning restore IDE0008 // Use explicit type
+
+         return new DateOnly(year, month, day);
+      }
+   }
+
+   /// <summary>
    ///   The raw personnummer value.
    /// </summary>
    public String Value { get; private init; }
+
+   public static implicit operator String(DkPersonnummer personnummer)
+      => personnummer?.Value ?? String.Empty;      // Handle null personnummer object gracefully by returning empty string
+
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator DkPersonnummer(String? personnummer) => new(personnummer);
 
    /// <summary>
    ///   Check the <paramref name="personnummer"/> to determine if it contains a
