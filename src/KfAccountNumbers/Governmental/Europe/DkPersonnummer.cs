@@ -250,6 +250,28 @@ public record DkPersonnummer
    public static explicit operator DkPersonnummer(String? personnummer) => new(personnummer);
 
    /// <summary>
+   ///   Create a new <see cref="DkPersonnummer"/> using the Result pattern.
+   /// </summary>
+   /// <param name="personnummer">
+   ///   String representation of a Danish personnummer.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{DkPersonnummer, DkPersonnummerValidationResult}"/>.
+   ///   Will contain the new <see cref="DkPersonnummer"/> if 
+   ///   <paramref name="personnummer"/> is valid or an
+   ///   <see cref="DkPersonnummerValidationResult"/> that identifies
+   ///   the validation rule that was failed if <paramref name="personnummer"/> is 
+   ///   invalid.
+   /// </returns>
+   public static CreateResult<DkPersonnummer, DkPersonnummerValidationResult> Create(String? personnummer)
+   {
+      DkPersonnummerValidationResult validationResult = Validate(personnummer);
+      return validationResult == DkPersonnummerValidationResult.ValidationPassed
+         ? new DkPersonnummer(personnummer, validationMode: ValidationMode.BypassValidation)
+         : validationResult;
+   }
+
+   /// <summary>
    ///   Get a string representation of the personnummer.
    /// </summary>
    /// <remarks>
