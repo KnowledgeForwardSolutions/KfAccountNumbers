@@ -157,6 +157,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      and https://da.wikipedia.org/wiki/CPR-nummer for more info.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(DkPersonnummerJsonConverter))]
 public record DkPersonnummer
 {
    /// <summary>
@@ -270,6 +271,29 @@ public record DkPersonnummer
          ? new DkPersonnummer(personnummer, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
+
+   /// <summary>
+   ///   Format the personnummer using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then the default mask "______-____" will be used instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted personnummer.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the personnummer.
+   /// </remarks>
+   public String Format(String mask = "______-____") => Value.FormatWithMask(mask);
 
    /// <summary>
    ///   Get a string representation of the personnummer.
@@ -402,4 +426,21 @@ public record DkPersonnummer
 
    private static Boolean ValidateSeparator(ReadOnlySpan<Char> personnummer)
       => personnummer.Length == UnformattedLength || personnummer[SeparatorOffset] == Chars.Dash;
+}
+
+public class DkPersonnummerJsonConverter : JsonConverter<DkPersonnummer>
+{
+   public override DkPersonnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new DkPersonnummer(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, DkPersonnummer value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }

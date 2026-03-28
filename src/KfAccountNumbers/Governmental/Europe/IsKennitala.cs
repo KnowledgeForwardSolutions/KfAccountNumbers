@@ -477,8 +477,8 @@ public class IsKennitalaJsonConverter : JsonConverter<IsKennitala>
          return null!;
       }
 
-      var kennitalaString = reader.GetString();
-      return new IsKennitala(kennitalaString);
+      var str = reader.GetString();
+      return new IsKennitala(str);
    }
 
    public override void Write(Utf8JsonWriter writer, IsKennitala value, JsonSerializerOptions options)

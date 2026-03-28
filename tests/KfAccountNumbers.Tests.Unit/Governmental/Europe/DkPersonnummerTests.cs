@@ -1,4 +1,4 @@
-// Ignore Spelling: Dk Kf Personnummer
+// Ignore Spelling: Deserialize Deserialization Dk Json Kf Personnummer
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -717,6 +717,73 @@ public class DkPersonnummerTests
 
    #endregion
 
+   #region Format Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void DkPersonnummer_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var expected = Valid11CharacterPersonnummer;
+
+      // Act.
+      var str = sut.Format();
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void DkPersonnummer_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var mask = "__________";
+      var expected = Valid10CharacterPersonnummer;
+
+      // Act.
+      var str = sut.Format(mask);
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void DkPersonnummer_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
+   {
+      // Arrange.
+      var sut = new DkPersonnummer(Valid10CharacterPersonnummer);
+      String mask = null!;
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = sut.Format(mask))
+         .Should()
+         .ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(Messages.FormatMaskEmpty + "*");
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void DkPersonnummer_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
+   {
+      // Arrange.
+      var sut = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+      var act = () => _ = sut.Format(mask);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   #endregion
+
    #region GetHashCode Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -846,6 +913,104 @@ public class DkPersonnummerTests
    [MemberData(nameof(InvalidDateOfBirthValues))]
    public void DkPersonnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidDateOfBirth(String value)
       => DkPersonnummer.Validate(value).Should().Be(DkPersonnummerValidationResult.InvalidDateOfBirth);
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void DkPersonnummer_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new DkPersonnummer(Valid10CharacterPersonnummer);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<DkPersonnummer>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void DkPersonnummer_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new DkPersonnummer(AltValid11CharacterPersonnummer);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public DkPersonnummer Personnummer { get; set; } = null!;
+   }
+
+   [Fact]
+   public void DkPersonnummer_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { Personnummer = new DkPersonnummer(Valid10CharacterPersonnummer) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void DkPersonnummer_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"Personnummer\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void DkPersonnummer_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"Personnummer\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.Personnummer.Should().BeNull();
+   }
+
+   [Fact]
+   public void DkPersonnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenPersonnummerIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"Personnummer\":\"100612-707079\"}";  // Invalid length
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should()
+         .ThrowExactly<KfValidationException<DkPersonnummerValidationResult>>()
+         .WithMessage(Messages.DkPersonnummerInvalidLength + "*")
+         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidLength);
+   }
 
    #endregion
 }
