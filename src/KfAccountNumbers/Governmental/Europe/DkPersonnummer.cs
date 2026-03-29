@@ -22,16 +22,16 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            <description>
 ///               A four digit sequence number used to differentiate between two
 ///               persons born on the same date. The sequence number also encodes
-///               additional information. The first digit is used indicate the
+///               additional information. The first digit is used to indicate the
 ///               century of birth (see below) and the final digit indicates the
-///               person's gender, with even numbers for female and odd numbers
+///               person's gender, with even numbers for females and odd numbers
 ///               for males.
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
-///      A Danish personummer may be formatted as a string of 10 consecutive digits
+///      A Danish personnummer may be formatted as a string of 10 consecutive digits
 ///      (DDMMYYSSSS) or as 11 characters with a dash ('-') as a separator character
 ///      separating the date of birth and the remaining four digits (DDMMYY-SSSS).
 ///   </para>
@@ -76,12 +76,6 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <description>
 ///               The optional separator character, if included, must be a dash ('-').
-///            </description>
-///         </item>
-///         <item>
-///            <description>
-///               The century indicator must be the ASCII character nine ('9') or
-///               the ASCII character zero ('0').
 ///            </description>
 ///         </item>
 ///         <item>
@@ -238,6 +232,14 @@ public record DkPersonnummer
          return new DateOnly(year, month, day);
       }
    }
+
+   /// <summary>
+   ///   The person's gender, as indicated by the trailing (right-most) digit.
+   ///   Odd numbers = Male; even numbers = Female.
+   /// </summary>
+   public BinaryGender Gender => Value[^GenderOffset] % 2 == 0       // This works because the ASCII character values for digits have the same odd/even pattern
+      ? BinaryGender.Female
+      : BinaryGender.Male;
 
    /// <summary>
    ///   The raw personnummer value.

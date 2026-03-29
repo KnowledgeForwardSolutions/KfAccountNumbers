@@ -90,7 +90,7 @@ a dash ('-') as a separator character separating the date of birth and the remai
 
 A Danish personnummer must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
-* The value must be 11 characters (including the separator) in length.
+* The value must be either 10 characters (without separator) or 11 characters (with separator) in length.
 * All characters other than the optional separator character must be ASCII digits ('0'-'9').
 * The separator character, if included, must be a dash ('-').
 * The date of birth, after deriving the century from the century indicator must be a valid date

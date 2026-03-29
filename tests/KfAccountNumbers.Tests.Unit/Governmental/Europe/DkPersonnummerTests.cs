@@ -130,8 +130,8 @@ public class DkPersonnummerTests
 
    public static TheoryData<String> InvalidDateOfBirthValues =>
    [
-      // It's not really possible to represent dates outside the valid
-      // range of 1858 - 2057. So instead, focus on invalid day/month values.
+      // Given the century indicator rules (0-9), dates outside 1858-2057
+      // are impossible to represent without violating century indicator constraints.
       "0100000112",        // Invalid month = 0
       "0113000112",        // Invalid month = 13
       "000100-0112",       // Invalid day = 0
@@ -328,6 +328,35 @@ public class DkPersonnummerTests
 
    #endregion
 
+   #region Gender Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData('0', BinaryGender.Female)]
+   [InlineData('1', BinaryGender.Male)]
+   [InlineData('2', BinaryGender.Female)]
+   [InlineData('3', BinaryGender.Male)]
+   [InlineData('4', BinaryGender.Female)]
+   [InlineData('5', BinaryGender.Male)]
+   [InlineData('6', BinaryGender.Female)]
+   [InlineData('7', BinaryGender.Male)]
+   [InlineData('8', BinaryGender.Female)]
+   [InlineData('9', BinaryGender.Male)]
+   public void DkPersonnummer_Gender_ShouldReturnExpectedValue(
+      Char genderChar,
+      BinaryGender expectedGender)
+   {
+      // Arrange.
+      var personnummer = $"{Valid10CharacterPersonnummer[..9]}{genderChar}";
+      var sut = new DkPersonnummer(personnummer);
+
+      // Act/assert.
+      sut.Gender.Should().Be(expectedGender);
+   }
+
+   #endregion
+
    #region Value Property Tests
    // ==========================================================================
    // ==========================================================================
@@ -389,10 +418,10 @@ public class DkPersonnummerTests
    public void DkPersonnummer_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      DkPersonnummer kennitala = null!;
+      DkPersonnummer personnummer = null!;
 
       // Act.
-      String str = kennitala;
+      String str = personnummer;
 
       // Act/assert.
       str.Should().NotBeNull();
@@ -403,10 +432,10 @@ public class DkPersonnummerTests
    public void DkPersonnummer_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      DkPersonnummer kennitala = null!;
+      DkPersonnummer personnummer = null!;
 
       // Act.
-      var str = (String)kennitala;
+      var str = (String)personnummer;
 
       // Act/assert.
       str.Should().NotBeNull();
