@@ -457,8 +457,8 @@ public class UsSocialSecurityNumberJsonConverter : JsonConverter<UsSocialSecurit
          return null!;
       }
 
-      var ssnString = reader.GetString();
-      return new UsSocialSecurityNumber(ssnString);
+      var str = reader.GetString();
+      return new UsSocialSecurityNumber(str);
    }
 
    public override void Write(Utf8JsonWriter writer, UsSocialSecurityNumber value, JsonSerializerOptions options)

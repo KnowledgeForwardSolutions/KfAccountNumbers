@@ -188,8 +188,8 @@ public class UsNationalProviderIdentifierJsonConverter : JsonConverter<UsNationa
          return null!;
       }
 
-      var npiString = reader.GetString();
-      return new UsNationalProviderIdentifier(npiString);
+      var str = reader.GetString();
+      return new UsNationalProviderIdentifier(str);
    }
 
    public override void Write(Utf8JsonWriter writer, UsNationalProviderIdentifier value, JsonSerializerOptions options)

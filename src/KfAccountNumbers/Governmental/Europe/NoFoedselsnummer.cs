@@ -530,8 +530,8 @@ public class NoFoedselsnummerJsonConverter : JsonConverter<NoFoedselsnummer>
          return null!;
       }
 
-      var foedselsnummerString = reader.GetString();
-      return new NoFoedselsnummer(foedselsnummerString);
+      var str = reader.GetString();
+      return new NoFoedselsnummer(str);
    }
 
    public override void Write(Utf8JsonWriter writer, NoFoedselsnummer value, JsonSerializerOptions options)

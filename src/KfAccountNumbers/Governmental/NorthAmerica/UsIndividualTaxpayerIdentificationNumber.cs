@@ -324,8 +324,8 @@ public class UsIndividualTaxpayerIdentificationNumberJsonConverter : JsonConvert
          return null!;
       }
 
-      var itinString = reader.GetString();
-      return new UsIndividualTaxpayerIdentificationNumber(itinString);
+      var str = reader.GetString();
+      return new UsIndividualTaxpayerIdentificationNumber(str);
    }
 
    public override void Write(Utf8JsonWriter writer, UsIndividualTaxpayerIdentificationNumber value, JsonSerializerOptions options)

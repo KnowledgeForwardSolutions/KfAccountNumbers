@@ -297,8 +297,8 @@ public class CaSocialInsuranceNumberJsonConverter : JsonConverter<CaSocialInsura
          return null!;
       }
 
-      var sinString = reader.GetString();
-      return new CaSocialInsuranceNumber(sinString);
+      var str = reader.GetString();
+      return new CaSocialInsuranceNumber(str);
    }
 
    public override void Write(Utf8JsonWriter writer, CaSocialInsuranceNumber value, JsonSerializerOptions options)

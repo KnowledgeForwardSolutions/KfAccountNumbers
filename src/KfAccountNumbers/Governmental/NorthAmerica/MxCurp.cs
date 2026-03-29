@@ -417,8 +417,8 @@ public class MxCurpJsonConverter : JsonConverter<MxCurp>
          return null!;
       }
 
-      var curpString = reader.GetString();
-      return new MxCurp(curpString);
+      var str = reader.GetString();
+      return new MxCurp(str);
    }
 
    public override void Write(Utf8JsonWriter writer, MxCurp value, JsonSerializerOptions options)
