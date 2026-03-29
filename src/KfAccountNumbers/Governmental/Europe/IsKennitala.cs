@@ -159,13 +159,12 @@ public record IsKennitala
    /// </summary>
    public const Int32 MinimumValidYearOfBirth = 1900;
 
-   private const Int32 NoSeparatorLength = 10;
-   private const Int32 SeparatorLength = 11;
+   private const Int32 UnformattedLength = 10;
+   private const Int32 FormattedLength = 11;
 
    private const Int32 SeparatorOffset = 6;
 
    // These offsets measure from the right side of the value.
-   private const Int32 CheckDigitOffset = 2;
    private const Int32 CenturyIndicatorOffset = 1;
 
    // Fyrirtæki adds 40 to the day portion of date of birth.
@@ -343,7 +342,7 @@ public record IsKennitala
       {
          return IsKennitalaValidationResult.Empty;
       }
-      else if (kennitala.Length is not NoSeparatorLength and not SeparatorLength)
+      else if (kennitala.Length is not UnformattedLength and not FormattedLength)
       {
          return IsKennitalaValidationResult.InvalidLength;
       }
@@ -392,7 +391,7 @@ public record IsKennitala
    }
 
    private static String GetRawValue(String kennitala)
-      => kennitala.Length == NoSeparatorLength
+      => kennitala.Length == UnformattedLength
          ? kennitala
          : String.Concat(
             kennitala.AsSpan(0, SeparatorOffset),
@@ -400,7 +399,7 @@ public record IsKennitala
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean IsFormatted(ReadOnlySpan<Char> kennitala)
-      => kennitala.Length == SeparatorLength;
+      => kennitala.Length == FormattedLength;
 
    private static IsKennitalaValidationResult ValidateCenturyIndicator(ReadOnlySpan<Char> kennitala)
    {
@@ -446,7 +445,7 @@ public record IsKennitala
       var weightIndex = 0;
       var isFormatted = IsFormatted(kennitala);
       var processLength = kennitala.Length - 1;
-      for(var index = 0; index < processLength; index++)
+      for (var index = 0; index < processLength; index++)
       {
          if (isFormatted && index == SeparatorOffset)
          {
@@ -478,8 +477,8 @@ public class IsKennitalaJsonConverter : JsonConverter<IsKennitala>
          return null!;
       }
 
-      var kennitalaString = reader.GetString();
-      return new IsKennitala(kennitalaString);
+      var str = reader.GetString();
+      return new IsKennitala(str);
    }
 
    public override void Write(Utf8JsonWriter writer, IsKennitala value, JsonSerializerOptions options)

@@ -199,7 +199,7 @@ public class SePersonnummerTests
       "81!228-9874",          // Non-digit character '!'
       "811 28-9874",          // Non-digit character ' '
       "8112a8-9874",          // Non-digit character 'a'
-      "8112a\u2153-9874",     // Non-digit character Unicode fraction 1/3\
+      "8112a\u2153-9874",     // Non-digit character Unicode fraction 1/3
       "811228-+874",          // Non-digit character '+'
       "811228-9.74",          // Non-digit character '.'
       "811228-98:4",          // Non-digit character ':'
@@ -212,7 +212,7 @@ public class SePersonnummerTests
       "1981!228-9874",        // Non-digit character '!'
       "19811 28-9874",        // Non-digit character ' '
       "198112a8-9874",        // Non-digit character 'a'
-      "198112a\u2153-9874",   // Non-digit character Unicode fraction 1/3\
+      "198112a\u2153-9874",   // Non-digit character Unicode fraction 1/3
       "19811228-+874",        // Non-digit character '+'
       "19811228-9.74",        // Non-digit character '.'
       "19811228-98:4",        // Non-digit character ':'

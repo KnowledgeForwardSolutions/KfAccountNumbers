@@ -684,8 +684,8 @@ public class SePersonnummerJsonConverter : JsonConverter<SePersonnummer>
          return null!;
       }
 
-      var personnummerString = reader.GetString();
-      return new SePersonnummer(personnummerString);
+      var str = reader.GetString();
+      return new SePersonnummer(str);
    }
 
    public override void Write(Utf8JsonWriter writer, SePersonnummer value, JsonSerializerOptions options)

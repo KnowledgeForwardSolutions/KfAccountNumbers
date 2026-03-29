@@ -291,4 +291,19 @@
   <data name="IsKennitalaInvalidCentury" xml:space="preserve">
     <value>IS Kennitala century indicator must be either '9' or '0'</value>
   </data>
+  <data name="DkPersonnummerEmpty" xml:space="preserve">
+    <value>DK Personnummer may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="DkPersonnummerInvalidLength" xml:space="preserve">
+    <value>DK Personnummer must have length 10 (no separator character) or 11 (separator character)</value>
+  </data>
+  <data name="DkPersonnummerInvalidCharacter" xml:space="preserve">
+    <value>DK Personnummer contains a non-digit character where a digit was expected</value>
+  </data>
+  <data name="DkPersonnummerInvalidSeparator" xml:space="preserve">
+    <value>DK Personnummer separator character must be a dash ('-')</value>
+  </data>
+  <data name="DkPersonnummerInvalidDateOfBirth" xml:space="preserve">
+    <value>DK Personnummer requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based)</value>
+  </data>
 </root>

@@ -200,8 +200,8 @@ public record NoFoedselsnummer
    /// </summary>
    public const Int32 MinimumValidYearOfBirth = 1854;
 
-   private const Int32 NoSeparatorLength = 11;
-   private const Int32 SeparatorLength = 12;
+   private const Int32 UnformattedLength = 11;
+   private const Int32 FormattedLength = 12;
 
    private const Int32 SeparatorOffset = 6;
 
@@ -391,7 +391,7 @@ public record NoFoedselsnummer
       {
          return NoFoedselsnummerValidationResult.Empty;
       }
-      else if (foedselsnummer.Length is not NoSeparatorLength and not SeparatorLength)
+      else if (foedselsnummer.Length is not UnformattedLength and not FormattedLength)
       {
          return NoFoedselsnummerValidationResult.InvalidLength;
       }
@@ -436,13 +436,13 @@ public record NoFoedselsnummer
       year += (individualNumber, year) switch
       {
          // Rule 1. 500–749: 1854–1899
-         (>= 500 and <= 749, >= 54) => 1800,
+         ( >= 500 and <= 749, >= 54) => 1800,
          // Rule 2. 000–499: 1900–1999
-         (< 500, _) => 1900,
+         ( < 500, _) => 1900,
          // Rule 3. 900–999: 1940–1999
-         (>= 900, >= 40) => 1900,
+         ( >= 900, >= 40) => 1900,
          // Rule 4. 500–999: 2000–2039
-         (>= 500, <= 39) => 2000,
+         ( >= 500, <= 39) => 2000,
          // No rule
          (_, _) => 0
       };
@@ -456,7 +456,7 @@ public record NoFoedselsnummer
          + (foedselsnummer[^(IndividualNumberOffset - 2)] - Chars.DigitZero);
 
    private static String GetRawFoedselsnummer(String foedselsnummer)
-      => foedselsnummer.Length == NoSeparatorLength
+      => foedselsnummer.Length == UnformattedLength
          ? foedselsnummer
          : String.Concat(
             foedselsnummer.AsSpan(0, SeparatorOffset),
@@ -464,7 +464,7 @@ public record NoFoedselsnummer
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean IsFormatted(ReadOnlySpan<Char> foedselsnummer)
-      => foedselsnummer.Length == SeparatorLength;
+      => foedselsnummer.Length == FormattedLength;
 
    private static NoFoedselsnummerValidationResult ValidateCheckDigits(ReadOnlySpan<Char> foedselsnummer)
    {
@@ -475,7 +475,7 @@ public record NoFoedselsnummer
       var c2Sum = 0;
       var weightIndex = 0;
       var processLength = foedselsnummer.Length;
-      for(var charIndex = 0; charIndex < processLength; charIndex ++)
+      for (var charIndex = 0; charIndex < processLength; charIndex++)
       {
          if (isFormatted && charIndex == SeparatorOffset)
          {
@@ -490,7 +490,7 @@ public record NoFoedselsnummer
 
          c1Sum += num * _c1Weights[weightIndex];
          c2Sum += num * _c2Weights[weightIndex];
-         weightIndex ++;
+         weightIndex++;
       }
 
       // Both weighted sums must be multiples of 11 for the check digits to be valid.
@@ -530,8 +530,8 @@ public class NoFoedselsnummerJsonConverter : JsonConverter<NoFoedselsnummer>
          return null!;
       }
 
-      var foedselsnummerString = reader.GetString();
-      return new NoFoedselsnummer(foedselsnummerString);
+      var str = reader.GetString();
+      return new NoFoedselsnummer(str);
    }
 
    public override void Write(Utf8JsonWriter writer, NoFoedselsnummer value, JsonSerializerOptions options)
