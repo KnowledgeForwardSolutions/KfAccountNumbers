@@ -679,7 +679,7 @@ public class DkPersonnummerTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void DkPersonnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidSeparator(String value)
+   public void DkPersonnummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(String value)
    {
       // Act.
       var result = DkPersonnummer.Create(value);
@@ -693,7 +693,7 @@ public class DkPersonnummerTests
 
    [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]
-   public void DkPersonnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidDateOfBirth(String value)
+   public void DkPersonnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasInvalidDateOfBirth(String value)
    {
       // Act.
       var result = DkPersonnummer.Create(value);

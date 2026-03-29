@@ -106,7 +106,7 @@ Example values:
 * 070761-4285 - Date of birth July 7, 1961, gender = male
 * 0102036234 - Date of birth February 1, 2003, gender = female
 
-The digit in the seventh character position (zero-based) is used to determine the exact century of
+The first digit following the date of birth is used to determine the exact century of
 birth, but some digits can span more than one century. The following rules are defined:
 * Century indicator = 0-3, then century = 1900
 * Century indicator = 4 **AND** year <= 36, then century = 2000

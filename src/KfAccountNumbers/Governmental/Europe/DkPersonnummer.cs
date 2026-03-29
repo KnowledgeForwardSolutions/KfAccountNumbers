@@ -97,9 +97,9 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      if the personnummer was issued pre- or post-2007.
 ///   </para>
 ///   <para>
-///      The digit in the seventh character position (zero-based) is used to
-///      determine the exact century of birth, but some digits can span more
-///      than one century. The following rules are defined:
+///      The first digit following the date of birth is used to determine the
+///      exact century of birth, but some digits can span more han one century.
+///      The following rules are defined:
 ///      <list type="bullet">
 ///         <item>
 ///            <description>

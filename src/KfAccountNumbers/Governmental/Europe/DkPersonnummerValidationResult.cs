@@ -37,8 +37,8 @@ public enum DkPersonnummerValidationResult
 
    /// <summary>
    ///   The date of birth specified by character positions 0-5 (zero-based) and
-   ///   the century indicator in the right-most character position is not a valid
-   ///   date in DDMMYY format.
+   ///   the century indicator (the first digit following the date of birth) is
+   ///   not a valid date in DDMMYY format.
    /// </summary>
    InvalidDateOfBirth,
 }

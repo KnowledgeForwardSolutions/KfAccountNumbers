@@ -295,7 +295,7 @@
     <value>DK Personnummer may not be null, empty or all whitespace characters</value>
   </data>
   <data name="DkPersonnummerInvalidLength" xml:space="preserve">
-    <value>DK Personummer must have length 10 (no separator character) or 11 (separator character)</value>
+    <value>DK Personnummer must have length 10 (no separator character) or 11 (separator character)</value>
   </data>
   <data name="DkPersonnummerInvalidCharacter" xml:space="preserve">
     <value>DK Personnummer contains a non-digit character where a digit was expected</value>

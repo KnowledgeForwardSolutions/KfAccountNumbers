@@ -169,7 +169,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DK Personummer must have length 10 (no separator character) or 11 (separator character).
+        ///   Looks up a localized string similar to DK Personnummer must have length 10 (no separator character) or 11 (separator character).
         /// </summary>
         internal static string DkPersonnummerInvalidLength {
             get {
