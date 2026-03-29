@@ -294,23 +294,23 @@ public class DkPersonnummerTests
    [InlineData("010137-9123", "19370101")]      // January 1, 1937 - note century break between 36 and 37
    [InlineData("311299-9123", "19991231")]      // December 31, 1999
 
-   [InlineData("2902040123",  "19040229")]      // February 29, leap year
-   [InlineData("2902041123",  "19040229")]      // February 29, leap year
-   [InlineData("2902042123",  "19040229")]      // February 29, leap year
-   [InlineData("2902043123",  "19040229")]      // February 29, leap year
-   [InlineData("2902044123",  "20040229")]      // February 29, leap year
-   [InlineData("2902045123",  "20040229")]      // February 29, leap year
-   [InlineData("2902046123",  "20040229")]      // February 29, leap year
-   [InlineData("2902047123",  "20040229")]      // February 29, leap year
-   [InlineData("2902048123",  "20040229")]      // February 29, leap year
-   [InlineData("2902049123",  "20040229")]      // February 29, leap year
+   [InlineData("2902040123", "19040229")]       // February 29, leap year
+   [InlineData("2902041123", "19040229")]       // February 29, leap year
+   [InlineData("2902042123", "19040229")]       // February 29, leap year
+   [InlineData("2902043123", "19040229")]       // February 29, leap year
+   [InlineData("2902044123", "20040229")]       // February 29, leap year
+   [InlineData("2902045123", "20040229")]       // February 29, leap year
+   [InlineData("2902046123", "20040229")]       // February 29, leap year
+   [InlineData("2902047123", "20040229")]       // February 29, leap year
+   [InlineData("2902048123", "20040229")]       // February 29, leap year
+   [InlineData("2902049123", "20040229")]       // February 29, leap year
 
-   [InlineData("2902004123",  "20000229")]      // February 29, 2000 (leap year because of century divisible by 400 rule)
-   [InlineData("2902005123",  "20000229")]      // February 29, 2000
-   [InlineData("2902006123",  "20000229")]      // February 29, 2000
-   [InlineData("2902007123",  "20000229")]      // February 29, 2000
-   [InlineData("2902008123",  "20000229")]      // February 29, 2000
-   [InlineData("2902009123",  "20000229")]      // February 29, 2000
+   [InlineData("2902004123", "20000229")]       // February 29, 2000 (leap year because of century divisible by 400 rule)
+   [InlineData("2902005123", "20000229")]       // February 29, 2000
+   [InlineData("2902006123", "20000229")]       // February 29, 2000
+   [InlineData("2902007123", "20000229")]       // February 29, 2000
+   [InlineData("2902008123", "20000229")]       // February 29, 2000
+   [InlineData("2902009123", "20000229")]       // February 29, 2000
    public void DkPersonnummer_DateOfBirth_ShouldReturnExpectedValue(
       String value,
       String expectedDateOfBirth)

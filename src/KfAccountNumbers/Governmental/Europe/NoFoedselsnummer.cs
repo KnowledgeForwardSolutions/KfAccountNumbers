@@ -436,13 +436,13 @@ public record NoFoedselsnummer
       year += (individualNumber, year) switch
       {
          // Rule 1. 500–749: 1854–1899
-         (>= 500 and <= 749, >= 54) => 1800,
+         ( >= 500 and <= 749, >= 54) => 1800,
          // Rule 2. 000–499: 1900–1999
-         (< 500, _) => 1900,
+         ( < 500, _) => 1900,
          // Rule 3. 900–999: 1940–1999
-         (>= 900, >= 40) => 1900,
+         ( >= 900, >= 40) => 1900,
          // Rule 4. 500–999: 2000–2039
-         (>= 500, <= 39) => 2000,
+         ( >= 500, <= 39) => 2000,
          // No rule
          (_, _) => 0
       };
@@ -475,7 +475,7 @@ public record NoFoedselsnummer
       var c2Sum = 0;
       var weightIndex = 0;
       var processLength = foedselsnummer.Length;
-      for(var charIndex = 0; charIndex < processLength; charIndex ++)
+      for (var charIndex = 0; charIndex < processLength; charIndex++)
       {
          if (isFormatted && charIndex == SeparatorOffset)
          {
@@ -490,7 +490,7 @@ public record NoFoedselsnummer
 
          c1Sum += num * _c1Weights[weightIndex];
          c2Sum += num * _c2Weights[weightIndex];
-         weightIndex ++;
+         weightIndex++;
       }
 
       // Both weighted sums must be multiples of 11 for the check digits to be valid.

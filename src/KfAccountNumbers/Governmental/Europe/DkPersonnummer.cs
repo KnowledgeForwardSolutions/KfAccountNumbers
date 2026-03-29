@@ -1,4 +1,4 @@
-// Ignore Spelling: Personnummer
+// Ignore Spelling: Json Personnummer
 
 namespace KfAccountNumbers.Governmental.Europe;
 
@@ -355,15 +355,15 @@ public record DkPersonnummer
       year += (centuryIndicator, year) switch
       {
          // Rule 1. Century indicator = 0-3 => 1900
-         (>= 0 and <= 3, _) => 1900,
+         ( >= 0 and <= 3, _) => 1900,
          // Rule 2. Century indicator = 4, year <= 36 => 2000
          (4, <= 36) => 2000,
          // Rule 3. Century indicator = 4, year >= 37 => 1900
          (4, >= 37) => 1900,
          // Rule 4. Century indicator = 5-8, year <= 57 => 2000
-         (>= 5 and <= 8, <= 57) => 2000,
+         ( >= 5 and <= 8, <= 57) => 2000,
          // Rule 5. Century indicator = 5-8, year >= 58 => 1800
-         (>= 5 and <= 8, >= 58) => 1800,
+         ( >= 5 and <= 8, >= 58) => 1800,
          // Rule 6. Century indicator = 9, year <= 36 => 2000
          (9, <= 36) => 2000,
          // Rule 7. Century indicator = 9, year >= 37 => 1900
