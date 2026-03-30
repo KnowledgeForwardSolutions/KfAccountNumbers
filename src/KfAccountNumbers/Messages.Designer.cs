@@ -205,7 +205,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FI Henkilotunnus contains a non-digit character where a digit was expected.
+        ///   Looks up a localized string similar to FI Henkilotunnus contains a non-digit character in the date of birth or individual number elements.
         /// </summary>
         internal static string FiHenkilotunnusInvalidCharacter {
             get {

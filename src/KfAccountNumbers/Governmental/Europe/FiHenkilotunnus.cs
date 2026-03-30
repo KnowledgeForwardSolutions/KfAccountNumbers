@@ -124,4 +124,128 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </remarks>
 public record FiHenkilotunnus
 {
+   /// <summary>
+   ///   The latest year of birth supported by <see cref="FiHenkilotunnus"/>.
+   /// </summary>
+   public const Int32 MaximumValidYearOfBirth = 2099;
+
+   /// <summary>
+   ///   The earliest year of birth supported by <see cref="FiHenkilotunnus"/>.
+   /// </summary>
+   public const Int32 MinimumValidYearOfBirth = 1800;
+
+   private const Int32 ValidLength = 11;
+   private const Int32 CenturyIndicatorOffset = 6;
+   private const Int32 IndividualNumberStartOffset = 7;
+   private const Int32 IndividualNumberEndOffset = 10;      // Range has exclusive end offset
+   private const Int32 GenderOffset = 9;
+   private const Int32 CheckCharacterOffset = 10;
+
+   private const String CheckCharacters = "0123456789ABCDEFHJKLMNPRSTUVWXY";
+
+   /// <summary>
+   ///   Check the <paramref name="henkilotunnus"/> to determine if it contains a
+   ///   valid Finnish henkilotunnus.
+   /// </summary>
+   /// <param name="henkilotunnus">
+   ///   String representation of a Finnish henkilotunnus.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="FiHenkilotunnusValidationResult"/> enumeration 
+   ///   value that indicates if the <paramref name="henkilotunnus"/> passed
+   ///   validation or what validation error was encountered.
+   /// </returns>
+   public static FiHenkilotunnusValidationResult Validate(String? henkilotunnus)
+   {
+      if (String.IsNullOrWhiteSpace(henkilotunnus))
+      {
+         return FiHenkilotunnusValidationResult.Empty;
+      }
+      else if (henkilotunnus.Length != ValidLength)
+      {
+         return FiHenkilotunnusValidationResult.InvalidLength;
+      }
+
+      // After performing basic checks, validate the check digit because the
+      // most common source of errors will be data entry errors. Then validate
+      // the subcomponents of the value.
+      FiHenkilotunnusValidationResult validationResult = ValidateCheckDigit(henkilotunnus);
+      if (validationResult != FiHenkilotunnusValidationResult.ValidationPassed)
+      {
+         // Could be either InvalidCharacter or InvalidCheckDigit.
+         return validationResult;
+      }
+      else if (!ValidateCenturyIndicator(henkilotunnus))
+      {
+         return FiHenkilotunnusValidationResult.InvalidCenturyIndicator;
+      }
+      else if (!ValidateIndividualNumber(henkilotunnus))
+      {
+         return FiHenkilotunnusValidationResult.InvalidIndividualNumber;
+      }
+
+      return FiHenkilotunnusValidationResult.ValidationPassed;
+   }
+
+   private static FiHenkilotunnusValidationResult ValidateCheckDigit(ReadOnlySpan<Char> henkilotunnus)
+   {
+      const Int32 processLength = 10;     // Exclude check digit from main process loop.
+
+      var sum = 0;
+
+      // Convert date of birth and individual number to an integer value.
+      for (var index = 0; index < processLength; index++)
+      {
+         if (index == CenturyIndicatorOffset)
+         {
+            continue;
+         }
+
+         sum *= 10;
+         var num = henkilotunnus[index] - Chars.DigitZero;
+         if (num < 0 || num > 9)
+         {
+            return FiHenkilotunnusValidationResult.InvalidCharacter;
+         }
+
+         sum += num;
+      }
+
+      var checkDigit = sum % 31;
+      var checkCharacter = CheckCharacters[checkDigit];
+
+      return henkilotunnus[CheckCharacterOffset] == checkCharacter
+         ? FiHenkilotunnusValidationResult.ValidationPassed
+         : FiHenkilotunnusValidationResult.InvalidCheckDigit;
+   }
+
+   private static Boolean ValidateCenturyIndicator(ReadOnlySpan<Char> henkilotunnus)
+      => henkilotunnus[CenturyIndicatorOffset] switch
+      {
+         Chars.Plus => true,
+         Chars.Dash => true,
+         Chars.UpperCaseA => true,
+         Chars.UpperCaseB => true,
+         Chars.UpperCaseC => true,
+         Chars.UpperCaseD => true,
+         Chars.UpperCaseE => true,
+         Chars.UpperCaseF => true,
+         Chars.UpperCaseU => true,
+         Chars.UpperCaseV => true,
+         Chars.UpperCaseW => true,
+         Chars.UpperCaseX => true,
+         Chars.UpperCaseY => true,
+         _ => false
+      };
+
+   private static Boolean ValidateIndividualNumber(ReadOnlySpan<Char> henkilotunnus)
+   {
+      var d1 = henkilotunnus[IndividualNumberStartOffset] - Chars.DigitZero;
+      var d2 = henkilotunnus[IndividualNumberStartOffset + 1] - Chars.DigitZero;
+      var d3 = henkilotunnus[IndividualNumberStartOffset + 2] - Chars.DigitZero;
+
+      var individualNumber = (d1 * 100) + (d2 * 10) + d3;
+
+      return individualNumber != 1;
+   }
 }

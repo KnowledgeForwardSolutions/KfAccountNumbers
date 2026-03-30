@@ -25,7 +25,9 @@ public enum FiHenkilotunnusValidationResult
    InvalidLength,
 
    /// <summary>
-   ///   The value contains a non-digit character where a digit was expected.
+   ///   The date of birth (character positions 0-5, zero-based) and/or the
+   ///   individual number (character positions 7-9, zero based) contain
+   ///   non-ASCII digit ('0'-'9') characters.
    /// </summary>
    InvalidCharacter,
 

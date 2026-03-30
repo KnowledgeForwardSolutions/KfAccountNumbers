@@ -313,7 +313,7 @@
     <value>FI Henkilotunnus must have length 11</value>
   </data>
   <data name="FiHenkilotunnusInvalidCharacter" xml:space="preserve">
-    <value>FI Henkilotunnus contains a non-digit character where a digit was expected</value>
+    <value>FI Henkilotunnus contains a non-digit character in the date of birth or individual number elements</value>
   </data>
   <data name="FiHenkilotunnusInvalidCheckDigit" xml:space="preserve">
     <value>FI Henkilotunnus must have a valid modulus 31 check character in the trailing (right-most) position</value>
