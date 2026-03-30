@@ -178,10 +178,10 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      UsNationalProviderIdentifier npi = null!;
+      UsNationalProviderIdentifier sut = null!;
 
       // Act.
-      String str = npi;
+      String str = sut;
 
       // Act/assert.
       str.Should().NotBeNull();
@@ -192,10 +192,10 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      UsNationalProviderIdentifier npi = null!;
+      UsNationalProviderIdentifier sut = null!;
 
       // Act.
-      String str = npi;
+      String str = sut;
 
       // Act/assert.
       str.Should().NotBeNull();

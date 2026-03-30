@@ -418,10 +418,10 @@ public class DkPersonnummerTests
    public void DkPersonnummer_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      DkPersonnummer personnummer = null!;
+      DkPersonnummer sut = null!;
 
       // Act.
-      String str = personnummer;
+      String str = sut;
 
       // Act/assert.
       str.Should().NotBeNull();
@@ -432,10 +432,10 @@ public class DkPersonnummerTests
    public void DkPersonnummer_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      DkPersonnummer personnummer = null!;
+      DkPersonnummer sut = null!;
 
       // Act.
-      var str = (String)personnummer;
+      var str = (String)sut;
 
       // Act/assert.
       str.Should().NotBeNull();

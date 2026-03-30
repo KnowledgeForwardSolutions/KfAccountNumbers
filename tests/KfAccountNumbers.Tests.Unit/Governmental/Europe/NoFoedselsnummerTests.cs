@@ -646,10 +646,10 @@ public class NoFoedselsnummerTests
    public void NoFoedselsnummer_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      NoFoedselsnummer foedselsnummer = null!;
+      NoFoedselsnummer sut = null!;
 
       // Act.
-      String str = foedselsnummer;
+      String str = sut;
 
       // Act/assert.
       str.Should().NotBeNull();
@@ -660,10 +660,10 @@ public class NoFoedselsnummerTests
    public void NoFoedselsnummer_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      NoFoedselsnummer foedselsnummer = null!;
+      NoFoedselsnummer sut = null!;
 
       // Act.
-      var str = (String)foedselsnummer;
+      var str = (String)sut;
 
       // Act/assert.
       str.Should().NotBeNull();

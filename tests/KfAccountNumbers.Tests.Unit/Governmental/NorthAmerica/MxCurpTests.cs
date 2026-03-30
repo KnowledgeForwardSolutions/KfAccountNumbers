@@ -620,10 +620,10 @@ public class MxCurpTests
    public void MxCurp_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      MxCurp curp = null!;
+      MxCurp sut = null!;
 
       // Act.
-      String str = curp;
+      String str = sut;
 
       // Act/assert.
       str.Should().NotBeNull();
@@ -634,10 +634,10 @@ public class MxCurpTests
    public void MxCurp_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      MxCurp curp = null!;
+      MxCurp sut = null!;
 
       // Act.
-      String str = curp;
+      String str = sut;
 
       // Act/assert.
       str.Should().NotBeNull();

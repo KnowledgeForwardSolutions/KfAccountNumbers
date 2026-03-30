@@ -331,10 +331,10 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      UsSocialSecurityNumber ssn = null!;
+      UsSocialSecurityNumber sut = null!;
 
       // Act.
-      String str = ssn;
+      String str = sut;
 
       // Act/assert.
       str.Should().NotBeNull();
@@ -345,10 +345,10 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_CastUsSsnToString_ShouldThrowArgumentNullException_WhenValueIsNull()
    {
       // Arrange.
-      UsSocialSecurityNumber ssn = null!;
+      UsSocialSecurityNumber sut = null!;
 
       // Act.
-      var str = (String)ssn;
+      var str = (String)sut;
 
       // Act/assert.
       str.Should().NotBeNull();

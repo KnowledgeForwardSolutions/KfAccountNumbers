@@ -260,10 +260,10 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber itin = null!;
+      UsIndividualTaxpayerIdentificationNumber sut = null!;
 
       // Act.
-      String str = itin;
+      String str = sut;
 
       // Act/assert.
       str.Should().NotBeNull();
@@ -274,10 +274,10 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber itin = null!;
+      UsIndividualTaxpayerIdentificationNumber sut = null!;
 
       // Act.
-      var str = (String)itin;
+      var str = (String)sut;
 
       // Act/assert.
       str.Should().NotBeNull();
