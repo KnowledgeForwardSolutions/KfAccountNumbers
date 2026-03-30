@@ -1,4 +1,4 @@
-// Ignore Spelling: Fi Henkilotunnus
+// Ignore Spelling: Fi Henkilotunnus Json
 
 namespace KfAccountNumbers.Governmental.Europe;
 
@@ -122,6 +122,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      test henkilötunnus values.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(FiHenkilotunnusJsonConverter))]
 public record FiHenkilotunnus
 {
    /// <summary>
@@ -435,4 +436,21 @@ public record FiHenkilotunnus
 
       return individualNumber >= 2;
    }
+}
+
+public class FiHenkilotunnusJsonConverter : JsonConverter<FiHenkilotunnus>
+{
+   public override FiHenkilotunnus Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new FiHenkilotunnus(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, FiHenkilotunnus value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }

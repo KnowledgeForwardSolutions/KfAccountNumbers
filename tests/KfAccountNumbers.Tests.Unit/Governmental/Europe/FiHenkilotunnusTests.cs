@@ -1,4 +1,4 @@
-// Ignore Spelling: Fi Henkilotunnus Kf
+// Ignore Spelling: Deserialize Deserialization Fi Henkilotunnus Json Kf
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -1060,6 +1060,104 @@ public class FiHenkilotunnusTests
 
       // Act/assert.
       FiHenkilotunnus.Validate(value).Should().Be(FiHenkilotunnusValidationResult.InvalidDateOfBirth);
+   }
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void FiHenkilotunnus_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new FiHenkilotunnus(ValidHenkilotunnus);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<FiHenkilotunnus>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void FiHenkilotunnus_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new FiHenkilotunnus(AltValidHenkilotunnus);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public FiHenkilotunnus Henkilotunnus { get; set; } = null!;
+   }
+
+   [Fact]
+   public void FiHenkilotunnus_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { Henkilotunnus = new FiHenkilotunnus(ValidHenkilotunnus) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void FiHenkilotunnus_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"Henkilotunnus\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void FiHenkilotunnus_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"Henkilotunnus\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.Henkilotunnus.Should().BeNull();
+   }
+
+   [Fact]
+   public void FiHenkilotunnus_JsonDeserialization_ShouldThrowKfValidationException_WhenHenkilotunnusIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"Henkilotunnus\":\"100612-707079\"}";  // Invalid length
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should()
+         .ThrowExactly<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusInvalidLength + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.InvalidLength);
    }
 
    #endregion
