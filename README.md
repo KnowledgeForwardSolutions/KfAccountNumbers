@@ -130,11 +130,12 @@ which extended the allowable century indicator characters to prevent exhausting 
 dates of birth.
 
 A Finnish henkilötunnus is an 11 character value structured as DDMMYYCZZZQ with the following elements:
-* DDMMYY - the person's date of birth (for individuals) or the date of registration (for companies) in DDMMYY format.
+* DDMMYY - the person's date of birth in DDMMYY format.
 * C - the century indicator, with `+` indicating 1800s, `-, U, V, W, X or Y` indicating 1900s and `A, B, C, D, E, F` indicating 2000s.
 * ZZZ - a three digit individual number used to differentiate between two persons born on the same date. Odd individual numbers
  indicate males and even numbers indicate females. Values from 002-899 indicate persons born in Finland or permanent residents.
  and values from 900-999 indicate a temporary value (for example, a hospital patient where the official henkilötunnus is unknown).
+ Individual numbers less than 002 are not valid.
 * Q - a modulus 31 check digit (or check character, actually). The check character will be one of 31 alphanumeric
  characters, `0123456789ABCDEFHJKLMNPRSTUVWXY` (the letters `G, I, O, Q and Z` are excluded to avoid possible confusion with
  digit characters).

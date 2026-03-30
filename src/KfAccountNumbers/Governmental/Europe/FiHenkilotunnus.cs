@@ -8,7 +8,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A Finnish henkilötunnus is a ten-digit number structured as DDMMYYCZZZQ,
+///      A Finnish henkilötunnus is a eleven-digit number structured as DDMMYYCZZZQ,
 ///      with the following elements:
 ///      <list type="bullet">
 ///         <item>
@@ -33,7 +33,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///               even numbers for females and odd numbers for males. Individual
 ///               numbers between 002 and 899 indicate persons born in Finland or
 ///               permanent residents and numbers between 900 and 999 are reserved
-///               for temporary identifiers. The individual number 001 is not
+///               for temporary identifiers. Individual numbers less than 002 are not
 ///               valid.
 ///            </description>
 ///         </item>
@@ -213,8 +213,8 @@ public record FiHenkilotunnus
 
    /// <summary>
    ///   The person's gender, as indicated by the individual number element
-   ///   (character positions 7-9, zero-based). Odd numbers = Male; even
-   ///   numbers = Female.
+   ///   (character positions 7-9, zero-based). Even numbers = Female; odd
+   ///   numbers = Male.
    /// </summary>
    public BinaryGender Gender => Value[GenderOffset] % 2 == 0       // This works because the ASCII character values for digits have the same odd/even pattern
       ? BinaryGender.Female
