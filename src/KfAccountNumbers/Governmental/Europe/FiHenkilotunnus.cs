@@ -8,7 +8,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A Finnish henkilötunnus is a eleven-digit number structured as DDMMYYCZZZQ,
+///      A Finnish henkilötunnus is an eleven-digit number structured as DDMMYYCZZZQ,
 ///      with the following elements:
 ///      <list type="bullet">
 ///         <item>

@@ -342,7 +342,7 @@ public class UsSocialSecurityNumberTests
    }
 
    [Fact]
-   public void UsSocialSecurityNumber_CastUsSsnToString_ShouldThrowArgumentNullException_WhenValueIsNull()
+   public void UsSocialSecurityNumber_CastUsSsnToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
       UsSocialSecurityNumber sut = null!;

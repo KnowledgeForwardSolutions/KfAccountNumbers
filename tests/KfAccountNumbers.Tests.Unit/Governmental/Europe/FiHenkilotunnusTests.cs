@@ -732,9 +732,8 @@ public class FiHenkilotunnusTests
    }
 
    [Fact]
-   public void FiHenkilotunnus_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   public void FiHenkilotunnus_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
-      // Arrange. 10 and 11 character versions for same person should still be equal.
       var sut1 = new FiHenkilotunnus(ValidHenkilotunnus);
       var sut2 = new FiHenkilotunnus(ValidHenkilotunnus);
 

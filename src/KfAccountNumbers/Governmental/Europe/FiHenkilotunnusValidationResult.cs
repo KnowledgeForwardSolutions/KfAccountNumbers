@@ -45,8 +45,9 @@ public enum FiHenkilotunnusValidationResult
    InvalidCenturyIndicator,
 
    /// <summary>
-   ///   The individual number (character positions 7-9, zero based) are "001",
-   ///   which below the minimum range for valid individual numbers ("002-999").
+   ///   The individual number (character positions 7-9, zero based) are "000"
+   ///   or "001", which are below the minimum range for valid individual
+   ///   numbers ("002-999").
    /// </summary>
    InvalidIndividualNumber,
 

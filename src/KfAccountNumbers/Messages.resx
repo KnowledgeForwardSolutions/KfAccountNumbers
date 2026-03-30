@@ -322,7 +322,7 @@
     <value>FI Henkilotunnus has an invalid century indicator in character position 6 (zero-based)</value>
   </data>
   <data name="FiHenkilotunnusInvalidIndividualNumber" xml:space="preserve">
-    <value>FI Henkilotunnus may not have an individual number "001" in character positions 7-9 (zero-based)</value>
+    <value>FI Henkilotunnus may not have an individual number less than "002" in character positions 7-9 (zero-based)</value>
   </data>
   <data name="FiHenkilotunnusInvalidDateOfBirth" xml:space="preserve">
     <value>FI Henkilotunnus requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based)</value>

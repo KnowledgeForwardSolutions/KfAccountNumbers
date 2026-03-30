@@ -232,7 +232,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FI Henkilotunnus may not have an individual number &quot;001&quot; in character positions 7-9 (zero-based).
+        ///   Looks up a localized string similar to FI Henkilotunnus may not have an individual number less than &quot;002&quot; in character positions 7-9 (zero-based).
         /// </summary>
         internal static string FiHenkilotunnusInvalidIndividualNumber {
             get {
