@@ -137,18 +137,74 @@ public record FiHenkilotunnus
    private const Int32 ValidLength = 11;
    private const Int32 CenturyIndicatorOffset = 6;
    private const Int32 IndividualNumberStartOffset = 7;
-   private const Int32 IndividualNumberEndOffset = 10;      // Range has exclusive end offset
    private const Int32 GenderOffset = 9;
    private const Int32 CheckCharacterOffset = 10;
 
    private const String CheckCharacters = "0123456789ABCDEFHJKLMNPRSTUVWXY";
 
    /// <summary>
-   ///   Check the <paramref name="henkilotunnus"/> to determine if it contains a
-   ///   valid Finnish henkilotunnus.
+   ///   Initialize a new instance of the <see cref="FiHenkilotunnus"/> class.
    /// </summary>
    /// <param name="henkilotunnus">
-   ///   String representation of a Finnish henkilotunnus.
+   ///   String representation of a Finnish henkilötunnus.
+   /// </param>
+   /// <exception cref="KfValidationException{FiHenkilotunnusValidationResult}">
+   ///   <paramref name="henkilotunnus"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="henkilotunnus"/> is not length 11.
+   ///   - or -
+   ///   <paramref name="henkilotunnus"/> contains a non-digit character in
+   ///   the date of birth and/or individual number element.
+   ///   - or -
+   ///   <paramref name="henkilotunnus"/> has an invalid modulus 31 check character
+   ///   in the trailing (right-most) position.
+   ///   - or -
+   ///   <paramref name="henkilotunnus"/> has an invalid century indicator in
+   ///   position 6 (zero-based). Valid century indicators are + (1800s),
+   ///   -, U, V, W, X or Y (1900s) and A, B, C, D, E, F (2000s).
+   ///   - or -
+   ///   <paramref name="henkilotunnus"/> has an invalid individual number in
+   ///   character positions 7-9 (zero-based). Valid individual numbers are
+   ///   &ge; 002.
+   ///   - or -
+   ///   <paramref name="henkilotunnus"/> contains an invalid date of birth in
+   ///   positions 0-5 (zero-based).
+   /// </exception>
+   public FiHenkilotunnus(String? henkilotunnus)
+      : this(henkilotunnus, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private FiHenkilotunnus(String? henkilotunnus, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         FiHenkilotunnusValidationResult validationResult = Validate(henkilotunnus);
+         if (validationResult != FiHenkilotunnusValidationResult.ValidationPassed)
+         {
+            throw validationResult.ToValidationException();
+         }
+      }
+
+      // Validation passed, just assign to Value property.
+      Value = henkilotunnus!;
+   }
+
+   /// <summary>
+   ///   The validated henkilötunnus.
+   /// </summary>
+   public String Value { get; private init; }
+
+   /// <summary>
+   ///   Check the <paramref name="henkilotunnus"/> to determine if it contains a
+   ///   valid Finnish henkilötunnus.
+   /// </summary>
+   /// <param name="henkilotunnus">
+   ///   String representation of a Finnish henkilötunnus.
    /// </param>
    /// <returns>
    ///   A <see cref="FiHenkilotunnusValidationResult"/> enumeration 

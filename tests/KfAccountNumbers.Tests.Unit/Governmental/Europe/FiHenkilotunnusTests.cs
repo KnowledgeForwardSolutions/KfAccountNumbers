@@ -1,4 +1,4 @@
-// Ignore Spelling: Fi Henkilotunnus
+// Ignore Spelling: Fi Henkilotunnus Kf
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -244,6 +244,124 @@ public class FiHenkilotunnusTests
    [InlineData("010100+032F")]
    public void FiHenkilotunnus_CheckDigitAlgorithm_ShouldGenerateAllPossibleCharacters(String value)
       => FiHenkilotunnus.Validate(value).Should().Be(FiHenkilotunnusValidationResult.ValidationPassed);
+
+   #endregion
+
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidHenkilotunnusValues))]
+   public void FiHenkilotunnus_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Act.
+      var sut = new FiHenkilotunnus(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(value);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDateOfBirthValues))]
+   public void FiHenkilotunnus_Constructor_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
+      String dateOfBirth,
+      Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(dateOfBirth, centuryIndicator);
+
+      // Act.
+      var sut = new FiHenkilotunnus(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(value);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void FiHenkilotunnus_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => new FiHenkilotunnus(value))
+         .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusEmpty + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void FiHenkilotunnus_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => new FiHenkilotunnus(value))
+         .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusInvalidLength + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void FiHenkilotunnus_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(String value)
+      => FluentActions
+         .Invoking(() => new FiHenkilotunnus(value))
+         .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void FiHenkilotunnus_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
+      => FluentActions
+         .Invoking(() => new FiHenkilotunnus(value))
+         .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusInvalidCheckDigit + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.InvalidCheckDigit);
+
+   [Theory]
+   [MemberData(nameof(InvalidCenturyIndicatorValues))]
+   public void FiHenkilotunnus_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCenturyIndicator(Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(centuryIndicator: centuryIndicator);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new FiHenkilotunnus(value))
+         .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusInvalidCenturyIndicator + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.InvalidCenturyIndicator);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidIndividualNumberValues))]
+   public void FiHenkilotunnus_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidIndividualNumber(String individualNumber)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(individualNumber: individualNumber);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new FiHenkilotunnus(value))
+         .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusInvalidIndividualNumber + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.InvalidIndividualNumber);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void FiHenkilotunnus_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(dateOfBirth, centuryIndicator);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new FiHenkilotunnus(value))
+         .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusInvalidDateOfBirth + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.InvalidDateOfBirth);
+   }
 
    #endregion
 
