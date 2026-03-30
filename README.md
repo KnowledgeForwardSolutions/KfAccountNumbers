@@ -145,7 +145,7 @@ A henkilötunnus must meet all of the following rules:
 * The date of birth and individual number elements (DDMMYY and ZZZ elements) must be ASCII digits ('0'-'9').
 * The century indicator must be `+, -, U, V, W, X, Y, A, B, C, D, E or F`.
 * The date of birth, after deriving the century of birth from the century indicator, must be a valid date between January 1, 1800 and December 31, 2099.
-* The individual number must not be 001.
+* The individual number must be greater than or equal to 002.
 * The check character must be a valid modulus 31 check character calculated from the date of birth and the individual number.
 
 Example values:

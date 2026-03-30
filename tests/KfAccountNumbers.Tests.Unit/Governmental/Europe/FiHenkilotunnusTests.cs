@@ -2,6 +2,7 @@
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
+#pragma warning disable CA2211 // Non-constant fields should not be visible
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -41,6 +42,53 @@ public class FiHenkilotunnusTests
       ValidTestHenkilotunnus,
       AltValidTestHenkilotunnus,
    ];
+
+   public static TheoryData<String, Char> ValidDateOfBirthValues = new()
+   {
+      { "010100", '+' },      // January 1, 1800
+      { "311299", '+' },      // December 31, 1899
+
+      { "010100", '-' },      // January 1, 1900
+      { "311299", '-' },      // December 31, 1999
+      { "010100", 'U' },      // January 1, 1900
+      { "311299", 'U' },      // December 31, 1999
+      { "010100", 'V' },      // January 1, 1900
+      { "311299", 'V' },      // December 31, 1999
+      { "010100", 'W' },      // January 1, 1900
+      { "311299", 'W' },      // December 31, 1999
+      { "010100", 'X' },      // January 1, 1900
+      { "311299", 'X' },      // December 31, 1999
+      { "010100", 'Y' },      // January 1, 1900
+      { "311299", 'Y' },      // December 31, 1999
+
+      { "010100", 'A' },      // January 1, 2000
+      { "311299", 'A' },      // December 31, 2099
+      { "010100", 'B' },      // January 1, 2000
+      { "311299", 'B' },      // December 31, 2099
+      { "010100", 'C' },      // January 1, 2000
+      { "311299", 'C' },      // December 31, 2099
+      { "010100", 'D' },      // January 1, 2000
+      { "311299", 'D' },      // December 31, 2099
+      { "010100", 'E' },      // January 1, 2000
+      { "311299", 'E' },      // December 31, 2099
+      { "010100", 'F' },      // January 1, 2000
+      { "311299", 'F' },      // December 31, 2099
+
+      { "310104", '+' },      // maximum days for January, any year
+      { "280201", '-' },      // maximum days for February, non-leap year
+      { "290204", 'U' },      // maximum days for February, leap year
+      { "290200", 'A' },      // maximum days for February, leap year (2000 is leap-year)
+      { "310304", '+' },      // maximum days for March, any year
+      { "300404", 'V' },      // maximum days for April, any year
+      { "310504", 'B' },      // maximum days for May, any year
+      { "300604", '+' },      // maximum days for June, any year
+      { "310704", 'W' },      // maximum days for July, any year
+      { "310804", 'C' },      // maximum days for August, any year
+      { "300904", '+' },      // maximum days for September, any year
+      { "311004", 'X' },      // maximum days for October, any year
+      { "301104", 'D' },      // maximum days for November, any year
+      { "311204", '+' },      // maximum days for December, any year
+   };
 
    public static TheoryData<String> InvalidLengthValues =>
    [
@@ -111,6 +159,35 @@ public class FiHenkilotunnusTests
       't',
    ];
 
+   public static TheoryData<String> InvalidIndividualNumberValues =>
+   [
+      "000",
+      "001",
+   ];
+
+   public static TheoryData<String, Char> InvalidDateOfBirthValues = new()
+   {
+      { "010004", '+' },      // month = 0
+      { "011304", '-' },      // month = 13
+      { "000104", 'A' },      // days = 0
+
+      { "320104", '+' },      // Invalid day of month for January, any year
+      { "290201", 'U' },      // Invalid day of for February, non-leap year
+      { "300204", 'B' },      // Invalid day of for February, leap year
+      { "300200", 'B' },      // Invalid day of for February, leap year (2000 is leap-year)
+      { "320304", '+' },      // Invalid day of for March, any year
+      { "310404", 'V' },      // Invalid day of for April, any year
+      { "320504", 'C' },      // Invalid day of for May, any year
+      { "310604", '+' },      // Invalid day of for June, any year
+      { "320704", 'W' },      // Invalid day of for July, any year
+      { "320804", 'D' },      // Invalid day of for August, any year
+      { "310904", '+' },      // Invalid day of for September, any year
+      { "321004", 'X' },      // Invalid day of for October, any year
+      { "311104", 'E' },      // Invalid day of for November, any year
+      { "321204", '+' },      // Invalid day of for December, any year
+
+   };
+
    #region Constants Tests
    // ==========================================================================
    // ==========================================================================
@@ -125,6 +202,51 @@ public class FiHenkilotunnusTests
 
    #endregion
 
+   #region Check Digit Algorithm Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   // Values below are valid henkilötunnus, and designed to produce all possible
+   // check characters. "010100+000" mod 31 has remainder 14. From there it is
+   // possible to derive the individual numbers that produce both valid henkilötunnus
+   // and all possible check characters.
+   [InlineData("010100+002H")]      // Starting point. "010100+002" mod 31 = 16, or check character H.
+   [InlineData("010100+003J")]      // Increment individual number to get next check character
+   [InlineData("010100+004K")]
+   [InlineData("010100+005L")]
+   [InlineData("010100+006M")]
+   [InlineData("010100+007N")]
+   [InlineData("010100+008P")]
+   [InlineData("010100+009R")]
+   [InlineData("010100+010S")]
+   [InlineData("010100+011T")]
+   [InlineData("010100+012U")]
+   [InlineData("010100+013V")]
+   [InlineData("010100+014W")]
+   [InlineData("010100+015X")]
+   [InlineData("010100+016Y")]
+   [InlineData("010100+0170")]      // Roll over to check character 0
+   [InlineData("010100+0181")]
+   [InlineData("010100+0192")]
+   [InlineData("010100+0203")]
+   [InlineData("010100+0214")]
+   [InlineData("010100+0225")]
+   [InlineData("010100+0236")]
+   [InlineData("010100+0247")]
+   [InlineData("010100+0258")]
+   [InlineData("010100+0269")]
+   [InlineData("010100+027A")]
+   [InlineData("010100+028B")]
+   [InlineData("010100+029C")]
+   [InlineData("010100+030D")]
+   [InlineData("010100+031E")]
+   [InlineData("010100+032F")]
+   public void FiHenkilotunnus_CheckDigitAlgorithm_ShouldGenerateAllPossibleCharacters(String value)
+      => FiHenkilotunnus.Validate(value).Should().Be(FiHenkilotunnusValidationResult.ValidationPassed);
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -133,6 +255,19 @@ public class FiHenkilotunnusTests
    [MemberData(nameof(ValidHenkilotunnusValues))]
    public void FiHenkilotunnus_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
       => FiHenkilotunnus.Validate(value).Should().Be(FiHenkilotunnusValidationResult.ValidationPassed);
+
+   [Theory]
+   [MemberData(nameof(ValidDateOfBirthValues))]
+   public void FiHenkilotunnus_Validate_ShouldReturnValidationPassed_WhenValueHasValidDateOfBirth(
+      String dateOfBirth,
+      Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(dateOfBirth, centuryIndicator);
+
+      // Act/assert.
+      FiHenkilotunnus.Validate(value).Should().Be(FiHenkilotunnusValidationResult.ValidationPassed);
+   }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
@@ -146,7 +281,7 @@ public class FiHenkilotunnusTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void FiHenkilotunnus_Validate_ShouldReturnInvalidCharacters_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+   public void FiHenkilotunnus_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
       => FiHenkilotunnus.Validate(value).Should().Be(FiHenkilotunnusValidationResult.InvalidCharacter);
 
    [Theory]
@@ -165,15 +300,28 @@ public class FiHenkilotunnusTests
       FiHenkilotunnus.Validate(value).Should().Be(FiHenkilotunnusValidationResult.InvalidCenturyIndicator);
    }
 
-   [Fact]
-   public void FiHenkilotunnus_Validate_ShouldReturnInvalidIndividualNumber_WhenValueHasInvalidIndividualNumber()
+   [Theory]
+   [MemberData(nameof(InvalidIndividualNumberValues))]
+   public void FiHenkilotunnus_Validate_ShouldReturnInvalidIndividualNumber_WhenValueHasInvalidIndividualNumber(String individualNumber)
    {
       // Arrange.
-      var individualNumber = "001";    // The only inavlid individual number
       var value = GetHenkilotunnusWithValidCheckDigit(individualNumber: individualNumber);
 
       // Act/assert.
       FiHenkilotunnus.Validate(value).Should().Be(FiHenkilotunnusValidationResult.InvalidIndividualNumber);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void FiHenkilotunnus_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(dateOfBirth, centuryIndicator);
+
+      // Act/assert.
+      FiHenkilotunnus.Validate(value).Should().Be(FiHenkilotunnusValidationResult.InvalidDateOfBirth);
    }
 
    #endregion

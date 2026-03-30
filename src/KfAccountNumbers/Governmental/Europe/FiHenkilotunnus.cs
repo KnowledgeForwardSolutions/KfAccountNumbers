@@ -105,7 +105,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The individual number must not be 001.
+///               The individual number must be &ge; 002.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -183,8 +183,42 @@ public record FiHenkilotunnus
       {
          return FiHenkilotunnusValidationResult.InvalidIndividualNumber;
       }
+      else if (!ValidateDateOfBirth(henkilotunnus))
+      {
+         return FiHenkilotunnusValidationResult.InvalidDateOfBirth;
+      }
 
       return FiHenkilotunnusValidationResult.ValidationPassed;
+   }
+
+   private static (Int32 day, Int32 month, Int32 year) GetDayMonthYear(ReadOnlySpan<Char> henkilotunnus)
+   {
+      var day = henkilotunnus.ParseTwoDigits();
+      var month = henkilotunnus[2..].ParseTwoDigits();
+      var year = henkilotunnus[4..].ParseTwoDigits();
+
+      // Adjust the year according to the value of the century indicator.
+      var centuryIndicator = henkilotunnus[CenturyIndicatorOffset];
+
+      year += centuryIndicator switch
+      {
+         Chars.Plus => 1800,
+         Chars.Dash => 1900,
+         Chars.UpperCaseA => 2000,
+         Chars.UpperCaseB => 2000,
+         Chars.UpperCaseC => 2000,
+         Chars.UpperCaseD => 2000,
+         Chars.UpperCaseE => 2000,
+         Chars.UpperCaseF => 2000,
+         Chars.UpperCaseU => 1900,
+         Chars.UpperCaseV => 1900,
+         Chars.UpperCaseW => 1900,
+         Chars.UpperCaseX => 1900,
+         Chars.UpperCaseY => 1900,
+         _ => 0
+      };
+
+      return (day, month, year);
    }
 
    private static FiHenkilotunnusValidationResult ValidateCheckDigit(ReadOnlySpan<Char> henkilotunnus)
@@ -238,6 +272,28 @@ public record FiHenkilotunnus
          _ => false
       };
 
+   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> personnummer)
+   {
+#pragma warning disable IDE0008 // Use explicit type
+      var (day, month, year) = GetDayMonthYear(personnummer);
+#pragma warning restore IDE0008 // Use explicit type
+
+      if (year < MinimumValidYearOfBirth || year > MaximumValidYearOfBirth)
+      {
+         // Should be impossible to ever reach this point because century indicator
+         // has been validated, but return false out of abundance of caution and
+         // to avoid throwing an exception.
+         return false;
+      }
+
+      if (month < 1 || month > 12)
+      {
+         return false;
+      }
+
+      return day >= 1 && day <= DateTime.DaysInMonth(year, month);
+   }
+
    private static Boolean ValidateIndividualNumber(ReadOnlySpan<Char> henkilotunnus)
    {
       var d1 = henkilotunnus[IndividualNumberStartOffset] - Chars.DigitZero;
@@ -246,6 +302,6 @@ public record FiHenkilotunnus
 
       var individualNumber = (d1 * 100) + (d2 * 10) + d3;
 
-      return individualNumber != 1;
+      return individualNumber >= 2;
    }
 }
