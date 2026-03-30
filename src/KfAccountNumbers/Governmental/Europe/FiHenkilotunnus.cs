@@ -237,6 +237,43 @@ public record FiHenkilotunnus
    /// </summary>
    public String Value { get; private init; }
 
+   public static implicit operator String(FiHenkilotunnus henkilotunnus)
+      => henkilotunnus?.Value ?? String.Empty;      // Handle null henkilotunnus object gracefully by returning empty string
+
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator FiHenkilotunnus(String? henkilotunnus) => new(henkilotunnus);
+
+   /// <summary>
+   ///   Create a new <see cref="FiHenkilotunnus"/> using the Result pattern.
+   /// </summary>
+   /// <param name="henkilotunnus">
+   ///   String representation of a Finnish henkilötunnus.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{FiHenkilotunnus, FiHenkilotunnusValidationResult}"/>.
+   ///   Will contain the new <see cref="FiHenkilotunnus"/> if 
+   ///   <paramref name="henkilotunnus"/> is valid or an
+   ///   <see cref="FiHenkilotunnusValidationResult"/> that identifies
+   ///   the validation rule that was failed if <paramref name="henkilotunnus"/> is 
+   ///   invalid.
+   /// </returns>
+   public static CreateResult<FiHenkilotunnus, FiHenkilotunnusValidationResult> Create(String? henkilotunnus)
+   {
+      FiHenkilotunnusValidationResult validationResult = Validate(henkilotunnus);
+      return validationResult == FiHenkilotunnusValidationResult.ValidationPassed
+         ? new FiHenkilotunnus(henkilotunnus, validationMode: ValidationMode.BypassValidation)
+         : validationResult;
+   }
+
+   /// <summary>
+   ///   Get a string representation of the henkilötunnus.
+   /// </summary>
+   /// <remarks>
+   ///   Will return the validated henkilötunnus, the same as the
+   ///   <see cref="Value"/> property.
+   /// </remarks>
+   public override String ToString() => Value;
+
    /// <summary>
    ///   Check the <paramref name="henkilotunnus"/> to determine if it contains a
    ///   valid Finnish henkilötunnus.

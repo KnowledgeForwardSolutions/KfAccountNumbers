@@ -512,6 +512,479 @@ public class FiHenkilotunnusTests
 
    #endregion
 
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void FiHenkilotunnus_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = ValidHenkilotunnus;
+      var sut = new FiHenkilotunnus(value);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(value);
+   }
+
+   [Fact]
+   public void FiHenkilotunnus_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = AltValidHenkilotunnus;
+      var sut = new FiHenkilotunnus(value);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(value);
+   }
+
+   [Fact]
+   public void FiHenkilotunnus_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      FiHenkilotunnus sut = null!;
+
+      // Act.
+      String str = sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void FiHenkilotunnus_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      FiHenkilotunnus sut = null!;
+
+      // Act.
+      var str = (String)sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidHenkilotunnusValues))]
+   public void FiHenkilotunnus_ExplicitCastToFiHenkilotunnus_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Act.
+      var sut = (FiHenkilotunnus)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(value);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDateOfBirthValues))]
+   public void FiHenkilotunnus_ExplicitCastToFiHenkilotunnus_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
+      String dateOfBirth,
+      Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(dateOfBirth, centuryIndicator);
+
+      // Act.
+      var sut = (FiHenkilotunnus)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(value);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void FiHenkilotunnus_ExplicitCastToFiHenkilotunnus_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => _ = (FiHenkilotunnus)value)
+         .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusEmpty + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void FiHenkilotunnus_ExplicitCastToFiHenkilotunnus_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => _ = (FiHenkilotunnus)value)
+         .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusInvalidLength + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void FiHenkilotunnus_ExplicitCastToFiHenkilotunnus_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+      => FluentActions
+         .Invoking(() => _ = (FiHenkilotunnus)value)
+         .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void FiHenkilotunnus_ExplicitCastToFiHenkilotunnus_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
+      => FluentActions
+         .Invoking(() => _ = (FiHenkilotunnus)value)
+         .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusInvalidCheckDigit + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.InvalidCheckDigit);
+
+   [Theory]
+   [MemberData(nameof(InvalidCenturyIndicatorValues))]
+   public void FiHenkilotunnus_ExplicitCastToFiHenkilotunnus_ShouldThrowKfValidationException_WhenValueHasInvalidCenturyIndicator(Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(centuryIndicator: centuryIndicator);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (FiHenkilotunnus)value)
+         .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusInvalidCenturyIndicator + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.InvalidCenturyIndicator);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidIndividualNumberValues))]
+   public void FiHenkilotunnus_ExplicitCastToFiHenkilotunnus_ShouldThrowKfValidationException_WhenValueHasInvalidIndividualNumber(String individualNumber)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(individualNumber: individualNumber);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (FiHenkilotunnus)value)
+         .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusInvalidIndividualNumber + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.InvalidIndividualNumber);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void FiHenkilotunnus_ExplicitCastToFiHenkilotunnus_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(dateOfBirth, centuryIndicator);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (FiHenkilotunnus)value)
+         .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
+         .WithMessage(Messages.FiHenkilotunnusInvalidDateOfBirth + "*")
+         .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.InvalidDateOfBirth);
+   }
+
+   #endregion
+
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void FiHenkilotunnus_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new FiHenkilotunnus(ValidHenkilotunnus);
+      var sut2 = new FiHenkilotunnus(ValidHenkilotunnus);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FiHenkilotunnus_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new FiHenkilotunnus(ValidHenkilotunnus);
+      var sut2 = new FiHenkilotunnus(AltValidHenkilotunnus);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void FiHenkilotunnus_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new FiHenkilotunnus(ValidHenkilotunnus);
+      var sut2 = new FiHenkilotunnus(AltValidHenkilotunnus);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FiHenkilotunnus_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 11 character versions for same person should still be equal.
+      var sut1 = new FiHenkilotunnus(ValidHenkilotunnus);
+      var sut2 = new FiHenkilotunnus(ValidHenkilotunnus);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidHenkilotunnusValues))]
+   public void FiHenkilotunnus_Create_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expectedValue = new FiHenkilotunnus(value);
+
+      // Act.
+      var result = FiHenkilotunnus.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDateOfBirthValues))]
+   public void FiHenkilotunnus_Create_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
+      String dateOfBirth,
+      Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(dateOfBirth, centuryIndicator);
+      var expectedValue = new FiHenkilotunnus(value);
+
+      // Act.
+      var result = FiHenkilotunnus.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void FiHenkilotunnus_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
+   {
+      // Act.
+      var result = FiHenkilotunnus.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(FiHenkilotunnusValidationResult.Empty);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void FiHenkilotunnus_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   {
+      // Act.
+      var result = FiHenkilotunnus.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(FiHenkilotunnusValidationResult.InvalidLength);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void FiHenkilotunnus_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+   {
+      // Act.
+      var result = FiHenkilotunnus.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(FiHenkilotunnusValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCenturyIndicatorValues))]
+   public void FiHenkilotunnus_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidCenturyIndicator(Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(centuryIndicator: centuryIndicator);
+
+      // Act.
+      var result = FiHenkilotunnus.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(FiHenkilotunnusValidationResult.InvalidCenturyIndicator);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidIndividualNumberValues))]
+   public void FiHenkilotunnus_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidIndividualNumber(String individualNumber)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(individualNumber: individualNumber);
+
+      // Act.
+      var result = FiHenkilotunnus.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(FiHenkilotunnusValidationResult.InvalidIndividualNumber);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void FiHenkilotunnus_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(dateOfBirth, centuryIndicator);
+
+      // Act.
+      var result = FiHenkilotunnus.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(FiHenkilotunnusValidationResult.InvalidDateOfBirth);
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void FiHenkilotunnus_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new FiHenkilotunnus(ValidHenkilotunnus);
+      var sut2 = new FiHenkilotunnus(ValidHenkilotunnus);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FiHenkilotunnus_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new FiHenkilotunnus(ValidHenkilotunnus);
+      var sut2 = new FiHenkilotunnus(AltValidHenkilotunnus);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void FiHenkilotunnus_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new FiHenkilotunnus(ValidHenkilotunnus);
+      var sut2 = new FiHenkilotunnus(ValidHenkilotunnus);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void FiHenkilotunnus_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new FiHenkilotunnus(ValidHenkilotunnus);
+      var sut2 = new FiHenkilotunnus(AltValidHenkilotunnus);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // FiHenkilotunnus does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void FiHenkilotunnus_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new FiHenkilotunnus(ValidHenkilotunnus);
+      var sut2 = new FiHenkilotunnus(ValidHenkilotunnus);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidHenkilotunnusValues))]
+   public void FiHenkilotunnus_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new FiHenkilotunnus(value);
+
+      // Act/assert.
+      sut.ToString().Should().Be(value);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
