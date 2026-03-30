@@ -187,6 +187,69 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to FI Henkilotunnus may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string FiHenkilotunnusEmpty {
+            get {
+                return ResourceManager.GetString("FiHenkilotunnusEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FI Henkilotunnus has an invalid century indicator in character position 6 (zero-based).
+        /// </summary>
+        internal static string FiHenkilotunnusInvalidCenturyIndicator {
+            get {
+                return ResourceManager.GetString("FiHenkilotunnusInvalidCenturyIndicator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FI Henkilotunnus contains a non-digit character in the date of birth or individual number elements.
+        /// </summary>
+        internal static string FiHenkilotunnusInvalidCharacter {
+            get {
+                return ResourceManager.GetString("FiHenkilotunnusInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FI Henkilotunnus must have a valid modulus 31 check character in the trailing (right-most) position.
+        /// </summary>
+        internal static string FiHenkilotunnusInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("FiHenkilotunnusInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FI Henkilotunnus requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based).
+        /// </summary>
+        internal static string FiHenkilotunnusInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("FiHenkilotunnusInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FI Henkilotunnus may not have an individual number less than &quot;002&quot; in character positions 7-9 (zero-based).
+        /// </summary>
+        internal static string FiHenkilotunnusInvalidIndividualNumber {
+            get {
+                return ResourceManager.GetString("FiHenkilotunnusInvalidIndividualNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FI Henkilotunnus must have length 11.
+        /// </summary>
+        internal static string FiHenkilotunnusInvalidLength {
+            get {
+                return ResourceManager.GetString("FiHenkilotunnusInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to String formatting mask may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string FormatMaskEmpty {

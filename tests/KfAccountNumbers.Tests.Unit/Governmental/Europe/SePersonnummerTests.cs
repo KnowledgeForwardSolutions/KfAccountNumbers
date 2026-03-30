@@ -583,8 +583,8 @@ public class SePersonnummerTests
    {
       // Arrange.
       var birthSerialNumber = $"54{digit}";
-      var personnummer = GetPersonnummerWithValidCheckDigit(birthSerialNumber: birthSerialNumber);
-      var sut = new SePersonnummer(personnummer);
+      var value = GetPersonnummerWithValidCheckDigit(birthSerialNumber: birthSerialNumber);
+      var sut = new SePersonnummer(value);
 
       // Act/assert.
       sut.Gender.Should().Be(expectedGender);
@@ -695,10 +695,10 @@ public class SePersonnummerTests
    public void SePersonnummer_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      SePersonnummer personnummer = null!;
+      SePersonnummer sut = null!;
 
       // Act.
-      String str = personnummer;
+      String str = sut;
 
       // Act/assert.
       str.Should().NotBeNull();
@@ -709,10 +709,10 @@ public class SePersonnummerTests
    public void SePersonnummer_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      SePersonnummer personnummer = null!;
+      SePersonnummer sut = null!;
 
       // Act.
-      var str = (String)personnummer;
+      var str = (String)sut;
 
       // Act/assert.
       str.Should().NotBeNull();

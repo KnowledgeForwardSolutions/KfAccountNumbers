@@ -550,10 +550,10 @@ public class IsKennitalaTests
    public void IsKennitala_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      IsKennitala kennitala = null!;
+      IsKennitala sut = null!;
 
       // Act.
-      String str = kennitala;
+      String str = sut;
 
       // Act/assert.
       str.Should().NotBeNull();
@@ -564,10 +564,10 @@ public class IsKennitalaTests
    public void IsKennitala_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      IsKennitala kennitala = null!;
+      IsKennitala sut = null!;
 
       // Act.
-      var str = (String)kennitala;
+      var str = (String)sut;
 
       // Act/assert.
       str.Should().NotBeNull();

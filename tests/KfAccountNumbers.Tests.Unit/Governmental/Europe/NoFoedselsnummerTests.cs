@@ -536,8 +536,8 @@ public class NoFoedselsnummerTests
       BinaryGender expectedGender)
    {
       // Arrange.
-      var personnummer = GetFoedselsnummerWithValidCheckDigits(individualNumber: individualNumber);
-      var sut = new NoFoedselsnummer(personnummer);
+      var value = GetFoedselsnummerWithValidCheckDigits(individualNumber: individualNumber);
+      var sut = new NoFoedselsnummer(value);
 
       // Act/assert.
       sut.Gender.Should().Be(expectedGender);
@@ -646,10 +646,10 @@ public class NoFoedselsnummerTests
    public void NoFoedselsnummer_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      NoFoedselsnummer foedselsnummer = null!;
+      NoFoedselsnummer sut = null!;
 
       // Act.
-      String str = foedselsnummer;
+      String str = sut;
 
       // Act/assert.
       str.Should().NotBeNull();
@@ -660,10 +660,10 @@ public class NoFoedselsnummerTests
    public void NoFoedselsnummer_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      NoFoedselsnummer foedselsnummer = null!;
+      NoFoedselsnummer sut = null!;
 
       // Act.
-      var str = (String)foedselsnummer;
+      var str = (String)sut;
 
       // Act/assert.
       str.Should().NotBeNull();

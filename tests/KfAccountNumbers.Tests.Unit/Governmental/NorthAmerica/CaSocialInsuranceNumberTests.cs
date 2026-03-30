@@ -312,10 +312,10 @@ public class CaSocialInsuranceNumberTests
    public void CaSocialInsuranceNumber_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      CaSocialInsuranceNumber sin = null!;
+      CaSocialInsuranceNumber sut = null!;
 
       // Act.
-      String str = sin;
+      String str = sut;
 
       // Act/assert.
       str.Should().NotBeNull();
@@ -326,10 +326,10 @@ public class CaSocialInsuranceNumberTests
    public void CaSocialInsuranceNumber_CastCaSinToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      CaSocialInsuranceNumber sin = null!;
+      CaSocialInsuranceNumber sut = null!;
 
       // Act.
-      var str = (String)sin;
+      var str = (String)sut;
 
       // Act/assert.
       str.Should().NotBeNull();

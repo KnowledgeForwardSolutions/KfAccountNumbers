@@ -40,7 +40,8 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Asia (future)
 	- Australia (future)
 	- Europe
-        - [DkPersonnummer](#dkpersonnummer) 
+        - [DkPersonnummer](#dkpersonnummer)
+        - [FiHenkilotunnus](#fihenkilotunnus)
         - [IsKennitala](#iskennitala) 
         - [NoFoedselsnummer](#nofoedselsnummer) 
         - [SePersonnummer](#sepersonnummer)
@@ -120,6 +121,41 @@ According to these rules, the valid range for a date of birth is January 1, 1858
 
 See [Wikipedia - Personal identification number (Denmark)](https://en.wikipedia.org/wiki/Personal_identification_number_%28Denmark%29)
 and [CPR-nummer](https://da.wikipedia.org/wiki/CPR-nummer) for more info.
+
+## FiHenkilotunnus
+
+The `FiHenkilotunnus` type represents the national identification number used by Finland. KfAccountNumbers'
+implementation of `FiHenkilotunnus` supports the [2023 separator reform](https://dvv.fi/en/reform-of-personal-identity-code)
+which extended the allowable century indicator characters to prevent exhausting available henkilötunnus for particular
+dates of birth.
+
+A Finnish henkilötunnus is an 11 character value structured as DDMMYYCZZZQ with the following elements:
+* DDMMYY - the person's date of birth in DDMMYY format.
+* C - the century indicator, with `+` indicating 1800s, `-, U, V, W, X or Y` indicating 1900s and `A, B, C, D, E, F` indicating 2000s.
+* ZZZ - a three digit individual number used to differentiate between two persons born on the same date. Odd individual numbers
+ indicate males and even numbers indicate females. Values from 002-899 indicate persons born in Finland or permanent residents
+ and values from 900-999 indicate a temporary value (for example, a hospital patient where the official henkilötunnus is unknown).
+ Individual numbers less than 002 are not valid.
+* Q - a modulus 31 check digit (or check character, actually). The check character will be one of 31 alphanumeric
+ characters, `0123456789ABCDEFHJKLMNPRSTUVWXY` (the letters `G, I, O, Q and Z` are excluded to avoid possible confusion with
+ digit characters).
+
+A henkilötunnus must meet all of the following rules:
+* The value may not be null, empty or all whitespace characters.
+* The value must be 11 characters in length.
+* The date of birth and individual number elements (DDMMYY and ZZZ elements) must be ASCII digits ('0'-'9').
+* The century indicator must be `+, -, U, V, W, X, Y, A, B, C, D, E or F`.
+* The date of birth, after deriving the century of birth from the century indicator, must be a valid date between January 1, 1800 and December 31, 2099.
+* The individual number must be greater than or equal to 002.
+* The check character must be a valid modulus 31 check character calculated from the date of birth and the individual number.
+
+Example values:
+* 230526-034N - date of birth May 23, 1926, gender = female, permanent resident
+* 160117A275C - date of birth January 16, 2017, gender = male, permanent resident
+* 020508D929B - date of birth May 2, 2008, gender = male, temporary/test value
+
+See [Wikipedia - National identification number - Finland](https://en.wikipedia.org/wiki/National_identification_number#Finland)
+for more info. Also see [Henkilötunnus](https://kenda.fi/tools/hetu/) for tools to generate test henkilötunnus values.
 
 ## IsKennitala
 

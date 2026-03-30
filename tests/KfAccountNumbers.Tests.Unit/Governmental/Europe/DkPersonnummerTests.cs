@@ -348,8 +348,8 @@ public class DkPersonnummerTests
       BinaryGender expectedGender)
    {
       // Arrange.
-      var personnummer = $"{Valid10CharacterPersonnummer[..9]}{genderChar}";
-      var sut = new DkPersonnummer(personnummer);
+      var value = $"{Valid10CharacterPersonnummer[..9]}{genderChar}";
+      var sut = new DkPersonnummer(value);
 
       // Act/assert.
       sut.Gender.Should().Be(expectedGender);
@@ -418,10 +418,10 @@ public class DkPersonnummerTests
    public void DkPersonnummer_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      DkPersonnummer personnummer = null!;
+      DkPersonnummer sut = null!;
 
       // Act.
-      String str = personnummer;
+      String str = sut;
 
       // Act/assert.
       str.Should().NotBeNull();
@@ -432,10 +432,10 @@ public class DkPersonnummerTests
    public void DkPersonnummer_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      DkPersonnummer personnummer = null!;
+      DkPersonnummer sut = null!;
 
       // Act.
-      var str = (String)personnummer;
+      var str = (String)sut;
 
       // Act/assert.
       str.Should().NotBeNull();
