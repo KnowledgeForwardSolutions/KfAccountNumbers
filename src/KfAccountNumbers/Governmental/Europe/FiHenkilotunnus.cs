@@ -8,7 +8,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A Danish personnummer is a ten-digit number structured as DDMMYYCZZZQ,
+///      A Finnish henkilötunnus is a ten-digit number structured as DDMMYYCZZZQ,
 ///      with the following elements:
 ///      <list type="bullet">
 ///         <item>
@@ -212,8 +212,9 @@ public record FiHenkilotunnus
    }
 
    /// <summary>
-   ///   The person's gender, as indicated by the trailing (right-most) digit.
-   ///   Odd numbers = Male; even numbers = Female.
+   ///   The person's gender, as indicated by the individual number element
+   ///   (character positions 7-9, zero-based). Odd numbers = Male; even
+   ///   numbers = Female.
    /// </summary>
    public BinaryGender Gender => Value[GenderOffset] % 2 == 0       // This works because the ASCII character values for digits have the same odd/even pattern
       ? BinaryGender.Female
@@ -226,7 +227,7 @@ public record FiHenkilotunnus
    /// </summary>
    /// <remarks>
    ///   The individual number element (characters 7-9, zero-based) determine
-   ///   the identifier type. 002-800 are issued to permanent residents and
+   ///   the identifier type. 002-899 are issued to permanent residents and
    ///   900-999 are used for temporary identifiers.
    /// </remarks>
    public FiIdentifierType IdentifierType => Value[IndividualNumberStartOffset] == Chars.DigitNine

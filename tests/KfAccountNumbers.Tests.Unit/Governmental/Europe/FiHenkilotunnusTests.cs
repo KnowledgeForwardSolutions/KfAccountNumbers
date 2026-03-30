@@ -498,7 +498,7 @@ public class FiHenkilotunnusTests
 
    [Theory]
    [InlineData(ValidHenkilotunnus)]
-   [InlineData(AltValidTestHenkilotunnus)]
+   [InlineData(AltValidHenkilotunnus)]
    [InlineData(ValidTestHenkilotunnus)]
    [InlineData(AltValidTestHenkilotunnus)]
    public void FiHenkilotunnus_Value_ShouldReturnValidatedHenkilotunnus(String value)
