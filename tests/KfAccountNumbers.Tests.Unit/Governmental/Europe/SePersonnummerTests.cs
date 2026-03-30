@@ -583,8 +583,8 @@ public class SePersonnummerTests
    {
       // Arrange.
       var birthSerialNumber = $"54{digit}";
-      var personnummer = GetPersonnummerWithValidCheckDigit(birthSerialNumber: birthSerialNumber);
-      var sut = new SePersonnummer(personnummer);
+      var value = GetPersonnummerWithValidCheckDigit(birthSerialNumber: birthSerialNumber);
+      var sut = new SePersonnummer(value);
 
       // Act/assert.
       sut.Gender.Should().Be(expectedGender);

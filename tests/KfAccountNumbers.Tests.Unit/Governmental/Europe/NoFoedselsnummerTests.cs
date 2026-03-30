@@ -536,8 +536,8 @@ public class NoFoedselsnummerTests
       BinaryGender expectedGender)
    {
       // Arrange.
-      var personnummer = GetFoedselsnummerWithValidCheckDigits(individualNumber: individualNumber);
-      var sut = new NoFoedselsnummer(personnummer);
+      var value = GetFoedselsnummerWithValidCheckDigits(individualNumber: individualNumber);
+      var sut = new NoFoedselsnummer(value);
 
       // Act/assert.
       sut.Gender.Should().Be(expectedGender);

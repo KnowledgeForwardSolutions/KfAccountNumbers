@@ -348,8 +348,8 @@ public class DkPersonnummerTests
       BinaryGender expectedGender)
    {
       // Arrange.
-      var personnummer = $"{Valid10CharacterPersonnummer[..9]}{genderChar}";
-      var sut = new DkPersonnummer(personnummer);
+      var value = $"{Valid10CharacterPersonnummer[..9]}{genderChar}";
+      var sut = new DkPersonnummer(value);
 
       // Act/assert.
       sut.Gender.Should().Be(expectedGender);

@@ -195,6 +195,44 @@ public record FiHenkilotunnus
    }
 
    /// <summary>
+   ///   The person's date of birth, derived from the first six digits in DDMMYY
+   ///   format and the exact century of birth derived from the century indicator.
+   /// </summary>
+   public DateOnly DateOfBirth
+   {
+      get
+      {
+#pragma warning disable IDE0008 // Use explicit type
+         var (day, month, year) = GetDayMonthYear(Value);
+#pragma warning restore IDE0008 // Use explicit type
+
+         return new DateOnly(year, month, day);
+      }
+   }
+
+   /// <summary>
+   ///   The person's gender, as indicated by the trailing (right-most) digit.
+   ///   Odd numbers = Male; even numbers = Female.
+   /// </summary>
+   public BinaryGender Gender => Value[GenderOffset] % 2 == 0       // This works because the ASCII character values for digits have the same odd/even pattern
+      ? BinaryGender.Female
+      : BinaryGender.Male;
+
+   /// <summary>
+   ///   The type of henkilötunnus identifier represented by this instance,
+   ///   indicating if this is identifier assigned to a permanent resident or
+   ///   a temporary identifier.
+   /// </summary>
+   /// <remarks>
+   ///   The individual number element (characters 7-9, zero-based) determine
+   ///   the identifier type. 002-800 are issued to permanent residents and
+   ///   900-999 are used for temporary identifiers.
+   /// </remarks>
+   public FiIdentifierType IdentifierType => Value[IndividualNumberStartOffset] == Chars.DigitNine
+      ? FiIdentifierType.Temporary
+      : FiIdentifierType.PermanentResident;
+
+   /// <summary>
    ///   The validated henkilötunnus.
    /// </summary>
    public String Value { get; private init; }

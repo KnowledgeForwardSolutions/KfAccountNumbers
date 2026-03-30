@@ -22,7 +22,7 @@ public class FiHenkilotunnusTests
 
       var temp = dateOfBirth + individualNumber;
       var sum = 0;
-      foreach(var ch in temp)
+      foreach (var ch in temp)
       {
          sum *= 10;
          var num = ch - Chars.DigitZero;
@@ -361,6 +361,153 @@ public class FiHenkilotunnusTests
          .Should().Throw<KfValidationException<FiHenkilotunnusValidationResult>>()
          .WithMessage(Messages.FiHenkilotunnusInvalidDateOfBirth + "*")
          .And.ValidationResult.Should().Be(FiHenkilotunnusValidationResult.InvalidDateOfBirth);
+   }
+
+   #endregion
+
+   #region DateOfBirth Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData("010100", '+', "18000101")]      // January 1, 1800
+   [InlineData("311299", '+', "18991231")]      // December 31, 1899
+
+   [InlineData("010100", '-', "19000101")]      // January 1, 1900
+   [InlineData("311299", '-', "19991231")]      // December 31, 1999
+   [InlineData("010100", 'U', "19000101")]      // January 1, 1900
+   [InlineData("311299", 'U', "19991231")]      // December 31, 1999
+   [InlineData("010100", 'V', "19000101")]      // January 1, 1900
+   [InlineData("311299", 'V', "19991231")]      // December 31, 1999
+   [InlineData("010100", 'W', "19000101")]      // January 1, 1900
+   [InlineData("311299", 'W', "19991231")]      // December 31, 1999
+   [InlineData("010100", 'X', "19000101")]      // January 1, 1900
+   [InlineData("311299", 'X', "19991231")]      // December 31, 1999
+   [InlineData("010100", 'Y', "19000101")]      // January 1, 1900
+   [InlineData("311299", 'Y', "19991231")]      // December 31, 1999
+
+   [InlineData("010100", 'A', "20000101")]      // January 1, 2000
+   [InlineData("311299", 'A', "20991231")]      // December 31, 2099
+   [InlineData("010100", 'B', "20000101")]      // January 1, 2000
+   [InlineData("311299", 'B', "20991231")]      // December 31, 2099
+   [InlineData("010100", 'C', "20000101")]      // January 1, 2000
+   [InlineData("311299", 'C', "20991231")]      // December 31, 2099
+   [InlineData("010100", 'D', "20000101")]      // January 1, 2000
+   [InlineData("311299", 'D', "20991231")]      // December 31, 2099
+   [InlineData("010100", 'E', "20000101")]      // January 1, 2000
+   [InlineData("311299", 'E', "20991231")]      // December 31, 2099
+   [InlineData("010100", 'F', "20000101")]      // January 1, 2000
+   [InlineData("311299", 'F', "20991231")]      // December 31, 2099
+
+   [InlineData("310104", '+', "18040131")]      // maximum days for January, any year
+   [InlineData("280201", '-', "19010228")]      // maximum days for February, non-leap year
+   [InlineData("290204", 'U', "19040229")]      // maximum days for February, leap year
+   [InlineData("290200", 'A', "20000229")]      // maximum days for February, leap year (2000 is leap-year)
+   [InlineData("310304", '+', "18040331")]      // maximum days for March, any year
+   [InlineData("300404", 'V', "19040430")]      // maximum days for April, any year
+   [InlineData("310504", 'B', "20040531")]      // maximum days for May, any year
+   [InlineData("300604", '+', "18040630")]      // maximum days for June, any year
+   [InlineData("310704", 'W', "19040731")]      // maximum days for July, any year
+   [InlineData("310804", 'C', "20040831")]      // maximum days for August, any year
+   [InlineData("300904", '+', "18040930")]      // maximum days for September, any year
+   [InlineData("311004", 'X', "19041031")]      // maximum days for October, any year
+   [InlineData("301104", 'D', "20041130")]      // maximum days for November, any year
+   [InlineData("311204", '+', "18041231")]      // maximum days for December, any year
+   public void FiHenkilotunnus_DateOfBirth_ShouldReturnExpectedValue(
+      String dateOfBirth,
+      Char centuryIndicator,
+      String expectedDateOfBirth)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(dateOfBirth, centuryIndicator);
+      var sut = new FiHenkilotunnus(value);
+      var expected = DateOnly.ParseExact(
+         expectedDateOfBirth,
+         "yyyyMMdd",
+         System.Globalization.CultureInfo.InvariantCulture);
+
+      // Act/assert.
+      sut.DateOfBirth.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Gender Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData('0', BinaryGender.Female)]
+   [InlineData('1', BinaryGender.Male)]
+   [InlineData('2', BinaryGender.Female)]
+   [InlineData('3', BinaryGender.Male)]
+   [InlineData('4', BinaryGender.Female)]
+   [InlineData('5', BinaryGender.Male)]
+   [InlineData('6', BinaryGender.Female)]
+   [InlineData('7', BinaryGender.Male)]
+   [InlineData('8', BinaryGender.Female)]
+   [InlineData('9', BinaryGender.Male)]
+   public void FiHenkilotunnus_Gender_ShouldReturnExpectedValue(
+      Char genderChar,
+      BinaryGender expectedGender)
+   {
+      // Arrange.
+      var individualNumber = $"12{genderChar}";
+      var value = GetHenkilotunnusWithValidCheckDigit(individualNumber: individualNumber);
+      var sut = new FiHenkilotunnus(value);
+
+      // Act/assert.
+      sut.Gender.Should().Be(expectedGender);
+   }
+
+   #endregion
+
+   #region IdentifierType Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData('0', FiIdentifierType.PermanentResident)]
+   [InlineData('1', FiIdentifierType.PermanentResident)]
+   [InlineData('2', FiIdentifierType.PermanentResident)]
+   [InlineData('3', FiIdentifierType.PermanentResident)]
+   [InlineData('4', FiIdentifierType.PermanentResident)]
+   [InlineData('5', FiIdentifierType.PermanentResident)]
+   [InlineData('6', FiIdentifierType.PermanentResident)]
+   [InlineData('7', FiIdentifierType.PermanentResident)]
+   [InlineData('8', FiIdentifierType.PermanentResident)]
+   [InlineData('9', FiIdentifierType.Temporary)]
+   public void FiHenkilotunnus_IdentifierType_ShouldReturnExpectedValue(
+      Char leadingIndividualNumberChar,
+      FiIdentifierType expectedIdentifierType)
+   {
+      // Arrange.
+      var individualNumber = $"{leadingIndividualNumberChar}12";
+      var value = GetHenkilotunnusWithValidCheckDigit(individualNumber: individualNumber);
+      var sut = new FiHenkilotunnus(value);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(expectedIdentifierType);
+   }
+
+   #endregion
+
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(ValidHenkilotunnus)]
+   [InlineData(AltValidTestHenkilotunnus)]
+   [InlineData(ValidTestHenkilotunnus)]
+   [InlineData(AltValidTestHenkilotunnus)]
+   public void FiHenkilotunnus_Value_ShouldReturnValidatedHenkilotunnus(String value)
+   {
+      // Arrange.
+      var sut = new FiHenkilotunnus(value);
+
+      // Act/assert.
+      sut.Value.Should().Be(value);
    }
 
    #endregion
