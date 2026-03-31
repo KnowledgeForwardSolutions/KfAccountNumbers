@@ -109,6 +109,28 @@ public class NlBurgerservicenummerTests
       "1234.56-782",
    ];
 
+   #region Check Digit Algorithm Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   // Values designed to produce all possible check digits 0-9
+                                 // Weights: 9 8 7 6 5 4 3 2 -1 
+   [InlineData("110000006")]     //          9 8             -6 = 11, mod 11 = 0             
+   [InlineData("101000005")]     //          9   7           -5 
+   [InlineData("100100004")]     //          9     6         -4
+   [InlineData("100010003")]     //          9       5       -3
+   [InlineData("100001002")]     //          9         4     -2
+   [InlineData("100000101")]     //          9           3   -1
+   [InlineData("110010000")]     //          9 8   6          0
+   [InlineData("100110009")]     //          9     6 5       -9
+   [InlineData("010110008")]     //            8   6 5       -8
+   [InlineData("001110007")]     //              7 6 5       -7
+   public void NlBurgerservicenummer_CheckDigitAlgorithm_ShouldValidateAllPossibleCheckDigits(String value)
+      => NlBurgerservicenummer.Validate(value).Should().Be(NlBurgerservicenummerValidationResult.ValidationPassed);
+
+   #endregion
+
    #region Constructor Tests
    // ==========================================================================
    // ==========================================================================
