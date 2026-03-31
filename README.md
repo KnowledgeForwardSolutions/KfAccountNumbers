@@ -250,15 +250,15 @@ See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/
 The `NlBurgerservicenummer` type represents a Dutch Burgerservicenummer (BSN), issued to all residents.
 
 A Burgerservicenummer consists of nine digits, with no intelligence or encoded attributes other than a trailing
-check digit calcuulated using a variation of the modulus 11 algorithm (the 11-proef algorithm). The number is
+check digit calculated using a variation of the modulus 11 algorithm (the 11-proef algorithm). The number is
 typically displayed as nine consecutive digits or formatted as NNNN-NN-NNN.
 
 A valid burgerservicenummer must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
 * The value must be either nine characters (without separators) or eleven characters (with separators) in length.
-* All characters (except the optional separator character) must be ASCII digits (0-9).
+* All characters (except the optional separator characters) must be ASCII digits (0-9).
 * The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as a separator.
-* If separator characters are present, they must be located in character positions 5 and 8 (zero-based) and the same
+* If separator characters are present, they must be located in character positions 4 and 7 (zero-based) and the same
  non-digit character must be used in both positions.
 * The trailing (right-most) character must be a valid modulus 11 (11-proef) check digit.
 

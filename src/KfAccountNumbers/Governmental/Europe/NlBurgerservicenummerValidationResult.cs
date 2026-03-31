@@ -35,7 +35,7 @@ public enum NlBurgerservicenummerValidationResult
 
    /// <summary>
    ///   Eleven character value contains a digit character (0-9) in a separator
-   ///   location (positions 5 and 8, zero-based). A valid separator may be any
+   ///   location (positions 4 and 7, zero-based). A valid separator may be any
    ///   character other than a digit.
    ///   - or -
    ///   Two different non-digit characters were used as separator characters.
