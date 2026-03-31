@@ -14,6 +14,23 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      displayed as nine consecutive digits or formatted as NNNN-NN-NNN.
 ///   </para>
 ///   <para>
+///      Example values:
+///      <list type="bullet">
+///         <item>
+///            <term>123456782</term>
+///            <description>
+///               Nine digits, no formatting characters
+///            </description>
+///         </item>
+///         <item>
+///            <term>1112-22-333</term>
+///            <description>
+///               Nine digits with formatting characters
+///            </description>
+///         </item>
+///      </list>
+///   </para>
+///   <para>
 ///      When creating a new <see cref="NlBurgerservicenummer"/>, the following
 ///      validation rules are applied:
 ///      <list type="bullet">
@@ -56,7 +73,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      normally used for modulus 11 check digits.
 ///   </para>
 ///   <para>
-///      See https://nl.wikipedia.org/wiki/Burgerservicenummer for more info.
+///      See https://nl.wikipedia.org/wiki/Burgerservicenummer (Dutch) for more info.
 ///   </para>
 /// </remarks>
 [JsonConverter(typeof(NlBurgerservicenummerJsonConverter))]
@@ -237,7 +254,7 @@ public record NlBurgerservicenummer
    private static NlBurgerservicenummerValidationResult ValidateCheckDigit(ReadOnlySpan<Char> burgerservicenummer)
    {
       var sum = 0;
-      var weight = 9;
+      var weight = 9;      // Weights applied left to right: 9, 8, 7, 6, 5, 4, 3, 2
       var isFormatted = IsFormatted(burgerservicenummer);
       var processLength = burgerservicenummer.Length - 1;      // Handle check digit separately
 
@@ -264,7 +281,7 @@ public record NlBurgerservicenummer
          return NlBurgerservicenummerValidationResult.InvalidCharacter;
       }
 
-      sum -= checkDigit;
+      sum -= checkDigit;      // Check digit weight = -1
 
       return sum % 11 == 0
          ? NlBurgerservicenummerValidationResult.ValidationPassed
