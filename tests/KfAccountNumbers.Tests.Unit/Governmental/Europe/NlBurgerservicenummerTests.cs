@@ -1,4 +1,4 @@
-// Ignore Spelling: Burgerservicenummer Kf
+// Ignore Spelling: Burgerservicenummer Deserialize Deserialization Json Kf
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -775,6 +775,104 @@ public class NlBurgerservicenummerTests
    [MemberData(nameof(InvalidSeparatorValues))]
    public void NlBurgerservicenummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasInvalidSeparator(String value)
       => NlBurgerservicenummer.Validate(value).Should().Be(NlBurgerservicenummerValidationResult.InvalidSeparator);
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void NlBurgerservicenummer_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new NlBurgerservicenummer(ValidBurgerservicenummer);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<NlBurgerservicenummer>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new NlBurgerservicenummer(AltValidFormattedBurgerservicenummer);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public NlBurgerservicenummer Burgerservicenummer { get; set; } = null!;
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { Burgerservicenummer = new NlBurgerservicenummer(AltValidBurgerservicenummer) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"Burgerservicenummer\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"Burgerservicenummer\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.Burgerservicenummer.Should().BeNull();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_JsonDeserialization_ShouldThrowKfValidationException_WhenBurgerservicenummerIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"Burgerservicenummer\":\"100612-707079\"}";  // Invalid length
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should()
+         .ThrowExactly<KfValidationException<NlBurgerservicenummerValidationResult>>()
+         .WithMessage(Messages.NlBurgerservicenummerInvalidLength + "*")
+         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.InvalidLength);
+   }
 
    #endregion
 }

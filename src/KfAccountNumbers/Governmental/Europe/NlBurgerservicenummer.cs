@@ -1,4 +1,4 @@
-// Ignore Spelling: Burgerservicenummer
+// Ignore Spelling: Burgerservicenummer Json
 
 namespace KfAccountNumbers.Governmental.Europe;
 
@@ -59,6 +59,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      See https://nl.wikipedia.org/wiki/Burgerservicenummer for more info.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(NlBurgerservicenummerJsonConverter))]
 public record NlBurgerservicenummer
 {
    private const Int32 UnformattedLength = 9;
@@ -282,4 +283,21 @@ public record NlBurgerservicenummer
 
       return s1 == s2 && !s1.IsAsciiDigit();
    }
+}
+
+public class NlBurgerservicenummerJsonConverter : JsonConverter<NlBurgerservicenummer>
+{
+   public override NlBurgerservicenummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new NlBurgerservicenummer(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, NlBurgerservicenummer value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }
