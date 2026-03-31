@@ -118,6 +118,12 @@ public record NlBurgerservicenummer
    /// </summary>
    public String Value { get; private init; }
 
+   public static implicit operator String(NlBurgerservicenummer burgerservicenummer)
+      => burgerservicenummer?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator NlBurgerservicenummer(String? burgerservicenummer) => new(burgerservicenummer);
+
    /// <summary>
    ///   Check the <paramref name="burgerservicenummer"/> to determine if it contains a
    ///   valid Dutch burgerservicenummer.

@@ -247,7 +247,7 @@ public record DkPersonnummer
    public String Value { get; private init; }
 
    public static implicit operator String(DkPersonnummer personnummer)
-      => personnummer?.Value ?? String.Empty;      // Handle null personnummer object gracefully by returning empty string
+      => personnummer?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
 
    // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
    public static explicit operator DkPersonnummer(String? personnummer) => new(personnummer);

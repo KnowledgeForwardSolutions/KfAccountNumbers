@@ -492,7 +492,7 @@ public class DkPersonnummerTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidNonDigitCharacter(String value)
+   public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(String value)
       => FluentActions
          .Invoking(() => _ = (DkPersonnummer)value)
          .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
