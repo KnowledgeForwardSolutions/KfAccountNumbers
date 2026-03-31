@@ -403,6 +403,51 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NL Burgerservicenummer may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string NlBurgerservicenummerEmpty {
+            get {
+                return ResourceManager.GetString("NlBurgerservicenummerEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NL Burgerservicenummer contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string NlBurgerservicenummerInvalidCharacter {
+            get {
+                return ResourceManager.GetString("NlBurgerservicenummerInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NL Burgerservicenummer must have a valid modulus 11 (11-proef) check digit in the trailing (right-most) position.
+        /// </summary>
+        internal static string NlBurgerservicenummerInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("NlBurgerservicenummerInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NL Burgerservicenummer must have length 9 (without separator characters) or 11 (with separator characters).
+        /// </summary>
+        internal static string NlBurgerservicenummerInvalidLength {
+            get {
+                return ResourceManager.GetString("NlBurgerservicenummerInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NL Burgerservicenummer separator character may not be a digit and the same non-digit character must be present in both separator character locations.
+        /// </summary>
+        internal static string NlBurgerservicenummerInvalidSeparator {
+            get {
+                return ResourceManager.GetString("NlBurgerservicenummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to NO Foedselsnummer may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string NoFoedselsnummerEmpty {

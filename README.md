@@ -260,7 +260,7 @@ A valid burgerservicenummer must meet all of the following rules:
 * The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as a separator.
 * If separator characters are present, they must be located in character positions 5 and 8 (zero-based) and the same
  non-digit character must be used in both positions.
-* The trailing (right-most) character must be a valid modulus 11 check digit.
+* The trailing (right-most) character must be a valid modulus 11 (11-proef) check digit.
 
 Example values:
 * 123456782
