@@ -8,11 +8,10 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A burgerservicenummer is a nine-digit number with no intelligent or
-///      encoded attributes other than a trailing check digit calculated using
-///      a variation of the modulus 11 algorithm (the 11-proef algorithm). The
-///      number is typically displayed as nine consecutive digits or formatted
-///      as NNNN-NN-NNN.
+///      A burgerservicenummer is a nine-digit number without embedded personal
+///      information or attributes other than a trailing check digit calculated
+///      using a variation of the modulus 11 algorithm. The number is typically
+///      displayed as nine consecutive digits or formatted as NNNN-NN-NNN.
 ///   </para>
 ///   <para>
 ///      When creating a new <see cref="NlBurgerservicenummer"/>, the following
@@ -46,11 +45,15 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <description>
 ///               The trailing (right-most) character position must be a valid
-///               check digit calculated using the 11-proef variation of the
-///               modulus 11 algorithm.
+///               check digit according to the variant modulus 11 algorithm.
 ///            </description>
 ///         </item>
 ///      </list>
+///   </para>
+///   <para>
+///      The variant modulus 11 algorithm used for burgerservicenummer assigns a
+///      weight of -1 to the check digit instead of the weight of 1 that is
+///      normally used for modulus 11 check digits.
 ///   </para>
 ///   <para>
 ///      See https://nl.wikipedia.org/wiki/Burgerservicenummer for more info.
@@ -123,6 +126,28 @@ public record NlBurgerservicenummer
 
    // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
    public static explicit operator NlBurgerservicenummer(String? burgerservicenummer) => new(burgerservicenummer);
+
+   /// <summary>
+   ///   Create a new <see cref="NlBurgerservicenummer"/> using the Result pattern.
+   /// </summary>
+   /// <param name="burgerservicenummer">
+   ///   String representation of a Dutch burgerservicenummer.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{NlBurgerservicenummer, NlBurgerservicenummerValidationResult}"/>.
+   ///   Will contain the new <see cref="NlBurgerservicenummer"/> if 
+   ///   <paramref name="burgerservicenummer"/> is valid or an
+   ///   <see cref="NlBurgerservicenummerValidationResult"/> that identifies
+   ///   the validation rule that was failed if <paramref name="burgerservicenummer"/> is 
+   ///   invalid.
+   /// </returns>
+   public static CreateResult<NlBurgerservicenummer, NlBurgerservicenummerValidationResult> Create(String? burgerservicenummer)
+   {
+      NlBurgerservicenummerValidationResult validationResult = Validate(burgerservicenummer);
+      return validationResult == NlBurgerservicenummerValidationResult.ValidationPassed
+         ? new NlBurgerservicenummer(burgerservicenummer, validationMode: ValidationMode.BypassValidation)
+         : validationResult;
+   }
 
    /// <summary>
    ///   Check the <paramref name="burgerservicenummer"/> to determine if it contains a

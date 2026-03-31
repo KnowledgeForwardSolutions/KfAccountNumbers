@@ -249,9 +249,9 @@ See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/
 
 The `NlBurgerservicenummer` type represents a Dutch Burgerservicenummer (BSN), issued to all residents.
 
-A Burgerservicenummer consists of nine digits, with no intelligence or encoded attributes other than a trailing
-check digit calculated using a variation of the modulus 11 algorithm (the 11-proef algorithm). The number is
-typically displayed as nine consecutive digits or formatted as NNNN-NN-NNN.
+A burgerservicenummer consists of nine digits, without embedded personal information or attributes other
+than a trailing check digit calculated using a variation of the modulus 11 algorithm. The number is
+typically displayed as nine consecutive digits (NNNNNNNNN) or formatted with separators (NNNN-NN-NNN).
 
 A valid burgerservicenummer must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
@@ -260,13 +260,16 @@ A valid burgerservicenummer must meet all of the following rules:
 * The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as a separator.
 * If separator characters are present, they must be located in character positions 4 and 7 (zero-based) and the same
  non-digit character must be used in both positions.
-* The trailing (right-most) character must be a valid modulus 11 (11-proef) check digit.
+* The trailing (right-most) character must be a valid check digit according to the variant modulus 11 algorithm.
 
 Example values:
 * 123456782
 * 1234-56-782
 
-See [Wikipedia - Citizen Service Number](https://nl.wikipedia.org/wiki/Burgerservicenummer) for more info.
+The variant modulus 11 algorithm used for burgerservicenummer assigns a weight of -1 to the check digit
+instead of the weight of 1 that is normally used for modulus 11 check digits.
+
+See [Wikipedia (Dutch) - Burgerservicenummer](https://nl.wikipedia.org/wiki/Burgerservicenummer) for more info.
 Also see [National ID Number Tool](https://nationalidnumber.com/burgerservicenummer-id) for tools to generate test BSN values.
 
 ## NoFoedselsnummer

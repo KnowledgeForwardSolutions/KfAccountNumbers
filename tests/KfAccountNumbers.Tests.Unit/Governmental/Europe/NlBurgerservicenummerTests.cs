@@ -1,5 +1,8 @@
 // Ignore Spelling: Burgerservicenummer Kf
 
+#pragma warning disable IDE0008 // Use explicit type
+#pragma warning disable IDE0058 // Expression value is never used
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class NlBurgerservicenummerTests
@@ -386,6 +389,8 @@ public class NlBurgerservicenummerTests
       (sut1 == sut2).Should().BeTrue();
    }
 
+   #endregion
+
    #region Inequality Operator Tests
    // ==========================================================================
    // ==========================================================================
@@ -424,6 +429,153 @@ public class NlBurgerservicenummerTests
    }
 
    #endregion
+
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidBurgerservicenummerValues))]
+   public void NlBurgerservicenummer_Create_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expectedValue = new NlBurgerservicenummer(value);
+
+      // Act.
+      var result = NlBurgerservicenummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSeparatorValues))]
+   public void NlBurgerservicenummer_Create_ShouldCreateInstance_WhenValueHasValidSeparator(String value)
+   {
+      // Arrange.
+      var expectedValue = new NlBurgerservicenummer(value);
+
+      // Act.
+      var result = NlBurgerservicenummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void NlBurgerservicenummer_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
+   {
+      // Act.
+      var result = NlBurgerservicenummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(NlBurgerservicenummerValidationResult.Empty);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void NlBurgerservicenummer_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   {
+      // Act.
+      var result = NlBurgerservicenummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(NlBurgerservicenummerValidationResult.InvalidLength);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void NlBurgerservicenummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+   {
+      // Act.
+      var result = NlBurgerservicenummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(NlBurgerservicenummerValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void NlBurgerservicenummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Act.
+      var result = NlBurgerservicenummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(NlBurgerservicenummerValidationResult.InvalidCheckDigit);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void NlBurgerservicenummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(String value)
+   {
+      // Act.
+      var result = NlBurgerservicenummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(NlBurgerservicenummerValidationResult.InvalidSeparator);
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void NlBurgerservicenummer_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidBurgerservicenummer);
+      var sut2 = new NlBurgerservicenummer(ValidBurgerservicenummer);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidBurgerservicenummer);
+      var sut2 = new NlBurgerservicenummer(AltValidBurgerservicenummer);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 9 and 11 character versions for same person should still be equal.
+      var sut1 = new NlBurgerservicenummer(ValidBurgerservicenummer);
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
 
    #endregion
 
