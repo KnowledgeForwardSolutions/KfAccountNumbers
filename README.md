@@ -42,7 +42,8 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Europe
         - [DkPersonnummer](#dkpersonnummer)
         - [FiHenkilotunnus](#fihenkilotunnus)
-        - [IsKennitala](#iskennitala) 
+        - [IsKennitala](#iskennitala)
+        - [NlBurgerservicenummer](#nlburgerservicenummer)
         - [NoFoedselsnummer](#nofoedselsnummer) 
         - [SePersonnummer](#sepersonnummer)
 	- NorthAmerica
@@ -82,9 +83,9 @@ personnummer is often informally called a CPR-nummer.
 A Danish personnummer is a ten-digit number structured as DDMMYYSSSS, with the following elements:
 * DDMMYY - the person's date of birth in DDMMYY format.
 * SSSS - a four digit sequence number used to differentiate between two persons born on the same date.
- The sequence number also encodes additional information. The first digit is used to indicate the century
- of birth (see below) and the final digit indicates the person's gender, with even numbers for females
- and odd numbers for males.
+  The sequence number also encodes additional information. The first digit is used to indicate the century
+  of birth (see below) and the final digit indicates the person's gender, with even numbers for females
+  and odd numbers for males.
 
 A Danish personnummer may be formatted as a string of 10 consecutive digits (DDMMYYSSSS) or as 11 characters with
 a dash ('-') as a separator character separating the date of birth and the remaining four digits (DDMMYY-SSSS).
@@ -95,7 +96,7 @@ A Danish personnummer must meet all of the following rules:
 * All characters other than the optional separator character must be ASCII digits ('0'-'9').
 * The separator character, if included, must be a dash ('-').
 * The date of birth, after deriving the century from the century indicator must be a valid date
- between January 1, 1858 and December 31, 2057.
+  between January 1, 1858 and December 31, 2057.
 
 The trailing (right-most) digit of the personnummer was originally a modulus 11 check digit. However, in 2007
 the use of the check digit was discontinued since available numbers for several dates were exhausted
@@ -133,12 +134,12 @@ A Finnish henkilötunnus is an 11 character value structured as DDMMYYCZZZQ with
 * DDMMYY - the person's date of birth in DDMMYY format.
 * C - the century indicator, with `+` indicating 1800s, `-, U, V, W, X or Y` indicating 1900s and `A, B, C, D, E, F` indicating 2000s.
 * ZZZ - a three digit individual number used to differentiate between two persons born on the same date. Odd individual numbers
- indicate males and even numbers indicate females. Values from 002-899 indicate persons born in Finland or permanent residents
- and values from 900-999 indicate a temporary value (for example, a hospital patient where the official henkilötunnus is unknown).
- Individual numbers less than 002 are not valid.
+  indicate males and even numbers indicate females. Values from 002-899 indicate persons born in Finland or permanent residents
+  and values from 900-999 indicate a temporary value (for example, a hospital patient where the official henkilötunnus is unknown).
+  Individual numbers less than 002 are not valid.
 * Q - a modulus 31 check digit (or check character, actually). The check character will be one of 31 alphanumeric
- characters, `0123456789ABCDEFHJKLMNPRSTUVWXY` (the letters `G, I, O, Q and Z` are excluded to avoid possible confusion with
- digit characters).
+  characters, `0123456789ABCDEFHJKLMNPRSTUVWXY` (the letters `G, I, O, Q and Z` are excluded to avoid possible confusion with
+  digit characters).
 
 A henkilötunnus must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
@@ -166,9 +167,9 @@ to an individual (Einstaklingur) or to a company (Fyrirtæki).
 
 An Icelandic kennitala is a ten-digit number structured as DDMMYYRRPC, with the following elements:
 * DDMMYY - the person's date of birth (for individuals) or the date of registration (for companies) in DDMMYY format.
- The only difference between an Einstaklingur kennitala and a Fyrirtæki kennitala is that 40 is added to the day
- component of the date of birth for the Fyrirtæki kennitala (i.e. 130585 becomes 530585). Day values in the range
- 41-71 (inclusive) indicate a Fyrirtæki kennitala.
+  The only difference between an Einstaklingur kennitala and a Fyrirtæki kennitala is that 40 is added to the day
+  component of the date of birth for the Fyrirtæki kennitala (i.e. 130585 becomes 530585). Day values in the range
+  41-71 (inclusive) indicate a Fyrirtæki kennitala.
 * RR - two random digits used to differentiate between two persons born on the same date.
 * P - a check digit calculated for the DDMMYYRR digits using a weighted modulus 11 algorithm.
 * C - a single digit indicating the century of birth. Valid digits are 9 (1900s) and 0 (2000s).
@@ -184,7 +185,7 @@ A valid kennitala must meet all of the following rules:
 * The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as a separator.
 * The century indicator must be the ASCII character nine ('9') or the ASCII character zero ('0').
 * The date of birth, after deriving the century from the century indicator (and if the value is a Fyrirtæki kennitala,
- after subtracting the Fyrirtæki kennitala offset) must be a valid date between January 1, 1900 and December 31, 2099.
+  after subtracting the Fyrirtæki kennitala offset) must be a valid date between January 1, 1900 and December 31, 2099.
 
 Example values:
 * 1205854369 - Einstaklingur, date of birth May 12, 1985, check digit = 6
@@ -244,6 +245,33 @@ be considered valid if it meets all of the other validation rules.
 See [Wikipedia - Unique Population Registry Code](https://en.wikipedia.org/wiki/Unique_Population_Registry_Code) and
 [Wikipedia - Clave Única de Registro de Población](https://es.wikipedia.org/wiki/Clave_%C3%9Anica_de_Registro_de_Poblaci%C3%B3n) for more info.
 
+## NlBurgerservicenummer
+
+The `NlBurgerservicenummer` type represents a Dutch Burgerservicenummer (BSN), issued to all residents.
+
+A burgerservicenummer consists of nine digits, without embedded personal information or attributes other
+than a trailing check digit calculated using a variation of the modulus 11 algorithm. The number is
+typically displayed as nine consecutive digits (NNNNNNNNN) or formatted with separators (NNNN-NN-NNN).
+
+A valid burgerservicenummer must meet all of the following rules:
+* The value may not be null, empty or all whitespace characters.
+* The value must be either nine characters (without separators) or eleven characters (with separators) in length.
+* All characters (except the optional separator characters) must be ASCII digits (0-9).
+* The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as a separator.
+* If separator characters are present, they must be located in character positions 4 and 7 (zero-based) and the same
+  non-digit character must be used in both positions.
+* The trailing (right-most) character must be a valid check digit according to the variant modulus 11 algorithm.
+
+Example values:
+* 123456782
+* 1234-56-782
+
+The variant modulus 11 algorithm used for burgerservicenummer assigns a weight of -1 to the check digit
+instead of the weight of 1 that is normally used for modulus 11 check digits.
+
+See [Wikipedia (Dutch) - Burgerservicenummer](https://nl.wikipedia.org/wiki/Burgerservicenummer) for more info.
+Also see [National ID Number Tool](https://nationalidnumber.com/burgerservicenummer-id) for tools to generate test BSN values.
+
 ## NoFoedselsnummer
 
 The `NoFoedselsnummer` type represents a Norwegian national identity number. Like a number of other countries, Norway has
@@ -256,16 +284,16 @@ indicates the exact type of identifier represented.
 
 Fødselsnummer and D-nummer are both 11 digit numbers formatted as DDMMYYIIICC, with the following elements:
 * DDMMYY - the person's date of birth in DDMMYY format. The only difference between a fødselsnummer and a D-nummer is
- that 40 is added to the day component of the person's date of birth (i.e. 130585 becomes 530585). Day values in the range
- 41-71 (inclusive) are considered D-nummers.
+  that 40 is added to the day component of the person's date of birth (i.e. 130585 becomes 530585). Day values in the range
+  41-71 (inclusive) are considered D-nummers.
 * III - three digit individual number. All three digits of the individual number are used to derive the century of the
- date of birth and the last digit of the individual number indicates the person's gender, with odd digits assigned to
- males and even digits assigned to females. See below for details on the derivation of the century of the date of birth.
+  date of birth and the last digit of the individual number indicates the person's gender, with odd digits assigned to
+  males and even digits assigned to females. See below for details on the derivation of the century of the date of birth.
 * CC - two separate check digits calculated using a weighted modulus 11 algorithm. The first check digit is calculated
- for the first nine digits (date of birth and individual number) and the second check digit is calculated for the date of
- birth, individual number and first check digit. The use of two different check digits drops the error rate encountered
- during data entry to approximately 1 in 100,000, a figure unattainable by single-digit check algorithms available when
- the fødselsnummer was introduced.
+  for the first nine digits (date of birth and individual number) and the second check digit is calculated for the date of
+  birth, individual number and first check digit. The use of two different check digits drops the error rate encountered
+  during data entry to approximately 1 in 100,000, a figure unattainable by single-digit check algorithms available when
+  the fødselsnummer was introduced.
 
 The 11 character value is sometimes formatted for greater readability by inserting a separator character, generally a
 space, between the date of birth and the individual number, i.e. DDMMYY IIICC.
@@ -276,7 +304,7 @@ A valid fødselsnummer or D-nummer must meet all of the following rules:
 * All characters (except the optional separator character) must be ASCII digits (0-9).
 * The optional separator character, if included, may not be an ASCII digit. Any non-digit character is allowed as a separator.
 * The date of birth, after deriving the century from the individual number (and if the value is a D-nummer,
- after subtracting the D-nummer offset) must be a valid date between January 1, 1854 and December 31, 2039.
+  after subtracting the D-nummer offset) must be a valid date between January 1, 1854 and December 31, 2039.
 * The trailing two characters must be valid weighted modulus 11 check digits.
 
 Example values:
@@ -319,15 +347,15 @@ between the two lengths are the number of digits used to represent the date of b
 eight. The format of personnummer and samordningsnummer are the same and consist of the following
 fields/sections:
 * The date of birth, represented by either six or eight digits (YYMMDD format or YYYYMMDD format). Originally six digits
- were used but the eight digit format was introduced in 1997.
+  were used but the eight digit format was introduced in 1997.
 * A separator character that separates the date of birth from the remaining four digits. The separator character is
- normally a dash ('-') but when a person turns 100 years old
- the dash is replaced by a plus sign ('+').
+  normally a dash ('-') but when a person turns 100 years old
+  the dash is replaced by a plus sign ('+').
 * A three digit birth serial number, issued serially as births are recorded for a particular date. The last digit of the
- birth serial number serves an additional purpose of indicating the person's gender, with odd digits assigned to males and
- even digits assigned to females.
+  birth serial number serves an additional purpose of indicating the person's gender, with odd digits assigned to males and
+  even digits assigned to females.
 * A single check digit calculated using the Luhn algorithm applied to the rightmost six digits of the date of birth and
- to the birth serial number.
+  to the birth serial number.
 
 The only difference between a personnummer and a samordningsnummer is that the samordningsnummer adds 60 to the day of a
 person's date of birth (i.e. 950123 would become 950183).
@@ -336,14 +364,14 @@ A valid personnummer or samordningsnummer must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
 * The value must be either 11 or 13 characters long.
 * For 11-character strings, the first 6 characters must represent a valid date in the format YYMMDD. For 13-character
- strings, the first 8 characters must represent a valid date in the format YYYYMMDD. Note that the validation specifically
- does **NOT** check for future dates, only that the date exists.
+  strings, the first 8 characters must represent a valid date in the format YYYYMMDD. Note that the validation specifically
+  does **NOT** check for future dates, only that the date exists.
 * The date of birth must be followed by a valid separator character. The separator must be either a dash (-) or a plus
- sign (+).
+  sign (+).
 * The separator must be followed by a three digit birth serial number.
 * The birth serial number must be followed by a  valid checksum calculated using the Luhn algorithm based on the six digit
- date of birth and the three-digit birth serial number. (The leading two digits of an eight digit date of birth are
- ignored.)
+  date of birth and the three-digit birth serial number. (The leading two digits of an eight digit date of birth are
+  ignored.)
 
 Note that the encoded date of birth may not be the person's actual date of birth. It is possible to run out of birth
 serial numbers for a particular day and in this case a day close to the actual date of birth is substituted in its stead.
@@ -374,15 +402,15 @@ digit date of birth and the other an eight digit date of birth.
 Example Values:
 * 890201-3286 - Personnummer, date of birth 890201, less than 100 years old, gender = female, check digit = 6.
 * 19890201-3286 - Personnummer, date of birth 19890201, less than 100 years old, gender = female, check digit = 6.
-(Note that the check digit is the same as for the six digit date of birth version because the two leading characters of
- an eight digit date of birth are ignored when calculating the check digit.)
+  (Note that the check digit is the same as for the six digit date of birth version because the two leading characters of
+  an eight digit date of birth are ignored when calculating the check digit.)
 * 811228+9874 - Personnummer, date of birth 811228, greater than 100 years old, gender = male, check digit = 4.
 * 890261-3283 - Samordningsnummer, date of birth 890261 (actual date of birth = 890201), less than 100 years old, gender =
- female, check digit = 3.
+  female, check digit = 3.
 * 19890261-3283 - Samordningsnummer, date of birth 19890261 (actual date of birth = 19890201), less than 100 years old, gender =
- female, check digit = 3.
+  female, check digit = 3.
 * 811288+9871 - Samordningsnummer, date of birth 811288 (actual date of birth = 811228), greater than 100 years old, gender =
- male, check digit = 1.
+  male, check digit = 1.
 
 See [Wikipedia - Personal identity number (Sweden)](https://en.wikipedia.org/wiki/Personal_identity_number_%28Sweden%29) for more info.
 
