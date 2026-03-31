@@ -534,7 +534,7 @@ public class NlBurgerservicenummerTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void NlBurgerservicenummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidCheckDigit(String value)
+   public void NlBurgerservicenummer_Create_ShouldReturnInvalidCheckDigitValidationResult_WhenValueHasInvalidCheckDigit(String value)
    {
       // Act.
       var result = NlBurgerservicenummer.Create(value);
@@ -790,12 +790,12 @@ public class NlBurgerservicenummerTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void NlBurgerservicenummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasInvalidCheckDigit(String value)
+   public void NlBurgerservicenummer_Validate_ShouldReturnInvalidCheckDigit_WhenValueHasInvalidCheckDigit(String value)
       => NlBurgerservicenummer.Validate(value).Should().Be(NlBurgerservicenummerValidationResult.InvalidCheckDigit);
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void NlBurgerservicenummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasInvalidSeparator(String value)
+   public void NlBurgerservicenummer_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(String value)
       => NlBurgerservicenummer.Validate(value).Should().Be(NlBurgerservicenummerValidationResult.InvalidSeparator);
 
    #endregion
