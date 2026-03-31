@@ -150,6 +150,37 @@ public record NlBurgerservicenummer
    }
 
    /// <summary>
+   ///   Format the burgerservicenummer using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then the default mask "____-__-___" will be used instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted burgerservicenummer.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the burgerservicenummer.
+   /// </remarks>
+   public String Format(String mask = "____-__-___") => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Get a string representation of the burgerservicenummer.
+   /// </summary>
+   /// <remarks>
+   ///   Will return the raw burgerservicenummer, without separator characters.
+   /// </remarks>
+   public override String ToString() => Value;
+
+   /// <summary>
    ///   Check the <paramref name="burgerservicenummer"/> to determine if it contains a
    ///   valid Dutch burgerservicenummer.
    /// </summary>
