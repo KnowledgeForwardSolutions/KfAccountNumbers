@@ -1,4 +1,4 @@
-// Ignore Spelling: Burgerservicenummer
+// Ignore Spelling: Burgerservicenummer Kf
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -10,6 +10,11 @@ public class NlBurgerservicenummerTests
    private const String AltValidFormattedBurgerservicenummer = "1112-22-333";
    private const String AltSeparatorCharBurgerservicenummer = "1638.97.426";
 
+   private static String GetRawBurgerservicenummer(String burgerservicenummer)
+      => burgerservicenummer.Length == 9
+         ? burgerservicenummer
+         : burgerservicenummer[..4] + burgerservicenummer[5..7] + burgerservicenummer[8..];
+
    public static TheoryData<String> ValidBurgerservicenummerValues =>
    [
       ValidBurgerservicenummer,
@@ -17,6 +22,14 @@ public class NlBurgerservicenummerTests
       ValidFormattedBurgerservicenummer,
       AltValidFormattedBurgerservicenummer,
       AltSeparatorCharBurgerservicenummer,
+   ];
+
+   public static TheoryData<String> ValidSeparatorValues =>
+   [
+      "1234-56-782",
+      "1234 56 782",
+      "1234.56.782",
+      "1234~56~782",
    ];
 
    public static TheoryData<String> InvalidLengthValues =>
@@ -93,6 +106,87 @@ public class NlBurgerservicenummerTests
       "1234.56-782",
    ];
 
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidBurgerservicenummerValues))]
+   public void NlBurgerservicenummer_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawBurgerservicenummer(value);
+
+      // Act.
+      var sut = new NlBurgerservicenummer(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSeparatorValues))]
+   public void NlBurgerservicenummer_Constructor_ShouldCreateInstance_WhenValueHasValidSeparator(String value)
+   {
+      // Arrange.
+      var expected = GetRawBurgerservicenummer(value);
+
+      // Act.
+      var sut = new NlBurgerservicenummer(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void NlBurgerservicenummer_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => new NlBurgerservicenummer(value))
+         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
+         .WithMessage(Messages.NlBurgerservicenummerEmpty + "*")
+         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void NlBurgerservicenummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => new NlBurgerservicenummer(value))
+         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
+         .WithMessage(Messages.NlBurgerservicenummerInvalidLength + "*")
+         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void NlBurgerservicenummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+      => FluentActions
+         .Invoking(() => new NlBurgerservicenummer(value))
+         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
+         .WithMessage(Messages.NlBurgerservicenummerInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void NlBurgerservicenummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
+      => FluentActions
+         .Invoking(() => new NlBurgerservicenummer(value))
+         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
+         .WithMessage(Messages.NlBurgerservicenummerInvalidCheckDigit + "*")
+         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.InvalidCheckDigit);
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void NlBurgerservicenummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
+      => FluentActions
+         .Invoking(() => new NlBurgerservicenummer(value))
+         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
+         .WithMessage(Messages.NlBurgerservicenummerInvalidSeparator + "*")
+         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.InvalidSeparator);
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -100,6 +194,11 @@ public class NlBurgerservicenummerTests
    [Theory]
    [MemberData(nameof(ValidBurgerservicenummerValues))]
    public void NlBurgerservicenummer_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
+      => NlBurgerservicenummer.Validate(value).Should().Be(NlBurgerservicenummerValidationResult.ValidationPassed);
+
+   [Theory]
+   [MemberData(nameof(ValidSeparatorValues))]
+   public void NlBurgerservicenummer_Validate_ShouldReturnValidationPassed_WhenValueHasValidSeparator(String value)
       => NlBurgerservicenummer.Validate(value).Should().Be(NlBurgerservicenummerValidationResult.ValidationPassed);
 
    [Theory]

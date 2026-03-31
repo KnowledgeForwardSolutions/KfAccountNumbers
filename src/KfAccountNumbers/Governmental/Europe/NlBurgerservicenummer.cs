@@ -67,6 +67,58 @@ public record NlBurgerservicenummer
    private const Int32 CheckDigitOffset = 1;    // Measured from end of value
 
    /// <summary>
+   ///   Initialize a new instance of the <see cref="NlBurgerservicenummer"/> class.
+   /// </summary>
+   /// <param name="burgerservicenummer">
+   ///   String representation of a Dutch burgerservicenummer.
+   /// </param>
+   /// <exception cref="KfValidationException{NlBurgerservicenummerValidationResult}">
+   ///   <paramref name="burgerservicenummer"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="burgerservicenummer"/> is not length 9 (or 11 if a separator
+   ///   character is used).
+   ///   - or -
+   ///   <paramref name="burgerservicenummer"/> contains a non-digit character in
+   ///   any position other than the separator locations.
+   ///   - or -
+   ///   <paramref name="burgerservicenummer"/> is 11 characters in length and has an
+   ///   ASCII digit ('0'-'9') in a separator location
+   ///   - or -
+   ///   <paramref name="burgerservicenummer"/> is 11 characters in length and has
+   ///   two different separator characters.
+   ///   - or -
+   ///   <paramref name="burgerservicenummer"/> contains an invalid modulus 11 (11-proef)
+   ///   check digit in the trailing (right-most) character position.
+   /// </exception>
+   public NlBurgerservicenummer(String? burgerservicenummer)
+      : this(burgerservicenummer, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private NlBurgerservicenummer(String? burgerservicenummer, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         NlBurgerservicenummerValidationResult validationResult = Validate(burgerservicenummer);
+         if (validationResult != NlBurgerservicenummerValidationResult.ValidationPassed)
+         {
+            throw validationResult.ToValidationException();
+         }
+      }
+
+      Value = GetRawValue(burgerservicenummer!);
+   }
+
+   /// <summary>
+   ///   The raw burgerservicenummer value.
+   /// </summary>
+   public String Value { get; private init; }
+
+   /// <summary>
    ///   Check the <paramref name="burgerservicenummer"/> to determine if it contains a
    ///   valid Dutch burgerservicenummer.
    /// </summary>
@@ -103,8 +155,17 @@ public record NlBurgerservicenummer
          return NlBurgerservicenummerValidationResult.InvalidSeparator;
       }
 
+
       return NlBurgerservicenummerValidationResult.ValidationPassed;
    }
+
+   private static String GetRawValue(String burgerservicenummer)
+      => burgerservicenummer.Length == UnformattedLength
+         ? burgerservicenummer
+         : String.Concat(
+            burgerservicenummer.AsSpan(0, FirstSeparatorOffset),
+            burgerservicenummer.AsSpan(FirstSeparatorOffset + 1, 2),
+            burgerservicenummer.AsSpan(SecondSeparatorOffset + 1));
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean IsFormatted(ReadOnlySpan<Char> burgerservicenummer)
