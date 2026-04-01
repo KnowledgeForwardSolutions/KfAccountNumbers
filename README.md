@@ -40,6 +40,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Asia (future)
 	- Australia (future)
 	- Europe
+        - [BeRijksregisternummer](#berijksregisternummer) 
         - [DkPersonnummer](#dkpersonnummer)
         - [FiHenkilotunnus](#fihenkilotunnus)
         - [IsKennitala](#iskennitala)
@@ -56,6 +57,62 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 * Utility
 
 # Business Objects
+
+## BeRijksregisternummer
+
+The `BeRijksregisternummer` type represents two possible national identification number used by Belgium.
+The Belgian National Register Number (Rijksregisternummer in Dutch, Numéro de registre national in French)
+is a unique identifier assigned to all persons (Belgian citizens and foreign residents) who are registered
+in Belgium's National Register (Rijksregister/Registre national). Persons who are not in the National
+register, but who still need a Belgian national identifier (such as cross-border workers) are assigned
+a BIS number (bis-nummer or numéro bis). The `BeRijksregisternummer` type includes an `IdentifierType`
+property which returns a `BEIdentifierType` enumeration value that indicates the exact type of identifier
+represented.
+
+A Belgian rijksregisternummer is an eleven-digit identifier structured as YYMMDDXXXCC with the following
+elements:
+* YYMMDD - the person's date of birth in YYMMDD format. A BIS number is differentiated from a
+  rijksregisternummer by the addition of a constant value (40 or 20, see below) to the month component
+  of the date of birth.
+* XXX - a three digit sequence number used to differentiate between persons born on the same date.
+  The sequence number also indicates gender with odd numbers for males and even numbers for females.
+* CC - two digit modulus 97 check sum calculated for the YYMMDD and XXX elements. The check sum
+  is also used to indicate century of birth. If CC is equal to the normal modulus 97 check sum then
+  the persons' century of birth is 1900-1999. If CC is equal to the modulus 97 check sum calculated by
+  first prefixing YYMMDDXXX with the digit 2 (i.e. 2YYMMDDXXX) then the person's century of birth
+  is 2000-2099.
+
+A Belgian rijksregisternummer may be formatted as a string of 11 consecutive digits (YYMMCCXXXCC) or
+as a 15 character string with characters separating the individual elements. YY.MM.DD-XXX.CC is the
+typical display format.
+
+A Belgian rijksregisternummer must meet all of the following rules:
+* The value may not be null, empty or all whitespace characters.
+* The value must be either 11 characters (without separators) or 15 characters (with separators) in length.
+* All characters other than the optional separator characters must be ASCII digits ('0'-'9').
+* The separator characters, if included, must not be ASCII digits ('0'-'9').
+* The two trailing (right-most) characters must be a valid modulus 97 check sum (taking into account
+  the possibility of a person born in the year 2000 or later).
+* The date of birth, after deriving the century of birth from the check sum and taking into account the
+  BIS number offset, must be a valid date between January 1, 1900 and December 31, 2099. **OR** the
+  date of birth may use zeros to indicate that some or all of the person's date of birth is unknown
+  (see below for more details).
+* The sequence number may not be 000 or 999.
+
+The date of birth can be adjusted in a variety of ways:
+* If the person's date of birth is incomplete, then the two digit year is used and zeros are used for
+  month and year (for example, 40.00.00-955.69).
+* If there are too many people with incomplete dates of birth for a particular year than can be represented
+  by a three digit sequence number (i.e. more than 499 males with incomplete dates of birth for the year 1940),
+  then 01 is used for the day of birth and the sequence number rolls over to 001 (ex. 40.00.01-001.33)
+* If the person's date of birth is unknown, then the constant 00.00.01 is used.
+* As noted above, if the value is a BIS number then 40 is added to the month component of the date of birth.
+* If the value is a BIS number **AND** the person's gender is unknown at the time the number is issued then
+  **20** is added to the month component of the date of birth.
+
+For cases of a BIS number for a person with an incomplete or unknown date of birth, `BeRijksregisternummer`
+stacks the appropriate rules. For example, 87.40.00-023.47 would be the BIS number for a person with an
+incomplete date of birth born in 1987.
 
 ## CaSocialInsuranceNumber
 
@@ -82,7 +139,7 @@ personnummer is often informally called a CPR-nummer.
 
 A Danish personnummer is a ten-digit number structured as DDMMYYSSSS, with the following elements:
 * DDMMYY - the person's date of birth in DDMMYY format.
-* SSSS - a four digit sequence number used to differentiate between two persons born on the same date.
+* SSSS - a four digit sequence number used to differentiate between persons born on the same date.
   The sequence number also encodes additional information. The first digit is used to indicate the century
   of birth (see below) and the final digit indicates the person's gender, with even numbers for females
   and odd numbers for males.
@@ -133,7 +190,7 @@ dates of birth.
 A Finnish henkilötunnus is an 11 character value structured as DDMMYYCZZZQ with the following elements:
 * DDMMYY - the person's date of birth in DDMMYY format.
 * C - the century indicator, with `+` indicating 1800s, `-, U, V, W, X or Y` indicating 1900s and `A, B, C, D, E, F` indicating 2000s.
-* ZZZ - a three digit individual number used to differentiate between two persons born on the same date. Odd individual numbers
+* ZZZ - a three digit individual number used to differentiate between persons born on the same date. Odd individual numbers
   indicate males and even numbers indicate females. Values from 002-899 indicate persons born in Finland or permanent residents
   and values from 900-999 indicate a temporary value (for example, a hospital patient where the official henkilötunnus is unknown).
   Individual numbers less than 002 are not valid.
@@ -170,7 +227,7 @@ An Icelandic kennitala is a ten-digit number structured as DDMMYYRRPC, with the 
   The only difference between an Einstaklingur kennitala and a Fyrirtæki kennitala is that 40 is added to the day
   component of the date of birth for the Fyrirtæki kennitala (i.e. 130585 becomes 530585). Day values in the range
   41-71 (inclusive) indicate a Fyrirtæki kennitala.
-* RR - two random digits used to differentiate between two persons born on the same date.
+* RR - two random digits used to differentiate between persons born on the same date.
 * P - a check digit calculated for the DDMMYYRR digits using a weighted modulus 11 algorithm.
 * C - a single digit indicating the century of birth. Valid digits are 9 (1900s) and 0 (2000s).
 
