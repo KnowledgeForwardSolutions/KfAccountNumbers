@@ -61,6 +61,60 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string BeRijksregisternummerEmpty {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string BeRijksregisternummerInvalidCharacter {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer must have a valid modulus 97 check sum in the two trailing (right-most) character positions.
+        /// </summary>
+        internal static string BeRijksregisternummerInvalidCheckDigits {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerInvalidCheckDigits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer must have a valid date of birth in YYMMDD format as the leading (left-most) digits.
+        /// </summary>
+        internal static string BeRijksregisternummerInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer must have length 11 (without separator characters) 15 (with separator characters).
+        /// </summary>
+        internal static string BeRijksregisternummerInvalidLength {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer with length 15 may not have digit characters (0-9) in character positions 2, 5, 8 or 12 (zero-based).
+        /// </summary>
+        internal static string BeRijksregisternummerInvalidSeparator {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CA Social Insurance Number may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string CaSinEmpty {
