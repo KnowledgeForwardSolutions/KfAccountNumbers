@@ -119,7 +119,7 @@ Example values:
 * 17110804680 - rijksregisternummer, date of birth November 11, 2017, gender = female, check digit calculation 97 - (2171108046 mod 97) = 97 - 17 = 80
 * 40 00 00 955-79 - rijksregisternummer, date of birth incomplete, year of birth = 1940, gender = male, check digit calculation 97 - (400000955 mod 97) = 97 - 18 = 79
 * 00 00 01 003-64 - rijksregisternummer, date of birth unknown, gender = male, check digit calculation 97 - (000001003 mod 97) = 97 - 33 = 64
-* 17.51.08-046.40 - BIS number, date of birth November 11, 1917, gender = female, check digit calculation 97 - (175108046C mod 97) = 97 - 57 = 40
+* 17.51.08-046.40 - BIS number, date of birth November 11, 1917, gender = female, check digit calculation 97 - (175108046 mod 97) = 97 - 57 = 40
 * 09 20 00 002 65 - BIS number, date of birth incomplete, year of birth 2009, gender unknown, check digit calculation 97 - (2092000002 mod 97) = 97 - 32 = 65
 
 See [Wikipedia (French) - Numéro de registre national](https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_registre_national)
