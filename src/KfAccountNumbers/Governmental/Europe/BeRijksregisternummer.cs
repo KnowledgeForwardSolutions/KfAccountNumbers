@@ -1,4 +1,4 @@
-// Ignore Spelling: Rijksregisternummer
+// Ignore Spelling: Rijksregisternummer Nummer
 
 namespace KfAccountNumbers.Governmental.Europe;
 
@@ -196,4 +196,145 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </remarks>
 public record BeRijksregisternummer
 {
+   /// <summary>
+   ///   Represents the month offset used to distinguish BIS-nummers from
+   ///   rijksregisternummers when the person's gender is known.
+   /// </summary>
+   /// <remarks>
+   ///   In Belgian identity numbers, a BIS-nummer is indicated by
+   ///   adding a constant to the month component of the date of birth.
+   /// </remarks>
+   public const Int32 BisNummerMonthOffset = 40;
+
+   /// <summary>
+   ///   Represents the month offset used to distinguish BIS-nummers from
+   ///   rijksregisternummers when the person's gender is unknown.
+   /// </summary>
+   /// <remarks>
+   ///   In Belgian identity numbers, a BIS-nummer is indicated by
+   ///   adding a constant to the month component of the date of birth.
+   /// </remarks>
+   public const Int32 BisNummerUnknownGenderMonthOffset = 20;
+
+   /// <summary>
+   ///   The latest year of birth supported by <see cref="BeRijksregisternummer"/>.
+   /// </summary>
+   public const Int32 MaximumValidYearOfBirth = 2099;
+
+   /// <summary>
+   ///   The earliest year of birth supported by <see cref="BeRijksregisternummer"/>.
+   /// </summary>
+   public const Int32 MinimumValidYearOfBirth = 1900;
+
+   private const Int32 UnformattedLength = 11;
+   private const Int32 FormattedLength = 15;
+
+   private const Int32 Separator1Offset = 2;
+   private const Int32 Separator2Offset = 5;
+   private const Int32 Separator3Offset = 8;
+   private const Int32 Separator4Offset = 12;
+
+   // These items are measured from the end of the value.
+   private const Int32 CheckDigit1Offset = 2;
+   private const Int32 CheckDigit2Offset = 1;
+
+   /// <summary>
+   ///   Check the <paramref name="rijksregisternummer"/> to determine if it contains a
+   ///   valid Belgian rijksregisternummer.
+   /// </summary>
+   /// <param name="rijksregisternummer">
+   ///   String representation of a Belgian rijksregisternummer.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="BeRijksregisternummerValidationResult"/> enumeration 
+   ///   value that indicates if the <paramref name="rijksregisternummer"/> passed
+   ///   validation or what validation error was encountered.
+   /// </returns>
+   public static BeRijksregisternummerValidationResult Validate(String? rijksregisternummer)
+   {
+      if (String.IsNullOrWhiteSpace(rijksregisternummer))
+      {
+         return BeRijksregisternummerValidationResult.Empty;
+      }
+      else if (rijksregisternummer.Length is not UnformattedLength and not FormattedLength)
+      {
+         return BeRijksregisternummerValidationResult.InvalidLength;
+      }
+
+      // After performing basic checks, validate the check digits because the
+      // most common source of errors will be data entry errors. Then validate
+      // the subcomponents of the value.
+      BeRijksregisternummerValidationResult validationResult = ValidateCheckDigits(rijksregisternummer);
+      if (validationResult != BeRijksregisternummerValidationResult.ValidationPassed)
+      {
+         // Could be either InvalidCharacter or InvalidCheckDigit.
+         return validationResult;
+      }
+      else if (!ValidateSeparators(rijksregisternummer))
+      {
+         return BeRijksregisternummerValidationResult.InvalidSeparator;
+      }
+
+
+      return BeRijksregisternummerValidationResult.ValidationPassed;
+   }
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean IsFormatted(ReadOnlySpan<Char> rijksregisternummer)
+      => rijksregisternummer.Length == FormattedLength;
+
+   private static BeRijksregisternummerValidationResult ValidateCheckDigits(ReadOnlySpan<Char> rijksregisternummer)
+   {
+      var processLength = rijksregisternummer.Length - 2;      // Exclude check digits from main loop
+      var isFormatted = IsFormatted(rijksregisternummer);
+
+      var sum = 0;
+      for (var index = 0; index < processLength; index++)
+      {
+         if (isFormatted &&
+            (index is Separator1Offset or Separator2Offset or Separator3Offset or Separator4Offset))
+         {
+            continue;
+         }
+
+         sum *= 10;
+         var num = rijksregisternummer[index] - Chars.DigitZero;
+         if (num < 0 || num > 9)
+         {
+            return BeRijksregisternummerValidationResult.InvalidCharacter;
+         }
+
+         sum += num;
+      }
+
+      var c1 = rijksregisternummer[^CheckDigit1Offset] - Chars.DigitZero;
+      var c2 = rijksregisternummer[^CheckDigit2Offset] - Chars.DigitZero;
+      if (c1 < 0 || c1 > 9 || c2 < 0 || c2 > 9)
+      {
+         return BeRijksregisternummerValidationResult.InvalidCharacter;
+      }
+      var checkSum = (c1 * 10) + c2;
+
+      // Check for persons born 1900-1999.
+      var remainder = 97 - (sum % 97);
+      if (remainder == checkSum)
+      {
+         return BeRijksregisternummerValidationResult.ValidationPassed;
+      }
+
+      // Then for persons born 2000-2099;
+      var longRemainder = 97 - ((2000000000L + sum) % 97);           // Long int to handle possible int overflow
+      return longRemainder == checkSum
+         ? BeRijksregisternummerValidationResult.ValidationPassed
+         : BeRijksregisternummerValidationResult.InvalidCheckDigits;
+   }
+
+   private static Boolean ValidateSeparators(ReadOnlySpan<Char> rijksregisternummer)
+      => rijksregisternummer.Length == UnformattedLength
+         || (  !rijksregisternummer[Separator1Offset].IsAsciiDigit()
+               && !rijksregisternummer[Separator2Offset].IsAsciiDigit()
+               && !rijksregisternummer[Separator3Offset].IsAsciiDigit()
+               && !rijksregisternummer[Separator4Offset].IsAsciiDigit()
+            );
+         
 }
