@@ -146,6 +146,27 @@ public static class ExtensionMethods
             : str;
 
    /// <summary>
+   ///   Parses a three-digit integer value from the specified read-only character
+   ///   span.
+   /// </summary>
+   /// <remarks>
+   ///   The method does not perform validation on the input span. Supplying a
+   ///   span that does not contain at least three valid digit characters results
+   ///   in undefined behavior.
+   /// </remarks>
+   /// <param name="span">
+   ///   A read-only span of characters that must contain at least three consecutive
+   ///   ASCII digit characters representing the number to parse.
+   /// </param>
+   /// <returns>
+   ///   An integer value in the range 0 to 999 corresponding to the three-digit
+   ///   number represented by the input span.
+   /// </returns>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   public static Int32 ParseThreeDigits(this ReadOnlySpan<Char> span)
+      => ((span[0] - Chars.DigitZero) * 100) + ((span[1] - Chars.DigitZero) * 10) + (span[2] - Chars.DigitZero);
+
+   /// <summary>
    ///   Parses a two-digit integer value from the specified read-only character
    ///   span.
    /// </summary>

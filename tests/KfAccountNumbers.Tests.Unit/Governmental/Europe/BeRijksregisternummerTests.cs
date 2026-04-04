@@ -55,25 +55,164 @@ public class BeRijksregisternummerTests
 
    public static TheoryData<String> InvalidLengthValues =>
    [
-      "1711080468",        // Length 10
-      "171108046801",      // Length 11
-      "85.07.30-033.2",      // Length 14
-      "85.07.30-033.289",      // Length 16
-      new String('1', 100) // Very long string
+      "1711080468",           // Length 10
+      "171108046801",         // Length 11
+      "85.07.30-033.2",       // Length 14
+      "85.07.30-033.289",     // Length 16
+      new String('1', 100)    // Very long string
    ];
 
    public static TheoryData<Int32, Int32, Int32, Boolean> ValidDateOfBirthValues = new()
    {
+      // false = unformatted
+      // rijksregisternummers
       { 1900,  1,  1, false },   // January 1, 1900
       { 1999, 12, 31, false },   // December 31, 1999
+
       { 2000,  1,  1, false },   // January 1, 2000
       { 2099, 12, 31, false },   // December 31, 2099
 
+      { 1901,  1, 31, false },   // maximum days for January, any year
+      { 1991,  2, 28, false },   // maximum days for February, non leap year
+      { 1996,  2, 29, false },   // maximum days for February, leap year
+      { 2000,  2, 29, false },   // maximum days for February, leap year (2000 is leap-year)
+      { 1904,  3, 31, false },   // maximum days for March, any year
+      { 1904,  4, 30, false },   // maximum days for April, any year
+      { 1904,  5, 31, false },   // maximum days for May, any year
+      { 2004,  6, 30, false },   // maximum days for June, any year
+      { 2004,  7, 31, false },   // maximum days for July, any year
+      { 2004,  8, 31, false },   // maximum days for August, any year
+      { 2004,  9, 30, false },   // maximum days for September, any year
+      { 2004, 10, 31, false },   // maximum days for October, any year
+      { 2004, 11, 30, false },   // maximum days for November, any year
+      { 2004, 12, 31, false },   // maximum days for December, any year
+
+      { 1950,  0,  0, false },   // Incomplete date of birth, only year known
+      {    0,  0,  1, false },   // Unknown date of birth
+
+      // BIS-nummers
+      { 1900, 41,  1, false },   // January 1, 1900
+      { 1999, 52, 31, false },   // December 31, 1999
+
+      { 2000, 41,  1, false },   // January 1, 2000
+      { 2099, 52, 31, false },   // December 31, 2099
+
+      { 1901, 41, 31, false },   // maximum days for January, any year
+      { 1991, 42, 28, false },   // maximum days for February, non leap year
+      { 1996, 42, 29, false },   // maximum days for February, leap year
+      { 2000, 42, 29, false },   // maximum days for February, leap year (2000 is leap-year)
+      { 1904, 43, 31, false },   // maximum days for March, any year
+      { 1904, 44, 30, false },   // maximum days for April, any year
+      { 1904, 45, 31, false },   // maximum days for May, any year
+      { 2004, 46, 30, false },   // maximum days for June, any year
+      { 2004, 47, 31, false },   // maximum days for July, any year
+      { 2004, 48, 31, false },   // maximum days for August, any year
+      { 2004, 49, 30, false },   // maximum days for September, any year
+      { 2004, 50, 31, false },   // maximum days for October, any year
+      { 2004, 51, 30, false },   // maximum days for November, any year
+      { 2004, 52, 31, false },   // maximum days for December, any year
+
+      { 1950, 40,  0, false },   // Incomplete date of birth, only year known
+      {    0, 40,  1, false },   // Unknown date of birth
+
+      // BIS-nummers, unknown gender
+      { 1900, 21,  1, false },   // January 1, 1900
+      { 1999, 32, 31, false },   // December 31, 1999
+
+      { 2000, 21,  1, false },   // January 1, 2000
+      { 2099, 32, 31, false },   // December 31, 2099
+
+      { 1901, 21, 31, false },   // maximum days for January, any year
+      { 1991, 22, 28, false },   // maximum days for February, non leap year
+      { 1996, 22, 29, false },   // maximum days for February, leap year
+      { 2000, 22, 29, false },   // maximum days for February, leap year (2000 is leap-year)
+      { 1904, 23, 31, false },   // maximum days for March, any year
+      { 1904, 24, 30, false },   // maximum days for April, any year
+      { 1904, 25, 31, false },   // maximum days for May, any year
+      { 2004, 26, 30, false },   // maximum days for June, any year
+      { 2004, 27, 31, false },   // maximum days for July, any year
+      { 2004, 28, 31, false },   // maximum days for August, any year
+      { 2004, 29, 30, false },   // maximum days for September, any year
+      { 2004, 30, 31, false },   // maximum days for October, any year
+      { 2004, 31, 30, false },   // maximum days for November, any year
+      { 2004, 32, 31, false },   // maximum days for December, any year
+
+      { 1950, 20,  0, false },   // Incomplete date of birth, only year known
+      {    0, 20,  1, false },   // Unknown date of birth
+
+      // true = formatted
       { 1900,  1,  1, true },    // January 1, 1900
       { 1999, 12, 31, true },    // December 31, 1999
       { 2000,  1,  1, true },    // January 1, 2000
       { 2099, 12, 31, true },    // December 31, 2099
 
+      { 1901,  1, 31, true },    // maximum days for January, any year
+      { 1991,  2, 28, true },    // maximum days for February, non leap year
+      { 1996,  2, 29, true },    // maximum days for February, leap year
+      { 2000,  2, 29, true },    // maximum days for February, leap year (2000 is leap-year)
+      { 1904,  3, 31, true },    // maximum days for March, any year
+      { 1904,  4, 30, true },    // maximum days for April, any year
+      { 1904,  5, 31, true },    // maximum days for May, any year
+      { 2004,  6, 30, true },    // maximum days for June, any year
+      { 2004,  7, 31, true },    // maximum days for July, any year
+      { 2004,  8, 31, true },    // maximum days for August, any year
+      { 2004,  9, 30, true },    // maximum days for September, any year
+      { 2004, 10, 31, true },    // maximum days for October, any year
+      { 2004, 11, 30, true },    // maximum days for November, any year
+      { 2004, 12, 31, true },    // maximum days for December, any year
+
+      { 1950,  0,  0, true },    // Incomplete date of birth, only year known
+      {    0,  0,  1, true },    // Unknown date of birth
+
+      // BIS-nummers
+      { 1900, 41,  1, true },    // January 1, 1900
+      { 1999, 52, 31, true },    // December 31, 1999
+
+      { 2000, 41,  1, true },    // January 1, 2000
+      { 2099, 52, 31, true },    // December 31, 2099
+
+      { 1901, 41, 31, true },    // maximum days for January, any year
+      { 1991, 42, 28, true },    // maximum days for February, non leap year
+      { 1996, 42, 29, true },    // maximum days for February, leap year
+      { 2000, 42, 29, true },    // maximum days for February, leap year (2000 is leap-year)
+      { 1904, 43, 31, true },    // maximum days for March, any year
+      { 1904, 44, 30, true },    // maximum days for April, any year
+      { 1904, 45, 31, true },    // maximum days for May, any year
+      { 2004, 46, 30, true },    // maximum days for June, any year
+      { 2004, 47, 31, true },    // maximum days for July, any year
+      { 2004, 48, 31, true },    // maximum days for August, any year
+      { 2004, 49, 30, true },    // maximum days for September, any year
+      { 2004, 50, 31, true },    // maximum days for October, any year
+      { 2004, 51, 30, true },    // maximum days for November, any year
+      { 2004, 52, 31, true },    // maximum days for December, any year
+
+      { 1950, 40,  0, true },    // Incomplete date of birth, only year known
+      {    0, 40,  1, true },    // Unknown date of birth
+
+      // BIS-nummers, unknown gender
+      { 1900, 21,  1, true },    // January 1, 1900
+      { 1999, 32, 31, true },    // December 31, 1999
+
+      { 2000, 21,  1, true },    // January 1, 2000
+      { 2099, 32, 31, true },    // December 31, 2099
+
+      { 1901, 21, 31, true },    // maximum days for January, any year
+      { 1991, 22, 28, true },    // maximum days for February, non leap year
+      { 1996, 22, 29, true },    // maximum days for February, leap year
+      { 2000, 22, 29, true },    // maximum days for February, leap year (2000 is leap-year)
+      { 1904, 23, 31, true },    // maximum days for March, any year
+      { 1904, 24, 30, true },    // maximum days for April, any year
+      { 1904, 25, 31, true },    // maximum days for May, any year
+      { 2004, 26, 30, true },    // maximum days for June, any year
+      { 2004, 27, 31, true },    // maximum days for July, any year
+      { 2004, 28, 31, true },    // maximum days for August, any year
+      { 2004, 29, 30, true },    // maximum days for September, any year
+      { 2004, 30, 31, true },    // maximum days for October, any year
+      { 2004, 31, 30, true },    // maximum days for November, any year
+      { 2004, 32, 31, true },    // maximum days for December, any year
+
+      { 1950, 20,  0, true },    // Incomplete date of birth, only year known
+      {    0, 20,  1, true },    // Unknown date of birth
    };
 
    public static TheoryData<String> InvalidCharacterValues =>
@@ -169,8 +308,112 @@ public class BeRijksregisternummerTests
       "85.07.30-033728",
       "85.07.30-033828",
       "85.07.30-033928",
-
    ];
+
+   public static TheoryData<Int32, Int32, Int32, Boolean> InvalidDateOfBirthValues = new()
+   {
+      // rijksregisternummers
+      { 1904, 13, 31, false },      // month = 13
+      { 1904,  1, 32, false },      // Invalid day of month for January, any year
+      { 1901,  2, 29, false },      // Invalid day of for February, non-leap year
+      { 1904,  2, 30, false },      // Invalid day of for February, leap year
+      { 1904,  2, 30, false },      // Invalid day of for February, leap year (2000 is leap-year)
+      { 1904,  3, 32, false },      // Invalid day of for March, any year
+      { 1904,  4, 31, false },      // Invalid day of for April, any year
+      { 1904,  5, 32, false },      // Invalid day of for May, any year
+      { 2004,  6, 31, false },      // Invalid day of for June, any year
+      { 2004,  7, 32, false },      // Invalid day of for July, any year
+      { 2004,  8, 32, false },      // Invalid day of for August, any year
+      { 2004,  9, 31, false },      // Invalid day of for September, any year
+      { 2004, 10, 32, false },      // Invalid day of for October, any year
+      { 2004, 11, 31, false },      // Invalid day of for November, any year
+      { 2004, 12, 32, false },      // Invalid day of for December, any year
+
+      // BIS-nummers
+      { 1904, 53, 31, false },      // month = 13
+      { 1904, 41, 32, false },      // Invalid day of month for January, any year
+      { 1901, 42, 29, false },      // Invalid day of for February, non-leap year
+      { 1904, 42, 30, false },      // Invalid day of for February, leap year
+      { 1904, 42, 30, false },      // Invalid day of for February, leap year (2000 is leap-year)
+      { 1904, 43, 32, false },      // Invalid day of for March, any year
+      { 1904, 44, 31, false },      // Invalid day of for April, any year
+      { 1904, 45, 32, false },      // Invalid day of for May, any year
+      { 2004, 46, 31, false },      // Invalid day of for June, any year
+      { 2004, 47, 32, false },      // Invalid day of for July, any year
+      { 2004, 48, 32, false },      // Invalid day of for August, any year
+      { 2004, 49, 31, false },      // Invalid day of for September, any year
+      { 2004, 50, 32, false },      // Invalid day of for October, any year
+      { 2004, 51, 31, false },      // Invalid day of for November, any year
+      { 2004, 52, 32, false },      // Invalid day of for December, any year
+
+      // BIS-nummers, unknown gender
+      { 1904, 33, 31, false },      // month = 13
+      { 1904, 21, 32, false },      // Invalid day of month for January, any year
+      { 1901, 22, 29, false },      // Invalid day of for February, non-leap year
+      { 1904, 22, 30, false },      // Invalid day of for February, leap year
+      { 1904, 22, 30, false },      // Invalid day of for February, leap year (2000 is leap-year)
+      { 1904, 23, 32, false },      // Invalid day of for March, any year
+      { 1904, 24, 31, false },      // Invalid day of for April, any year
+      { 1904, 25, 32, false },      // Invalid day of for May, any year
+      { 2004, 26, 31, false },      // Invalid day of for June, any year
+      { 2004, 27, 32, false },      // Invalid day of for July, any year
+      { 2004, 28, 32, false },      // Invalid day of for August, any year
+      { 2004, 29, 31, false },      // Invalid day of for September, any year
+      { 2004, 30, 32, false },      // Invalid day of for October, any year
+      { 2004, 31, 31, false },      // Invalid day of for November, any year
+      { 2004, 32, 32, false },      // Invalid day of for December, any year
+
+      // rijksregisternummers
+      { 1904, 13, 31, true },       // month = 13
+      { 1904,  1, 32, true },       // Invalid day of month for January, any year
+      { 1901,  2, 29, true },       // Invalid day of for February, non-leap year
+      { 1904,  2, 30, true },       // Invalid day of for February, leap year
+      { 1904,  2, 30, true },       // Invalid day of for February, leap year (2000 is leap-year)
+      { 1904,  3, 32, true },       // Invalid day of for March, any year
+      { 1904,  4, 31, true },       // Invalid day of for April, any year
+      { 1904,  5, 32, true },       // Invalid day of for May, any year
+      { 2004,  6, 31, true },       // Invalid day of for June, any year
+      { 2004,  7, 32, true },       // Invalid day of for July, any year
+      { 2004,  8, 32, true },       // Invalid day of for August, any year
+      { 2004,  9, 31, true },       // Invalid day of for September, any year
+      { 2004, 10, 32, true },       // Invalid day of for October, any year
+      { 2004, 11, 31, true },       // Invalid day of for November, any year
+      { 2004, 12, 32, true },       // Invalid day of for December, any year
+
+      // BIS-nummers
+      { 1904, 53, 31, true },       // month = 13
+      { 1904, 41, 32, true },       // Invalid day of month for January, any year
+      { 1901, 42, 29, true },       // Invalid day of for February, non-leap year
+      { 1904, 42, 30, true },       // Invalid day of for February, leap year
+      { 1904, 42, 30, true },       // Invalid day of for February, leap year (2000 is leap-year)
+      { 1904, 43, 32, true },       // Invalid day of for March, any year
+      { 1904, 44, 31, true },       // Invalid day of for April, any year
+      { 1904, 45, 32, true },       // Invalid day of for May, any year
+      { 2004, 46, 31, true },       // Invalid day of for June, any year
+      { 2004, 47, 32, true },       // Invalid day of for July, any year
+      { 2004, 48, 32, true },       // Invalid day of for August, any year
+      { 2004, 49, 31, true },       // Invalid day of for September, any year
+      { 2004, 50, 32, true },       // Invalid day of for October, any year
+      { 2004, 51, 31, true },       // Invalid day of for November, any year
+      { 2004, 52, 32, true },       // Invalid day of for December, any year
+
+      // BIS-nummers, unknown gender
+      { 1904, 33, 31, true },       // month = 13
+      { 1904, 21, 32, true },       // Invalid day of month for January, any year
+      { 1901, 22, 29, true },       // Invalid day of for February, non-leap year
+      { 1904, 22, 30, true },       // Invalid day of for February, leap year
+      { 1904, 22, 30, true },       // Invalid day of for February, leap year (2000 is leap-year)
+      { 1904, 23, 32, true },       // Invalid day of for March, any year
+      { 1904, 24, 31, true },       // Invalid day of for April, any year
+      { 1904, 25, 32, true },       // Invalid day of for May, any year
+      { 2004, 26, 31, true },       // Invalid day of for June, any year
+      { 2004, 27, 32, true },       // Invalid day of for July, any year
+      { 2004, 28, 32, true },       // Invalid day of for August, any year
+      { 2004, 29, 31, true },       // Invalid day of for September, any year
+      { 2004, 30, 32, true },       // Invalid day of for October, any year
+      { 2004, 31, 31, true },       // Invalid day of for November, any year
+      { 2004, 32, 32, true },       // Invalid day of for December, any year
+   };
 
    #region Constants Tests
    // ==========================================================================
@@ -242,6 +485,21 @@ public class BeRijksregisternummerTests
    [MemberData(nameof(InvalidSeparatorValues))]
    public void BeRijksregisternummer_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidInvalidSeparator(String value)
       => BeRijksregisternummer.Validate(value).Should().Be(BeRijksregisternummerValidationResult.InvalidSeparator);
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void BeRijksregisternummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidInvalidDateOfBirth(
+      Int32 year,
+      Int32 month,
+      Int32 day,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetRijksregisternummerWithValidCheckDigits(year, month, day, formatted: formatted);
+
+      // Act/assert.
+      BeRijksregisternummer.Validate(value).Should().Be(BeRijksregisternummerValidationResult.InvalidDateOfBirth);
+   }
 
    #endregion
 }

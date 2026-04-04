@@ -234,6 +234,11 @@ public record BeRijksregisternummer
    private const Int32 Separator3Offset = 8;
    private const Int32 Separator4Offset = 12;
 
+   /// <summary>
+   ///   The raw burgerservicenummer value.
+   /// </summary>
+   public String Value { get; private init; }
+
    // These items are measured from the end of the value.
    private const Int32 CheckDigit1Offset = 2;
    private const Int32 CheckDigit2Offset = 1;
@@ -274,9 +279,44 @@ public record BeRijksregisternummer
       {
          return BeRijksregisternummerValidationResult.InvalidSeparator;
       }
-
+      else if (!ValidateDateOfBirth(rijksregisternummer))
+      {
+         return BeRijksregisternummerValidationResult.InvalidDateOfBirth;
+      }
 
       return BeRijksregisternummerValidationResult.ValidationPassed;
+   }
+
+   private static (Int32 year, Int32 month, Int32 day) GetYearMonthDay(ReadOnlySpan<Char> rijksregisternummer)
+   {
+      var fieldWidth = rijksregisternummer.Length == UnformattedLength ? 2 : 3;
+      var year = rijksregisternummer.ParseTwoDigits();
+
+      var fieldStart = fieldWidth;
+      var month = rijksregisternummer[fieldStart..].ParseTwoDigits();
+
+      fieldStart += fieldWidth;
+      var day = rijksregisternummer[fieldStart..].ParseTwoDigits();
+
+      fieldStart += fieldWidth;
+      var sequenceNumber = rijksregisternummer[fieldStart..].ParseThreeDigits();
+
+      // Already parsed the individual elements, combine to use in checksum calculation.
+      var total = sequenceNumber + (day * 1000) + (month * 10000) + (year * 10000000);
+      var checksum = rijksregisternummer[^2..].ParseTwoDigits();
+      var century = (97 - (total % 97)) == checksum
+         ? 1900
+         : 2000;
+
+      // Apply BIS-nummer offsets if necessary.
+      month = month switch
+      {
+         >= BisNummerMonthOffset => month - BisNummerMonthOffset,
+         >= BisNummerUnknownGenderMonthOffset => month - BisNummerUnknownGenderMonthOffset,
+         _ => month
+      };
+
+      return (century + year, month, day);
    }
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -327,6 +367,34 @@ public record BeRijksregisternummer
       return longRemainder == checkSum
          ? BeRijksregisternummerValidationResult.ValidationPassed
          : BeRijksregisternummerValidationResult.InvalidCheckDigits;
+   }
+
+   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> rijksregisternummer)
+   {
+#pragma warning disable IDE0008 // Use explicit type
+      var (year, month, day) = GetYearMonthDay(rijksregisternummer);
+#pragma warning restore IDE0008 // Use explicit type
+
+      if (year < MinimumValidYearOfBirth || year > MaximumValidYearOfBirth)
+      {
+         // Should be impossible to ever reach this point because of the check
+         // digit calcuations, but return false out of abundance of caution and
+         // to avoid throwing an exception.
+         return false;
+      }
+
+      // Allow zero for incomplete dates of birth.
+      if (month == 0 || day == 0)
+      {
+         return true;
+      }
+
+      if (month < 1 || month > 12)
+      {
+         return false;
+      }
+
+      return day >= 1 && day <= DateTime.DaysInMonth(year, month);
    }
 
    private static Boolean ValidateSeparators(ReadOnlySpan<Char> rijksregisternummer)
