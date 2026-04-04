@@ -404,5 +404,4 @@ public record BeRijksregisternummer
                && !rijksregisternummer[Separator3Offset].IsAsciiDigit()
                && !rijksregisternummer[Separator4Offset].IsAsciiDigit()
             );
-         
 }

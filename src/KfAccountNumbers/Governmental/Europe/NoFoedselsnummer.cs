@@ -432,7 +432,7 @@ public record NoFoedselsnummer
       // Adjust the year according to the value of the individual number.
       // See https://blog.variant.no/ssns-and-pattern-matching-in-c-9-498f96aa71d4
       // for description of the rules used.
-      var individualNumber = GetIntegerIndividualNumber(foedselsnummer);
+      var individualNumber = foedselsnummer[^IndividualNumberOffset..].ParseThreeDigits();
       year += (individualNumber, year) switch
       {
          // Rule 1. 500–749: 1854–1899
@@ -449,11 +449,6 @@ public record NoFoedselsnummer
 
       return (day, month, year);
    }
-
-   private static Int32 GetIntegerIndividualNumber(ReadOnlySpan<Char> foedselsnummer)
-      => ((foedselsnummer[^IndividualNumberOffset] - Chars.DigitZero) * 100)
-         + ((foedselsnummer[^(IndividualNumberOffset - 1)] - Chars.DigitZero) * 10)         // Decrement offset value (measuring from end, so subtract to move right)
-         + (foedselsnummer[^(IndividualNumberOffset - 2)] - Chars.DigitZero);
 
    private static String GetRawFoedselsnummer(String foedselsnummer)
       => foedselsnummer.Length == UnformattedLength
