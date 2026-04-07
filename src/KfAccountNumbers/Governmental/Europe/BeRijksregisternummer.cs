@@ -338,8 +338,8 @@ public record BeRijksregisternummer
          }
 
          sum *= 10;
-         var num = rijksregisternummer[index] - Chars.DigitZero;
-         if (num < 0 || num > 9)
+         var num = rijksregisternummer[index].ToSingleDigit();
+         if (!num.IsValidDigit())
          {
             return BeRijksregisternummerValidationResult.InvalidCharacter;
          }
@@ -347,9 +347,9 @@ public record BeRijksregisternummer
          sum += num;
       }
 
-      var c1 = rijksregisternummer[^CheckDigit1Offset] - Chars.DigitZero;
-      var c2 = rijksregisternummer[^CheckDigit2Offset] - Chars.DigitZero;
-      if (c1 < 0 || c1 > 9 || c2 < 0 || c2 > 9)
+      var c1 = rijksregisternummer[^CheckDigit1Offset].ToSingleDigit();
+      var c2 = rijksregisternummer[^CheckDigit2Offset].ToSingleDigit();
+      if (!c1.IsValidDigit() || !c2.IsValidDigit())
       {
          return BeRijksregisternummerValidationResult.InvalidCharacter;
       }

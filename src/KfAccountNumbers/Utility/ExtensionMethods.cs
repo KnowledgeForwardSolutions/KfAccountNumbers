@@ -1,3 +1,5 @@
+// Ignore Spelling: validator
+
 namespace KfAccountNumbers.Utility;
 
 public static class ExtensionMethods
@@ -29,8 +31,8 @@ public static class ExtensionMethods
    ///      The <paramref name="mask"/> is applied one character at a time,
    ///      moving from left to right. If the character in the mask is an 
    ///      underscore ('_') then the next available character from the 
-   ///      <paramref name="str"/> is added to the output. Otherwise the mask 
-   ///      character is considered a literal character and it is added to the
+   ///      <paramref name="str"/> is added to the output. Otherwise, the mask 
+   ///      character is considered a literal character, and it is added to the
    ///      output instead. If there are no remaining <paramref name="str"/>
    ///      characters then additional mask underscore characters are ignored.
    ///   </para>
@@ -111,7 +113,86 @@ public static class ExtensionMethods
    ///      also evaluate as <see langword="true"/>.
    ///   </para>
    /// </remarks>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    public static Boolean IsAsciiDigit(this Char ch) => Char.IsAsciiDigit(ch);
+
+   /// <summary>
+   ///   Determines whether the result of converting a single character to an
+   ///   integer value resulted in a value other than 0-9.
+   /// </summary>
+   /// <param name="num">
+   ///   The integer value to evaluate as a potential decimal digit.
+   /// </param>
+   /// <returns>
+   ///   <see langword="false"/> if the value is less than 0 or greater than 9;
+   ///   otherwise, <see langword="true"/>.
+   /// </returns>
+   /// <remarks>
+   ///   KfAccountNumbers typically converts a character that it expects to be
+   ///   a decimal digit to an integer by subtracting the character '0' from
+   ///   the character being converted. If the character being converted is
+   ///   not an ASCII digit ('0'-'9') then the converted value will be either
+   ///   less than zero or greater than nine.
+   /// </remarks>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   public static Boolean IsValidDigit(this Int32 num) => num is >= 0 and <= 9;
+
+   /// <summary>
+   ///   Parses a three-digit integer value from the specified read-only character
+   ///   span.
+   /// </summary>
+   /// <remarks>
+   ///   The method does not perform validation on the input span. Supplying a
+   ///   span that does not contain at least three valid digit characters results
+   ///   in undefined behavior.
+   /// </remarks>
+   /// <param name="span">
+   ///   A read-only span of characters that must contain at least three consecutive
+   ///   ASCII digit characters representing the number to parse.
+   /// </param>
+   /// <returns>
+   ///   An integer value in the range 0 to 999 corresponding to the three-digit
+   ///   number represented by the input span.
+   /// </returns>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   public static Int32 ParseThreeDigits(this ReadOnlySpan<Char> span)
+      => (span[0].ToSingleDigit() * 100) + (span[1].ToSingleDigit() * 10) + span[2].ToSingleDigit();
+
+   /// <summary>
+   ///   Parses a two-digit integer value from the specified read-only character
+   ///   span.
+   /// </summary>
+   /// <remarks>
+   ///   The method does not perform validation on the input span. Supplying a
+   ///   span that does not contain at least two valid digit characters results
+   ///   in undefined behavior.
+   /// </remarks>
+   /// <param name="span">
+   ///   A read-only span of characters that must contain at least two consecutive
+   ///   ASCII digit characters representing the number to parse.
+   /// </param>
+   /// <returns>
+   ///   An integer value in the range 0 to 99 corresponding to the two-digit
+   ///   number represented by the input span.
+   /// </returns>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   public static Int32 ParseTwoDigits(this ReadOnlySpan<Char> span)
+      => (span[0].ToSingleDigit() * 10) + span[1].ToSingleDigit();
+
+   /// <summary>
+   ///   Get the integer equivalent of an ASCII digit character.
+   /// </summary>
+   /// <param name="ch">
+   ///   The <see cref="Char"/> to convert.
+   /// </param>
+   /// <returns>
+   ///   The integer equivalent of the ASCII character.
+   /// </returns>
+   /// <remarks>
+   ///   If <paramref name="ch"/> is not an ASCII digit char (0-9) then this 
+   ///   method will return a value that is not between 0-9.
+   /// </remarks>
+   public static Int32 ToSingleDigit(this Char ch) => ch - Chars.DigitZero;
 
    /// <summary>
    ///   Guard against a String value that is <see langword="null"/>, 
@@ -144,48 +225,6 @@ public static class ExtensionMethods
          : String.IsNullOrWhiteSpace(str)
             ? throw new ArgumentException(message, callerArgumentName)
             : str;
-
-   /// <summary>
-   ///   Parses a three-digit integer value from the specified read-only character
-   ///   span.
-   /// </summary>
-   /// <remarks>
-   ///   The method does not perform validation on the input span. Supplying a
-   ///   span that does not contain at least three valid digit characters results
-   ///   in undefined behavior.
-   /// </remarks>
-   /// <param name="span">
-   ///   A read-only span of characters that must contain at least three consecutive
-   ///   ASCII digit characters representing the number to parse.
-   /// </param>
-   /// <returns>
-   ///   An integer value in the range 0 to 999 corresponding to the three-digit
-   ///   number represented by the input span.
-   /// </returns>
-   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   public static Int32 ParseThreeDigits(this ReadOnlySpan<Char> span)
-      => ((span[0] - Chars.DigitZero) * 100) + ((span[1] - Chars.DigitZero) * 10) + (span[2] - Chars.DigitZero);
-
-   /// <summary>
-   ///   Parses a two-digit integer value from the specified read-only character
-   ///   span.
-   /// </summary>
-   /// <remarks>
-   ///   The method does not perform validation on the input span. Supplying a
-   ///   span that does not contain at least two valid digit characters results
-   ///   in undefined behavior.
-   /// </remarks>
-   /// <param name="span">
-   ///   A read-only span of characters that must contain at least two consecutive
-   ///   ASCII digit characters representing the number to parse.
-   /// </param>
-   /// <returns>
-   ///   An integer value in the range 0 to 99 corresponding to the two-digit
-   ///   number represented by the input span.
-   /// </returns>
-   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   public static Int32 ParseTwoDigits(this ReadOnlySpan<Char> span)
-      => ((span[0] - Chars.DigitZero) * 10) + (span[1] - Chars.DigitZero);
 
    /// <summary>
    ///   Validate that String value is not <see langword="null"/>, 
