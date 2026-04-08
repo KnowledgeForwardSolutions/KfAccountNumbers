@@ -235,6 +235,53 @@ public record BeRijksregisternummer
    private const Int32 Separator4Offset = 12;
 
    /// <summary>
+   ///   Initialize a new instance of the <see cref="BeRijksregisternummer"/> class.
+   /// </summary>
+   /// <param name="rijksregisternummer">
+   ///   String representation of a Belgian rijksregisternummer.
+   /// </param>
+   /// <exception cref="KfValidationException{BeRijksregisternummerValidationResult}">
+   ///   <paramref name="rijksregisternummer"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="rijksregisternummer"/> is not length 11 (or 15 if separator
+   ///   characters are used).
+   ///   - or -
+   ///   <paramref name="rijksregisternummer"/> contains a non-digit character in
+   ///   any position other than the separator locations.
+   ///   - or -
+   ///   <paramref name="rijksregisternummer"/> has invalid modulus 97 check digit
+   ///   characters in the trailing (right-most) character positions.
+   ///   - or -
+   ///   <paramref name="rijksregisternummer"/> is 11 characters in length and has a
+   ///   character other than dash ('-') as a separator.
+   ///   - or -
+   ///   <paramref name="rijksregisternummer"/> contains an invalid date of birth in
+   ///   the leading (left-most) six digits.
+   /// </exception>
+   public BeRijksregisternummer(String? rijksregisternummer)
+      : this(rijksregisternummer, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private BeRijksregisternummer(String? rijksregisternummer, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         BeRijksregisternummerValidationResult validationResult = Validate(rijksregisternummer);
+         if (validationResult != BeRijksregisternummerValidationResult.ValidationPassed)
+         {
+            throw validationResult.ToValidationException();
+         }
+      }
+
+      Value = GetRawValue(rijksregisternummer!);
+   }
+
+   /// <summary>
    ///   The raw burgerservicenummer value.
    /// </summary>
    public String Value { get; private init; }
@@ -287,6 +334,41 @@ public record BeRijksregisternummer
       return BeRijksregisternummerValidationResult.ValidationPassed;
    }
 
+   private static String GetRawValue(String rijksregisternummer)
+   {
+      if (rijksregisternummer.Length == UnformattedLength)
+      {
+         return rijksregisternummer;
+      }
+
+      var buffer = ArrayPool<Char>.Shared.Rent(UnformattedLength);
+      try
+      {
+         ReadOnlySpan<Char> source = rijksregisternummer.AsSpan();
+         var span = new Span<Char>(buffer);
+
+         ReadOnlySpan<Int32> segmentLengths = [ 2, 2, 2, 3, 2 ];
+         var sourceOffset = 0;
+         var targetOffset = 0;
+         foreach(var length in segmentLengths)
+         {
+            ReadOnlySpan<Char> sourceSpan = source[sourceOffset..(sourceOffset + length)];
+            Span<Char> targetSpan = span[targetOffset..(targetOffset + length)];
+
+            sourceSpan.CopyTo(targetSpan);
+
+            sourceOffset += length + 1;
+            targetOffset += length;
+         }
+
+         return span[..UnformattedLength].ToString();
+      }
+      finally
+      {
+         ArrayPool<Char>.Shared.Return(buffer);
+      }
+   }
+
    private static (Int32 year, Int32 month, Int32 day) GetYearMonthDay(ReadOnlySpan<Char> rijksregisternummer)
    {
       var fieldWidth = rijksregisternummer.Length == UnformattedLength ? 2 : 3;
@@ -332,7 +414,7 @@ public record BeRijksregisternummer
       for (var index = 0; index < processLength; index++)
       {
          if (isFormatted &&
-            (index is Separator1Offset or Separator2Offset or Separator3Offset or Separator4Offset))
+             (index is Separator1Offset or Separator2Offset or Separator3Offset or Separator4Offset))
          {
             continue;
          }
@@ -403,5 +485,5 @@ public record BeRijksregisternummer
                && !rijksregisternummer[Separator2Offset].IsAsciiDigit()
                && !rijksregisternummer[Separator3Offset].IsAsciiDigit()
                && !rijksregisternummer[Separator4Offset].IsAsciiDigit()
-            );
+         );
 }
