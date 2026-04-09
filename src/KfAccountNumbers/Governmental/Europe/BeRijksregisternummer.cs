@@ -1,4 +1,4 @@
-// Ignore Spelling: Rijksregisternummer Nummer
+// Ignore Spelling: Json Nummer Rijksregisternummer
 
 namespace KfAccountNumbers.Governmental.Europe;
 
@@ -194,6 +194,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      See https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_registre_national (French) for more info.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(BeRijksregisternummerJsonConverter))]
 public record BeRijksregisternummer
 {
    /// <summary>
@@ -299,8 +300,8 @@ public record BeRijksregisternummer
 
          return (year, month, day) switch
          {
-            (> 0, > 0, > 0) => new DateResult(year, month, day),
-            (> 0, 0, _) => new DateResult(year),
+            ( > 0, > 0, > 0) => new DateResult(year, month, day),
+            ( > 0, 0, _) => new DateResult(year),
             _ => new DateResult()
          };
       }
@@ -316,6 +317,59 @@ public record BeRijksregisternummer
 
    // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
    public static explicit operator BeRijksregisternummer(String? rijksregisternummer) => new(rijksregisternummer);
+
+   /// <summary>
+   ///   Create a new <see cref="BeRijksregisternummer"/> using the Result pattern.
+   /// </summary>
+   /// <param name="rijksregisternummer">
+   ///   String representation of a Belgian rijksregisternummer.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{BeRijksregisternummer, BeRijksregisternummerValidationResult}"/>.
+   ///   Will contain the new <see cref="BeRijksregisternummer"/> if 
+   ///   <paramref name="rijksregisternummer"/> is valid or an
+   ///   <see cref="BeRijksregisternummerValidationResult"/> that identifies
+   ///   the validation rule that was failed if <paramref name="rijksregisternummer"/> is 
+   ///   invalid.
+   /// </returns>
+   public static CreateResult<BeRijksregisternummer, BeRijksregisternummerValidationResult> Create(String? rijksregisternummer)
+   {
+      BeRijksregisternummerValidationResult validationResult = Validate(rijksregisternummer);
+      return validationResult == BeRijksregisternummerValidationResult.ValidationPassed
+         ? new BeRijksregisternummer(rijksregisternummer, validationMode: ValidationMode.BypassValidation)
+         : validationResult;
+   }
+
+   /// <summary>
+   ///   Format the rijksregisternummer using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then the default mask "__.__.__-___.__" will be used instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted rijksregisternummer.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the rijksregisternummer.
+   /// </remarks>
+   public String Format(String mask = "__.__.__-___.__") => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Get a string representation of the rijksregisternummer.
+   /// </summary>
+   /// <remarks>
+   ///   Will return the raw rijksregisternummer, without  separator characters.
+   /// </remarks>
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="rijksregisternummer"/> to determine if it contains a
@@ -374,10 +428,10 @@ public record BeRijksregisternummer
          ReadOnlySpan<Char> source = rijksregisternummer.AsSpan();
          var span = new Span<Char>(buffer);
 
-         ReadOnlySpan<Int32> segmentLengths = [ 2, 2, 2, 3, 2 ];
+         ReadOnlySpan<Int32> segmentLengths = [2, 2, 2, 3, 2];
          var sourceOffset = 0;
          var targetOffset = 0;
-         foreach(var length in segmentLengths)
+         foreach (var length in segmentLengths)
          {
             ReadOnlySpan<Char> sourceSpan = source[sourceOffset..(sourceOffset + length)];
             Span<Char> targetSpan = span[targetOffset..(targetOffset + length)];
@@ -514,9 +568,26 @@ public record BeRijksregisternummer
 
    private static Boolean ValidateSeparators(ReadOnlySpan<Char> rijksregisternummer)
       => rijksregisternummer.Length == UnformattedLength
-         || (  !rijksregisternummer[Separator1Offset].IsAsciiDigit()
-               && !rijksregisternummer[Separator2Offset].IsAsciiDigit()
-               && !rijksregisternummer[Separator3Offset].IsAsciiDigit()
-               && !rijksregisternummer[Separator4Offset].IsAsciiDigit()
+         || (!rijksregisternummer[Separator1Offset].IsAsciiDigit()
+            && !rijksregisternummer[Separator2Offset].IsAsciiDigit()
+            && !rijksregisternummer[Separator3Offset].IsAsciiDigit()
+            && !rijksregisternummer[Separator4Offset].IsAsciiDigit()
          );
+}
+
+public class BeRijksregisternummerJsonConverter : JsonConverter<BeRijksregisternummer>
+{
+   public override BeRijksregisternummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new BeRijksregisternummer(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, BeRijksregisternummer value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }
