@@ -234,6 +234,10 @@ public record BeRijksregisternummer
    private const Int32 Separator3Offset = 8;
    private const Int32 Separator4Offset = 12;
 
+   // These items are measured from the end of the value.
+   private const Int32 CheckDigit1Offset = 2;
+   private const Int32 CheckDigit2Offset = 1;
+
    /// <summary>
    ///   Initialize a new instance of the <see cref="BeRijksregisternummer"/> class.
    /// </summary>
@@ -307,9 +311,11 @@ public record BeRijksregisternummer
    /// </summary>
    public String Value { get; private init; }
 
-   // These items are measured from the end of the value.
-   private const Int32 CheckDigit1Offset = 2;
-   private const Int32 CheckDigit2Offset = 1;
+   public static implicit operator String(BeRijksregisternummer rijksregisternummer)
+      => rijksregisternummer?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator BeRijksregisternummer(String? rijksregisternummer) => new(rijksregisternummer);
 
    /// <summary>
    ///   Check the <paramref name="rijksregisternummer"/> to determine if it contains a
@@ -405,7 +411,7 @@ public record BeRijksregisternummer
       var sequenceNumber = rijksregisternummer[fieldStart..].ParseThreeDigits();
 
       // Apply BIS-nummer offsets if necessary.
-      month = month switch
+      var effectiveMonth = month switch
       {
          >= BisNummerMonthOffset => month - BisNummerMonthOffset,
          >= BisNummerUnknownGenderMonthOffset => month - BisNummerUnknownGenderMonthOffset,
@@ -413,7 +419,7 @@ public record BeRijksregisternummer
       };
 
       // Add the century to the year if the date is not incomplete.
-      if (year > 0 || month > 0)
+      if (year > 0 || effectiveMonth > 0)
       {
          // Already parsed the individual elements, combine to use in checksum calculation.
          var total = sequenceNumber + (day * 1000) + (month * 100000) + (year * 10000000);
@@ -425,7 +431,7 @@ public record BeRijksregisternummer
          year += century;
       }
 
-      return (year, month, day);
+      return (year, effectiveMonth, day);
    }
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]

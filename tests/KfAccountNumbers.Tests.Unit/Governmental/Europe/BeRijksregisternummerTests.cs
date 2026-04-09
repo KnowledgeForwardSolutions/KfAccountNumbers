@@ -532,6 +532,15 @@ public class BeRijksregisternummerTests
          .And.ValidationResult.Should().Be(BeRijksregisternummerValidationResult.InvalidCheckDigits);
 
    [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void BeRijksregisternummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
+      => FluentActions
+         .Invoking(() => new BeRijksregisternummer(value))
+         .Should().Throw<KfValidationException<BeRijksregisternummerValidationResult>>()
+         .WithMessage(Messages.BeRijksregisternummerInvalidSeparator + "*")
+         .And.ValidationResult.Should().Be(BeRijksregisternummerValidationResult.InvalidSeparator);
+
+   [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]
    public void BeRijksregisternummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
       Int32 year,
@@ -581,6 +590,192 @@ public class BeRijksregisternummerTests
 
       // Act/assert.
       sut.DateOfBirth.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Valid11CharacterRijksregisternummer, Valid11CharacterRijksregisternummer)]
+   [InlineData(Valid15CharacterRijksregisternummer, Valid11CharacterRijksregisternummer)]
+   [InlineData(Valid11CharacterBisnummer, Valid11CharacterBisnummer)]
+   [InlineData(Valid15CharacterBisnummer, Valid11CharacterBisnummer)]
+   public void BeRijksregisternummer_Value_ShouldReturnValidatedRijksregisternummer(
+      String value,
+      String expected)
+   {
+      // Arrange.
+      var sut = new BeRijksregisternummer(value);
+
+      // Act/assert.
+      sut.Value.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void BeRijksregisternummer_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid11CharacterRijksregisternummer;
+      var sut = new BeRijksregisternummer(value);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(value);
+   }
+
+   [Fact]
+   public void BeRijksregisternummer_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid15CharacterBisnummer;
+      var sut = new BeRijksregisternummer(value);
+      var expected = GetRawRijksregisternummer(value);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void BeRijksregisternummer_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      BeRijksregisternummer sut = null!;
+
+      // Act.
+      String str = sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void BeRijksregisternummer_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      BeRijksregisternummer sut = null!;
+
+      // Act.
+      var str = (String)sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidRijksregisternummerValues))]
+   public void BeRijksregisternummer_ExplicitCastToBeRijksregisternummer_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawRijksregisternummer(value);
+
+      // Act.
+      var sut = (BeRijksregisternummer)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDateOfBirthValues))]
+   public void BeRijksregisternummer_ExplicitCastToBeRijksregisternummer_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
+      Int32 year,
+      Int32 month,
+      Int32 day,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetRijksregisternummerWithValidCheckDigits(year, month, day, formatted: formatted);
+      var expected = GetRawRijksregisternummer(value);
+
+      // Act.
+      var sut = (BeRijksregisternummer)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void BeRijksregisternummer_ExplicitCastToBeRijksregisternummer_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => _ = (BeRijksregisternummer)value)
+         .Should().Throw<KfValidationException<BeRijksregisternummerValidationResult>>()
+         .WithMessage(Messages.BeRijksregisternummerEmpty + "*")
+         .And.ValidationResult.Should().Be(BeRijksregisternummerValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void BeRijksregisternummer_ExplicitCastToBeRijksregisternummer_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => _ = (BeRijksregisternummer)value)
+         .Should().Throw<KfValidationException<BeRijksregisternummerValidationResult>>()
+         .WithMessage(Messages.BeRijksregisternummerInvalidLength + "*")
+         .And.ValidationResult.Should().Be(BeRijksregisternummerValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void BeRijksregisternummer_ExplicitCastToBeRijksregisternummer_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+      => FluentActions
+         .Invoking(() => _ = (BeRijksregisternummer)value)
+         .Should().Throw<KfValidationException<BeRijksregisternummerValidationResult>>()
+         .WithMessage(Messages.BeRijksregisternummerInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(BeRijksregisternummerValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void BeRijksregisternummer_ExplicitCastToBeRijksregisternummer_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
+      => FluentActions
+         .Invoking(() => _ = (BeRijksregisternummer)value)
+         .Should().Throw<KfValidationException<BeRijksregisternummerValidationResult>>()
+         .WithMessage(Messages.BeRijksregisternummerInvalidCheckDigits + "*")
+         .And.ValidationResult.Should().Be(BeRijksregisternummerValidationResult.InvalidCheckDigits);
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void BeRijksregisternummer_ExplicitCastToBeRijksregisternummer_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
+      => FluentActions
+         .Invoking(() => _ = (BeRijksregisternummer)value)
+         .Should().Throw<KfValidationException<BeRijksregisternummerValidationResult>>()
+         .WithMessage(Messages.BeRijksregisternummerInvalidSeparator + "*")
+         .And.ValidationResult.Should().Be(BeRijksregisternummerValidationResult.InvalidSeparator);
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void BeRijksregisternummer_ExplicitCastToBeRijksregisternummer_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
+      Int32 year,
+      Int32 month,
+      Int32 day,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetRijksregisternummerWithValidCheckDigits(year, month, day, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (BeRijksregisternummer)value)
+         .Should().Throw<KfValidationException<BeRijksregisternummerValidationResult>>()
+         .WithMessage(Messages.BeRijksregisternummerInvalidDateOfBirth + "*")
+         .And.ValidationResult.Should().Be(BeRijksregisternummerValidationResult.InvalidDateOfBirth);
    }
 
    #endregion
