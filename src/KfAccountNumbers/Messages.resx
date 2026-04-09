@@ -360,4 +360,19 @@
   <data name="BeRijksregisternummerInvalidDateOfBirth" xml:space="preserve">
     <value>BE Rijksregisternummer must have a valid date of birth in YYMMDD format as the leading (left-most) digits</value>
   </data>
+  <data name="YearOutOFRange" xml:space="preserve">
+    <value>Year value must be between 1 and 9999, inclusive</value>
+  </data>
+  <data name="MonthOutOfRange" xml:space="preserve">
+    <value>Month must be between 1 and 12, inclusive</value>
+  </data>
+  <data name="DayOutOfRange" xml:space="preserve">
+    <value>Day must be between 1 and 31, inclusive</value>
+  </data>
+  <data name="DayOutOfRangeForYearAndMonth" xml:space="preserve">
+    <value>Day {0} is invalid for year {1} and month {2}</value>
+  </data>
+  <data name="DateResultPartialDateToDateOnly" xml:space="preserve">
+    <value>Can not convert a partial or unknown date to a DateOnly type.</value>
+  </data>
 </root>

@@ -187,6 +187,33 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can not convert a partial or unknown date to a DateOnly type..
+        /// </summary>
+        internal static string DateResultPartialDateToDateOnly {
+            get {
+                return ResourceManager.GetString("DateResultPartialDateToDateOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Day must be between 1 and 31, inclusive.
+        /// </summary>
+        internal static string DayOutOfRange {
+            get {
+                return ResourceManager.GetString("DayOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Day {0} is invalid for year {1} and month {2}.
+        /// </summary>
+        internal static string DayOutOfRangeForYearAndMonth {
+            get {
+                return ResourceManager.GetString("DayOutOfRangeForYearAndMonth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Description may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string DescriptionEmpty {
@@ -381,6 +408,15 @@ namespace KfAccountNumbers {
         internal static string IsKennitalaInvalidSeparator {
             get {
                 return ResourceManager.GetString("IsKennitalaInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Month must be between 1 and 12, inclusive.
+        /// </summary>
+        internal static string MonthOutOfRange {
+            get {
+                return ResourceManager.GetString("MonthOutOfRange", resourceCulture);
             }
         }
         
@@ -786,6 +822,15 @@ namespace KfAccountNumbers {
         internal static string ValidationPassed {
             get {
                 return ResourceManager.GetString("ValidationPassed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Year value must be between 1 and 9999, inclusive.
+        /// </summary>
+        internal static string YearOutOFRange {
+            get {
+                return ResourceManager.GetString("YearOutOFRange", resourceCulture);
             }
         }
     }

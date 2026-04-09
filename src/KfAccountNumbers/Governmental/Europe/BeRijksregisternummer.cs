@@ -282,6 +282,27 @@ public record BeRijksregisternummer
    }
 
    /// <summary>
+   ///   The person's date of birth, derived from the first six digits in YYMMDD
+   ///   format and the exact century of birth derived from the check digits.
+   /// </summary>
+   public DateResult DateOfBirth
+   {
+      get
+      {
+#pragma warning disable IDE0008 // Use explicit type
+         var (year, month, day) = GetYearMonthDay(Value);
+#pragma warning restore IDE0008 // Use explicit type
+
+         return (year, month, day) switch
+         {
+            (> 0, > 0, > 0) => new DateResult(year, month, day),
+            (> 0, 0, _) => new DateResult(year),
+            _ => new DateResult()
+         };
+      }
+   }
+
+   /// <summary>
    ///   The raw burgerservicenummer value.
    /// </summary>
    public String Value { get; private init; }
@@ -383,13 +404,6 @@ public record BeRijksregisternummer
       fieldStart += fieldWidth;
       var sequenceNumber = rijksregisternummer[fieldStart..].ParseThreeDigits();
 
-      // Already parsed the individual elements, combine to use in checksum calculation.
-      var total = sequenceNumber + (day * 1000) + (month * 10000) + (year * 10000000);
-      var checksum = rijksregisternummer[^2..].ParseTwoDigits();
-      var century = (97 - (total % 97)) == checksum
-         ? 1900
-         : 2000;
-
       // Apply BIS-nummer offsets if necessary.
       month = month switch
       {
@@ -398,7 +412,20 @@ public record BeRijksregisternummer
          _ => month
       };
 
-      return (century + year, month, day);
+      // Add the century to the year if the date is not incomplete.
+      if (year > 0 || month > 0)
+      {
+         // Already parsed the individual elements, combine to use in checksum calculation.
+         var total = sequenceNumber + (day * 1000) + (month * 100000) + (year * 10000000);
+         var checksum = rijksregisternummer[^2..].ParseTwoDigits();
+         var century = (97 - (total % 97)) == checksum
+            ? 1900
+            : 2000;
+
+         year += century;
+      }
+
+      return (year, month, day);
    }
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -457,18 +484,18 @@ public record BeRijksregisternummer
       var (year, month, day) = GetYearMonthDay(rijksregisternummer);
 #pragma warning restore IDE0008 // Use explicit type
 
+      // Allow zero for incomplete dates of birth.
+      if (year == 0 || month == 0 || day == 0)
+      {
+         return true;
+      }
+
       if (year < MinimumValidYearOfBirth || year > MaximumValidYearOfBirth)
       {
          // Should be impossible to ever reach this point because of the check
          // digit calcuations, but return false out of abundance of caution and
          // to avoid throwing an exception.
          return false;
-      }
-
-      // Allow zero for incomplete dates of birth.
-      if (month == 0 || day == 0)
-      {
-         return true;
       }
 
       if (month < 1 || month > 12)
