@@ -375,4 +375,7 @@
   <data name="DateResultPartialDateToDateOnly" xml:space="preserve">
     <value>Can not convert a partial or unknown date to a DateOnly type.</value>
   </data>
+  <data name="BeRijksregisternummerInvalidSequenceNumber" xml:space="preserve">
+    <value>BE Rijksregisternummer sequence number may not be '000' or '999'</value>
+  </data>
 </root>

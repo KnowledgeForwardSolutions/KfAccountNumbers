@@ -45,7 +45,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      A Belgian rijksregisternummer may be formatted as a string of 11 consecutive
-///      digits (YYMMCCXXXCC) or as a 15 character string with characters separating
+///      digits (YYMMDDXXXCC) or as a 15 character string with characters separating
 ///      the individual elements. YY.MM.DD-XXX.CC is the typical display format.
 ///   </para>
 ///   <para>
@@ -236,6 +236,7 @@ public record BeRijksregisternummer
    private const Int32 Separator4Offset = 12;
 
    // These items are measured from the end of the value.
+   private const Int32 GenderOffset = 3;
    private const Int32 CheckDigit1Offset = 2;
    private const Int32 CheckDigit2Offset = 1;
 
@@ -308,7 +309,43 @@ public record BeRijksregisternummer
    }
 
    /// <summary>
-   ///   The raw burgerservicenummer value.
+   ///   The person's gender, as indicated by the sequence number (and in the
+   ///   case of a BIS-nummer, the month offset).
+   /// </summary>
+   public BinaryOrUnknownGender Gender
+   {
+      get
+      {
+         ReadOnlySpan<Char> span = Value.AsSpan();
+
+         // Check for BIS-nummer with unknown gender.
+         var num = span[2..].ParseTwoDigits();
+         if (num is >= 20 and <= 32)
+         {
+            return BinaryOrUnknownGender.Unknown;
+         }
+
+         return span[^GenderOffset] % 2 == 0          // This works because the ASCII character values for digits have the same odd/even pattern
+            ? BinaryOrUnknownGender.Female
+            : BinaryOrUnknownGender.Male;
+      }
+   }
+
+   /// <summary>
+   ///   The type of Belgian identifier represented by the current value.
+   /// </summary>
+   /// <remarks>
+   ///   The month component of the date of birth determines the identifier type.
+   ///   BIS-nummers add an offset (either 20 or 40) to the month so month values
+   ///   greater than 12 indicate that the identifier is a BIS-nummer.
+   /// </remarks>
+   public BeIdentifierType IdentifierType
+      => Value.AsSpan(2..).ParseTwoDigits() > 12
+         ? BeIdentifierType.BisNummer
+         : BeIdentifierType.Rijksregisternummer;
+
+   /// <summary>
+   ///   The raw rijksregisternummer value.
    /// </summary>
    public String Value { get; private init; }
 
@@ -406,6 +443,10 @@ public record BeRijksregisternummer
       else if (!ValidateSeparators(rijksregisternummer))
       {
          return BeRijksregisternummerValidationResult.InvalidSeparator;
+      }
+      else if (!ValidateSequenceNumber(rijksregisternummer))
+      {
+         return BeRijksregisternummerValidationResult.InvalidSequenceNumber;
       }
       else if (!ValidateDateOfBirth(rijksregisternummer))
       {
@@ -573,6 +614,14 @@ public record BeRijksregisternummer
             && !rijksregisternummer[Separator3Offset].IsAsciiDigit()
             && !rijksregisternummer[Separator4Offset].IsAsciiDigit()
          );
+
+   private static Boolean ValidateSequenceNumber(ReadOnlySpan<Char> rijsregisternummer)
+   {
+      var offsetFromEnd = IsFormatted(rijsregisternummer) ? 6 : 5;
+      var sequenceNumber = rijsregisternummer[^offsetFromEnd..].ParseThreeDigits();
+
+      return sequenceNumber is not 0 and not 999;
+   }
 }
 
 public class BeRijksregisternummerJsonConverter : JsonConverter<BeRijksregisternummer>

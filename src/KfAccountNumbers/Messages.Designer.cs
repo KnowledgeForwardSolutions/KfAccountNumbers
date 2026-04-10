@@ -115,6 +115,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer sequence number may not be &apos;000&apos; or &apos;999&apos;.
+        /// </summary>
+        internal static string BeRijksregisternummerInvalidSequenceNumber {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerInvalidSequenceNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CA Social Insurance Number may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string CaSinEmpty {

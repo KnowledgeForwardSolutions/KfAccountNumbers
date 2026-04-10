@@ -343,6 +343,14 @@ public class BeRijksregisternummerTests
       "85.07.30-033928",
    ];
 
+   public static TheoryData<String> InvalidSequenceNumberValues =>
+   [
+      "17110800097",
+      "17110899968",
+      "17.11.08-000.97",
+      "17.11.08-999.68",
+   ];
+
    public static TheoryData<Int32, Int32, Int32, Boolean> InvalidDateOfBirthValues = new()
    {
       // rijksregisternummers
@@ -555,6 +563,15 @@ public class BeRijksregisternummerTests
          .And.ValidationResult.Should().Be(BeRijksregisternummerValidationResult.InvalidSeparator);
 
    [Theory]
+   [MemberData(nameof(InvalidSequenceNumberValues))]
+   public void BeRijksregisternummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSequenceNumber(String value)
+      => FluentActions
+         .Invoking(() => new BeRijksregisternummer(value))
+         .Should().Throw<KfValidationException<BeRijksregisternummerValidationResult>>()
+         .WithMessage(Messages.BeRijksregisternummerInvalidSequenceNumber + "*")
+         .And.ValidationResult.Should().Be(BeRijksregisternummerValidationResult.InvalidSequenceNumber);
+
+   [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]
    public void BeRijksregisternummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
       Int32 year,
@@ -604,6 +621,70 @@ public class BeRijksregisternummerTests
 
       // Act/assert.
       sut.DateOfBirth.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Gender Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(10, 180, BinaryOrUnknownGender.Female, false)]
+   [InlineData(10, 181, BinaryOrUnknownGender.Male, false)]
+   [InlineData(10, 182, BinaryOrUnknownGender.Female, false)]
+   [InlineData(10, 183, BinaryOrUnknownGender.Male, false)]
+   [InlineData(10, 184, BinaryOrUnknownGender.Female, false)]
+   [InlineData(10, 185, BinaryOrUnknownGender.Male, true)]
+   [InlineData(10, 186, BinaryOrUnknownGender.Female, true)]
+   [InlineData(10, 187, BinaryOrUnknownGender.Male, true)]
+   [InlineData(10, 188, BinaryOrUnknownGender.Female, true)]
+   [InlineData(10, 189, BinaryOrUnknownGender.Male, true)]
+
+   [InlineData(21, 181, BinaryOrUnknownGender.Unknown, false)]
+   [InlineData(32, 182, BinaryOrUnknownGender.Unknown, true)]
+   public void BeRijksregisternummer_Gender_ShouldReturnExpectedValue(
+      Int32 month,
+      Int32 sequenceNumber,
+      BinaryOrUnknownGender expectedGender,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetRijksregisternummerWithValidCheckDigits(
+         month: month,
+         sequenceNumber: sequenceNumber,
+         formatted: formatted);
+      var sut = new BeRijksregisternummer(value);
+
+      // Act/assert.
+      sut.Gender.Should().Be(expectedGender);
+   }
+
+   #endregion
+
+   #region IdentifierType Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Valid11CharacterRijksregisternummer, BeIdentifierType.Rijksregisternummer)]
+   [InlineData(AltValid15CharacterRijksregisternummer, BeIdentifierType.Rijksregisternummer)]
+   [InlineData(IncompleteDateOfBirthRijksregisternummer, BeIdentifierType.Rijksregisternummer)]
+   [InlineData(UnknownDateOfBirthRijksregisternummer, BeIdentifierType.Rijksregisternummer)]
+   [InlineData(Valid11CharacterBisnummer, BeIdentifierType.BisNummer)]
+   [InlineData(AltValid15CharacterBisnummer, BeIdentifierType.BisNummer)]
+   [InlineData(IncompleteDateOfBirthBisnummer, BeIdentifierType.BisNummer)]
+   [InlineData(UnknownDateOfBirthBisnummer, BeIdentifierType.BisNummer)]
+   [InlineData(UnknownDateOfBirthUnknownGenderBisnummer, BeIdentifierType.BisNummer)]
+   public void BeRijksregisternummer_IdentifierType_ShouldReturnExpectedValue(
+      String value,
+      BeIdentifierType expectedIdentifierType)
+   {
+      // Arrange.
+      var sut = new BeRijksregisternummer(value);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(expectedIdentifierType);
    }
 
    #endregion
@@ -772,6 +853,15 @@ public class BeRijksregisternummerTests
          .Should().Throw<KfValidationException<BeRijksregisternummerValidationResult>>()
          .WithMessage(Messages.BeRijksregisternummerInvalidSeparator + "*")
          .And.ValidationResult.Should().Be(BeRijksregisternummerValidationResult.InvalidSeparator);
+
+   [Theory]
+   [MemberData(nameof(InvalidSequenceNumberValues))]
+   public void BeRijksregisternummer_ExplicitCastToBeRijksregisternummer_ShouldThrowKfValidationException_WhenValueHasInvalidSequenceNumber(String value)
+      => FluentActions
+         .Invoking(() => _ = (BeRijksregisternummer)value)
+         .Should().Throw<KfValidationException<BeRijksregisternummerValidationResult>>()
+         .WithMessage(Messages.BeRijksregisternummerInvalidSequenceNumber + "*")
+         .And.ValidationResult.Should().Be(BeRijksregisternummerValidationResult.InvalidSequenceNumber);
 
    [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]
@@ -1005,6 +1095,20 @@ public class BeRijksregisternummerTests
       result.IsSuccess.Should().BeFalse();
       result.Value.Should().Be(null);
       result.ValidationFailure.Should().Be(BeRijksregisternummerValidationResult.InvalidSeparator);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSequenceNumberValues))]
+   public void BeRijksregisternummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSequenceNumber(String value)
+   {
+      // Act.
+      var result = BeRijksregisternummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(BeRijksregisternummerValidationResult.InvalidSequenceNumber);
    }
 
    [Theory]
@@ -1286,6 +1390,11 @@ public class BeRijksregisternummerTests
    [MemberData(nameof(InvalidSeparatorValues))]
    public void BeRijksregisternummer_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidInvalidSeparator(String value)
       => BeRijksregisternummer.Validate(value).Should().Be(BeRijksregisternummerValidationResult.InvalidSeparator);
+
+   [Theory]
+   [MemberData(nameof(InvalidSequenceNumberValues))]
+   public void BeRijksregisternummer_Validate_ShouldReturnInvalidSequenceNumber_WhenValueHasInvalidInvalidSequenceNumber(String value)
+      => BeRijksregisternummer.Validate(value).Should().Be(BeRijksregisternummerValidationResult.InvalidSequenceNumber);
 
    [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]

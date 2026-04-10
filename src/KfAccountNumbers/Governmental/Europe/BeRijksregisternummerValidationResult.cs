@@ -43,6 +43,11 @@ public enum BeRijksregisternummerValidationResult
    InvalidSeparator,
 
    /// <summary>
+   ///   The sequence number element may not be "000" or "999".
+   /// </summary>
+   InvalidSequenceNumber,
+
+   /// <summary>
    ///   The date of birth specified by leading (left-most) six digits and the
    ///   check digits is not a valid date in YYMMDD format.
    /// </summary>
@@ -62,6 +67,7 @@ public static class BeRijksregisternummerValidationResultExtensions
          BeRijksregisternummerValidationResult.InvalidCharacter => Messages.BeRijksregisternummerInvalidCharacter,
          BeRijksregisternummerValidationResult.InvalidCheckDigits => Messages.BeRijksregisternummerInvalidCheckDigits,
          BeRijksregisternummerValidationResult.InvalidSeparator => Messages.BeRijksregisternummerInvalidSeparator,
+         BeRijksregisternummerValidationResult.InvalidSequenceNumber => Messages.BeRijksregisternummerInvalidSequenceNumber,
          BeRijksregisternummerValidationResult.InvalidDateOfBirth => Messages.BeRijksregisternummerInvalidDateOfBirth,
          BeRijksregisternummerValidationResult.ValidationPassed => Messages.ValidationPassed,
          _ => throw new SwitchExpressionException()
