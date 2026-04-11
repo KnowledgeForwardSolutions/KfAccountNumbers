@@ -66,7 +66,7 @@ is a unique identifier assigned to all persons (Belgian citizens and foreign res
 in Belgium's National Register (Rijksregister/Registre national). Persons who are not in the National
 register, but who still need a Belgian national identifier (such as cross-border workers) are assigned
 a BIS number (bis-nummer or numéro bis). The `BeRijksregisternummer` type includes an `IdentifierType`
-property which returns a `BEIdentifierType` enumeration value that indicates the exact type of identifier
+property which returns a `BeIdentifierType` enumeration value that indicates the exact type of identifier
 represented.
 
 A Belgian rijksregisternummer is an eleven-digit identifier structured as YYMMDDXXXCC with the following
@@ -82,7 +82,7 @@ elements:
   first prefixing YYMMDDXXX with the digit 2 (i.e. 2YYMMDDXXX) then the person's century of birth
   is 2000-2099.
 
-A Belgian rijksregisternummer may be formatted as a string of 11 consecutive digits (YYMMCCXXXCC) or
+A Belgian rijksregisternummer may be formatted as a string of 11 consecutive digits (YYMMDDXXXCC) or
 as a 15 character string with characters separating the individual elements. YY.MM.DD-XXX.CC is the
 typical display format.
 
