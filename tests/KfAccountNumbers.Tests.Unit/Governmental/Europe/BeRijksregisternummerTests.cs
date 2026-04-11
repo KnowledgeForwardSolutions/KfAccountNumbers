@@ -23,15 +23,15 @@ public class BeRijksregisternummerTests
    private const String IncompleteDateOfBirthUnknownGenderBisnummer = "01 20 00 955-11";  // 2001
    private const String UnknownDateOfBirthUnknownGenderBisnummer = "00 20 01 003-10";
 
-   private static String GetRawRijksregisternummer(String rijsregisternummer)
+   private static String GetRawRijksregisternummer(String rijksregisternummer)
    {
-      if (rijsregisternummer.Length == 11)
+      if (rijksregisternummer.Length == 11)
       {
-         return rijsregisternummer;
+         return rijksregisternummer;
       }
 
-      return rijsregisternummer[0..2] + rijsregisternummer[3..5] + rijsregisternummer[6..8] +
-         rijsregisternummer[9..12] + rijsregisternummer[13..];
+      return rijksregisternummer[0..2] + rijksregisternummer[3..5] + rijksregisternummer[6..8] +
+         rijksregisternummer[9..12] + rijksregisternummer[13..];
    }
 
    private static String GetRijksregisternummerWithValidCheckDigits(
@@ -45,8 +45,8 @@ public class BeRijksregisternummerTests
       var checkSum = GetCheckSum(temp);
       
       return formatted
-         ? $"{year % 100:D2}{month:D2}{day:D2}{sequenceNumber:D3}{checkSum:D2}"
-         : $"{year % 100:D2}.{month:D2}.{day:D2}-{sequenceNumber:D3}.{checkSum:D2}";
+         ? $"{year % 100:D2}.{month:D2}.{day:D2}-{sequenceNumber:D3}.{checkSum:D2}"
+         : $"{year % 100:D2}{month:D2}{day:D2}{sequenceNumber:D3}{checkSum:D2}";
    }
 
    private static Int32 GetCheckSum(String str)
@@ -80,14 +80,18 @@ public class BeRijksregisternummerTests
       UnknownDateOfBirthUnknownGenderBisnummer,
    ];
 
-   public static TheoryData<String> InvalidLengthValues =>
-   [
-      "1711080468",           // Length 10
-      "171108046801",         // Length 11
-      "85.07.30-033.2",       // Length 14
-      "85.07.30-033.289",     // Length 16
-      new String('1', 100)    // Very long string
-   ];
+   public static TheoryData<Int32, Int32, Boolean> ValidSequenceNumberBoundaryValues = new()
+   {
+      { 1965,   1, false },      // Sequence number lower bound
+      { 1965, 998, false },      // Sequence number upper bound
+      { 2010,   1, false },
+      { 2010, 998, false },
+
+      { 1965,   1, true },
+      { 1965, 998, true },
+      { 2010,   1, true },
+      { 2010, 998, true },
+   };
 
    public static TheoryData<Int32, Int32, Int32, Boolean> ValidDateOfBirthValues = new()
    {
@@ -248,6 +252,15 @@ public class BeRijksregisternummerTests
       {    0, 20,  1, true },    // Unknown date of birth
    };
 
+   public static TheoryData<String> InvalidLengthValues =>
+   [
+      "1711080468",           // Length 10
+      "171108046801",         // Length 11
+      "85.07.30-033.2",       // Length 14
+      "85.07.30-033.289",     // Length 16
+      new String('1', 100)    // Very long string
+   ];
+
    public static TheoryData<String> InvalidCharacterValues =>
    [
       "A7110804680",             // Non-digit character 'A'
@@ -285,6 +298,9 @@ public class BeRijksregisternummerTests
       "17110408680",             // 17110804680 with two digit jump transposition, 804 -> 408
       "85073004428",             // 85073003328 with two digit twin error, 33 -> 44
       "17220804680",             // 17110804680 with two digit twin error, 11 -> 22
+      "85073003300",             // 85073003328 with invalid check digits -> 00
+      "17110804698",             // 17110804680 with invalid check digits -> 98
+      "85073003399",             // 85073003328 with invalid check digits -> 99
 
       "85.07.20-033.28",         // 85073003328 with single digit transcription error, 3 -> 2
       "17.11.08-056.80",         // 17110804680 with single digit transcription error, 4 -> 5
@@ -294,6 +310,9 @@ public class BeRijksregisternummerTests
       "17 11 04 086 80",         // 17110804680 with two digit jump transposition, 804 -> 408
       "85 07 30 044 28",         // 85073003328 with two digit twin error, 33 -> 44
       "17 22 08 046 80",         // 17110804680 with two digit twin error, 11 -> 22
+      "85.07.30-033.00",         // 85073003328 with invalid check digits -> 00
+      "17.11.08-046.98",         // 17110804680 with invalid check digits -> 98
+      "85.07.30-033.99",         // 85073003328 with invalid check digits -> 99
    ];
 
    public static TheoryData<String> InvalidSeparatorValues =>
@@ -345,16 +364,22 @@ public class BeRijksregisternummerTests
 
    public static TheoryData<String> InvalidSequenceNumberValues =>
    [
-      "17110800097",
-      "17110899968",
-      "17.11.08-000.97",
-      "17.11.08-999.68",
+      "17110800097",          // 1917
+      "17110899968",          // 1917
+      "17.11.08-000.97",      // 1917
+      "17.11.08-999.68",      // 1917
+      "17110800029",          // 2017
+      "17110899997",          // 2017
+      "17.11.08-000.29",      // 2017
+      "17.11.08-999.97",      // 2017
    ];
 
    public static TheoryData<Int32, Int32, Int32, Boolean> InvalidDateOfBirthValues = new()
    {
       // rijksregisternummers
+      {    0,  0,  0, false },      // Unknown date of birth requires non-zero day
       { 1904, 13, 31, false },      // month = 13
+      { 1904,  1,  0, false },      // day = 0
       { 1904,  1, 32, false },      // Invalid day of month for January, any year
       { 1901,  2, 29, false },      // Invalid day of for February, non-leap year
       { 1904,  2, 30, false },      // Invalid day of for February, leap year
@@ -371,7 +396,9 @@ public class BeRijksregisternummerTests
       { 2004, 12, 32, false },      // Invalid day of for December, any year
 
       // BIS-nummers
+      {    0, 40,  0, false },      // Unknown date of birth requires non-zero day
       { 1904, 53, 31, false },      // month = 13
+      { 1904, 41,  0, false },      // day = 0
       { 1904, 41, 32, false },      // Invalid day of month for January, any year
       { 1901, 42, 29, false },      // Invalid day of for February, non-leap year
       { 1904, 42, 30, false },      // Invalid day of for February, leap year
@@ -388,7 +415,9 @@ public class BeRijksregisternummerTests
       { 2004, 52, 32, false },      // Invalid day of for December, any year
 
       // BIS-nummers, unknown gender
+      {    0, 20,  0, false },      // Unknown date of birth requires non-zero day
       { 1904, 33, 31, false },      // month = 13
+      { 1904, 21,  0, false },      // day = 0
       { 1904, 21, 32, false },      // Invalid day of month for January, any year
       { 1901, 22, 29, false },      // Invalid day of for February, non-leap year
       { 1904, 22, 30, false },      // Invalid day of for February, leap year
@@ -405,7 +434,9 @@ public class BeRijksregisternummerTests
       { 2004, 32, 32, false },      // Invalid day of for December, any year
 
       // rijksregisternummers
+      {    0,  0,  0, true },       // Unknown date of birth requires non-zero day
       { 1904, 13, 31, true },       // month = 13
+      { 1904,  1,  0, true },       // day = 0
       { 1904,  1, 32, true },       // Invalid day of month for January, any year
       { 1901,  2, 29, true },       // Invalid day of for February, non-leap year
       { 1904,  2, 30, true },       // Invalid day of for February, leap year
@@ -422,7 +453,9 @@ public class BeRijksregisternummerTests
       { 2004, 12, 32, true },       // Invalid day of for December, any year
 
       // BIS-nummers
+      {    0, 40,  0, true },       // Unknown date of birth requires non-zero day
       { 1904, 53, 31, true },       // month = 13
+      { 1904, 41,  0, true },       // day = 0
       { 1904, 41, 32, true },       // Invalid day of month for January, any year
       { 1901, 42, 29, true },       // Invalid day of for February, non-leap year
       { 1904, 42, 30, true },       // Invalid day of for February, leap year
@@ -439,7 +472,9 @@ public class BeRijksregisternummerTests
       { 2004, 52, 32, true },       // Invalid day of for December, any year
 
       // BIS-nummers, unknown gender
+      {    0, 20,  0, true },       // Unknown date of birth requires non-zero day
       { 1904, 33, 31, true },       // month = 13
+      { 1904, 21,  0, true },       // day = 0
       { 1904, 21, 32, true },       // Invalid day of month for January, any year
       { 1901, 22, 29, true },       // Invalid day of for February, non-leap year
       { 1904, 22, 30, true },       // Invalid day of for February, leap year
@@ -487,6 +522,28 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
+      var expected = GetRawRijksregisternummer(value);
+
+      // Act.
+      var sut = new BeRijksregisternummer(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSequenceNumberBoundaryValues))]
+   public void BeRijksregisternummer_Constructor_ShouldCreateInstance_WhenValueHasValidSerialNumber(
+      Int32 year,
+      Int32 sequenceNumber,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetRijksregisternummerWithValidCheckDigits(
+         year,
+         sequenceNumber: sequenceNumber,
+         formatted: formatted);
       var expected = GetRawRijksregisternummer(value);
 
       // Act.
@@ -687,6 +744,25 @@ public class BeRijksregisternummerTests
       sut.IdentifierType.Should().Be(expectedIdentifierType);
    }
 
+   [Theory]
+   [InlineData(1, BeIdentifierType.Rijksregisternummer)]     // Month 1 = rijksregisternummer
+   [InlineData(12, BeIdentifierType.Rijksregisternummer)]    // Month 12 = rijksregisternummer
+   [InlineData(20, BeIdentifierType.BisNummer)]              // Month 20 = BIS unknown gender (min)
+   [InlineData(32, BeIdentifierType.BisNummer)]              // Month 32 = BIS unknown gender (max)
+   [InlineData(40, BeIdentifierType.BisNummer)]              // Month 40 = BIS (min)
+   [InlineData(52, BeIdentifierType.BisNummer)]              // Month 52 = BIS (max)
+   public void BeRijksregisternummer_IdentifierType_ShouldReturnExpectedValue_ForMonthBoundaries(
+      Int32 month,
+      BeIdentifierType expectedType)
+   {
+      // Arrange.
+      var value = GetRijksregisternummerWithValidCheckDigits(month: month);
+      var sut = new BeRijksregisternummer(value);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(expectedType);
+   }
+
    #endregion
 
    #region Value Property Tests
@@ -779,6 +855,28 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_ExplicitCastToBeRijksregisternummer_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
+      var expected = GetRawRijksregisternummer(value);
+
+      // Act.
+      var sut = (BeRijksregisternummer)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSequenceNumberBoundaryValues))]
+   public void BeRijksregisternummer_ExplicitCastToBeRijksregisternummer_ShouldCreateInstance_WhenValueHasValidSequenceNumber(
+      Int32 year,
+      Int32 sequenceNumber,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetRijksregisternummerWithValidCheckDigits(
+         year,
+         sequenceNumber: sequenceNumber,
+         formatted: formatted);
       var expected = GetRawRijksregisternummer(value);
 
       // Act.
@@ -924,7 +1022,6 @@ public class BeRijksregisternummerTests
    [Fact]
    public void BeRijksregisternummer_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqualAndHaveIncompleteDateOfBirth()
    {
-      // Arrange. 10 and 11 character versions for same person should still be equal.
       var sut1 = new BeRijksregisternummer(IncompleteDateOfBirthRijksregisternummer);
       var sut2 = new BeRijksregisternummer(IncompleteDateOfBirthRijksregisternummer);
 
@@ -993,6 +1090,30 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
+      var expectedValue = new BeRijksregisternummer(value);
+
+      // Act.
+      var result = BeRijksregisternummer.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSequenceNumberBoundaryValues))]
+   public void BeRijksregisternummer_Create_ShouldCreateInstance_WhenValueHasValidSequenceNumber(
+      Int32 year,
+      Int32 sequenceNumber,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetRijksregisternummerWithValidCheckDigits(
+         year,
+         sequenceNumber: sequenceNumber,
+         formatted: formatted);
       var expectedValue = new BeRijksregisternummer(value);
 
       // Act.
@@ -1350,6 +1471,23 @@ public class BeRijksregisternummerTests
    [MemberData(nameof(ValidRijksregisternummerValues))]
    public void BeRijksregisternummer_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
       => BeRijksregisternummer.Validate(value).Should().Be(BeRijksregisternummerValidationResult.ValidationPassed);
+
+   [Theory]
+   [MemberData(nameof(ValidSequenceNumberBoundaryValues))]
+   public void BeRijksregisternummer_Validate_ShouldReturnValidationPassed_WhenValueHasValidSequenceNumber(
+      Int32 year,
+      Int32 sequenceNumber,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetRijksregisternummerWithValidCheckDigits(
+         year,
+         sequenceNumber: sequenceNumber,
+         formatted: formatted);
+
+      // Act/assert.
+      BeRijksregisternummer.Validate(value).Should().Be(BeRijksregisternummerValidationResult.ValidationPassed);
+   }
 
    [Theory]
    [MemberData(nameof(ValidDateOfBirthValues))]

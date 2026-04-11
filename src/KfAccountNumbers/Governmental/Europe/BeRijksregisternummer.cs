@@ -586,7 +586,8 @@ public record BeRijksregisternummer
 #pragma warning restore IDE0008 // Use explicit type
 
       // Allow zero for incomplete dates of birth.
-      if (year == 0 || month == 0 || day == 0)
+      if ((year > 0 && month == 0)                    // Incomplete date of birth
+         || (year == 0 && month == 0 && day > 0))     // Unknown date of birth
       {
          return true;
       }
