@@ -118,14 +118,14 @@ public static class ExtensionMethods
 
    /// <summary>
    ///   Determines whether the result of converting a single character to an
-   ///   integer value resulted in a value other than 0-9.
+   ///   integer value is a valid decimal digit in the range 0-9.
    /// </summary>
    /// <param name="num">
    ///   The integer value to evaluate as a potential decimal digit.
    /// </param>
    /// <returns>
-   ///   <see langword="false"/> if the value is less than 0 or greater than 9;
-   ///   otherwise, <see langword="true"/>.
+   ///   <see langword="true"/> if <paramref name="num"/> is in the range 0-9,
+   ///   inclusive; otherwise, <see langword="false"/>.
    /// </returns>
    /// <remarks>
    ///   KfAccountNumbers typically converts a character that it expects to be

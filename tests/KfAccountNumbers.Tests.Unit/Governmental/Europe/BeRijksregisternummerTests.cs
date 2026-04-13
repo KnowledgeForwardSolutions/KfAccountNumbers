@@ -1192,7 +1192,7 @@ public class BeRijksregisternummerTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void BeRijksregisternummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidCheckDigits(String value)
+   public void BeRijksregisternummer_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigits(String value)
    {
       // Act.
       var result = BeRijksregisternummer.Create(value);
@@ -1220,7 +1220,7 @@ public class BeRijksregisternummerTests
 
    [Theory]
    [MemberData(nameof(InvalidSequenceNumberValues))]
-   public void BeRijksregisternummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSequenceNumber(String value)
+   public void BeRijksregisternummer_Create_ShouldReturnInvalidSequenceNumberValidationResult_WhenValueHasInvalidSequenceNumber(String value)
    {
       // Act.
       var result = BeRijksregisternummer.Create(value);
@@ -1536,7 +1536,7 @@ public class BeRijksregisternummerTests
 
    [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]
-   public void BeRijksregisternummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidInvalidDateOfBirth(
+   public void BeRijksregisternummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidDateOfBirth(
       Int32 year,
       Int32 month,
       Int32 day,

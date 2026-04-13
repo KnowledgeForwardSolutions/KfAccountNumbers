@@ -97,7 +97,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BE Rijksregisternummer must have length 11 (without separator characters) 15 (with separator characters).
+        ///   Looks up a localized string similar to BE Rijksregisternummer must have length 11 (without separator characters) or 15 (with separator characters).
         /// </summary>
         internal static string BeRijksregisternummerInvalidLength {
             get {
@@ -196,7 +196,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Can not convert a partial or unknown date to a DateOnly type..
+        ///   Looks up a localized string similar to Cannot convert a partial or unknown date to a DateOnly type..
         /// </summary>
         internal static string DateResultPartialDateToDateOnly {
             get {
@@ -837,9 +837,9 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to Year value must be between 1 and 9999, inclusive.
         /// </summary>
-        internal static string YearOutOFRange {
+        internal static string YearOutOfRange {
             get {
-                return ResourceManager.GetString("YearOutOFRange", resourceCulture);
+                return ResourceManager.GetString("YearOutOfRange", resourceCulture);
             }
         }
     }

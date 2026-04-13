@@ -346,7 +346,7 @@
     <value>BE Rijksregisternummer may not be null, empty or all whitespace characters</value>
   </data>
   <data name="BeRijksregisternummerInvalidLength" xml:space="preserve">
-    <value>BE Rijksregisternummer must have length 11 (without separator characters) 15 (with separator characters)</value>
+    <value>BE Rijksregisternummer must have length 11 (without separator characters) or 15 (with separator characters)</value>
   </data>
   <data name="BeRijksregisternummerInvalidCharacter" xml:space="preserve">
     <value>BE Rijksregisternummer contains a non-digit character where a digit was expected</value>
@@ -360,7 +360,7 @@
   <data name="BeRijksregisternummerInvalidDateOfBirth" xml:space="preserve">
     <value>BE Rijksregisternummer must have a valid date of birth in YYMMDD format as the leading (left-most) digits</value>
   </data>
-  <data name="YearOutOFRange" xml:space="preserve">
+  <data name="YearOutOfRange" xml:space="preserve">
     <value>Year value must be between 1 and 9999, inclusive</value>
   </data>
   <data name="MonthOutOfRange" xml:space="preserve">
@@ -373,7 +373,7 @@
     <value>Day {0} is invalid for year {1} and month {2}</value>
   </data>
   <data name="DateResultPartialDateToDateOnly" xml:space="preserve">
-    <value>Can not convert a partial or unknown date to a DateOnly type.</value>
+    <value>Cannot convert a partial or unknown date to a DateOnly type.</value>
   </data>
   <data name="BeRijksregisternummerInvalidSequenceNumber" xml:space="preserve">
     <value>BE Rijksregisternummer sequence number may not be '000' or '999'</value>

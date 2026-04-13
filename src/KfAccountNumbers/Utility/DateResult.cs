@@ -41,27 +41,28 @@ public record DateResult
    {
       if (year is < 1 or > 9999)
       {
-         throw new ArgumentOutOfRangeException(nameof(year), Messages.YearOutOFRange);
+         throw new ArgumentOutOfRangeException(nameof(year), year, Messages.YearOutOfRange);
       }
-      
+
       if (month is < 1 or > 12)
       {
-         throw new ArgumentOutOfRangeException(nameof(month), Messages.MonthOutOfRange);
+         throw new ArgumentOutOfRangeException(nameof(month), month, Messages.MonthOutOfRange);
       }
-      
-      if (day is < 1 or > 31)
-      {
-         throw new ArgumentOutOfRangeException(nameof(day), Messages.DayOutOfRange);
-      }
-      
+
       if (year is not null && month is not null && day is not null)
       {
          if (day > DateTime.DaysInMonth(year.Value, month.Value))
          {
-            throw new ArgumentOutOfRangeException(nameof(day), 
+            throw new ArgumentOutOfRangeException(nameof(day),
+               day,
                String.Format(Messages.DayOutOfRangeForYearAndMonth, day, year, month));
          }
       }
+      else if (day is < 1 or > 31)
+      {
+         throw new ArgumentOutOfRangeException(nameof(day), day, Messages.DayOutOfRange);
+      }
+
 
       Year = year;
       Month = month;

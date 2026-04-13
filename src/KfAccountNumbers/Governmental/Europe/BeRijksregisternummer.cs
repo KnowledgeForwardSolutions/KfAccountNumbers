@@ -104,7 +104,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <description>
 ///               If the person's date of birth is incomplete, then the two digit
-///               year  is used and zeros are used for month and year (for example,
+///               year is used and zeros are used for month and day (for example,
 ///               40.00.00-955.69).
 ///            </description>
 ///         </item>
@@ -114,7 +114,10 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///               a particular year than can be represented by a three digit sequence
 ///               number (i.e. more than 499 males with incomplete dates of birth for
 ///               the year 1940), then 01 is used for the day of birth and the sequence
-///               number rolls over to 001 (ex. 40.00.01-001.33)
+///               number rolls over to 001 (ex. 40.00.01-001.33). (Note that
+///               <see cref="BeRijksregisternummer"/> does not enforce an upper limit
+///               on the day component in cases of rollover, though multiple rollovers
+///               in a single year should be rare.)
 ///            </description>
 ///         </item>
 ///         <item>
@@ -259,8 +262,8 @@ public record BeRijksregisternummer
    ///   <paramref name="rijksregisternummer"/> has invalid modulus 97 check digit
    ///   characters in the trailing (right-most) character positions.
    ///   - or -
-   ///   <paramref name="rijksregisternummer"/> is 11 characters in length and has a
-   ///   character other than dash ('-') as a separator.
+   ///   <paramref name="rijksregisternummer"/> is 15 characters in length and has
+   ///   an ASCII digit character ('0'-'9') in a separator location.
    ///   - or -
    ///   <paramref name="rijksregisternummer"/> contains an invalid date of birth in
    ///   the leading (left-most) six digits.

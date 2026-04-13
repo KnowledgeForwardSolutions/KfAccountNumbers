@@ -60,7 +60,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 
 ## BeRijksregisternummer
 
-The `BeRijksregisternummer` type represents two possible national identification number used by Belgium.
+The `BeRijksregisternummer` type represents two possible national identification numbers used by Belgium.
 The Belgian National Register Number (Rijksregisternummer in Dutch, Numéro de registre national in French)
 is a unique identifier assigned to all persons (Belgian citizens and foreign residents) who are registered
 in Belgium's National Register (Rijksregister/Registre national). Persons who are not in the National
@@ -104,7 +104,9 @@ The date of birth can be adjusted in a variety of ways:
   month and year (for example, 40.00.00-955.69).
 * If there are too many people with incomplete dates of birth for a particular year than can be represented
   by a three digit sequence number (i.e. more than 499 males with incomplete dates of birth for the year 1940),
-  then 01 is used for the day of birth and the sequence number rolls over to 001 (ex. 40.00.01-001.33)
+  then 01 is used for the day of birth and the sequence number rolls over to 001 (ex. 40.00.01-001.33).
+  (Note that `BeRijksregisternummer` does not enforce an upper limit on the day component in cases of
+  rollover, though multiple rollovers in a single year should be rare.)
 * If the person's date of birth is unknown, then the constant 00.00.01 is used.
 * As noted above, if the value is a BIS number then 40 is added to the month component of the date of birth.
 * If the value is a BIS number **AND** the person's gender is unknown at the time the number is issued then

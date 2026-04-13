@@ -1,7 +1,7 @@
 # S0014-BeNationalRegisterNumber Business Object
 
 ## Overview
-Create a strongly typed business object to represent a Belgian National Register Number (Rijksregisternummer in Dutch, Numéro de registre national in French) issued by the Belgian government. The National Register Number is a unique identifier assigned to all persons registered in Belgium's National Register (Rijksregister/Registre national), including Belgian citizens and foreign residents.
+Create a strongly typed business object to represent a Belgian National Register Number (Rijksregisternummer in Dutch, NumÃ©ro de registre national in French) issued by the Belgian government. The National Register Number is a unique identifier assigned to all persons registered in Belgium's National Register (Rijksregister/Registre national), including Belgian citizens and foreign residents.
 
 ## Background
 A Belgian National Register Number is an 11-digit identifier in the format YY.MM.DD-XXX.CC, where:
@@ -165,7 +165,8 @@ Invalid examples:
   - Validate that serial is in range 001-998
 - **Check Digit Range**: Check digits range from 01-97
   - This is a result of the modulo 97 calculation
-  - Validate that check digits are = 97
+  - Validate that check digits match the calculated modulo 97 result
+
 - **Format Flexibility**: Accept various separator patterns during input
   - YY.MM.DD-XXX.CC (official format)
   - YYMMDD-XXXCC, YY.MM.DD-XXXCC, etc.
