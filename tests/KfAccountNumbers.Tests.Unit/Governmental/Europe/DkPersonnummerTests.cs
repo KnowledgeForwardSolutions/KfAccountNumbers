@@ -220,7 +220,7 @@ public class DkPersonnummerTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void DkPersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(String value)
+   public void DkPersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
       => FluentActions
          .Invoking(() => new DkPersonnummer(value))
          .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
@@ -492,7 +492,7 @@ public class DkPersonnummerTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(String value)
+   public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
       => FluentActions
          .Invoking(() => _ = (DkPersonnummer)value)
          .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
@@ -665,7 +665,7 @@ public class DkPersonnummerTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void DkPersonnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacter(String value)
+   public void DkPersonnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
    {
       // Act.
       var result = DkPersonnummer.Create(value);
@@ -930,7 +930,7 @@ public class DkPersonnummerTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void DkPersonnummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(String value)
+   public void DkPersonnummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
       => DkPersonnummer.Validate(value).Should().Be(DkPersonnummerValidationResult.InvalidCharacter);
 
    [Theory]

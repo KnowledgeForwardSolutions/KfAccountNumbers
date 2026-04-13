@@ -1,7 +1,7 @@
 # S0014-BeNationalRegisterNumber Business Object
 
 ## Overview
-Create a strongly typed business object to represent a Belgian National Register Number (Rijksregisternummer in Dutch, Numéro de registre national in French) issued by the Belgian government. The National Register Number is a unique identifier assigned to all persons registered in Belgium's National Register (Rijksregister/Registre national), including Belgian citizens and foreign residents.
+Create a strongly typed business object to represent a Belgian National Register Number (Rijksregisternummer in Dutch, NumÃ©ro de registre national in French) issued by the Belgian government. The National Register Number is a unique identifier assigned to all persons registered in Belgium's National Register (Rijksregister/Registre national), including Belgian citizens and foreign residents.
 
 ## Background
 A Belgian National Register Number is an 11-digit identifier in the format YY.MM.DD-XXX.CC, where:
@@ -38,7 +38,7 @@ A valid National Register Number must meet all of the following rules:
 - Characters 2-3 (MM) must be digits 01-12
 - Characters 4-5 (DD) must be digits 01-31
 - Characters 6-8 (XXX) must be digits 001-998 (000 and 999 are not used)
-- Characters 9-10 (CC) must be digits 00-96
+- Characters 9-10 (CC) must be digits 01-97
 - The date portion (YY.MM.DD) must represent a valid calendar date
 - The check digits must be correctly calculated using modulo 97 algorithm
 - If separators are used, they must be dots (.) or dashes (-) in appropriate positions
@@ -163,9 +163,10 @@ Invalid examples:
   - Independent of century calculation
 - **Reserved Serial Numbers**: 000 and 999 are not used
   - Validate that serial is in range 001-998
-- **Check Digit Range**: Check digits range from 00-96 (never 97-99)
+- **Check Digit Range**: Check digits range from 01-97
   - This is a result of the modulo 97 calculation
-  - Validate that check digits are = 96
+  - Validate that check digits match the calculated modulo 97 result
+
 - **Format Flexibility**: Accept various separator patterns during input
   - YY.MM.DD-XXX.CC (official format)
   - YYMMDD-XXXCC, YY.MM.DD-XXXCC, etc.

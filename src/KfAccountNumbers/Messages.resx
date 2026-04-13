@@ -342,4 +342,40 @@
   <data name="NlBurgerservicenummerInvalidSeparator" xml:space="preserve">
     <value>NL Burgerservicenummer separator character may not be a digit and the same non-digit character must be present in both separator character locations</value>
   </data>
+  <data name="BeRijksregisternummerEmpty" xml:space="preserve">
+    <value>BE Rijksregisternummer may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="BeRijksregisternummerInvalidLength" xml:space="preserve">
+    <value>BE Rijksregisternummer must have length 11 (without separator characters) or 15 (with separator characters)</value>
+  </data>
+  <data name="BeRijksregisternummerInvalidCharacter" xml:space="preserve">
+    <value>BE Rijksregisternummer contains a non-digit character where a digit was expected</value>
+  </data>
+  <data name="BeRijksregisternummerInvalidCheckDigits" xml:space="preserve">
+    <value>BE Rijksregisternummer must have a valid modulus 97 check sum in the two trailing (right-most) character positions</value>
+  </data>
+  <data name="BeRijksregisternummerInvalidSeparator" xml:space="preserve">
+    <value>BE Rijksregisternummer with length 15 may not have digit characters (0-9) in character positions 2, 5, 8 or 12 (zero-based)</value>
+  </data>
+  <data name="BeRijksregisternummerInvalidDateOfBirth" xml:space="preserve">
+    <value>BE Rijksregisternummer must have a valid date of birth in YYMMDD format as the leading (left-most) digits</value>
+  </data>
+  <data name="YearOutOfRange" xml:space="preserve">
+    <value>Year value must be between 1 and 9999, inclusive</value>
+  </data>
+  <data name="MonthOutOfRange" xml:space="preserve">
+    <value>Month must be between 1 and 12, inclusive</value>
+  </data>
+  <data name="DayOutOfRange" xml:space="preserve">
+    <value>Day must be between 1 and 31, inclusive</value>
+  </data>
+  <data name="DayOutOfRangeForYearAndMonth" xml:space="preserve">
+    <value>Day {0} is invalid for year {1} and month {2}</value>
+  </data>
+  <data name="DateResultPartialDateToDateOnly" xml:space="preserve">
+    <value>Cannot convert a partial or unknown date to a DateOnly type.</value>
+  </data>
+  <data name="BeRijksregisternummerInvalidSequenceNumber" xml:space="preserve">
+    <value>BE Rijksregisternummer sequence number may not be '000' or '999'</value>
+  </data>
 </root>

@@ -429,11 +429,7 @@ public record FiHenkilotunnus
 
    private static Boolean ValidateIndividualNumber(ReadOnlySpan<Char> henkilotunnus)
    {
-      var d1 = henkilotunnus[IndividualNumberStartOffset] - Chars.DigitZero;
-      var d2 = henkilotunnus[IndividualNumberStartOffset + 1] - Chars.DigitZero;
-      var d3 = henkilotunnus[IndividualNumberStartOffset + 2] - Chars.DigitZero;
-
-      var individualNumber = (d1 * 100) + (d2 * 10) + d3;
+      var individualNumber = henkilotunnus[IndividualNumberStartOffset..].ParseThreeDigits();
 
       return individualNumber >= 2;
    }

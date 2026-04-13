@@ -61,6 +61,69 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string BeRijksregisternummerEmpty {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string BeRijksregisternummerInvalidCharacter {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer must have a valid modulus 97 check sum in the two trailing (right-most) character positions.
+        /// </summary>
+        internal static string BeRijksregisternummerInvalidCheckDigits {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerInvalidCheckDigits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer must have a valid date of birth in YYMMDD format as the leading (left-most) digits.
+        /// </summary>
+        internal static string BeRijksregisternummerInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer must have length 11 (without separator characters) or 15 (with separator characters).
+        /// </summary>
+        internal static string BeRijksregisternummerInvalidLength {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer with length 15 may not have digit characters (0-9) in character positions 2, 5, 8 or 12 (zero-based).
+        /// </summary>
+        internal static string BeRijksregisternummerInvalidSeparator {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer sequence number may not be &apos;000&apos; or &apos;999&apos;.
+        /// </summary>
+        internal static string BeRijksregisternummerInvalidSequenceNumber {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerInvalidSequenceNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CA Social Insurance Number may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string CaSinEmpty {
@@ -129,6 +192,33 @@ namespace KfAccountNumbers {
         internal static string CreateResultValueNull {
             get {
                 return ResourceManager.GetString("CreateResultValueNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot convert a partial or unknown date to a DateOnly type..
+        /// </summary>
+        internal static string DateResultPartialDateToDateOnly {
+            get {
+                return ResourceManager.GetString("DateResultPartialDateToDateOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Day must be between 1 and 31, inclusive.
+        /// </summary>
+        internal static string DayOutOfRange {
+            get {
+                return ResourceManager.GetString("DayOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Day {0} is invalid for year {1} and month {2}.
+        /// </summary>
+        internal static string DayOutOfRangeForYearAndMonth {
+            get {
+                return ResourceManager.GetString("DayOutOfRangeForYearAndMonth", resourceCulture);
             }
         }
         
@@ -327,6 +417,15 @@ namespace KfAccountNumbers {
         internal static string IsKennitalaInvalidSeparator {
             get {
                 return ResourceManager.GetString("IsKennitalaInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Month must be between 1 and 12, inclusive.
+        /// </summary>
+        internal static string MonthOutOfRange {
+            get {
+                return ResourceManager.GetString("MonthOutOfRange", resourceCulture);
             }
         }
         
@@ -732,6 +831,15 @@ namespace KfAccountNumbers {
         internal static string ValidationPassed {
             get {
                 return ResourceManager.GetString("ValidationPassed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Year value must be between 1 and 9999, inclusive.
+        /// </summary>
+        internal static string YearOutOfRange {
+            get {
+                return ResourceManager.GetString("YearOutOfRange", resourceCulture);
             }
         }
     }
