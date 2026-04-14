@@ -112,6 +112,7 @@ public static class FrDepartmentCodes
          { "973", "Guyane" },
          { "974", "La Réunion" },
          { "976", "Mayotte" },
+         { "99", "à l'étranger" },
       }
       .GetAlternateLookup<ReadOnlySpan<Char>>();
 
@@ -155,6 +156,6 @@ public static class FrDepartmentCodes
    ///   This method performs a case-insensitive comparison of the supplied 
    ///   <paramref name="departmentCode"/> to the valid department codes.
    /// </remarks>
-   public static Boolean ValidateStateCode(ReadOnlySpan<Char> departmentCode)
+   public static Boolean ValidateDepartmentCode(ReadOnlySpan<Char> departmentCode)
       => _validDepartments.ContainsKey(departmentCode);
 }

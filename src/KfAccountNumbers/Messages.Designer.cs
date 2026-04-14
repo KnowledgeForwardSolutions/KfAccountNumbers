@@ -277,7 +277,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FI Henkilotunnus may not be null, empty or all whitespace characters.
+        ///   Looks up a localized string similar to FI Henkilotunnus number may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string FiHenkilotunnusEmpty {
             get {
@@ -354,6 +354,78 @@ namespace KfAccountNumbers {
         internal static string FormatStrNull {
             get {
                 return ResourceManager.GetString("FormatStrNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FR INSEE may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string FrInseeNumberEmpty {
+            get {
+                return ResourceManager.GetString("FrInseeNumberEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FR INSEE number contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string FrInseeNumberInvalidCharacter {
+            get {
+                return ResourceManager.GetString("FrInseeNumberInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FR INSEE number must have a valid modulus 97 check sum in the two trailing (right-most) character positions.
+        /// </summary>
+        internal static string FrInseeNumberInvalidCheckDigits {
+            get {
+                return ResourceManager.GetString("FrInseeNumberInvalidCheckDigits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FR INSEE number must have a valid INSEE department code.
+        /// </summary>
+        internal static string FrInseeNumberInvalidDepartment {
+            get {
+                return ResourceManager.GetString("FrInseeNumberInvalidDepartment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FR INSEE number requires a gender code of 1 (male), 2 (female) or 7 (male), 8 (female) for temporary INSEE numbers.
+        /// </summary>
+        internal static string FrInseeNumberInvalidGender {
+            get {
+                return ResourceManager.GetString("FrInseeNumberInvalidGender", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FR INSEE number must have length 15 (without separators) or 21 (with separators).
+        /// </summary>
+        internal static string FrInseeNumberInvalidLength {
+            get {
+                return ResourceManager.GetString("FrInseeNumberInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FR INSEE number must have a month value between 01 and 12 (for known dates) or 20-42, 50-99 (for persons with unknown or incomplete date of birth documentation).
+        /// </summary>
+        internal static string FrInseeNumberInvalidMonth {
+            get {
+                return ResourceManager.GetString("FrInseeNumberInvalidMonth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FR INSEE number with length 21 may not have digit characters (0-9) in character positions 1, 4, 7, 10, 15 and 18 (zero-based) and the same character must be used in each location.
+        /// </summary>
+        internal static string FrInseeNumberInvalidSeparator {
+            get {
+                return ResourceManager.GetString("FrInseeNumberInvalidSeparator", resourceCulture);
             }
         }
         

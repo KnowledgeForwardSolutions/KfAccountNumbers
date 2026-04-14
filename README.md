@@ -246,13 +246,14 @@ A French INSEE number is a 15-digit number structured as SYYMMLLOOOKKKCC with th
   is replaced by 19, and department code "2B" is replaced by 18.
 
 An INSEE number may be formatted as 15 consecutive digits or as 21 characters with spaces separating the different
-elements, i.e. S YY MM LL OOO KKK CC.
+elements, i.e. "S YY MM LL OOO KKK CC".
 
 A valid INSEE number must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
 * The value must be either 15 characters (without separators) or 21 characters (with separators) in length.
 * All characters (except the optional separator characters or Corsican department codes) must be ASCII digits ('0'-'9').
 * The two trailing (right-most) characters must be a valid modulus 97 check sum.
+* The separator characters (if used) may not be ASCII digits ('0'-'9'). All separator characters must be the same character.
 * The leading gender indicator (S) must be 1, 2, 7 or 8.
 * The month element (MM) must be a number between 01 and 12 (for known dates) or 20-42, 50-99 (for persons with unknown or
   incomplete date of birth documentation).
