@@ -149,4 +149,146 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </remarks>
 public record FrInseeNumber
 {
+   private const Int32 UnformattedLength = 15;
+   private const Int32 FormattedLength = 21;
+
+   private const Int32 Separator1Offset = 1;
+   private const Int32 Separator2Offset = 4;
+   private const Int32 Separator3Offset = 7;
+   private const Int32 Separator4Offset = 10;
+   private const Int32 Separator5Offset = 14;
+   private const Int32 Separator6Offset = 18;
+
+   private const Int32 UnformattedCorsicanDepartmentLetterOffset = 6;
+   private const Int32 FormattedCorsicanDepartmentLetterOffset = 9;
+
+   // These items are measured from the end of the value.
+   private const Int32 CheckDigit1Offset = 2;
+   private const Int32 CheckDigit2Offset = 1;
+
+   /// <summary>
+   ///   Check the <paramref name="insee"/> to determine if it contains a
+   ///   valid French INSEE number.
+   /// </summary>
+   /// <param name="insee">
+   ///   String representation of a French INSEE number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="FrInseeNumberValidationResult"/> enumeration 
+   ///   value that indicates if the <paramref name="insee"/> passed
+   ///   validation or what validation error was encountered.
+   /// </returns>
+   public static FrInseeNumberValidationResult Validate(String? insee)
+   {
+      if (String.IsNullOrWhiteSpace(insee))
+      {
+         return FrInseeNumberValidationResult.Empty;
+      }
+      else if (insee.Length is not UnformattedLength and not FormattedLength)
+      {
+         return FrInseeNumberValidationResult.InvalidLength;
+      }
+
+      // After performing basic checks, validate the check digits because the
+      // most common source of errors will be data entry errors. Then validate
+      // the subcomponents of the value.
+      FrInseeNumberValidationResult validationResult = ValidateCheckDigits(insee);
+      if (validationResult != FrInseeNumberValidationResult.ValidationPassed)
+      {
+         // Could be either InvalidCharacter or InvalidCheckDigit.
+         return validationResult;
+      }
+      //else if (!ValidateSeparators(insee))
+      //{
+      //   return BeRijksregisternummerValidationResult.InvalidSeparator;
+      //}
+      //else if (!ValidateSequenceNumber(insee))
+      //{
+      //   return BeRijksregisternummerValidationResult.InvalidSequenceNumber;
+      //}
+      //else if (!ValidateDateOfBirth(insee))
+      //{
+      //   return BeRijksregisternummerValidationResult.InvalidDateOfBirth;
+      //}
+
+      return FrInseeNumberValidationResult.ValidationPassed;
+   }
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean IsFormatted(ReadOnlySpan<Char> insee)
+      => insee.Length == FormattedLength;
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean IsSeparatorLocation(Int32 index)
+      => index is Separator1Offset or Separator2Offset or Separator3Offset or
+            Separator4Offset or Separator5Offset or Separator6Offset;
+
+   private static FrInseeNumberValidationResult ValidateCheckDigits(ReadOnlySpan<Char> insee)
+   {
+      var processLength = insee.Length - 2;      // Exclude check digits from main loop
+      var isFormatted = IsFormatted(insee);
+      var letterOffset = isFormatted ? FormattedCorsicanDepartmentLetterOffset : UnformattedCorsicanDepartmentLetterOffset;
+      var corsicanOffset = 0L;
+
+      var sum = 0L;
+      for (var index = 0; index < processLength; index++)
+      {
+         if (isFormatted && IsSeparatorLocation(index))
+         {
+            continue;
+         }
+
+         sum *= 10;
+         var num = insee[index].ToSingleDigit();
+         if (!num.IsValidDigit())
+         {
+            // Handle possible valid letter character in department code (2A or 2B are valid for Corsica).
+            // Note that there are two possible ways to handle Corsican department codes. The common
+            // option is to substitute "19" for "2A" and "18" for "2B" and process normally. The other
+            // option (described in footnote "F" on https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_s%C3%A9curit%C3%A9_sociale_en_France
+            // is to set the value for the letter character to zero and then subtracting 1,000,000 (for A)
+            // or 2,000,000 (for B) from the sum before calculating the remainder. The second option,
+            // which we call the "corsican offset", is used here because it does not involve creating
+            // a temporary copy of the INSEE with only digits or require looking ahead to the second
+            // department character if the department code starts with 2.
+            if (index == letterOffset)
+            {
+               corsicanOffset = insee[index] switch
+               {
+                  Chars.UpperCaseA => 1000000,
+                  Chars.UpperCaseB => 2000000,
+                  Chars.LowerCaseA => 1000000,
+                  Chars.LowerCaseB => 2000000,
+                  _ => 0L
+               };
+            }
+
+            // If not part of a valid Corsican department code then the character is invalid.
+            if (corsicanOffset == 0L)
+            {
+               return FrInseeNumberValidationResult.InvalidCharacter;
+            }
+
+            // If using corsican offset then num is ignored for this character.
+            num = 0;
+         }
+
+         sum += num;
+      }
+
+      sum -= corsicanOffset;
+      var remainder = 97 - (sum % 97);
+
+      var c1 = insee[^CheckDigit1Offset].ToSingleDigit();
+      var c2 = insee[^CheckDigit2Offset].ToSingleDigit();
+      if (!c1.IsValidDigit() || !c2.IsValidDigit())
+      {
+         return FrInseeNumberValidationResult.InvalidCharacter;
+      }
+      var checkSum = (c1 * 10) + c2;
+
+      return checkSum == remainder
+         ? FrInseeNumberValidationResult.ValidationPassed
+         : FrInseeNumberValidationResult.InvalidCheckDigits;
+   }
 }

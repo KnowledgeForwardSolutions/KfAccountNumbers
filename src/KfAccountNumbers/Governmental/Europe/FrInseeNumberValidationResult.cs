@@ -36,7 +36,7 @@ public enum FrInseeNumberValidationResult
 
    /// <summary>
    ///   21 character value contains a digit character (0-9) in a separator
-   ///   location (positions 1, 4, 7, 10, 15 and 18, zero-based). A valid separator
+   ///   location (positions 1, 4, 7, 10, 14 and 18, zero-based). A valid separator
    ///   may be any character other than a digit and the same character must be
    ///   used in all locations.
    /// </summary>
