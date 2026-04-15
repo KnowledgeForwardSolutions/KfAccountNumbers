@@ -198,10 +198,10 @@ public record FrInseeNumber
          // Could be either InvalidCharacter or InvalidCheckDigit.
          return validationResult;
       }
-      //else if (!ValidateSeparators(insee))
-      //{
-      //   return BeRijksregisternummerValidationResult.InvalidSeparator;
-      //}
+      else if (!ValidateSeparators(insee))
+      {
+         return FrInseeNumberValidationResult.InvalidSeparator;
+      }
       //else if (!ValidateSequenceNumber(insee))
       //{
       //   return BeRijksregisternummerValidationResult.InvalidSequenceNumber;
@@ -257,9 +257,7 @@ public record FrInseeNumber
                {
                   Chars.UpperCaseA => 1000000,
                   Chars.UpperCaseB => 2000000,
-                  Chars.LowerCaseA => 1000000,
-                  Chars.LowerCaseB => 2000000,
-                  _ => 0L
+                  _ => 0L                          // Not a valid Corsican department code
                };
             }
 
@@ -290,5 +288,23 @@ public record FrInseeNumber
       return checkSum == remainder
          ? FrInseeNumberValidationResult.ValidationPassed
          : FrInseeNumberValidationResult.InvalidCheckDigits;
+   }
+
+   private static Boolean ValidateSeparators(ReadOnlySpan<Char> insee)
+   {
+      if (insee.Length == UnformattedLength)
+      {
+         return true;
+      }
+
+      var separator = insee[Separator1Offset];
+
+      // Separator may not be an ASCII digit and all separators must be the same.
+      return !separator.IsAsciiDigit()
+             && insee[Separator2Offset] == separator
+             && insee[Separator3Offset] == separator
+             && insee[Separator4Offset] == separator
+             && insee[Separator5Offset] == separator
+             && insee[Separator6Offset] == separator;
    }
 }

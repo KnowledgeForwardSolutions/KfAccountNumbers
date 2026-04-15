@@ -11,26 +11,74 @@ public class FrInseeNumberTests
    private const String Valid15CharacterInseeNumber = "188121884813236";
    private const String AltValid15CharacterInseeNumber = "255102445387701";
    private const String Valid15CharacterInseeNumberCorsica = "112072A28806058";
+   private const String AltValid15CharacterInseeNumberCorsica = "112072B28806085";
    private const String Valid15CharacterTemporaryInseeNumber = "821099901013371";
    private const String Valid21CharacterInseeNumber = "1 88 12 18 848 132 36";
    private const String AltValid21CharacterInseeNumber = "2 55 10 24 453 877 01";
    private const String Valid21CharacterInseeNumberCorsica = "1 12 07 2A 288 060 58";
-   private const String Valid21CharacterTemporaryInseeNumber = "8 21 09 99 010 133 71";
+   private const String AltValid21CharacterInseeNumberCorsica = "1 12 07 2B 288 060 85";
+   private const String Valid21CharacterTemporaryInseeNumber = "8-21-09-99-010-133-71";
 
+   private static String GetInseeWithValidCheckDigits(
+      Char gender = Chars.DigitOne,
+      String year = "92",
+      String month = "06",
+      String department = "24",
+      String commune = "149",
+      String registrationOrder = "437")
+   {
+      var effectiveDepartment = department switch
+      {
+         "2A" => "19",
+         "2B" => "18",
+         _ => department
+      };
+      var effectiveCommune = department.Length == 3 ? commune[..2] : commune;    // Ensure default 3 char commune is valid for overseas departments
+      var work = $"{gender}{year}{month}{effectiveDepartment}{effectiveCommune}{registrationOrder}";
+      var checkSum = GetCheckSum(work);
+
+      return $"{gender}{year}{month}{department}{effectiveCommune}{registrationOrder}{checkSum:D2}";
+   }
+
+   private static Int32 GetCheckSum(String str)
+   {
+      var sum = 0L;
+      foreach (var ch in str)
+      {
+         sum *= 10;
+         var num = ch - Chars.DigitZero;
+         sum += num;
+      }
+
+      return (Int32)(97 - (sum % 97));
+   }
 
    public static TheoryData<String> ValidInseeNumbers =>
    [
       Valid15CharacterInseeNumber,
       AltValid15CharacterInseeNumber,
       Valid15CharacterInseeNumberCorsica,
+      AltValid15CharacterInseeNumberCorsica,
       Valid15CharacterTemporaryInseeNumber,
       Valid21CharacterInseeNumber,
       AltValid21CharacterInseeNumber,
       Valid21CharacterInseeNumberCorsica,
+      AltValid21CharacterInseeNumberCorsica,
       Valid21CharacterTemporaryInseeNumber,
 
       "295109912611193",
    ];
+
+   public static TheoryData<String> ValidDepartmentCodes
+   {
+      get
+      {
+         var data = new TheoryData<String>();
+         var departmentCodes = FrDepartmentCodes.GetAllDepartmentCodes();
+         data.AddRange(departmentCodes.AsEnumerable());
+         return data;
+      }
+   }
 
    public static TheoryData<String> InvalidLengthValues =>
    [
@@ -41,6 +89,93 @@ public class FrInseeNumberTests
       new String('1', 100)    // Very long string
    ];
 
+   public static TheoryData<String> InvalidCharacterValues =>
+   [
+      "A88121884813236",               // Non-digit character 'A'
+      "1 8121884813236",               // Non-digit character ' '
+      "18-121884813236",               // Non-digit character '-'
+      "188=21884813236",               // Non-digit character '='
+      "1881B1884813236",               // Non-digit character 'B'
+      "18812C884813236",               // Non-digit character 'C'
+      "188121a84813236",               // Non-digit character 'a' - 'A' would be valid in this location but not 'a'
+      "1881218b4813236",               // Non-digit character 'b'
+      "18812188~813236",               // Non-digit character '~'
+      "188121884\u215313236",          // Non-digit character Unicode fraction 1/3
+      "1881218848\u00D63236",          // Invalid character unicode O with umlaut
+      "18812188481A236",               // Non-digit character 'A'
+      "188121884813 36",               // Non-digit character ' '
+      "1881218848132-6",               // Non-digit character '-'
+      "18812188481323=",               // Non-digit character '='
+
+      "A 88 12 18 848 132 36",         // Non-digit character 'A'
+      "1  8 12 18 848 132 36",         // Non-digit character ' '
+      "1 8- 12 18 848 132 36",         // Non-digit character '-'
+      "1 88 =2 18 848 132 36",         // Non-digit character '='
+      "1 88 1B 18 848 132 36",         // Non-digit character 'B'
+      "1 88 12 C8 848 132 36",         // Non-digit character 'C'
+      "1 88 12 1a 848 132 36",         // Non-digit character 'a' - 'A' would be valid in this location but not 'a'
+      "1 88 12 18 b48 132 36",         // Non-digit character 'b'
+      "1 88 12 18 8~8 132 36",         // Non-digit character '~'
+      "1 88 12 18 84\u2153 132 36",    // Non-digit character Unicode fraction 1/3
+      "1 88 12 18 848 \u00D632 36",    // Invalid character unicode O with umlaut
+      "1 88 12 18 848 1A2 36",         // Non-digit character 'A'
+      "1 88 12 18 848 13  36",         // Non-digit character ' '
+      "1 88 12 18 848 132 -6",         // Non-digit character '-'
+      "1 88 12 18 848 132 3=",         // Non-digit character '='
+   ];
+
+   public static TheoryData<String> InvalidCheckDigitValues =>
+   [
+      "188121884812236",               // 188121884813236 with single digit transcription error, 3 -> 2
+      "255102545387701",               // 255102445387701 with single digit transcription error, 4 -> 5
+      "112072A28806059",               // 112072A28806058 with check digit transcription error, 8 -> 9
+      "188128184813236",               // 188121884813236 with two digit transposition error, 18 -> 81
+      "255102445387071",               // 255102445387701 with two digit transposition error, 70 -> 07
+      "117022A28806058",               // 112072A28806058 with two digit jump transposition, 207 -> 702
+      "188121994813236",               // 188121884813236 with two digit twin error, 88 -> 99
+      "255102445388801",               // 255102445387701 with two digit twin error, 77 -> 88
+      "112072A28806000",               // 112072A28806058 with invalid check digits -> 00
+      "188121884813298",               // 188121884813236 with invalid check digits -> 98
+      "255102445387799",               // 255102445387701 with invalid check digits -> 99
+
+      "1 88 12 18 848 122 36",         // 188121884813236 with single digit transcription error, 3 -> 2
+      "2 55 10 25 453 877 01",         // 255102445387701 with single digit transcription error, 4 -> 5
+      "1 12 07 2A 288 060 59",         // 112072A28806058 with check digit transcription error, 8 -> 9
+      "1 88 12 81 848 132 36",         // 188121884813236 with two digit transposition error, 18 -> 81
+      "2 55 10 24 453 870 71",         // 255102445387701 with two digit transposition error, 70 -> 07
+      "1 17 02 2A 288 060 58",         // 112072A28806058 with two digit jump transposition, 207 -> 702
+      "1 88 12 19 948 132 36",         // 188121884813236 with two digit twin error, 88 -> 99
+      "2 55 10 24 453 888 01",         // 255102445387701 with two digit twin error, 77 -> 88
+      "1 12 07 2A 288 060 00",         // 112072A28806058 with invalid check digits -> 00
+      "1 88 12 18 848 132 98",         // 188121884813236 with invalid check digits -> 98
+      "2 55 10 24 453 877 99",         // 255102445387701 with invalid check digits -> 99
+   ];
+
+   public static TheoryData<String> InvalidSeparatorValues =>
+   [
+      "1088 12 18 848 132 36",
+      "1188 12 18 848 132 36",
+      "1288 12 18 848 132 36",
+      "1388 12 18 848 132 36",
+      "1488 12 18 848 132 36",
+      "1588 12 18 848 132 36",
+      "1688 12 18 848 132 36",
+      "1788 12 18 848 132 36",
+      "1888 12 18 848 132 36",
+      "1988 12 18 848 132 36",
+
+      "1 88012 18 848 132 36",
+      "1 88 12018 848 132 36",
+      "1 88 12 180848 132 36",
+      "1 88 12 18 8480132 36",
+      "1 88 12 18 848 132036",
+
+      "1.88-12.18.848.132.36",
+      "1 88 12.18 848 132 36",
+      "1 88 12 18.848 132 36",
+      "1 88 12 18 848.132 36",
+      "1 88 12 18 848 132*36",
+   ];
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -51,6 +186,17 @@ public class FrInseeNumberTests
       => FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.ValidationPassed);
 
    [Theory]
+   [MemberData(nameof(ValidDepartmentCodes))]
+   public void FrInseeNumber_Validate_ShouldReturnValidationPassed_WhenValueHasValidDepartmentCode(String department)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(department: department);
+
+      // Act/assert.
+      FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.ValidationPassed);
+   }
+
+   [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void FrInseeNumber_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String value)
       => FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.Empty);
@@ -59,6 +205,21 @@ public class FrInseeNumberTests
    [MemberData(nameof(InvalidLengthValues))]
    public void FrInseeNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
       => FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void FrInseeNumber_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+      => FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void FrInseeNumber_Validate_ShouldReturnInvalidCheckDigits_WhenValueHasInvalidCheckDigits(String value)
+      => FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidCheckDigits);
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void FrInseeNumber_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(String value)
+      => FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidSeparator);
 
    #endregion
 }
