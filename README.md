@@ -257,7 +257,8 @@ A valid INSEE number must meet all of the following rules:
 * The leading gender indicator (S) must be 1, 2, 7 or 8.
 * The month element (MM) must be a number between 01 and 12 (for known dates) or 13, 20-42, 50-99 (for persons with unknown or
   incomplete date of birth documentation).
-* The COG element (LLOOO) must start with a valid department code, or 99 for persons born abroad.
+* The COG element (LLOOO) must start with a valid department code, or 99 for persons born abroad. For departments
+  with alphabetic characters (Corsica 2A, 2B), the alphabetic character must be uppercase.
 
 Example values:
 * 188121884813261 - gender = male, year of birth = 88, month of birth = 12, department = 18 (Cher)

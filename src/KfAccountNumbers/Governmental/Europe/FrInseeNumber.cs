@@ -108,7 +108,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <description>
 ///               The COG element (LLOOO) must start with a valid department code, or
-///               99 for persons born abroad.
+///               99 for persons born abroad.  For departments with alphabetic characters
+///               (Corsica 2A, 2B), the alphabetic character must be uppercase.
 ///            </description>
 ///         </item>
 ///      </list>
@@ -242,7 +243,7 @@ public record FrInseeNumber
       var letterOffset = isFormatted ? FormattedCorsicanDepartmentLetterOffset : UnformattedCorsicanDepartmentLetterOffset;
       var corsicanOffset = 0L;
 
-      var sum = 0L;
+      var sum = 0L;        // Long required because 13 digits exceeds int capacity
       for (var index = 0; index < processLength; index++)
       {
          if (isFormatted && IsSeparatorLocation(index))
@@ -318,8 +319,8 @@ public record FrInseeNumber
       {
          // Possible overseas department.
          ReadOnlySpan<Char> extendedDepartment = IsFormatted(insee)
-            ? [ ..department, insee[end + 1] ]
-            : insee[start..(end + 1)];
+            ? [ ..department, insee[end + 1] ]                       // If formatted, we have to skip over separator between department and commune
+            : insee[start..(end + 1)];                               // If not formatted, simply extend the slice
 
          return FrDepartmentCodes.ValidateDepartmentCode(extendedDepartment);
       }
