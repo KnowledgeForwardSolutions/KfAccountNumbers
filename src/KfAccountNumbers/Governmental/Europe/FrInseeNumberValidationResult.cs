@@ -80,7 +80,7 @@ public static class FrInseeNumberValidationResultExtensions
          FrInseeNumberValidationResult.InvalidCheckDigits => Messages.FrInseeNumberInvalidCheckDigits,
          FrInseeNumberValidationResult.InvalidSeparator => Messages.FrInseeNumberInvalidSeparator,
          FrInseeNumberValidationResult.InvalidGender => Messages.FrInseeNumberInvalidGender,
-         FrInseeNumberValidationResult.InvalidMonth => Messages.MonthOutOfRange,
+         FrInseeNumberValidationResult.InvalidMonth => Messages.FrInseeNumberInvalidMonth,
          FrInseeNumberValidationResult.InvalidDepartment => Messages.FrInseeNumberInvalidDepartment,
          FrInseeNumberValidationResult.ValidationPassed => Messages.ValidationPassed,
          _ => throw new SwitchExpressionException()

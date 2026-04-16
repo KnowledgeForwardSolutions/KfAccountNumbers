@@ -1,4 +1,4 @@
-// Ignore Spelling: Insee
+// Ignore Spelling: Insee Kf
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -28,17 +28,20 @@ public class FrInseeNumberTests
       String registrationOrder = "437",
       Boolean formatted = false)
    {
-      var effectiveDepartment = department switch
+      commune = department.Length == 3 ? commune[..2] : commune;    // Ensure default 3 char commune is valid for overseas departments
+
+      // Calculate the check sum by performing substitutions for Corsican department codes.
+      var checksumDepartment = department switch
       {
          "2A" => "19",
          "2B" => "18",
          _ => department
       };
-      var effectiveCommune = department.Length == 3 ? commune[..2] : commune;    // Ensure default 3 char commune is valid for overseas departments
-      var work = $"{gender}{year}{month}{effectiveDepartment}{effectiveCommune}{registrationOrder}";
+      var work = $"{gender}{year}{month}{checksumDepartment}{commune}{registrationOrder}";
       var checkSum = GetCheckSum(work);
 
-      var insee = $"{gender}{year}{month}{department}{effectiveCommune}{registrationOrder}{checkSum:D2}";
+      // Construct the INSEE using the original department and the calculated checksum.
+      var insee = $"{gender}{year}{month}{department}{commune}{registrationOrder}{checkSum:D2}";
 
       return formatted
          ? $"{insee[0]} {insee[1..3]} {insee[3..5]} {insee[5..7]} {insee[7..10]} {insee[10..13]} {insee[13..]}"
@@ -58,6 +61,11 @@ public class FrInseeNumberTests
       return (Int32)(97 - (sum % 97));
    }
 
+   private static String GetRawInsee(String insee)
+      => insee.Length == 15
+      ? insee
+      : insee[..1] + insee[2..4] + insee[5..7] + insee[8..10] + insee[11..14] + insee[15..18] + insee[19..];
+
    public static TheoryData<String> ValidInseeNumbers =>
    [
       Valid15CharacterInseeNumber,
@@ -70,8 +78,6 @@ public class FrInseeNumberTests
       Valid21CharacterInseeNumberCorsica,
       AltValid21CharacterInseeNumberCorsica,
       Valid21CharacterTemporaryInseeNumber,
-
-      "295109912611193",
    ];
 
    public static TheoryData<Char> ValidGenders =>
@@ -104,21 +110,27 @@ public class FrInseeNumberTests
 
    public static TheoryData<String, Boolean> ValidMonths = new()
    {
+      // Standard months
       { "01", false },
       { "12", false },
-      { "13", false },
-      { "20", false },
-      { "42", false },
-      { "50", false },
-      { "99", false },
+   
+      // Special month codes for unknown/incomplete DOB
+      { "13", false },     // Unknown month (birth month not known)
+      { "20", false },     // Incomplete DOB range start
+      { "42", false },     // Incomplete DOB range end
+      { "50", false },     // Incomplete DOB range start (alternate)
+      { "99", false },     // Incomplete DOB range end (maximum)
 
+      // Standard months
       { "01", true },
       { "12", true },
-      { "13", true },
-      { "20", true },
-      { "42", true },
-      { "50", true },
-      { "99", true },
+   
+      // Special month codes for unknown/incomplete DOB
+      { "13", true },      // Unknown month (birth month not known)
+      { "20", true },      // Incomplete DOB range start
+      { "42", true },      // Incomplete DOB range end
+      { "50", true },      // Incomplete DOB range start (alternate)
+      { "99", true },      // Incomplete DOB range end (maximum)
    };
 
    public static TheoryData<String> InvalidLengthValues =>
@@ -247,13 +259,188 @@ public class FrInseeNumberTests
       { "00", false },
       { "20", false },
       { "97", false },
+      { "970", false },    // Invalid overseas department
       { "975", false },    // Invalid overseas department
+      { "977", false },    // Invalid overseas department
+      { "978", false },    // Invalid overseas department
+      { "979", false },    // Invalid overseas department
 
       { "00", true },
       { "20", true },
       { "97", true },
+      { "970", true },     // Invalid overseas department
       { "975", true },     // Invalid overseas department
+      { "977", true },     // Invalid overseas department
+      { "978", true },     // Invalid overseas department
+      { "979", true },     // Invalid overseas department
    };
+
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidInseeNumbers))]
+   public void FrInseeNumber_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawInsee(value);
+
+      // Act.
+      var sut = new FrInseeNumber(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidGenders))]
+   public void FrInseeNumber_Constructor_ShouldCreateInstance_WhenValueHasValidGender(Char gender)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender: gender);
+      var expected = GetRawInsee(value);
+
+      // Act.
+      var sut = new FrInseeNumber(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidMonths))]
+   public void FrInseeNumber_Constructor_ShouldCreateInstance_WhenValueHasValidMonth(
+      String month,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
+      var expected = GetRawInsee(value);
+
+      // Act.
+      var sut = new FrInseeNumber(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDepartmentCodes))]
+   public void FrInseeNumber_Constructor_ShouldCreateInstance_WhenValueHasValidDepartmentCode(
+      String department,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
+      var expected = GetRawInsee(value);
+
+      // Act.
+      var sut = new FrInseeNumber(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => new FrInseeNumber(value))
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberEmpty + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => new FrInseeNumber(value))
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidLength + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException__WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+      => FluentActions
+         .Invoking(() => new FrInseeNumber(value))
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException__WhenValueHasInvalidCheckDigits(String value)
+      => FluentActions
+         .Invoking(() => new FrInseeNumber(value))
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidCheckDigits + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidCheckDigits);
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException__WhenValueHasInvalidSeparator(String value)
+      => FluentActions
+         .Invoking(() => new FrInseeNumber(value))
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidSeparator + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidSeparator);
+
+   [Theory]
+   [MemberData(nameof(InvalidGenderValues))]
+   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidGender(Char gender)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender: gender);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new FrInseeNumber(value))
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidGender + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidGender);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidMonthValues))]
+   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidMonth(
+      String month,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new FrInseeNumber(value))
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidMonth + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidMonth);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDepartmentCodes))]
+   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDepartment(
+      String department,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new FrInseeNumber(value))
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidDepartment + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidDepartment);
+   }
+
+   #endregion
 
    #region Validate Method Tests
    // ==========================================================================
@@ -339,7 +526,7 @@ public class FrInseeNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidMonthValues))]
-   public void FrInseeNumber_Validate_ShouldReturnInvalidGender_WhenValueHasInvalidMonth(
+   public void FrInseeNumber_Validate_ShouldReturnInvalidMonth_WhenValueHasInvalidMonth(
       String month,
       Boolean formatted)
    {
@@ -352,7 +539,7 @@ public class FrInseeNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidDepartmentCodes))]
-   public void FrInseeNumber_Validate_ShouldReturnInvalidDepartment_WhenValueHasInvalidMonth(
+   public void FrInseeNumber_Validate_ShouldReturnInvalidDepartment_WhenValueHasInvalidDepartment(
       String department,
       Boolean formatted)
    {

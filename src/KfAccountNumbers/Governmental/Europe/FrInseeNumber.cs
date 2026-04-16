@@ -176,6 +176,68 @@ public record FrInseeNumber
    private const String OverseasDepartmentPrefix = "97";
 
    /// <summary>
+   ///   Initialize a new instance of the <see cref="FrInseeNumber"/> class.
+   /// </summary>
+   /// <param name="insee">
+   ///   String representation of a French INSEE number..
+   /// </param>
+   /// <exception cref="KfValidationException{FrInseeNumberValidationResult}">
+   ///   <paramref name="insee"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="insee"/> is not length 15 (or 21 if separator
+   ///   characters are used).
+   ///   - or -
+   ///   <paramref name="insee"/> contains a non-digit character in
+   ///   any position other than the separator locations. (Exception: Corsican
+   ///   departments - 2A and 2B.)
+   ///   - or -
+   ///   <paramref name="insee"/> has invalid modulus 97 check digit
+   ///   characters in the trailing (right-most) character positions.
+   ///   - or -
+   ///   <paramref name="insee"/> is 21 characters in length and has
+   ///   an ASCII digit character ('0'-'9') in a separator location or does not
+   ///   use the same separator character in each location.
+   ///   - or -
+   ///   <paramref name="insee"/> contains an invalid gender value. Valid gender
+   ///   values are 1 (male) and 2 (female) or 7 (male) and 8 (female) for
+   ///   temporary INSEE numbers.
+   ///   - or -
+   ///   <paramref name="insee"/> contains an invalid value for month of birth.
+   ///   Valid values for month of birth are 01-12 (for known dates of birth)
+   ///   and 13, 20-42, 50-99 for persons with unknown or incomplete date of
+   ///   birth documentation.
+   ///   - or -
+   ///   <paramref name="insee"/> contains an invalid department code.
+   /// </exception>
+   public FrInseeNumber(String? insee)
+      : this(insee, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private FrInseeNumber(String? insee, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         FrInseeNumberValidationResult validationResult = Validate(insee);
+         if (validationResult != FrInseeNumberValidationResult.ValidationPassed)
+         {
+            throw validationResult.ToValidationException();
+         }
+      }
+
+      Value = GetRawValue(insee!);
+   }
+
+   /// <summary>
+   ///   The raw INSEE number.
+   /// </summary>
+   public String Value { get; private init; }
+
+   /// <summary>
    ///   Check the <paramref name="insee"/> to determine if it contains a
    ///   valid French INSEE number.
    /// </summary>
@@ -225,6 +287,41 @@ public record FrInseeNumber
       }
 
       return FrInseeNumberValidationResult.ValidationPassed;
+   }
+
+   private static String GetRawValue(String insee)
+   {
+      if (insee.Length == UnformattedLength)
+      {
+         return insee;
+      }
+
+      var buffer = ArrayPool<Char>.Shared.Rent(UnformattedLength);
+      try
+      {
+         ReadOnlySpan<Char> source = insee.AsSpan();
+         var span = new Span<Char>(buffer);
+
+         ReadOnlySpan<Int32> segmentLengths = [1, 2, 2, 2, 3, 3, 2];
+         var sourceOffset = 0;
+         var targetOffset = 0;
+         foreach (var length in segmentLengths)
+         {
+            ReadOnlySpan<Char> sourceSpan = source[sourceOffset..(sourceOffset + length)];
+            Span<Char> targetSpan = span[targetOffset..(targetOffset + length)];
+
+            sourceSpan.CopyTo(targetSpan);
+
+            sourceOffset += length + 1;
+            targetOffset += length;
+         }
+
+         return span[..UnformattedLength].ToString();
+      }
+      finally
+      {
+         ArrayPool<Char>.Shared.Return(buffer);
+      }
    }
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
