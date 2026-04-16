@@ -255,7 +255,7 @@ A valid INSEE number must meet all of the following rules:
 * The two trailing (right-most) characters must be a valid modulus 97 check sum.
 * The separator characters (if used) may not be ASCII digits ('0'-'9'). All separator characters must be the same character.
 * The leading gender indicator (S) must be 1, 2, 7 or 8.
-* The month element (MM) must be a number between 01 and 12 (for known dates) or 20-42, 50-99 (for persons with unknown or
+* The month element (MM) must be a number between 01 and 12 (for known dates) or 13, 20-42, 50-99 (for persons with unknown or
   incomplete date of birth documentation).
 * The COG element (LLOOO) must start with a valid department code, or 99 for persons born abroad.
 

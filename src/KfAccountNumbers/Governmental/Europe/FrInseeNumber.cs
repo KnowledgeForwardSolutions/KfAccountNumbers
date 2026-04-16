@@ -101,7 +101,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <description>
 ///               The month element (MM) must be a number between 01 and 12 (for known
-///               dates) or 20-42, 50-99 (for persons with unknown or incomplete date
+///               dates) or 13, 20-42, 50-99 (for persons with unknown or incomplete date
 ///               of birth documentation).
 ///            </description>
 ///         </item>
@@ -152,6 +152,12 @@ public record FrInseeNumber
    private const Int32 UnformattedLength = 15;
    private const Int32 FormattedLength = 21;
 
+   private const Int32 GenderOffset = 0;
+   private const Int32 UnformattedMonthOffset = 3;
+   private const Int32 FormattedMonthOffset = 5;
+   private const Int32 UnformattedDepartmentOffset = 5;
+   private const Int32 FormattedDepartmentOffset = 8;
+
    private const Int32 Separator1Offset = 1;
    private const Int32 Separator2Offset = 4;
    private const Int32 Separator3Offset = 7;
@@ -165,6 +171,8 @@ public record FrInseeNumber
    // These items are measured from the end of the value.
    private const Int32 CheckDigit1Offset = 2;
    private const Int32 CheckDigit2Offset = 1;
+
+   private const String OverseasDepartmentPrefix = "97";
 
    /// <summary>
    ///   Check the <paramref name="insee"/> to determine if it contains a
@@ -202,14 +210,18 @@ public record FrInseeNumber
       {
          return FrInseeNumberValidationResult.InvalidSeparator;
       }
-      //else if (!ValidateSequenceNumber(insee))
-      //{
-      //   return BeRijksregisternummerValidationResult.InvalidSequenceNumber;
-      //}
-      //else if (!ValidateDateOfBirth(insee))
-      //{
-      //   return BeRijksregisternummerValidationResult.InvalidDateOfBirth;
-      //}
+      else if (!ValidateGender(insee))
+      {
+         return FrInseeNumberValidationResult.InvalidGender;
+      }
+      else if (!ValidateMonth(insee))
+      {
+         return FrInseeNumberValidationResult.InvalidMonth;
+      }
+      else if (!ValidateDepartment(insee))
+      {
+         return FrInseeNumberValidationResult.InvalidDepartment;
+      }
 
       return FrInseeNumberValidationResult.ValidationPassed;
    }
@@ -288,6 +300,50 @@ public record FrInseeNumber
       return checkSum == remainder
          ? FrInseeNumberValidationResult.ValidationPassed
          : FrInseeNumberValidationResult.InvalidCheckDigits;
+   }
+
+   private static Boolean ValidateDepartment(ReadOnlySpan<Char> insee)
+   {
+      var start = IsFormatted(insee)
+         ? FormattedDepartmentOffset
+         : UnformattedDepartmentOffset;
+      var end = start + 2;
+
+      ReadOnlySpan<Char> department = insee[start..end];
+      if (FrDepartmentCodes.ValidateDepartmentCode(department))
+      {
+         return true;
+      }
+      else if (department.Equals(OverseasDepartmentPrefix, StringComparison.OrdinalIgnoreCase))
+      {
+         // Possible overseas department.
+         ReadOnlySpan<Char> extendedDepartment = IsFormatted(insee)
+            ? [ ..department, insee[end + 1] ]
+            : insee[start..(end + 1)];
+
+         return FrDepartmentCodes.ValidateDepartmentCode(extendedDepartment);
+      }
+
+      return false;
+   }
+
+   private static Boolean ValidateGender(ReadOnlySpan<Char> insee)
+      => insee[GenderOffset] is Chars.DigitOne or Chars.DigitTwo or Chars.DigitSeven or Chars.DigitEight;
+
+   private static Boolean ValidateMonth(ReadOnlySpan<Char> insee)
+   {
+      var month = IsFormatted(insee)
+         ? insee[FormattedMonthOffset..].ParseTwoDigits()
+         : insee[UnformattedMonthOffset..].ParseTwoDigits();
+
+      return month switch
+      {
+         >= 1 and <= 12 => true,
+         13 => true,
+         >= 20 and <= 42 => true,
+         >= 50 => true,
+         _ => false
+      };
    }
 
    private static Boolean ValidateSeparators(ReadOnlySpan<Char> insee)

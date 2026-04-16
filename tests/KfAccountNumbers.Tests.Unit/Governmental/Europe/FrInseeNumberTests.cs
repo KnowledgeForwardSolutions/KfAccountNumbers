@@ -24,8 +24,9 @@ public class FrInseeNumberTests
       String year = "92",
       String month = "06",
       String department = "24",
-      String commune = "149",
-      String registrationOrder = "437")
+      String commune = "549",
+      String registrationOrder = "437",
+      Boolean formatted = false)
    {
       var effectiveDepartment = department switch
       {
@@ -37,7 +38,11 @@ public class FrInseeNumberTests
       var work = $"{gender}{year}{month}{effectiveDepartment}{effectiveCommune}{registrationOrder}";
       var checkSum = GetCheckSum(work);
 
-      return $"{gender}{year}{month}{department}{effectiveCommune}{registrationOrder}{checkSum:D2}";
+      var insee = $"{gender}{year}{month}{department}{effectiveCommune}{registrationOrder}{checkSum:D2}";
+
+      return formatted
+         ? $"{insee[0]} {insee[1..3]} {insee[3..5]} {insee[5..7]} {insee[7..10]} {insee[10..13]} {insee[13..]}"
+         : insee;
    }
 
    private static Int32 GetCheckSum(String str)
@@ -69,16 +74,52 @@ public class FrInseeNumberTests
       "295109912611193",
    ];
 
-   public static TheoryData<String> ValidDepartmentCodes
+   public static TheoryData<Char> ValidGenders =>
+   [
+      Chars.DigitOne,
+      Chars.DigitTwo,
+      Chars.DigitSeven,
+      Chars.DigitEight,
+   ];
+
+   public static TheoryData<String, Boolean> ValidDepartmentCodes
    {
       get
       {
-         var data = new TheoryData<String>();
+         var data = new TheoryData<String, Boolean>();
+         var formatOptions = new Boolean[] { true, false };
          var departmentCodes = FrDepartmentCodes.GetAllDepartmentCodes();
-         data.AddRange(departmentCodes.AsEnumerable());
+
+         foreach(var opt in formatOptions)
+         {
+            foreach(var code in departmentCodes)
+            {
+               data.Add(code, opt);
+            }
+         }
+
          return data;
       }
    }
+
+   public static TheoryData<String, Boolean> ValidMonths = new()
+   {
+      { "01", false },
+      { "12", false },
+      { "13", false },
+      { "20", false },
+      { "42", false },
+      { "50", false },
+      { "99", false },
+
+      { "01", true },
+      { "12", true },
+      { "13", true },
+      { "20", true },
+      { "42", true },
+      { "50", true },
+      { "99", true },
+   };
 
    public static TheoryData<String> InvalidLengthValues =>
    [
@@ -176,6 +217,44 @@ public class FrInseeNumberTests
       "1 88 12 18 848.132 36",
       "1 88 12 18 848 132*36",
    ];
+
+   public static TheoryData<Char> InvalidGenderValues =>
+   [
+      Chars.DigitThree,
+      Chars.DigitFour,
+      Chars.DigitFive,
+      Chars.DigitSix,
+      Chars.DigitNine,
+   ];
+
+   public static TheoryData<String, Boolean> InvalidMonthValues = new()
+   {
+      { "00", false },
+      { "14", false },
+      { "19", false },
+      { "43", false },
+      { "49", false },
+
+      { "00", false },
+      { "14", false },
+      { "19", false },
+      { "43", false },
+      { "49", false },
+   };
+
+   public static TheoryData<String, Boolean> InvalidDepartmentCodes = new()
+   {
+      { "00", false },
+      { "20", false },
+      { "97", false },
+      { "975", false },    // Invalid overseas department
+
+      { "00", true },
+      { "20", true },
+      { "97", true },
+      { "975", true },     // Invalid overseas department
+   };
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -186,11 +265,37 @@ public class FrInseeNumberTests
       => FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.ValidationPassed);
 
    [Theory]
-   [MemberData(nameof(ValidDepartmentCodes))]
-   public void FrInseeNumber_Validate_ShouldReturnValidationPassed_WhenValueHasValidDepartmentCode(String department)
+   [MemberData(nameof(ValidGenders))]
+   public void FrInseeNumber_Validate_ShouldReturnValidationPassed_WhenValueHasValidGender(Char gender)
    {
       // Arrange.
-      var value = GetInseeWithValidCheckDigits(department: department);
+      var value = GetInseeWithValidCheckDigits(gender: gender);
+
+      // Act/assert.
+      FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.ValidationPassed);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidMonths))]
+   public void FrInseeNumber_Validate_ShouldReturnValidationPassed_WhenValueHasValidMonth(
+      String month,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
+
+      // Act/assert.
+      FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.ValidationPassed);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDepartmentCodes))]
+   public void FrInseeNumber_Validate_ShouldReturnValidationPassed_WhenValueHasValidDepartmentCode(
+      String department,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
 
       // Act/assert.
       FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.ValidationPassed);
@@ -220,6 +325,43 @@ public class FrInseeNumberTests
    [MemberData(nameof(InvalidSeparatorValues))]
    public void FrInseeNumber_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(String value)
       => FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidSeparator);
+
+   [Theory]
+   [MemberData(nameof(InvalidGenderValues))]
+   public void FrInseeNumber_Validate_ShouldReturnInvalidGender_WhenValueHasInvalidGender(Char gender)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender: gender);
+
+      // Act/assert.
+      FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidGender);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidMonthValues))]
+   public void FrInseeNumber_Validate_ShouldReturnInvalidGender_WhenValueHasInvalidMonth(
+      String month,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
+
+      // Act/assert.
+      FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidMonth);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDepartmentCodes))]
+   public void FrInseeNumber_Validate_ShouldReturnInvalidDepartment_WhenValueHasInvalidMonth(
+      String department,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
+
+      // Act/assert.
+      FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidDepartment);
+   }
 
    #endregion
 }
