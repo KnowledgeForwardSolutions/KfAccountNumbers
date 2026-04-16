@@ -442,6 +442,76 @@ public class FrInseeNumberTests
 
    #endregion
 
+   #region Department Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidDepartmentCodes))]
+   public void FrInseeNumber_Department_ShouldReturnExpectedValue(
+      String department,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
+      var sut = new FrInseeNumber(value);
+
+      // Act/assert.
+      sut.Department.Should().Be(department);
+   }
+
+   #endregion
+
+   #region Gender Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Chars.DigitOne, BinaryGender.Male, true)]
+   [InlineData(Chars.DigitTwo, BinaryGender.Female, true)]
+   [InlineData(Chars.DigitSeven, BinaryGender.Male, true)]
+   [InlineData(Chars.DigitEight, BinaryGender.Female, true)]
+   [InlineData(Chars.DigitOne, BinaryGender.Male, false)]
+   [InlineData(Chars.DigitTwo, BinaryGender.Female, false)]
+   [InlineData(Chars.DigitSeven, BinaryGender.Male, false)]
+   [InlineData(Chars.DigitEight, BinaryGender.Female, false)]
+   public void FrInseeNumber_Gender_ShouldReturnExpectedValue(
+      Char gender,
+      BinaryGender expectedGender,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender, formatted: formatted);
+      var sut = new FrInseeNumber(value);
+
+      // Act/arrange
+      sut.Gender.Should().Be(expectedGender);
+   }
+
+   #endregion
+
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Valid15CharacterInseeNumber, Valid15CharacterInseeNumber)]
+   [InlineData(Valid21CharacterInseeNumber, Valid15CharacterInseeNumber)]
+   [InlineData(Valid15CharacterInseeNumberCorsica, Valid15CharacterInseeNumberCorsica)]
+   [InlineData(Valid21CharacterInseeNumberCorsica, Valid15CharacterInseeNumberCorsica)]
+   public void FrInseeNumber_Value_ShouldReturnValidatedInseeNumber(
+      String value,
+      String expected)
+   {
+      // Arrange.
+      var sut = new FrInseeNumber(value);
+
+      // Act/assert.
+      sut.Value.Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================

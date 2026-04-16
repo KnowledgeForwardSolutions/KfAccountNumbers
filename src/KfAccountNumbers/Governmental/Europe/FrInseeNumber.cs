@@ -233,6 +233,43 @@ public record FrInseeNumber
    }
 
    /// <summary>
+   ///   Get the INSEE code for the department where the person was born, as
+   ///   encoded in the INSEE number.
+   /// </summary>
+   public String Department
+   {
+      get
+      {
+         var endOffset = UnformattedDepartmentOffset + 2;
+         ReadOnlySpan<Char> department = Value.AsSpan(UnformattedDepartmentOffset..endOffset);
+         if (!department.Equals(OverseasDepartmentPrefix, StringComparison.OrdinalIgnoreCase))
+         {
+            return department.ToString();
+         }
+
+         // Overseas departments use an additional character for department code.
+         endOffset ++;
+         department = Value.AsSpan(UnformattedDepartmentOffset..endOffset);
+         return department.ToString();
+      }
+   }
+
+   /// <summary>
+   ///   The person's gender, as indicated by the leading (left-most) digit in
+   ///   the INSEE number.
+   /// </summary>
+   public BinaryGender Gender
+#pragma warning disable CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
+      => Value[GenderOffset] switch
+      {
+         Chars.DigitOne => BinaryGender.Male,
+         Chars.DigitTwo => BinaryGender.Female,
+         Chars.DigitSeven => BinaryGender.Male,
+         Chars.DigitEight => BinaryGender.Female,
+      };
+#pragma warning restore CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
+
+   /// <summary>
    ///   The raw INSEE number.
    /// </summary>
    public String Value { get; private init; }
