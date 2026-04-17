@@ -253,7 +253,7 @@ public record FrInseeNumber
    ///   The five-digit INSEE COG (Code officiel géographique) identifying the
    ///   person's department and commune of birth.
    /// </summary>
-   public String Cog => Value.AsSpan(UnformattedDepartmentOffset..UnformattedSequenceOffset).ToString();
+   public String Cog => Value[UnformattedDepartmentOffset..UnformattedSequenceOffset];
 
    /// <summary>
    ///   Get the INSEE code for the department where the person was born, as
@@ -267,13 +267,12 @@ public record FrInseeNumber
          ReadOnlySpan<Char> department = Value.AsSpan(UnformattedDepartmentOffset..endOffset);
          if (!department.Equals(OverseasDepartmentPrefix, StringComparison.OrdinalIgnoreCase))
          {
-            return department.ToString();
+            return Value[UnformattedDepartmentOffset..endOffset];
          }
 
          // Overseas departments use an additional character for department code.
          endOffset ++;
-         department = Value.AsSpan(UnformattedDepartmentOffset..endOffset);
-         return department.ToString();
+         return Value[UnformattedDepartmentOffset..endOffset];
       }
    }
 
@@ -296,6 +295,12 @@ public record FrInseeNumber
    ///   The raw INSEE number.
    /// </summary>
    public String Value { get; private init; }
+
+   public static implicit operator String(FrInseeNumber insee)
+      => insee?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator FrInseeNumber(String? insee) => new(insee);
 
    /// <summary>
    ///   Check the <paramref name="insee"/> to determine if it contains a

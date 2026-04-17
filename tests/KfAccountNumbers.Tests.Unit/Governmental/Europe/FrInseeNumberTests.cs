@@ -579,6 +579,232 @@ public class FrInseeNumberTests
 
    #endregion
 
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void FrInseeNumber_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid15CharacterInseeNumber;
+      var sut = new FrInseeNumber(value);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(value);
+   }
+
+   [Fact]
+   public void FrInseeNumber_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid21CharacterInseeNumberCorsica;
+      var sut = new FrInseeNumber(value);
+      var expected = GetRawInsee(value);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void FrInseeNumber_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      FrInseeNumber sut = null!;
+
+      // Act.
+      String str = sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void FrInseeNumber_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      FrInseeNumber sut = null!;
+
+      // Act.
+      var str = (String)sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidInseeNumbers))]
+   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawInsee(value);
+
+      // Act.
+      var sut = (FrInseeNumber)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidGenders))]
+   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldCreateInstance_WhenValueHasValidGender(Char gender)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender: gender);
+      var expected = GetRawInsee(value);
+
+      // Act.
+      var sut = (FrInseeNumber)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidMonths))]
+   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldCreateInstance_WhenValueHasValidMonth(
+      String month,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
+      var expected = GetRawInsee(value);
+
+      // Act.
+      var sut = (FrInseeNumber)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDepartmentCodes))]
+   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldCreateInstance_WhenValueHasValidDepartmentCode(
+      String department,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
+      var expected = GetRawInsee(value);
+
+      // Act.
+      var sut = (FrInseeNumber)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => _ = (FrInseeNumber)value)
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberEmpty + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => _ = (FrInseeNumber)value)
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidLength + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+      => FluentActions
+         .Invoking(() => _ = (FrInseeNumber)value)
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
+      => FluentActions
+         .Invoking(() => _ = (FrInseeNumber)value)
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidCheckDigits + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidCheckDigits);
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
+      => FluentActions
+         .Invoking(() => _ = (FrInseeNumber)value)
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidSeparator + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidSeparator);
+
+   [Theory]
+   [MemberData(nameof(InvalidGenderValues))]
+   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueHasInvalidGender(Char gender)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender: gender);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (FrInseeNumber)value)
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidGender + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidGender);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidMonthValues))]
+   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueHasInvalidMonth(
+      String month,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (FrInseeNumber)value)
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidMonth + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidMonth);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDepartmentCodes))]
+   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueHasInvalidDepartment(
+      String department,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (FrInseeNumber)value)
+         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidDepartment + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidDepartment);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
