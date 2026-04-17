@@ -1,5 +1,7 @@
 // Ignore Spelling: Insee Kf
 
+using System.Configuration;
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 #pragma warning disable IDE0008 // Use explicit type
@@ -438,6 +440,71 @@ public class FrInseeNumberTests
          .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
          .WithMessage(Messages.FrInseeNumberInvalidDepartment + "*")
          .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidDepartment);
+   }
+
+   #endregion
+
+   #region BirthMonth Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidMonths))]
+   public void FrInseeNumber_BirthMonth_ShouldReturnExpectedValue(
+      String month,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
+      var sut = new FrInseeNumber(value);
+      var expected = Int32.Parse(month);
+
+      // Act/assert.
+      sut.BirthMonth.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region BirthYear Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData("00", false)]
+   [InlineData("50", false)]
+   [InlineData("99", false)]
+   [InlineData("00", true)]
+   [InlineData("50", true)]
+   [InlineData("99", true)]
+   public void FrInseeNumber_BirthYear_ShouldReturnExpectedValue(
+      String year,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(year: year, formatted: formatted);
+      var sut = new FrInseeNumber(value);
+      var expected = Int32.Parse(year);
+
+      // Act/assert.
+      sut.BirthYear.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Cog Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidInseeNumbers))]
+   public void FrInseeNumber_Cog_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new FrInseeNumber(value);
+      var expected = sut.Value[5..10];
+
+      // Act/assert.
+      sut.Cog.Should().Be(expected);
    }
 
    #endregion

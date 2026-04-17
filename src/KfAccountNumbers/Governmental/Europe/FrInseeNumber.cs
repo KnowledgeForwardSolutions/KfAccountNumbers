@@ -154,10 +154,12 @@ public record FrInseeNumber
    private const Int32 FormattedLength = 21;
 
    private const Int32 GenderOffset = 0;
-   private const Int32 UnformattedMonthOffset = 3;
    private const Int32 FormattedMonthOffset = 5;
-   private const Int32 UnformattedDepartmentOffset = 5;
    private const Int32 FormattedDepartmentOffset = 8;
+   private const Int32 UnformattedYearOffset = 1;
+   private const Int32 UnformattedMonthOffset = 3;
+   private const Int32 UnformattedDepartmentOffset = 5;
+   private const Int32 UnformattedSequenceOffset = 10;
 
    private const Int32 Separator1Offset = 1;
    private const Int32 Separator2Offset = 4;
@@ -179,7 +181,7 @@ public record FrInseeNumber
    ///   Initialize a new instance of the <see cref="FrInseeNumber"/> class.
    /// </summary>
    /// <param name="insee">
-   ///   String representation of a French INSEE number..
+   ///   String representation of a French INSEE number.
    /// </param>
    /// <exception cref="KfValidationException{FrInseeNumberValidationResult}">
    ///   <paramref name="insee"/> is <see langword="null"/>, empty or all 
@@ -231,6 +233,27 @@ public record FrInseeNumber
 
       Value = GetRawValue(insee!);
    }
+
+   /// <summary>
+   ///   Get the person's integer month of birth.
+   /// </summary>
+   /// <remarks>
+   ///   Birth month is normally 1-12, but may be other values for persons with
+   ///   unknown or incomplete documentation. Other possible values are 13,
+   ///   20-42 and 50-99.
+   /// </remarks>
+   public Int32 BirthMonth => Value.AsSpan(UnformattedMonthOffset..).ParseTwoDigits();
+
+   /// <summary>
+   ///   Get the person's two digit year of birth (0-99).
+   /// </summary>
+   public Int32 BirthYear => Value.AsSpan(UnformattedYearOffset..).ParseTwoDigits();
+
+   /// <summary>
+   ///   The five-digit INSEE COG (Code officiel géographique) identifying the
+   ///   person's department and commune of birth.
+   /// </summary>
+   public String Cog => Value.AsSpan(UnformattedDepartmentOffset..UnformattedSequenceOffset).ToString();
 
    /// <summary>
    ///   Get the INSEE code for the department where the person was born, as
