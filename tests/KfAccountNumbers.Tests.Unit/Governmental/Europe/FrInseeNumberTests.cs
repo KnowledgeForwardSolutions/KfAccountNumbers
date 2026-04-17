@@ -805,6 +805,481 @@ public class FrInseeNumberTests
 
    #endregion
 
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void FrInseeNumber_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut2 = new FrInseeNumber(Valid15CharacterInseeNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FrInseeNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut2 = new FrInseeNumber(AltValid15CharacterInseeNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void FrInseeNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 15 and 21 character versions for same person should still be equal.
+      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut2 = new FrInseeNumber(Valid21CharacterInseeNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void FrInseeNumber_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut2 = new FrInseeNumber(AltValid15CharacterInseeNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FrInseeNumber_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 15 and 21 character versions for same person should still be equal.
+      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut2 = new FrInseeNumber(Valid21CharacterInseeNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void FrInseeNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut2 = new FrInseeNumber(Valid15CharacterInseeNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidInseeNumbers))]
+   public void FrInseeNumber_Create_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expectedValue = new FrInseeNumber(value);
+
+      // Act.
+      var result = FrInseeNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidGenders))]
+   public void FrInseeNumber_Create_ShouldCreateInstance_WhenValueHasValidGender(Char gender)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender: gender);
+      var expectedValue = new FrInseeNumber(value);
+
+      // Act.
+      var result = FrInseeNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidMonths))]
+   public void FrInseeNumber_Create_ShouldCreateInstance_WhenValueHasValidMonth(
+      String month,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
+      var expectedValue = new FrInseeNumber(value);
+
+      // Act.
+      var result = FrInseeNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDepartmentCodes))]
+   public void FrInseeNumber_Create_ShouldCreateInstance_WhenValueHasValidDepartmentCode(
+      String department,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
+      var expectedValue = new FrInseeNumber(value);
+
+      // Act.
+      var result = FrInseeNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void FrInseeNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
+   {
+      // Act.
+      var result = FrInseeNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.Empty);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void FrInseeNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   {
+      // Act.
+      var result = FrInseeNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.InvalidLength);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void FrInseeNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+   {
+      // Act.
+      var result = FrInseeNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void FrInseeNumber_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigits(String value)
+   {
+      // Act.
+      var result = FrInseeNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.InvalidCheckDigits);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void FrInseeNumber_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(String value)
+   {
+      // Act.
+      var result = FrInseeNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.InvalidSeparator);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidGenderValues))]
+   public void FrInseeNumber_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidGender(Char gender)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender: gender);
+      var result = FrInseeNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.InvalidGender);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidMonthValues))]
+   public void FrInseeNumber_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidMonth(
+      String month,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
+      var result = FrInseeNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.InvalidMonth);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDepartmentCodes))]
+   public void FrInseeNumber_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidDepartment(
+      String department,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
+      var result = FrInseeNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.InvalidDepartment);
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void FrInseeNumber_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut2 = new FrInseeNumber(Valid15CharacterInseeNumber);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FrInseeNumber_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut2 = new FrInseeNumber(AltValid15CharacterInseeNumber);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void FrInseeNumber_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 15 and 21 character versions for same person should still be equal.
+      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut2 = new FrInseeNumber(Valid21CharacterInseeNumber);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Format Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void FrInseeNumber_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var expected = Valid21CharacterInseeNumber;
+
+      // Act.
+      var str = sut.Format();
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void FrInseeNumber_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var mask = "_______________";
+      var expected = Valid15CharacterInseeNumber;
+
+      // Act.
+      var str = sut.Format(mask);
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void FrInseeNumber_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
+   {
+      // Arrange.
+      var sut = new FrInseeNumber(Valid15CharacterInseeNumberCorsica);
+      String mask = null!;
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = sut.Format(mask))
+         .Should()
+         .ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(Messages.FormatMaskEmpty + "*");
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void FrInseeNumber_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
+   {
+      // Arrange.
+      var sut = new FrInseeNumber(Valid21CharacterInseeNumberCorsica);
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+      var act = () => _ = sut.Format(mask);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void FrInseeNumber_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut2 = new FrInseeNumber(Valid15CharacterInseeNumber);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void FrInseeNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut2 = new FrInseeNumber(AltValid15CharacterInseeNumber);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   [Fact]
+   public void FrInseeNumber_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 15 and 21 character versions for same person should still be equal.
+      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut2 = new FrInseeNumber(Valid21CharacterInseeNumber);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // FrInseeNumber does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void FrInseeNumber_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(Valid15CharacterTemporaryInseeNumber);
+      var sut2 = new FrInseeNumber(Valid15CharacterTemporaryInseeNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidInseeNumbers))]
+   public void FrInseeNumber_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new FrInseeNumber(value);
+      var expected = GetRawInsee(value);
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================

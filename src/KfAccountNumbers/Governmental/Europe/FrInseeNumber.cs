@@ -303,6 +303,58 @@ public record FrInseeNumber
    public static explicit operator FrInseeNumber(String? insee) => new(insee);
 
    /// <summary>
+   ///   Create a new <see cref="FrInseeNumber"/> using the Result pattern.
+   /// </summary>
+   /// <param name="insee">
+   ///   String representation of a French INSEE number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{FrInseeNumber, FrInseeNumberValidationResult}"/>.
+   ///   Will contain the new <see cref="FrInseeNumber"/> if 
+   ///   <paramref name="insee"/> is valid or an <see cref="FrInseeNumber"/> that
+   ///   identifies the validation rule that was failed if <paramref name="insee"/>
+   ///   is invalid.
+   /// </returns>
+   public static CreateResult<FrInseeNumber, FrInseeNumberValidationResult> Create(String? insee)
+   {
+      FrInseeNumberValidationResult validationResult = Validate(insee);
+      return validationResult == FrInseeNumberValidationResult.ValidationPassed
+         ? new FrInseeNumber(insee, validationMode: ValidationMode.BypassValidation)
+         : validationResult;
+   }
+
+   /// <summary>
+   ///   Format the INSEE number using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then the default mask "_ __ __ __ ___ ___ __" will be used instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted INSEE number.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the INSEE number.
+   /// </remarks>
+   public String Format(String mask = "_ __ __ __ ___ ___ __") => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Get a string representation of the INSEE number.
+   /// </summary>
+   /// <remarks>
+   ///   Will return the raw INSEE number, without  separator characters.
+   /// </remarks>
+   public override String ToString() => Value;
+
+   /// <summary>
    ///   Check the <paramref name="insee"/> to determine if it contains a
    ///   valid French INSEE number.
    /// </summary>
