@@ -277,6 +277,51 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ES NIF may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string EsNifEmpty {
+            get {
+                return ResourceManager.GetString("EsNifEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES NIF contains a character that was not expected. For DNI, the leading (left-most) eight characters must be ASCII digits (&apos;0&apos;-&apos;9&apos;). For NIE, the leading character must be X, Y or Z and the next seven non-separator characters must be ASCII digits..
+        /// </summary>
+        internal static string EsNifInvalidCharacter {
+            get {
+                return ResourceManager.GetString("EsNifInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES NIF must have a valid modulus 23 check character in the trailing (right-most) position.
+        /// </summary>
+        internal static string EsNifInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("EsNifInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES NIF must have length 9 (no separators), 10 (DNI with one separator) or 11 (NIE with two separators).
+        /// </summary>
+        internal static string EsNifInvalidLength {
+            get {
+                return ResourceManager.GetString("EsNifInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES NIF separator character may not be an ASCII digit (&apos;0&apos;-&apos;9&apos;). For NIE both separator characters must be the same.
+        /// </summary>
+        internal static string EsNifInvalidSeparator {
+            get {
+                return ResourceManager.GetString("EsNifInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to FI Henkilotunnus number may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string FiHenkilotunnusEmpty {

@@ -402,4 +402,19 @@
   <data name="FrInseeNumberInvalidDepartment" xml:space="preserve">
     <value>FR INSEE number must have a valid INSEE department code</value>
   </data>
+  <data name="EsNifEmpty" xml:space="preserve">
+    <value>ES NIF may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="EsNifInvalidLength" xml:space="preserve">
+    <value>ES NIF must have length 9 (no separators), 10 (DNI with one separator) or 11 (NIE with two separators)</value>
+  </data>
+  <data name="EsNifInvalidCharacter" xml:space="preserve">
+    <value>ES NIF contains a character that was not expected. For DNI, the leading (left-most) eight characters must be ASCII digits ('0'-'9'). For NIE, the leading character must be X, Y or Z and the next seven non-separator characters must be ASCII digits.</value>
+  </data>
+  <data name="EsNifInvalidCheckDigit" xml:space="preserve">
+    <value>ES NIF must have a valid modulus 23 check character in the trailing (right-most) position</value>
+  </data>
+  <data name="EsNifInvalidSeparator" xml:space="preserve">
+    <value>ES NIF separator character may not be an ASCII digit ('0'-'9'). For NIE both separator characters must be the same</value>
+  </data>
 </root>
