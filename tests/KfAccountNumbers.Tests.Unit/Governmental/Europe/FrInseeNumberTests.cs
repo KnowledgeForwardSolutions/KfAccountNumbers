@@ -1,4 +1,4 @@
-// Ignore Spelling: Insee Kf
+// Ignore Spelling: Deserialize Deserialization Insee Json Kf
 
 using System.Configuration;
 
@@ -553,6 +553,29 @@ public class FrInseeNumberTests
 
       // Act/arrange
       sut.Gender.Should().Be(expectedGender);
+   }
+
+   #endregion
+
+   #region IsTemporary Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Chars.DigitOne, false)]
+   [InlineData(Chars.DigitTwo, false)]
+   [InlineData(Chars.DigitSeven, true)]
+   [InlineData(Chars.DigitEight, true)]
+   public void FrInseeNumber_IsTemporary_ShouldReturnExpectedValue(
+      Char gender,
+      Boolean expected)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender);
+      var sut = new FrInseeNumber(value);
+
+      // Act/arrange
+      sut.IsTemporaryInsee.Should().Be(expected);
    }
 
    #endregion
@@ -1386,6 +1409,104 @@ public class FrInseeNumberTests
 
       // Act/assert.
       FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidDepartment);
+   }
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void FrInseeNumber_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new FrInseeNumber(Valid15CharacterInseeNumberCorsica);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<FrInseeNumber>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void FrInseeNumber_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new FrInseeNumber(AltValid21CharacterInseeNumber);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public FrInseeNumber InseeNumber { get; set; } = null!;
+   }
+
+   [Fact]
+   public void FrInseeNumber_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { InseeNumber = new FrInseeNumber(Valid15CharacterInseeNumber) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void FrInseeNumber_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"InseeNumber\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void FrInseeNumber_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"InseeNumber\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.InseeNumber.Should().BeNull();
+   }
+
+   [Fact]
+   public void FrInseeNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenInseeNumberIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"InseeNumber\":\"1881218848132613\"}";  // Invalid length
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should()
+         .ThrowExactly<KfValidationException<FrInseeNumberValidationResult>>()
+         .WithMessage(Messages.FrInseeNumberInvalidLength + "*")
+         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidLength);
    }
 
    #endregion

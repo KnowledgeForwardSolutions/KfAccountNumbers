@@ -148,6 +148,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_s%C3%A9curit%C3%A9_sociale_en_France (French) for more info.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(FrInseeNumberJsonConverter))]
 public record FrInseeNumber
 {
    private const Int32 UnformattedLength = 15;
@@ -288,6 +289,24 @@ public record FrInseeNumber
          Chars.DigitTwo => BinaryGender.Female,
          Chars.DigitSeven => BinaryGender.Male,
          Chars.DigitEight => BinaryGender.Female,
+      };
+#pragma warning restore CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
+
+   /// <summary>
+   ///   Indicates if this INSEE number is temporary or permanent.
+   /// </summary>
+   /// <remarks>
+   ///   Permanent INSEE numbers use gender codes '1' or '2' while temporary
+   ///   INSEE numbers use gender codes '7' or '8'.
+   /// </remarks>
+   public Boolean IsTemporaryInsee
+#pragma warning disable CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
+      => Value[GenderOffset] switch
+      {
+         Chars.DigitOne => false,
+         Chars.DigitTwo => false,
+         Chars.DigitSeven => true,
+         Chars.DigitEight => true,
       };
 #pragma warning restore CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
 
@@ -578,4 +597,21 @@ public record FrInseeNumber
              && insee[Separator5Offset] == separator
              && insee[Separator6Offset] == separator;
    }
+}
+
+public class FrInseeNumberJsonConverter : JsonConverter<FrInseeNumber>
+{
+   public override FrInseeNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new FrInseeNumber(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, FrInseeNumber value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }
