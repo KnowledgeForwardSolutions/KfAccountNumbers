@@ -32,7 +32,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>LLOO</term>
+///            <term>LLOOO</term>
 ///            <description>
 ///               Five-digit INSEE COG (Code officiel géographique) identifying
 ///               the person's department and commune of birth. (Exception: LL
@@ -118,13 +118,13 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      Example values:
 ///      <list type="bullet">
 ///         <item>
-///            <term>188121884813261</term>
+///            <term>188121884813236</term>
 ///            <description>
 ///               gender = male, year of birth = 88, month of birth = 12, department = 18 (Cher)
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>255102445387796</term>
+///            <term>255102445387701</term>
 ///            <description>
 ///               gender = female, year of birth = 55, month of birth = 10, department = 24 (Dordogne)
 ///            </description>
@@ -160,6 +160,7 @@ public record FrInseeNumber
    private const Int32 UnformattedYearOffset = 1;
    private const Int32 UnformattedMonthOffset = 3;
    private const Int32 UnformattedDepartmentOffset = 5;
+   private const Int32 UnformattedCommuneOffset = 7;
    private const Int32 UnformattedSequenceOffset = 10;
 
    private const Int32 Separator1Offset = 1;
@@ -177,6 +178,7 @@ public record FrInseeNumber
    private const Int32 CheckDigit2Offset = 1;
 
    private const String OverseasDepartmentPrefix = "97";
+   private const String BornAbroadDepartment = "99";
 
    /// <summary>
    ///   Initialize a new instance of the <see cref="FrInseeNumber"/> class.
@@ -254,6 +256,29 @@ public record FrInseeNumber
    ///   The five-digit INSEE COG (Code officiel géographique) identifying the
    ///   person's department and commune of birth.
    /// </summary>
+   /// <remarks>
+   ///   The COG is the combination of department and commune of birth. There
+   ///   are three possible patterns for COG:
+   ///   <list type="bullet">
+   ///      <item>
+   ///         <description>
+   ///            For persons born in metropolitan France, 2-digit department + 3-digit
+   ///            commune (including Corsican departments 2A and 2B).
+   ///         </description>
+   ///      </item>
+   ///      <item>
+   ///         <description>
+   ///            For persons born in overseas departments, 3-digit department + 2-digit commune.
+   ///         </description>
+   ///      </item>
+   ///      <item>
+   ///         <description>
+   ///            For persons born abroad, fixed 2-digit department of 99 + three-digit
+   ///            ISO 3166-1 country code.
+   ///         </description>
+   ///      </item>
+   ///   </list>
+   /// </remarks>
    public String Cog => Value[UnformattedDepartmentOffset..UnformattedSequenceOffset];
 
    /// <summary>
@@ -264,15 +289,14 @@ public record FrInseeNumber
    {
       get
       {
-         var endOffset = UnformattedDepartmentOffset + 2;
-         ReadOnlySpan<Char> department = Value.AsSpan(UnformattedDepartmentOffset..endOffset);
-         if (!department.Equals(OverseasDepartmentPrefix, StringComparison.OrdinalIgnoreCase))
+         var endOffset =UnformattedCommuneOffset;
+         if (Value.AsSpan(UnformattedDepartmentOffset..endOffset).Equals(OverseasDepartmentPrefix, StringComparison.OrdinalIgnoreCase))
          {
+            endOffset ++;
             return Value[UnformattedDepartmentOffset..endOffset];
          }
 
          // Overseas departments use an additional character for department code.
-         endOffset ++;
          return Value[UnformattedDepartmentOffset..endOffset];
       }
    }
@@ -282,15 +306,23 @@ public record FrInseeNumber
    ///   the INSEE number.
    /// </summary>
    public BinaryGender Gender
-#pragma warning disable CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
       => Value[GenderOffset] switch
       {
          Chars.DigitOne => BinaryGender.Male,
          Chars.DigitTwo => BinaryGender.Female,
          Chars.DigitSeven => BinaryGender.Male,
          Chars.DigitEight => BinaryGender.Female,
+         _ => throw new InvalidOperationException()      // Validation during construction ensures this can never be reached
       };
-#pragma warning restore CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
+
+   /// <summary>
+   ///   Indicates if the person was born abroad.
+   /// </summary>
+   /// <remarks>
+   ///   Persons born abroad have a fixed department code of "99".
+   /// </remarks>
+   public Boolean IsBornAbroad
+      => Value.AsSpan(UnformattedDepartmentOffset..UnformattedCommuneOffset).Equals(BornAbroadDepartment, StringComparison.OrdinalIgnoreCase);
 
    /// <summary>
    ///   Indicates if this INSEE number is temporary or permanent.
@@ -300,15 +332,14 @@ public record FrInseeNumber
    ///   INSEE numbers use gender codes '7' or '8'.
    /// </remarks>
    public Boolean IsTemporaryInsee
-#pragma warning disable CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
       => Value[GenderOffset] switch
       {
          Chars.DigitOne => false,
          Chars.DigitTwo => false,
          Chars.DigitSeven => true,
          Chars.DigitEight => true,
+         _ => throw new InvalidOperationException()      // Validation during construction ensures this can never be reached
       };
-#pragma warning restore CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
 
    /// <summary>
    ///   The raw INSEE number.

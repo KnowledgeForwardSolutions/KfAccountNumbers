@@ -13,7 +13,7 @@ public static class FrDepartmentCodes
       {
          { "01", "Ain" },
          { "02", "Aisne" },
-         { "03", "Allier	dans l’Allier" },
+         { "03", "Allier" },
          { "04", "Alpes-de-Haute-Provence" },
          { "05", "Hautes-Alpes" },
          { "06", "Alpes-Maritimes" },
@@ -57,7 +57,7 @@ public static class FrDepartmentCodes
          { "43", "Haute-Loire" },
          { "44", "Loire-Atlantique" },
          { "45", "Loiret" },
-         { "46", "Lott" },
+         { "46", "Lot" },
          { "47", "Lot-et-Garonne" },
          { "48", "Lozère" },
          { "49", "Maine-et-Loire" },

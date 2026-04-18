@@ -240,7 +240,10 @@ A French INSEE number is a 15-digit number structured as SYYMMLLOOOKKKCC with th
 * YY - two-digit year of birth.
 * MM - two-digit month of birth.
 * LLOOO - five-digit INSEE COG (Code officiel géographique) identifying the person's department and commune of birth.
-  (Exception: LL may be "2A" or "2B" for the two departments in Corsica).
+  The COG is the combination of department and commune of birth. There are three possible patterns for COG:
+  * For persons born in metropolitan France, 2-digit department + 3-digit commune (including Corsican departments 2A and 2B).
+  * For persons born in overseas departments, 3-digit department + 2-digit commune.
+  * For persons born abroad, fixed 2-digit department of 99 + three-digit ISO 3166-1 country code.
 * KKK - three digits used to distinguish between people born in the same year/month/department/commune.
 * CC - two-digit modulus 97 check sum calculated for the preceding 13 digits. When calculating the checksum, department code "2A"
   is replaced by 19, and department code "2B" is replaced by 18.
@@ -261,8 +264,8 @@ A valid INSEE number must meet all of the following rules:
   with alphabetic characters (Corsica 2A, 2B), the alphabetic character must be uppercase.
 
 Example values:
-* 188121884813261 - gender = male, year of birth = 88, month of birth = 12, department = 18 (Cher)
-* 255102445387796 - gender = female, year of birth = 55, month of birth = 10, department = 24 (Dordogne)
+* 188121884813236 - gender = male, year of birth = 88, month of birth = 12, department = 18 (Cher)
+* 255102445387701 - gender = female, year of birth = 55, month of birth = 10, department = 24 (Dordogne)
 * 112072A28806058 - gender = male, year of birth = 12, month of birth = 07, department = 2A (Corse-du-Sud)
 * 821099901013371 - temporary INSEE, gender = female, year of birth = 21, month of birth = 09, department = 99 (born abroad)
 

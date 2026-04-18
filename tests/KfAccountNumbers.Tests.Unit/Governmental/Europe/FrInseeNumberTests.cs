@@ -1,7 +1,5 @@
 // Ignore Spelling: Deserialize Deserialization Insee Json Kf
 
-using System.Configuration;
-
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 #pragma warning disable IDE0008 // Use explicit type
@@ -177,6 +175,11 @@ public class FrInseeNumberTests
       "1 88 12 18 848 13  36",         // Non-digit character ' '
       "1 88 12 18 848 132 -6",         // Non-digit character '-'
       "1 88 12 18 848 132 3=",         // Non-digit character '='
+
+      "112072a28806058",               // lowercase 'a' in Corsican department position
+      "112072b28806085",               // lowercase 'b' in Corsican department position
+      "1 12 07 2a 288 060 58",         // lowercase 'a' formatted
+      "1 12 07 2b 288 060 85",         // lowercase 'b' formatted
    ];
 
    public static TheoryData<String> InvalidCheckDigitValues =>
@@ -249,11 +252,11 @@ public class FrInseeNumberTests
       { "43", false },
       { "49", false },
 
-      { "00", false },
-      { "14", false },
-      { "19", false },
-      { "43", false },
-      { "49", false },
+      { "00", true },
+      { "14", true },
+      { "19", true },
+      { "43", true },
+      { "49", true },
    };
 
    public static TheoryData<String, Boolean> InvalidDepartmentCodes = new()
@@ -368,7 +371,7 @@ public class FrInseeNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException__WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
       => FluentActions
          .Invoking(() => new FrInseeNumber(value))
          .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
@@ -377,7 +380,7 @@ public class FrInseeNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException__WhenValueHasInvalidCheckDigits(String value)
+   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
       => FluentActions
          .Invoking(() => new FrInseeNumber(value))
          .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
@@ -386,7 +389,7 @@ public class FrInseeNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException__WhenValueHasInvalidSeparator(String value)
+   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
       => FluentActions
          .Invoking(() => new FrInseeNumber(value))
          .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
@@ -553,6 +556,34 @@ public class FrInseeNumberTests
 
       // Act/arrange
       sut.Gender.Should().Be(expectedGender);
+   }
+
+   #endregion
+
+   #region IsBornAbroad Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData("01",  false, false)]
+   [InlineData("2A",  false, false)]
+   [InlineData("973", false, false)]
+   [InlineData("99",   true, false)]
+   [InlineData("01",  false, true)]
+   [InlineData("2A",  false, true)]
+   [InlineData("973", false, true)]
+   [InlineData("99",   true, true)]
+   public void FrInseeNumber_IsBornAbroad_ShouldReturnExpectedValue(
+      String department,
+      Boolean expectedResult,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
+      var sut = new FrInseeNumber(value);
+
+      // Act/arrange
+      sut.IsBornAbroad.Should().Be(expectedResult);
    }
 
    #endregion
@@ -1057,7 +1088,7 @@ public class FrInseeNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidGenderValues))]
-   public void FrInseeNumber_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidGender(Char gender)
+   public void FrInseeNumber_Create_ShouldReturnInvalidGenderValidationResult_WhenValueHasInvalidGender(Char gender)
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(gender: gender);
@@ -1072,7 +1103,7 @@ public class FrInseeNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidMonthValues))]
-   public void FrInseeNumber_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidMonth(
+   public void FrInseeNumber_Create_ShouldReturnInvaliMonthValidationResult_WhenValueHasInvalidMonth(
       String month,
       Boolean formatted)
    {
@@ -1089,7 +1120,7 @@ public class FrInseeNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidDepartmentCodes))]
-   public void FrInseeNumber_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidDepartment(
+   public void FrInseeNumber_Create_ShouldReturnInvalidDepartmentValidationResult_WhenValueHasInvalidDepartment(
       String department,
       Boolean formatted)
    {

@@ -391,13 +391,13 @@
     <value>FR INSEE number must have a valid modulus 97 check sum in the two trailing (right-most) character positions</value>
   </data>
   <data name="FrInseeNumberInvalidSeparator" xml:space="preserve">
-    <value>FR INSEE number with length 21 may not have digit characters (0-9) in character positions 1, 4, 7, 10, 15 and 18 (zero-based) and the same character must be used in each location</value>
+    <value>FR INSEE number with length 21 may not have digit characters (0-9) in character positions 1, 4, 7, 10, 14 and 18 (zero-based) and the same character must be used in each location</value>
   </data>
   <data name="FrInseeNumberInvalidGender" xml:space="preserve">
     <value>FR INSEE number requires a gender code of 1 (male), 2 (female) or 7 (male), 8 (female) for temporary INSEE numbers</value>
   </data>
   <data name="FrInseeNumberInvalidMonth" xml:space="preserve">
-    <value>FR INSEE number must have a month value between 01 and 12 (for known dates) or 20-42, 50-99 (for persons with unknown or incomplete date of birth documentation)</value>
+    <value>FR INSEE number must have a month value between 01 and 12 (for known dates) or 12, 20-42, 50-99 (for persons with unknown or incomplete date of birth documentation)</value>
   </data>
   <data name="FrInseeNumberInvalidDepartment" xml:space="preserve">
     <value>FR INSEE number must have a valid INSEE department code</value>

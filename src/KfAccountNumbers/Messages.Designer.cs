@@ -412,7 +412,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FR INSEE number must have a month value between 01 and 12 (for known dates) or 20-42, 50-99 (for persons with unknown or incomplete date of birth documentation).
+        ///   Looks up a localized string similar to FR INSEE number must have a month value between 01 and 12 (for known dates) or 12, 20-42, 50-99 (for persons with unknown or incomplete date of birth documentation).
         /// </summary>
         internal static string FrInseeNumberInvalidMonth {
             get {
@@ -421,7 +421,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FR INSEE number with length 21 may not have digit characters (0-9) in character positions 1, 4, 7, 10, 15 and 18 (zero-based) and the same character must be used in each location.
+        ///   Looks up a localized string similar to FR INSEE number with length 21 may not have digit characters (0-9) in character positions 1, 4, 7, 10, 14 and 18 (zero-based) and the same character must be used in each location.
         /// </summary>
         internal static string FrInseeNumberInvalidSeparator {
             get {

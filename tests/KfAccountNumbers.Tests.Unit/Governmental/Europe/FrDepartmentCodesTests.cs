@@ -7,7 +7,7 @@ public class FrDepartmentCodesTests
    // ==========================================================================
 
    [Fact]
-   public void FrDepartmentCodes_GetAllDepartmentCodes_ShouldReturnFullListOfStateCodes()
+   public void FrDepartmentCodes_GetAllDepartmentCodes_ShouldReturnFullListOfDepartmentCodes()
    {
       // Arrange.
       String[] expectedDepartmentCodes =

@@ -61,7 +61,7 @@ public enum FrInseeNumberValidationResult
    /// <summary>
    ///   The two or three character department code (character positions 5-7 in
    ///   values without separators or character positions 8-10 in values with
-   ///   separators, all zero-based) are not a value INSEE department code.
+   ///   separators, all zero-based) are not a valid INSEE department code.
    /// </summary>
    InvalidDepartment,
 }
