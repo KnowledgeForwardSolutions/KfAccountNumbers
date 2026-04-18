@@ -42,6 +42,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Europe
         - [BeRijksregisternummer](#berijksregisternummer) 
         - [DkPersonnummer](#dkpersonnummer)
+        - [EsNif](#esnif)
         - [FiHenkilotunnus](#fihenkilotunnus)
         - [FrInseeNumber](#frinseenumber)
         - [IsKennitala](#iskennitala)
@@ -193,6 +194,46 @@ According to these rules, the valid range for a date of birth is January 1, 1858
 
 See [Wikipedia - Personal identification number (Denmark)](https://en.wikipedia.org/wiki/Personal_identification_number_%28Denmark%29)
 and [CPR-nummer](https://da.wikipedia.org/wiki/CPR-nummer) for more info.
+
+## EsNif
+
+The `EsNif` type represents a Spanish tax identifier, officially known as the Número de Identificación Fiscal (NIF). `EsNif`
+actually supports two different identifiers, the documento nacional de identidad (DNI) issued to Spanish citizens or the
+número de identificación de extranjero (NIE) issued to foreigners residing in Spain. `EsNif` includes an `IdentifierType`
+property which returns an `EsIdentifierType` enumeration value that indicates if the number is a DNI or NIE.
+
+DNI and NIE are both nine-digit numbers with similar, but slightly different structures. A DNI has the
+structure DDDDDDDDC while a NIE uses PDDDDDDDC, where
+* D is a digit (0-9).
+* C is an alphabetic character representing the modulus 23 check digit calculated from the previous eight digits
+* P is one of the letters X, Y or Z (when calculating the check digit, X = 0, Y = 1 and Z = 2).
+
+The only difference between a DNI and a NIE is if the leading (left-most) character is a digit or the letter X, Y or Z.
+Both values may be formatted as a sequence of nine characters or may be formatted for greater readability by using
+separators. For a DNI, a separator (generally a dash '-') is placed between the digits and the trailing alphabetic 
+character. For a NIE, separators are placed between the leading letter and the digits, and between the digits and
+the trailing alphabetic character.
+
+A NIF must meet all of the following rules:
+* The value may not be null, empty or all whitespace characters.
+* The value must be 9 characters in length (without separators) or 10 characters (DNI with one separator) or
+  11 characters (NIE with two separators)
+* All characters other than the leading and trailing characters (and the optional separators) must be ASCII digits
+  ('0'-'9'). The leading character must be either an ASCII digit or X, Y, or Z.
+* The trailing character must be a valid modulus 23 check character. Valid characters are "TRWAGMYFPDXBNJZSQVHLCKE"
+  (where T represents a remainder of 0 and E represents a remainder of 22).
+* The optional separator character(s), if included, may not be an ASCII digit. Any non-digit character is allowed as a separator.
+  For a DNI, the separator must be in character position 8 (zero-based). For a NIE, the separators must be in character
+  positions 1 and 9 (zero-based) and both separator characters must be the same.
+
+Example values:
+* 12345678Z - DNI
+* 50487563-X - DNI
+* X1234567L - NIE
+* Y-7654321-G - NIE
+
+See [Wikipedia - National Identity Card (Spain)](https://en.wikipedia.org/wiki/National_Identity_Card_%28Spain%29)
+and [Wikipedia (Spanish) - Número de identificación fiscal](https://es.wikipedia.org/wiki/N%C3%BAmero_de_identificaci%C3%B3n_fiscal)
 
 ## FiHenkilotunnus
 
