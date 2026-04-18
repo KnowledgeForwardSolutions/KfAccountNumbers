@@ -43,6 +43,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
         - [BeRijksregisternummer](#berijksregisternummer) 
         - [DkPersonnummer](#dkpersonnummer)
         - [FiHenkilotunnus](#fihenkilotunnus)
+        - [FrInseeNumber](#frinseenumber)
         - [IsKennitala](#iskennitala)
         - [NlBurgerservicenummer](#nlburgerservicenummer)
         - [NoFoedselsnummer](#nofoedselsnummer) 
@@ -227,6 +228,49 @@ Example values:
 
 See [Wikipedia - National identification number - Finland](https://en.wikipedia.org/wiki/National_identification_number#Finland)
 for more info. Also see [Henkilötunnus](https://kenda.fi/tools/hetu/) for tools to generate test henkilötunnus values.
+
+## FrInseeNumber
+
+The `FrInseeNumber` type represents the national identification number used by France, managed by the Institut national de la
+statistique et des études économiques (INSEE). INSEE numbers are sometimes abbreviated as NIR (numéro d'inscription au répertoire
+des personnes physiques)
+
+A French INSEE number is a 15-digit number structured as SYYMMLLOOOKKKCC with the following elements:
+* S - the person's gender, where 1 = male and 2 = female. Temporary INSEE numbers use 7 = male and 8 = female instead.
+* YY - two-digit year of birth.
+* MM - two-digit month of birth.
+* LLOOO - five-digit INSEE COG (Code officiel géographique) identifying the person's department and commune of birth.
+  The COG is the combination of department and commune of birth. There are three possible patterns for COG:
+  * For persons born in metropolitan France, 2-digit department + 3-digit commune (including Corsican departments 2A and 2B).
+  * For persons born in overseas departments, 3-digit department + 2-digit commune.
+  * For persons born abroad, fixed 2-digit department of 99 + three-digit ISO 3166-1 country code.
+* KKK - three digits used to distinguish between people born in the same year/month/department/commune.
+* CC - two-digit modulus 97 check sum calculated for the preceding 13 digits. When calculating the checksum, department code "2A"
+  is replaced by 19, and department code "2B" is replaced by 18.
+
+An INSEE number may be formatted as 15 consecutive digits or as 21 characters with spaces separating the different
+elements, i.e. "S YY MM LL OOO KKK CC".
+
+A valid INSEE number must meet all of the following rules:
+* The value may not be null, empty or all whitespace characters.
+* The value must be either 15 characters (without separators) or 21 characters (with separators) in length.
+* All characters (except the optional separator characters or Corsican department codes) must be ASCII digits ('0'-'9').
+* The two trailing (right-most) characters must be a valid modulus 97 check sum.
+* The separator characters (if used) may not be ASCII digits ('0'-'9'). All separator characters must be the same character.
+* The leading gender indicator (S) must be 1, 2, 7 or 8.
+* The month element (MM) must be a number between 01 and 12 (for known dates) or 13, 20-42, 50-99 (for persons with unknown or
+  incomplete date of birth documentation).
+* The COG element (LLOOO) must start with a valid department code, or 99 for persons born abroad. For departments
+  with alphabetic characters (Corsica 2A, 2B), the alphabetic character must be uppercase.
+
+Example values:
+* 188121884813236 - gender = male, year of birth = 88, month of birth = 12, department = 18 (Cher)
+* 255102445387701 - gender = female, year of birth = 55, month of birth = 10, department = 24 (Dordogne)
+* 112072A28806058 - gender = male, year of birth = 12, month of birth = 07, department = 2A (Corse-du-Sud)
+* 821099901013371 - temporary INSEE, gender = female, year of birth = 21, month of birth = 09, department = 99 (born abroad)
+
+See [Wikipedia - INSEE code](https://en.wikipedia.org/wiki/INSEE_code) and
+[Wikipedia (French) - Numéro de sécurité sociale en France](https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_s%C3%A9curit%C3%A9_sociale_en_France) for more info.
 
 ## IsKennitala
 

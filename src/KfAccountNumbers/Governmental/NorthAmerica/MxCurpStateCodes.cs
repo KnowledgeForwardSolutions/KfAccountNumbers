@@ -1,3 +1,5 @@
+// Ignore Spelling: Curp Mx
+
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
 /// <summary>

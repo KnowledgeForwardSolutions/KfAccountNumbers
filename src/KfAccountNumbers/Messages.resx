@@ -307,7 +307,7 @@
     <value>DK Personnummer requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based)</value>
   </data>
   <data name="FiHenkilotunnusEmpty" xml:space="preserve">
-    <value>FI Henkilotunnus may not be null, empty or all whitespace characters</value>
+    <value>FI Henkilotunnus number may not be null, empty or all whitespace characters</value>
   </data>
   <data name="FiHenkilotunnusInvalidLength" xml:space="preserve">
     <value>FI Henkilotunnus must have length 11</value>
@@ -377,5 +377,29 @@
   </data>
   <data name="BeRijksregisternummerInvalidSequenceNumber" xml:space="preserve">
     <value>BE Rijksregisternummer sequence number may not be '000' or '999'</value>
+  </data>
+  <data name="FrInseeNumberEmpty" xml:space="preserve">
+    <value>FR INSEE may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="FrInseeNumberInvalidLength" xml:space="preserve">
+    <value>FR INSEE number must have length 15 (without separators) or 21 (with separators)</value>
+  </data>
+  <data name="FrInseeNumberInvalidCharacter" xml:space="preserve">
+    <value>FR INSEE number contains a non-digit character where a digit was expected</value>
+  </data>
+  <data name="FrInseeNumberInvalidCheckDigits" xml:space="preserve">
+    <value>FR INSEE number must have a valid modulus 97 check sum in the two trailing (right-most) character positions</value>
+  </data>
+  <data name="FrInseeNumberInvalidSeparator" xml:space="preserve">
+    <value>FR INSEE number with length 21 may not have digit characters (0-9) in character positions 1, 4, 7, 10, 14 and 18 (zero-based) and the same character must be used in each location</value>
+  </data>
+  <data name="FrInseeNumberInvalidGender" xml:space="preserve">
+    <value>FR INSEE number requires a gender code of 1 (male), 2 (female) or 7 (male), 8 (female) for temporary INSEE numbers</value>
+  </data>
+  <data name="FrInseeNumberInvalidMonth" xml:space="preserve">
+    <value>FR INSEE number must have a month value between 01 and 12 (for known dates) or 12, 20-42, 50-99 (for persons with unknown or incomplete date of birth documentation)</value>
+  </data>
+  <data name="FrInseeNumberInvalidDepartment" xml:space="preserve">
+    <value>FR INSEE number must have a valid INSEE department code</value>
   </data>
 </root>
