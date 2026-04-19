@@ -120,6 +120,9 @@ public record EsNif
    private const Int32 DniFormmattedLength = 10;
    private const Int32 NieFormattedLength = 11;
 
+   private const Int32 LeadingSeparatorOffset = 1;
+   private const Int32 TrailingSeparatorOffset = 2;         // Measured from end of string
+
    private const String CheckCharacters = "TRWAGMYFPDXBNJZSQVHLCKE";
    private static readonly HashSet<Char> ValidCheckCharacters = CheckCharacters.ToHashSet();
 
@@ -155,18 +158,10 @@ public record EsNif
          // Could be either InvalidCharacter or InvalidCheckDigit.
          return validationResult;
       }
-      //else if (!ValidateSeparators(nif))
-      //{
-      //   return EsNifValidationResult.InvalidSeparator;
-      //}
-      //else if (!ValidateSequenceNumber(nif))
-      //{
-      //   return EsNifValidationResult.InvalidSequenceNumber;
-      //}
-      //else if (!ValidateDateOfBirth(nif))
-      //{
-      //   return EsNifValidationResult.InvalidDateOfBirth;
-      //}
+      else if (!ValidateSeparators(nif))
+      {
+         return EsNifValidationResult.InvalidSeparator;
+      }
 
       return EsNifValidationResult.ValidationPassed;
    }
@@ -226,4 +221,17 @@ public record EsNif
          || (!isLeadingDigit && nif.Length == NieFormattedLength);
    }
 
+   private static Boolean ValidateSeparators(ReadOnlySpan<Char> nif)
+   {
+      if (nif.Length == UnformattedLength)
+      {
+         return true;
+      }
+
+      var trailingSeparator = nif[^TrailingSeparatorOffset];
+      var validTrailingSeparator = !trailingSeparator.IsAsciiDigit();
+
+      return (nif.Length == DniFormmattedLength && validTrailingSeparator)
+         || (validTrailingSeparator && trailingSeparator == nif[LeadingSeparatorOffset]);
+   }
 }
