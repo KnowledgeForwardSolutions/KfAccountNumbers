@@ -3,8 +3,10 @@
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
-///   Strongly typed business object that represents a Spanish documento nacional
-///   de identidad (DNI) or número de identificación de extranjero (NIE).
+///   Strongly typed business object that represents a Spanish Número de Identificación
+///   Fiscal (NIF). NIF may be either of two different values, a documento nacional
+///   de identidad (DNI) issued to Spanish citizens or a número de identificación de
+///   extranjero (NIE) issued to foreigners residing in Spain.
 /// </summary>
 /// <remarks>
 ///   <para>
@@ -114,4 +116,114 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </remarks>
 public record EsNif
 {
+   private const Int32 UnformattedLength = 9;
+   private const Int32 DniFormmattedLength = 10;
+   private const Int32 NieFormattedLength = 11;
+
+   private const String CheckCharacters = "TRWAGMYFPDXBNJZSQVHLCKE";
+   private static readonly HashSet<Char> ValidCheckCharacters = CheckCharacters.ToHashSet();
+
+   /// <summary>
+   ///   Check the <paramref name="nif"/> to determine if it contains a
+   ///   valid Spanish Número de Identificación Fiscal (NIF).
+   /// </summary>
+   /// <param name="nif">
+   ///   String representation of a Spanish Número de Identificación Fiscal (NIF).
+   /// </param>
+   /// <returns>
+   ///   A <see cref="EsNifValidationResult"/> enumeration 
+   ///   value that indicates if the <paramref name="nif"/> passed
+   ///   validation or what validation error was encountered.
+   /// </returns>
+   public static EsNifValidationResult Validate(String? nif)
+   {
+      if (String.IsNullOrWhiteSpace(nif))
+      {
+         return EsNifValidationResult.Empty;
+      }
+      else if (!ValidateLength(nif))
+      {
+         return EsNifValidationResult.InvalidLength;
+      }
+
+      // After performing basic checks, validate the check digit because the
+      // most common source of errors will be data entry errors. Then validate
+      // the subcomponents of the value.
+      EsNifValidationResult validationResult = ValidateCheckDigit(nif);
+      if (validationResult != EsNifValidationResult.ValidationPassed)
+      {
+         // Could be either InvalidCharacter or InvalidCheckDigit.
+         return validationResult;
+      }
+      //else if (!ValidateSeparators(nif))
+      //{
+      //   return EsNifValidationResult.InvalidSeparator;
+      //}
+      //else if (!ValidateSequenceNumber(nif))
+      //{
+      //   return EsNifValidationResult.InvalidSequenceNumber;
+      //}
+      //else if (!ValidateDateOfBirth(nif))
+      //{
+      //   return EsNifValidationResult.InvalidDateOfBirth;
+      //}
+
+      return EsNifValidationResult.ValidationPassed;
+   }
+
+   private static EsNifValidationResult ValidateCheckDigit(ReadOnlySpan<Char> nif)
+   {
+      // Process leading character outside main loop.
+      var leadingCharacter = nif[0];
+      var num = leadingCharacter.ToSingleDigit();
+      if (!num.IsValidDigit())
+      {
+         // Handle possible NIE.
+         num = leadingCharacter - Chars.UpperCaseX;
+         if (num is < 0 or > 2)              // X = 0, Y = 1, Z = 2
+         {
+            return EsNifValidationResult.InvalidCharacter;
+         }
+      }
+      var sum = num;
+
+      // Handle inner digits.
+      var start = nif.Length == NieFormattedLength ? 2 : 1;
+      var end = nif.Length == NieFormattedLength ? 9 : 8;
+      for(var index = start; index < end; index++)
+      {
+         sum *= 10;
+         num = nif[index].ToSingleDigit();
+         if (!num.IsValidDigit())
+         {
+            return EsNifValidationResult.InvalidCharacter;
+         }
+
+         sum += num;
+      }
+
+      var remainder = sum % 23;
+      var checkCharacter = CheckCharacters[remainder];
+      var trailingCharacter = nif[^1];
+      if (trailingCharacter == checkCharacter)
+      {
+         return EsNifValidationResult.ValidationPassed;
+      }
+
+      // If check character doesn't match, check for character not in
+      // set of valid check characters.
+      return ValidCheckCharacters.Contains(trailingCharacter)
+         ? EsNifValidationResult.InvalidCheckDigit
+         : EsNifValidationResult.InvalidCharacter;
+   }
+
+   private static Boolean ValidateLength(ReadOnlySpan<Char> nif)
+   {
+      var isLeadingDigit = nif[0].IsAsciiDigit();
+
+      return nif.Length == UnformattedLength
+         || (isLeadingDigit && nif.Length == DniFormmattedLength)
+         || (!isLeadingDigit && nif.Length == NieFormattedLength);
+   }
+
 }
