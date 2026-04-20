@@ -3,10 +3,11 @@
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
-///   Strongly typed business object that represents a Spanish Número de Identificación
-///   Fiscal (NIF). NIF may be either of two different values, a documento nacional
-///   de identidad (DNI) issued to Spanish citizens or a número de identificación de
-///   extranjero (NIE) issued to foreigners residing in Spain.
+///   Strongly typed business object that represents a Spanish tax identifier,
+///   officially known as theNúmero de Identificación Fiscal (NIF). NIF may be
+///   either of two different values, a documento nacional de identidad (DNI)
+///   issued to Spanish citizens or a número de identificación de extranjero (NIE)
+///   issued to foreigners residing in Spain.
 /// </summary>
 /// <remarks>
 ///   <para>
