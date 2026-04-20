@@ -203,9 +203,9 @@ número de identificación de extranjero (NIE) issued to foreigners residing in 
 property which returns an `EsIdentifierType` enumeration value that indicates if the number is a DNI or NIE.
 
 DNI and NIE are both nine-digit numbers with similar, but slightly different structures. A DNI has the
-structure DDDDDDDDC while a NIE uses PDDDDDDDC, where
+structure DDDDDDDDC while a NIE uses PDDDDDDDC, where:
 * D is a digit (0-9).
-* C is an alphabetic character representing the modulus 23 check digit calculated from the previous eight digits
+* C is an alphabetic character representing the modulus 23 check digit calculated from the previous eight digits.
 * P is one of the letters X, Y or Z (when calculating the check digit, X = 0, Y = 1 and Z = 2).
 
 The only difference between a DNI and a NIE is if the leading (left-most) character is a digit or the letter X, Y or Z.
@@ -217,7 +217,7 @@ the trailing alphabetic character.
 A NIF must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
 * The value must be 9 characters in length (without separators) or 10 characters (DNI with one separator) or
-  11 characters (NIE with two separators)
+  11 characters (NIE with two separators).
 * All characters other than the leading and trailing characters (and the optional separators) must be ASCII digits
   ('0'-'9'). The leading character must be either an ASCII digit or X, Y, or Z.
 * The trailing character must be a valid modulus 23 check character. Valid characters are "TRWAGMYFPDXBNJZSQVHLCKE"
@@ -225,6 +225,9 @@ A NIF must meet all of the following rules:
 * The optional separator character(s), if included, may not be an ASCII digit. Any non-digit character is allowed as a separator.
   For a DNI, the separator must be in character position 8 (zero-based). For a NIE, the separators must be in character
   positions 1 and 9 (zero-based) and both separator characters must be the same.
+
+Note that the `EsNif` constructor and Create/Validate methods are case-sensitive and require that alphabetic characters
+be upper-case.
 
 Example values:
 * 12345678Z - DNI
