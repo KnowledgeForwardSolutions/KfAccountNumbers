@@ -230,6 +230,18 @@ public class EsNifTests
    public void EsNif_CheckDigitAlgorithm_ShouldGenerateAllPossibleCharacters(String value)
       => EsNif.Validate(value).Should().Be(EsNifValidationResult.ValidationPassed);
 
+   [Theory]
+   [InlineData("00000000T")]     // Minimum DNI
+   [InlineData("99999999R")]     // Maximum DNI
+   [InlineData("X0000000T")]     // Minimum X NIE
+   [InlineData("X9999999J")]     // Maximum X NIE
+   [InlineData("Y0000000Z")]     // Minimum Y NIE
+   [InlineData("Y9999999G")]     // Maximum Y NIE
+   [InlineData("Z0000000M")]     // Minimum Z NIE
+   [InlineData("Z9999999H")]     // Maximum Z NIE
+   public void EsNif_CheckDigitAlgorithm_ShouldHandleBoundaryValues(String value)
+      => EsNif.Validate(value).Should().Be(EsNifValidationResult.ValidationPassed);
+
    #endregion
 
    #region Constructor Tests

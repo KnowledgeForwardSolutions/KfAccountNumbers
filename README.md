@@ -226,6 +226,9 @@ A NIF must meet all of the following rules:
   For a DNI, the separator must be in character position 8 (zero-based). For a NIE, the separators must be in character
   positions 1 and 9 (zero-based) and both separator characters must be the same.
 
+Note that the `EsNif` constructor and Create/Validate methods are case-sensitive and require that alphabetic characters
+be upper-case.
+
 Example values:
 * 12345678Z - DNI
 * 50487563-X - DNI

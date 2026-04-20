@@ -40,7 +40,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      The only difference between a DNI and a NIE is if the leading (left-most)
 ///      character is a digit or the letter X, Y or Z. Both values may be formatted
 ///      as a sequence of nine characters or may be formatted for greater readability
-///      by using    separators. For a DNI, a separator (generally a dash '-') is
+///      by using separators. For a DNI, a separator (generally a dash '-') is
 ///      placed between the digits and the trailing alphabetic character. For a NIE,
 ///      separators are placed between the leading letter and the digits, and between
 ///      the digits and the trailing alphabetic character.
@@ -87,24 +87,27 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      </list>
 ///   </para>
 ///   <para>
+///      Note that the `EsNif` constructor and Create/Validate methods are case-sensitive and
+///      require that alphabetic characters be upper-case.
+///   </para>
+///   <para>
 ///      Example values:
 ///      <list type="bullet">
 ///         <item>
 ///            <term>12345678Z</term>
-///            <description>DNI</description>
+///            <description>DNI (unformatted)</description>
 ///         </item>
 ///         <item>
-///            <term>17110804680</term>
 ///            <term>50487563-X</term>
-///            <description>DNE</description>
+///            <description>DNI (formatted)</description>
 ///         </item>
 ///         <item>
 ///            <term>X1234567L</term>
-///            <description>NIF</description>
+///            <description>NIE (unformatted)</description>
 ///         </item>
 ///         <item>
 ///            <term>Y-7654321-G</term>
-///            <description>NIE</description>
+///            <description>NIE (formatted)</description>
 ///         </item>
 ///      </list>
 ///   </para>
@@ -131,7 +134,7 @@ public record EsNif
    ///   Initialize a new instance of the <see cref="EsNif"/> class.
    /// </summary>
    /// <param name="nif">
-   ///   String representation of a Spanis Número de Identificación
+   ///   String representation of a Spanish Número de Identificación
    ///   Fiscal (NIF).
    /// </param>
    /// <exception cref="KfValidationException{EsNifValidationResult}">
@@ -228,8 +231,9 @@ public record EsNif
    /// </summary>
    /// <param name="mask">
    ///   Optional. The mask that specifies the final output. If not supplied
-   ///   then the mask used will be determined by the <see cref="IdentifierType"/>.
-   ///   DNI will use "________-_" and NIE will use "_-_______-_".
+   ///   (or <see langword="null"/>), the mask used will be determined by the
+   ///   <see cref="IdentifierType"/>. DNI will use "________-_" and NIE will
+   ///   use "_-_______-_".
    /// </param>
    /// <returns>
    ///   A formatted NIF.
@@ -367,14 +371,25 @@ public record EsNif
    {
       if (nif.Length == UnformattedLength)
       {
-         return true;
+         return true;  // No separators to validate
       }
 
       var trailingSeparator = nif[^TrailingSeparatorOffset];
-      var validTrailingSeparator = !trailingSeparator.IsAsciiDigit();
+   
+      // Separator must not be a digit
+      if (trailingSeparator.IsAsciiDigit())
+      {
+         return false;
+      }
 
-      return (nif.Length == DniFormmattedLength && validTrailingSeparator)
-         || (validTrailingSeparator && trailingSeparator == nif[LeadingSeparatorOffset]);
+      // DNI has only trailing separator
+      if (nif.Length == DniFormmattedLength)
+      {
+         return true;
+      }
+
+      // NIE has leading and trailing separators - must match
+      return trailingSeparator == nif[LeadingSeparatorOffset];
    }
 }
 
