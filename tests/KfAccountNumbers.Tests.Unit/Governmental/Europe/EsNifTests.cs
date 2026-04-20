@@ -22,7 +22,8 @@ public class EsNifTests
       {
          9 => nif,
          10 => nif[..8] + nif[^1],
-         11 => nif[0] + nif[2..9] + nif[^1]
+         11 => nif[0] + nif[2..9] + nif[^1],
+         _ => throw new InvalidOperationException(),
       };
 
    public static TheoryData<String> ValidNifValues =>
@@ -50,7 +51,7 @@ public class EsNifTests
    public static TheoryData<String> InvalidCharacterValues =>
    [
       "1 345678Z",               // Unformatted DNI, non-digit character ' '
-      "1_345678Z",               // Unformatted DNI, non-digit character '-'
+      "1-345678Z",               // Unformatted DNI, non-digit character '-'
       "12=45678Z",               // Unformatted DNI, non-digit character '='
       "123A5678Z",               // Unformatted DNI, non-digit character 'A'
       "1234B678Z",               // Unformatted DNI, non-digit character 'B'
@@ -65,7 +66,7 @@ public class EsNifTests
       "1\u00D6345678Z",          // Unformatted DNI, invalid character unicode O with umlaut               
 
       "1 345678-Z",              // Formatted DNI, non-digit character ' '
-      "1_345678-Z",              // Formatted DNI, non-digit character '-'
+      "1-345678-Z",              // Formatted DNI, non-digit character '-'
       "12=45678-Z",              // Formatted DNI, non-digit character '='
       "123A5678-Z",              // Formatted DNI, non-digit character 'A'
       "1234B678-Z",              // Formatted DNI, non-digit character 'B'
@@ -84,7 +85,7 @@ public class EsNifTests
       "x1234567L",               // Unformatted NIE, invalid leading character 'x'
       "y1234567L",               // Unformatted NIE, invalid leading character 'y'
       "z1234567L",               // Unformatted NIE, invalid leading character 'z'
-      "X_234567L",               // Unformatted NIE, non-digit character '-'
+      "X-234567L",               // Unformatted NIE, non-digit character '-'
       "X1=34567L",               // Unformatted NIE, non-digit character '='
       "X12A4567L",               // Unformatted NIE, non-digit character 'A'
       "X123B567L",               // Unformatted NIE, non-digit character 'B'
@@ -103,7 +104,7 @@ public class EsNifTests
       "x-1234567 L",             // Formatted NIE, invalid leading character 'x'
       "y-1234567 L",             // Formatted NIE, invalid leading character 'y'
       "z-1234567 L",             // Formatted NIE, invalid leading character 'z'
-      "X-_234567 L",             // Formatted NIE, non-digit character '-'
+      "X--234567 L",             // Formatted NIE, non-digit character '-'
       "X-1=34567 L",             // Formatted NIE, non-digit character '='
       "X-12A4567 L",             // Formatted NIE, non-digit character 'A'
       "X 123B567 L",             // Formatted NIE, non-digit character 'B'
@@ -843,7 +844,7 @@ public class EsNifTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void EsNif_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidInvalidSeparator(String value)
+   public void EsNif_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(String value)
       => EsNif.Validate(value).Should().Be(EsNifValidationResult.InvalidSeparator);
 
    #endregion

@@ -4,7 +4,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
 ///   Strongly typed business object that represents a Spanish tax identifier,
-///   officially known as theNúmero de Identificación Fiscal (NIF). NIF may be
+///   officially known as the Número de Identificación Fiscal (NIF). NIF may be
 ///   either of two different values, a documento nacional de identidad (DNI)
 ///   issued to Spanish citizens or a número de identificación de extranjero (NIE)
 ///   issued to foreigners residing in Spain.
@@ -122,7 +122,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record EsNif
 {
    private const Int32 UnformattedLength = 9;
-   private const Int32 DniFormmattedLength = 10;
+   private const Int32 DniFormattedLength = 10;
    private const Int32 NieFormattedLength = 11;
 
    private const Int32 LeadingSeparatorOffset = 1;
@@ -245,7 +245,7 @@ public record EsNif
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the rijksregisternummer.
+   ///   details on creating a mask to format the NIF.
    /// </remarks>
    public String Format(String? mask = null)
    {
@@ -308,7 +308,7 @@ public record EsNif
       => nif.Length switch
       {
          UnformattedLength => nif,
-         DniFormmattedLength => String.Concat(nif.AsSpan(..8), nif.AsSpan(^1..)),
+         DniFormattedLength => String.Concat(nif.AsSpan(..8), nif.AsSpan(^1..)),
          NieFormattedLength => String.Concat(nif.AsSpan(..1), nif.AsSpan(2..^2), nif.AsSpan(^1..)),
          _ => throw new InvalidOperationException()      // Validation ensures this is never reached
       };
@@ -364,7 +364,7 @@ public record EsNif
       var isLeadingDigit = nif[0].IsAsciiDigit();
 
       return nif.Length == UnformattedLength
-         || (isLeadingDigit && nif.Length == DniFormmattedLength)
+         || (isLeadingDigit && nif.Length == DniFormattedLength)
          || (!isLeadingDigit && nif.Length == NieFormattedLength);
    }
 
@@ -384,7 +384,7 @@ public record EsNif
       }
 
       // DNI has only trailing separator
-      if (nif.Length == DniFormmattedLength)
+      if (nif.Length == DniFormattedLength)
       {
          return true;
       }
