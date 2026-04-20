@@ -1,4 +1,4 @@
-// Ignore Spelling: Nif
+// Ignore Spelling: Kf Nif
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -16,6 +16,14 @@ public class EsNifTests
    private const String AltValid9CharacterNie = "Y7654321G";
    private const String Valid11CharacterNie = "X-1234567-L";
    private const String AltValid11CharacterNie = "Y 7654321 G";
+
+   private static String GetRawNif(String nif)
+      => nif.Length switch
+      {
+         9 => nif,
+         10 => nif[..8] + nif[^1],
+         11 => nif[0] + nif[2..9] + nif[^1]
+      };
 
    public static TheoryData<String> ValidNifValues =>
    [
@@ -221,6 +229,94 @@ public class EsNifTests
    [InlineData("X-0000022-E")]
    public void EsNif_CheckDigitAlgorithm_ShouldGenerateAllPossibleCharacters(String value)
       => EsNif.Validate(value).Should().Be(EsNifValidationResult.ValidationPassed);
+
+   #endregion
+
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidNifValues))]
+   public void EsNif_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawNif(value);
+
+      // Act.
+      var sut = new EsNif(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => new EsNif(value))
+         .Should().Throw<KfValidationException<EsNifValidationResult>>()
+         .WithMessage(Messages.EsNifEmpty + "*")
+         .And.ValidationResult.Should().Be(EsNifValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => new EsNif(value))
+         .Should().Throw<KfValidationException<EsNifValidationResult>>()
+         .WithMessage(Messages.EsNifInvalidLength + "*")
+         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCharacter(String value)
+      => FluentActions
+         .Invoking(() => new EsNif(value))
+         .Should().Throw<KfValidationException<EsNifValidationResult>>()
+         .WithMessage(Messages.EsNifInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
+      => FluentActions
+         .Invoking(() => new EsNif(value))
+         .Should().Throw<KfValidationException<EsNifValidationResult>>()
+         .WithMessage(Messages.EsNifInvalidCheckDigit + "*")
+         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidCheckDigit);
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
+      => FluentActions
+         .Invoking(() => new EsNif(value))
+         .Should().Throw<KfValidationException<EsNifValidationResult>>()
+         .WithMessage(Messages.EsNifInvalidSeparator + "*")
+         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidSeparator);
+
+   #endregion
+
+   #region IdentifierType Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Valid9CharacterDni, EsIdentifierType.Dni)]
+   [InlineData(Valid10CharacterDni, EsIdentifierType.Dni)]
+   [InlineData(Valid9CharacterNie, EsIdentifierType.Nie)]
+   [InlineData(Valid11CharacterNie, EsIdentifierType.Nie)]
+   public void EsNif_IdentifierType_ShouldReturnExpectedValue(
+      String value,
+      EsIdentifierType expectedIdentifierType)
+   {
+      // Arrange.
+      var sut = new EsNif(value);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(expectedIdentifierType);
+   }
 
    #endregion
 

@@ -127,6 +127,74 @@ public record EsNif
    private static readonly HashSet<Char> ValidCheckCharacters = CheckCharacters.ToHashSet();
 
    /// <summary>
+   ///   Initialize a new instance of the <see cref="EsNif"/> class.
+   /// </summary>
+   /// <param name="nif">
+   ///   String representation of a Spanis Número de Identificación
+   ///   Fiscal (NIF).
+   /// </param>
+   /// <exception cref="KfValidationException{EsNifValidationResult}">
+   ///   <paramref name="nif"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="nif"/> is not length 9 (without separators)
+   ///   or 10 (DNI with 1 separator) or 11 (NIE with 2 separators).
+   ///   - or -
+   ///   <paramref name="nif"/> contains an invalid character. Leading (left-most)
+   ///   character must be an ASCII digit ('0'-'9') or 'X', 'Y' or 'Z'. Trailing
+   ///   (right-most) character must be an alphabetic character from the subset
+   ///   used by modulus 23. All other characters must be ASCII digits.
+   ///   - or -
+   ///   <paramref name="nif"/> has invalid modulus 23 check character
+   ///   in the trailing (right-most) character position. Valid characters are
+   ///   "TRWAGMYFPDXBNJZSQVHLCKE" (where T represents a remainder of 0 and E
+   ///   represents a remainder of 22).
+   ///   - or -
+   ///   <paramref name="nif"/> is greater than 9 characters in length and has
+   ///   an ASCII digit ('0'-'9') in a separator location or is 11 characters
+   ///   in length and has two different separator characters.
+   /// </exception>
+   public EsNif(String? nif)
+      : this(nif, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private EsNif(String? nif, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         EsNifValidationResult validationResult = Validate(nif);
+         if (validationResult != EsNifValidationResult.ValidationPassed)
+         {
+            throw validationResult.ToValidationException();
+         }
+      }
+
+      Value = GetRawValue(nif!);
+   }
+
+   /// <summary>
+   ///   The type of Spanish Número de Identificación Fiscal represented by the
+   ///   current value.
+   /// </summary>
+   /// <remarks>
+   ///   The leading character determines the identifier type. Documento nacional
+   ///   de identidad (DNI) start with a digit character while número de
+   ///   identificación de extranjero (NIE) start with 'X', 'Y' or 'Z'.
+   /// </remarks>
+   public EsIdentifierType IdentifierType => Value[0].IsAsciiDigit()
+      ? EsIdentifierType.Dni
+      : EsIdentifierType.Nie;
+
+   /// <summary>
+   ///   The raw NIF value.
+   /// </summary>
+   public String Value { get; private init; }
+
+   /// <summary>
    ///   Check the <paramref name="nif"/> to determine if it contains a
    ///   valid Spanish Número de Identificación Fiscal (NIF).
    /// </summary>
@@ -165,6 +233,15 @@ public record EsNif
 
       return EsNifValidationResult.ValidationPassed;
    }
+
+   private static String GetRawValue(String nif)
+      => nif.Length switch
+      {
+         UnformattedLength => nif,
+         DniFormmattedLength => String.Concat(nif.AsSpan(..8), nif.AsSpan(^1..)),
+         NieFormattedLength => String.Concat(nif.AsSpan(..1), nif.AsSpan(2..^2), nif.AsSpan(^1..)),
+         _ => throw new InvalidOperationException()      // Validation ensures this is never reached
+      };
 
    private static EsNifValidationResult ValidateCheckDigit(ReadOnlySpan<Char> nif)
    {
