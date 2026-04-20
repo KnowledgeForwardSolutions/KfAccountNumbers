@@ -1,4 +1,4 @@
-// Ignore Spelling: Kf Nif
+// Ignore Spelling: Deserialize Deserialization Json Kf Nif
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -320,6 +320,486 @@ public class EsNifTests
 
    #endregion
 
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void EsNif_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid9CharacterDni;
+      var sut = new EsNif(value);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(value);
+   }
+
+   [Fact]
+   public void EsNif_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid11CharacterNie;
+      var sut = new EsNif(value);
+      var expected = GetRawNif(value);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void EsNif_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      EsNif sut = null!;
+
+      // Act.
+      String str = sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void EsNif_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      EsNif sut = null!;
+
+      // Act.
+      var str = (String)sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidNifValues))]
+   public void EsNif_ExplicitCastToEsNif_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawNif(value);
+
+      // Act.
+      var sut = (EsNif)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void EsNif_ExplicitCastToEsNif_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => _ = (EsNif)value)
+         .Should().Throw<KfValidationException<EsNifValidationResult>>()
+         .WithMessage(Messages.EsNifEmpty + "*")
+         .And.ValidationResult.Should().Be(EsNifValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void EsNif_ExplicitCastToEsNif_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => _ = (EsNif)value)
+         .Should().Throw<KfValidationException<EsNifValidationResult>>()
+         .WithMessage(Messages.EsNifInvalidLength + "*")
+         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void EsNif_ExplicitCastToEsNif_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+      => FluentActions
+         .Invoking(() => _ = (EsNif)value)
+         .Should().Throw<KfValidationException<EsNifValidationResult>>()
+         .WithMessage(Messages.EsNifInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void EsNif_ExplicitCastToEsNif_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
+      => FluentActions
+         .Invoking(() => _ = (EsNif)value)
+         .Should().Throw<KfValidationException<EsNifValidationResult>>()
+         .WithMessage(Messages.EsNifInvalidCheckDigit + "*")
+         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidCheckDigit);
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void EsNif_ExplicitCastToEsNif_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
+      => FluentActions
+         .Invoking(() => _ = (EsNif)value)
+         .Should().Throw<KfValidationException<EsNifValidationResult>>()
+         .WithMessage(Messages.EsNifInvalidSeparator + "*")
+         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidSeparator);
+
+   #endregion
+
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void EsNif_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new EsNif(Valid9CharacterDni);
+      var sut2 = new EsNif(Valid9CharacterDni);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void EsNif_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new EsNif(Valid9CharacterDni);
+      var sut2 = new EsNif(AltValid9CharacterDni);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void EsNif_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. formatted and unformatted versions for same person should still be equal.
+      var sut1 = new EsNif(Valid9CharacterDni);
+      var sut2 = new EsNif(Valid10CharacterDni);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void EsNif_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new EsNif(Valid9CharacterNie);
+      var sut2 = new EsNif(AltValid9CharacterNie);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void EsNif_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. formatted and unformatted versions for same person should still be equal.
+      var sut1 = new EsNif(Valid9CharacterNie);
+      var sut2 = new EsNif(Valid11CharacterNie);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void EsNif_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new EsNif(Valid9CharacterNie);
+      var sut2 = new EsNif(Valid9CharacterNie);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidNifValues))]
+   public void EsNif_Create_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expectedValue = new EsNif(value);
+
+      // Act.
+      var result = EsNif.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void EsNif_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
+   {
+      // Act.
+      var result = EsNif.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(EsNifValidationResult.Empty);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void EsNif_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   {
+      // Act.
+      var result = EsNif.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(EsNifValidationResult.InvalidLength);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void EsNif_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidCharacter(String value)
+   {
+      // Act.
+      var result = EsNif.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(EsNifValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void EsNif_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigits(String value)
+   {
+      // Act.
+      var result = EsNif.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(EsNifValidationResult.InvalidCheckDigit);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void EsNif_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(String value)
+   {
+      // Act.
+      var result = EsNif.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(EsNifValidationResult.InvalidSeparator);
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void EsNif_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new EsNif(Valid9CharacterDni);
+      var sut2 = new EsNif(Valid9CharacterDni);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void EsNif_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new EsNif(Valid9CharacterNie);
+      var sut2 = new EsNif(AltValid9CharacterNie);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void EsNif_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. formatted and unformatted versions for same person should still be equal.
+      var sut1 = new EsNif(Valid9CharacterDni);
+      var sut2 = new EsNif(Valid10CharacterDni);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Format Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Valid9CharacterDni, Valid10CharacterDni)]
+   [InlineData(Valid9CharacterNie, Valid11CharacterNie)]
+   public void EsNif_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed(
+      String value,
+      String expected)
+   {
+      // Arrange.
+      var sut = new EsNif(value);
+
+      // Act.
+      var str = sut.Format();
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void EsNif_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new EsNif(Valid11CharacterNie);
+      var mask = "_________";
+      var expected = Valid9CharacterNie;
+
+      // Act.
+      var str = sut.Format(mask);
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void EsNif_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
+   {
+      // Arrange.
+      var sut = new EsNif(Valid11CharacterNie);
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+      var act = () => _ = sut.Format(mask);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void EsNif_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new EsNif(Valid9CharacterNie);
+      var sut2 = new EsNif(Valid9CharacterNie);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void EsNif_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new EsNif(Valid9CharacterDni);
+      var sut2 = new EsNif(AltValid9CharacterDni);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   [Fact]
+   public void EsNif_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. formatted and unformatted versions for same person should still be equal.
+      var sut1 = new EsNif(Valid9CharacterDni);
+      var sut2 = new EsNif(Valid10CharacterDni);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // EsNif does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void EsNif_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new EsNif(Valid9CharacterDni);
+      var sut2 = new EsNif(Valid9CharacterDni);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidNifValues))]
+   public void EsNif_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new EsNif(value);
+      var expected = GetRawNif(value);
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -353,6 +833,104 @@ public class EsNifTests
    [MemberData(nameof(InvalidSeparatorValues))]
    public void EsNif_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidInvalidSeparator(String value)
       => EsNif.Validate(value).Should().Be(EsNifValidationResult.InvalidSeparator);
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void EsNif_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new EsNif(Valid9CharacterDni);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<EsNif>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void EsNif_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new EsNif(AltValid11CharacterNie);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public EsNif Nif { get; set; } = null!;
+   }
+
+   [Fact]
+   public void EsNif_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { Nif = new EsNif(Valid9CharacterNie) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void EsNif_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"Nif\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void EsNif_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"Nif\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.Nif.Should().BeNull();
+   }
+
+   [Fact]
+   public void EsNif_JsonDeserialization_ShouldThrowKfValidationException_WhenNifIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"Nif\":\"012345678-Z\"}";  // Invalid length
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should()
+         .ThrowExactly<KfValidationException<EsNifValidationResult>>()
+         .WithMessage(Messages.EsNifInvalidLength + "*")
+         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidLength);
+   }
 
    #endregion
 }

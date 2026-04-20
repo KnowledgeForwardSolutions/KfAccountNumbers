@@ -1,4 +1,4 @@
-// Ignore Spelling: Nif
+// Ignore Spelling: Json Nif
 
 namespace KfAccountNumbers.Governmental.Europe;
 
@@ -114,6 +114,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      for more info.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(EsNifJsonConverter))]
 public record EsNif
 {
    private const Int32 UnformattedLength = 9;
@@ -190,9 +191,73 @@ public record EsNif
       : EsIdentifierType.Nie;
 
    /// <summary>
-   ///   The raw NIF value.
+   ///   The raw Número de Identificación Fiscal value.
    /// </summary>
    public String Value { get; private init; }
+
+   public static implicit operator String(EsNif nif)
+      => nif?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator EsNif(String? nif) => new(nif);
+
+   /// <summary>
+   ///   Create a new <see cref="EsNif"/> using the Result pattern.
+   /// </summary>
+   /// <param name="nif">
+   ///   String representation of a Spanish Número de Identificación Fiscal.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{EsNif, EsNifValidationResult}"/>.
+   ///   Will contain the new <see cref="EsNif"/> if 
+   ///   <paramref name="nif"/> is valid or an
+   ///   <see cref="EsNifValidationResult"/> that identifies
+   ///   the validation rule that was failed if <paramref name="nif"/> is 
+   ///   invalid.
+   /// </returns>
+   public static CreateResult<EsNif, EsNifValidationResult> Create(String? nif)
+   {
+      EsNifValidationResult validationResult = Validate(nif);
+      return validationResult == EsNifValidationResult.ValidationPassed
+         ? new EsNif(nif, validationMode: ValidationMode.BypassValidation)
+         : validationResult;
+   }
+
+   /// <summary>
+   ///   Format the NIF using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then the mask used will be determined by the <see cref="IdentifierType"/>.
+   ///   DNI will use "________-_" and NIE will use "_-_______-_".
+   /// </param>
+   /// <returns>
+   ///   A formatted NIF.
+   /// </returns>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the rijksregisternummer.
+   /// </remarks>
+   public String Format(String? mask = null)
+   {
+      mask ??= IdentifierType == EsIdentifierType.Dni
+            ? "________-_"
+            : "_-_______-_";
+
+      return Value.FormatWithMask(mask);
+   }
+
+   /// <summary>
+   ///   Get a string representation of the NIF.
+   /// </summary>
+   /// <remarks>
+   ///   Will return the raw NIF, without  separator characters.
+   /// </remarks>
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="nif"/> to determine if it contains a
@@ -311,4 +376,21 @@ public record EsNif
       return (nif.Length == DniFormmattedLength && validTrailingSeparator)
          || (validTrailingSeparator && trailingSeparator == nif[LeadingSeparatorOffset]);
    }
+}
+
+public class EsNifJsonConverter : JsonConverter<EsNif>
+{
+   public override EsNif Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new EsNif(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, EsNif value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }
