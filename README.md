@@ -45,6 +45,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
         - [EsNif](#esnif)
         - [FiHenkilotunnus](#fihenkilotunnus)
         - [FrInseeNumber](#frinseenumber)
+        - [IePpsNumber](#ieppsnumber)
         - [IsKennitala](#iskennitala)
         - [NlBurgerservicenummer](#nlburgerservicenummer)
         - [NoFoedselsnummer](#nofoedselsnummer) 
@@ -315,6 +316,35 @@ Example values:
 
 See [Wikipedia - INSEE code](https://en.wikipedia.org/wiki/INSEE_code) and
 [Wikipedia (French) - Numéro de sécurité sociale en France](https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_s%C3%A9curit%C3%A9_sociale_en_France) for more info.
+
+## IePpsNumber
+
+The `IePpsNumber` type represents an Irish Personal Public Service number, the national identification number used by Ireland.
+
+An Irish PPS Number consists of seven digits followed by an alphabetic check character and sometimes one additional
+letter. The optional second letter was made permanent in 2013 to allow for expansion of the number of PPS numbers issued.
+A PPS Number is structured as DDDDDDDC or DDDDDDDCE where
+* D is a digit (0-9).
+* C is an alphabetic character representing the weighted modulus 23 check character calculated from the previous seven digits and the
+  second letter, if present.
+* An optional letter in the range of A-I or W.
+
+An Irish PPS Number is typically displayed as a single string of eight or nine characters, without any separator characters.
+
+A valid PPS Number must meet all of the following rules:
+* The value may not be null, empty or all whitespace characters.
+* The value must be either 8 or 9 characters in length.
+* The characters in positions 0-6 (zero-based) must be ASCII digits ('0'-'9').
+* The character in position 7 (zero-based) must be a valid weighted modulus 23 check character in the range of A-W.
+* The character in position 8 (zero-based), if present, must be a letter in the range of A-I or W.
+
+Example values:
+* 1234567T - Check character = T
+* 1234567FA - Check character = F, second letter = A
+* 7654321PA - Check character = P, second letter = A  
+* 9876543XA - Check character = X, second letter = A
+
+See [Wikipedia - Personal Public Service Number](https://en.wikipedia.org/wiki/Personal_Public_Service_Number) for more info.
 
 ## IsKennitala
 
