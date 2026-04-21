@@ -475,6 +475,42 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to IE PPS Number may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string IePpsNumberEmpty {
+            get {
+                return ResourceManager.GetString("IePpsNumberEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IE PPS Number must have digit characters (0-9) in character positions 0-6 (zero-based), a letter in the range A-W in character position 7 (zero-based) and optionally, a letter in the range A-I or W in character position 8 (zero-based).
+        /// </summary>
+        internal static string IePpsNumberInvalidCharacter {
+            get {
+                return ResourceManager.GetString("IePpsNumberInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IE PPS Number must have valid weighted modulus 23 check character in character position 7 (zero-based).
+        /// </summary>
+        internal static string IePpsNumberInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("IePpsNumberInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IE PPS Number must have length of eight characters or nine characters.
+        /// </summary>
+        internal static string IePpsNumberInvalidLength {
+            get {
+                return ResourceManager.GetString("IePpsNumberInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to IS Kennitala may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string IsKennitalaEmpty {
