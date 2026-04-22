@@ -19,6 +19,16 @@ public class IePpsNumberTests
    private const String MixedCaseValid9CharacterPpsNumber = "1234567Fa";
    private const String MixedCaseAltValid9CharacterPpsNumber = "7654321pA";
 
+   private static String GetPpsNumberWithValidCheckDigit(
+      String digits = "1234567",
+      String trailingCharacter = "")
+   {
+      var temp = $"{digits}_{trailingCharacter}";
+      var checkCharacter = GetCheckDigit(temp);
+
+      return $"{digits}{checkCharacter}{trailingCharacter}";
+   }
+
    private static Char GetCheckDigit(String ppsNumber)
    {
       var sum = 0;
@@ -71,6 +81,31 @@ public class IePpsNumberTests
       MixedCaseAltValid9CharacterPpsNumber,
    ];
 
+   public static TheoryData<String> ValidTrailingCharacters =>
+   [
+      "",
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H",
+      "I",
+      "W",
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f",
+      "g",
+      "h",
+      "i",
+      "w",
+   ];
+
    public static TheoryData<String> InvalidCharacterValues =>
    [
       " 234567T",                // non-digit character ' '
@@ -116,14 +151,41 @@ public class IePpsNumberTests
       "2222334T",                // 1122334T with two digit twin error, 11 -> 22
    ];
 
-   //[Fact]
-   //public void CheckDigitTest()
-   //{
-   //   var value = "1122334T";
-   //   var value2 = "1357910GI";
 
-   //   var checkCharacter = GetCheckDigit(value2);
-   //}
+   #region Check Digit Algorithm Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   // Values below are valid PPS Number values, and designed to produce all
+   // possible check characters.
+   [InlineData("0000054W")]         // Remainder = 0
+   [InlineData("0000046A")]         // Remainder = 1
+   [InlineData("0000055B")]         // Remainder = 2
+   [InlineData("0000047C")]         // Remainder = 3
+   [InlineData("0000056D")]         // Remainder = 4
+   [InlineData("0000048E")]         // Remainder = 5
+   [InlineData("0000057F")]         // Remainder = 6
+   [InlineData("0000049G")]         // Remainder = 7
+   [InlineData("0000058H")]         // Remainder = 8
+   [InlineData("0000067I")]         // Remainder = 9
+   [InlineData("0000059J")]         // Remainder = 10
+   [InlineData("0000085K")]         // Remainder = 11
+   [InlineData("0000094LW")]        // Remainder = 12
+   [InlineData("0000086MW")]        // Remainder = 13
+   [InlineData("0000095NW")]        // Remainder = 14
+   [InlineData("0000087OW")]        // Remainder = 15
+   [InlineData("0000096PW")]        // Remainder = 16
+   [InlineData("0000088QW")]        // Remainder = 17
+   [InlineData("0000097RW")]        // Remainder = 18
+   [InlineData("0000089SW")]        // Remainder = 19
+   [InlineData("0000098TW")]        // Remainder = 20
+   [InlineData("0000904UW")]        // Remainder = 21
+   [InlineData("0000099VW")]        // Remainder = 22
+   public void IePpsNumber_CheckDigitAlgorithm_ShouldGenerateAllPossibleCharacters(String value)
+      => IePpsNumber.Validate(value).Should().Be(IePpsNumberValidationResult.ValidationPassed);
+
+   #endregion
 
    #region Validate Method Tests
    // ==========================================================================
@@ -133,6 +195,17 @@ public class IePpsNumberTests
    [MemberData(nameof(ValidPpsNumberValues))]
    public void IePpsNumber_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
       => IePpsNumber.Validate(value).Should().Be(IePpsNumberValidationResult.ValidationPassed);
+
+   [Theory]
+   [MemberData(nameof(ValidTrailingCharacters))]
+   public void IePpsNumber_Validate_ShouldReturnValidationPassed_WhenTrailingCharacterIsValid(String trailingCharacter)
+   {
+      // Arrange.
+      var value = GetPpsNumberWithValidCheckDigit(trailingCharacter: trailingCharacter);
+
+      // Act/assert.
+      IePpsNumber.Validate(value).Should().Be(IePpsNumberValidationResult.ValidationPassed);
+   }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
