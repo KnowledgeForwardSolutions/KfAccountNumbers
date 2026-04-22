@@ -338,11 +338,14 @@ A valid PPS Number must meet all of the following rules:
 * The character in position 7 (zero-based) must be a valid weighted modulus 23 check character in the range of A-W.
 * The character in position 8 (zero-based), if present, must be a letter in the range of A-I or W.
 
+`IePpsNumber` is case-insensitive and will accept both upper-case and lower-case letters in the two trailing positions
+however the value will be normalized to upper-case internally.
+
 Example values:
 * 1234567T - Check character = T
 * 1234567FA - Check character = F, second letter = A
 * 7654321PA - Check character = P, second letter = A  
-* 9876543XA - Check character = X, second letter = A
+* 9876543QA - Check character = Q, second letter = A
 
 See [Wikipedia - Personal Public Service Number](https://en.wikipedia.org/wiki/Personal_Public_Service_Number) for more info.
 
