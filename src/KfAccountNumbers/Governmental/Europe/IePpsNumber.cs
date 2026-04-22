@@ -109,9 +109,60 @@ public record IePpsNumber
    private const Int32 ExtendedLength = 9;
 
    private const Int32 CheckCharacterOffset = 7;
-   private const Int32 TrailingCharacterOffset = 1;      // Measured from end of string
+   private const Int32 TrailingCharacterOffset = 8;
 
    private const String CheckCharacters = "WABCDEFGHIJKLMNOPQRSTUV";    // Note leading W because W = 0 and A = 1, B = 2, ...
+
+   /// <summary>
+   ///   Initialize a new instance of the <see cref="IePpsNumber"/> class.
+   /// </summary>
+   /// <param name="ppsNumber">
+   ///   String representation of a Spanish Número de Identificación
+   ///   Fiscal (NIF).
+   /// </param>
+   /// <exception cref="KfValidationException{IePpsNumberValidationResult}">
+   ///   <paramref name="ppsNumber"/> is <see langword="null"/>, empty or all 
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="ppsNumber"/> is not length 8 or length 9.
+   ///   - or -
+   ///   <paramref name="ppsNumber"/> contains an invalid character. The characters
+   ///   in positions 0-6 (zero-based) must be ASCII digits ('0'-'9'). The character
+   ///   in position 7 (zero-based) must an uppercase or lowercase letter in the
+   ///   range A-W. The character in position 8 (zero-based), if present, must be a
+   ///   letter in the range of A-I or W.
+   ///   - or -
+   ///   <paramref name="ppsNumber"/> has invalid modulus 23 check character
+   ///   in the character position 7 (zero-based). Valid characters are 
+   ///   uppercase or lowercase letters in the range A-W.  (where W represents a
+   ///   remainder of 0, A = remainder of 1, B = remainder of 2,...). 
+   /// </exception>
+   public IePpsNumber(String? ppsNumber)
+      : this(ppsNumber, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private IePpsNumber(String? ppsNumber, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         IePpsNumberValidationResult validationResult = Validate(ppsNumber);
+         if (validationResult != IePpsNumberValidationResult.ValidationPassed)
+         {
+            throw validationResult.ToValidationException();
+         }
+      }
+
+      Value = GetRawValue(ppsNumber!);
+   }
+
+   /// <summary>
+   ///   The raw PPS Number value.
+   /// </summary>
+   public String Value { get; private init; }
 
    /// <summary>
    ///   Check the <paramref name="ppsNumber"/> to determine if it contains a
@@ -142,6 +193,13 @@ public record IePpsNumber
       return ValidateCheckDigit(ppsNumber);
    }
 
+   // If already uppercase then return original value, otherwise normalize to uppercase.
+   private static String GetRawValue(String ppsNumber)
+      => Char.IsLower(ppsNumber[CheckCharacterOffset])
+         || (ppsNumber.Length == ExtendedLength && Char.IsLower(ppsNumber[TrailingCharacterOffset]))
+         ? ppsNumber.ToUpperInvariant()
+         : ppsNumber;
+
    private static IePpsNumberValidationResult ValidateCheckDigit(ReadOnlySpan<Char> ppsNumber)
    {
       var sum = 0;
@@ -163,7 +221,7 @@ public record IePpsNumber
       // Handle optional trailing character.
       if (ppsNumber.Length == ExtendedLength)
       {
-         var trailingCharacter = Char.ToUpper(ppsNumber[^TrailingCharacterOffset], CultureInfo.InvariantCulture);
+         var trailingCharacter = Char.ToUpper(ppsNumber[TrailingCharacterOffset], CultureInfo.InvariantCulture);
          var trailingCharacterValue = trailingCharacter switch
          {
             >= Chars.UpperCaseA and <= Chars.UpperCaseI => (trailingCharacter - Chars.UpperCaseA) + 1,

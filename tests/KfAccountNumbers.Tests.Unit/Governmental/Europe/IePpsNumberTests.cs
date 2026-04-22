@@ -1,3 +1,5 @@
+// Ignore Spelling: Deserialize Deserialization Json Kf
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 #pragma warning disable IDE0008 // Use explicit type
@@ -184,6 +186,79 @@ public class IePpsNumberTests
    [InlineData("0000099VW")]        // Remainder = 22
    public void IePpsNumber_CheckDigitAlgorithm_ShouldGenerateAllPossibleCharacters(String value)
       => IePpsNumber.Validate(value).Should().Be(IePpsNumberValidationResult.ValidationPassed);
+
+   #endregion
+
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidPpsNumberValues))]
+   public void IePpsNumber_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = value.ToUpperInvariant();
+
+      // Act.
+      var sut = new IePpsNumber(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidTrailingCharacters))]
+   public void IePpsNumber_Constructor_ShouldCreateInstance_WhenValueHasValidTrailingCharacter(String trailingCharacter)
+   {
+      // Arrange.
+      var value = GetPpsNumberWithValidCheckDigit(trailingCharacter: trailingCharacter);
+      var expected = value.ToUpperInvariant();
+
+      // Act.
+      var sut = new IePpsNumber(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void IePpsNumber_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => new IePpsNumber(value))
+         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
+         .WithMessage(Messages.IePpsNumberEmpty + "*")
+         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void IePpsNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => new IePpsNumber(value))
+         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
+         .WithMessage(Messages.IePpsNumberInvalidLength + "*")
+         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void IePpsNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCharacter(String value)
+      => FluentActions
+         .Invoking(() => new IePpsNumber(value))
+         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
+         .WithMessage(Messages.IePpsNumberInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void IePpsNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
+      => FluentActions
+         .Invoking(() => new IePpsNumber(value))
+         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
+         .WithMessage(Messages.IePpsNumberInvalidCheckDigit + "*")
+         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.InvalidCheckDigit);
 
    #endregion
 

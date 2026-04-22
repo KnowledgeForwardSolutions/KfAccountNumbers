@@ -293,7 +293,7 @@ public class EsNifTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
+   public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
       => FluentActions
          .Invoking(() => new EsNif(value))
          .Should().Throw<KfValidationException<EsNifValidationResult>>()
