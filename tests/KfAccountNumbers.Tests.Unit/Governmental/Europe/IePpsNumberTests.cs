@@ -62,7 +62,7 @@ public class IePpsNumberTests
 
    public static TheoryData<String> InvalidLengthValues =>
    [
-      "123456T",              // Length 8
+      "123456T",              // Length 7
       "12345678FA",           // Length 10
       new String('1', 100)    // Very long string
    ];
@@ -403,7 +403,7 @@ public class IePpsNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void IePpsNumber_ExplicitCastToIePpsNumber_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
+   public void IePpsNumber_ExplicitCastToIePpsNumber_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
       => FluentActions
          .Invoking(() => _ = (IePpsNumber)value)
          .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
@@ -573,7 +573,7 @@ public class IePpsNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void IePpsNumber_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigits(String value)
+   public void IePpsNumber_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigit(String value)
    {
       // Act.
       var result = IePpsNumber.Create(value);
@@ -841,7 +841,7 @@ public class IePpsNumberTests
    }
 
    [Fact]
-   public void IePpsNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenNifIsInvalid()
+   public void IePpsNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenPpsNumberIsInvalid()
    {
       // Arrange.
       var json = "{\"PpsNumber\":\"12345678FA\"}";  // Invalid length

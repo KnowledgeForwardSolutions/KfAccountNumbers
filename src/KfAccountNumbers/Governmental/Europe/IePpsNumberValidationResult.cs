@@ -24,14 +24,14 @@ public enum IePpsNumberValidationResult
 
    /// <summary>
    ///   The value contains a character that was not expected. The leading (left-most)
-   ///   seven characters must be ASCII digits ('0'-'9'), the eigth character must be
+   ///   seven characters must be ASCII digits ('0'-'9'), the eighth character must be
    ///   a letter in the range A-W and the optional ninth character must be a letter
    ///   in the range A-I or W.
    /// </summary>
    InvalidCharacter,
 
    /// <summary>
-   ///   The eigth character is not a valid weighted modulus 23 check character.
+   ///   The eighth character is not a valid weighted modulus 23 check character.
    /// </summary>
    InvalidCheckDigit,
 }

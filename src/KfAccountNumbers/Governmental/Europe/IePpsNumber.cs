@@ -129,7 +129,7 @@ public record IePpsNumber
    ///   - or -
    ///   <paramref name="ppsNumber"/> contains an invalid character. The characters
    ///   in positions 0-6 (zero-based) must be ASCII digits ('0'-'9'). The character
-   ///   in position 7 (zero-based) must an uppercase or lowercase letter in the
+   ///   in position 7 (zero-based) must be an uppercase or lowercase letter in the
    ///   range A-W. The character in position 8 (zero-based), if present, must be a
    ///   letter in the range of A-I or W.
    ///   - or -
