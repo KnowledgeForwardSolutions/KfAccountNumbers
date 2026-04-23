@@ -327,7 +327,7 @@ A PPS Number is structured as DDDDDDDC or DDDDDDDCE where
 * D is a digit (0-9).
 * C is an alphabetic character representing the weighted modulus 23 check character calculated from the previous seven digits and the
   second letter, if present.
-* An optional letter in the range of A-I or W.
+* E is an optional letter in the range of A-I or W, made permanent in 2013 to expand the available number space for PPS number issuance.
 
 An Irish PPS Number is typically displayed as a single string of eight or nine characters, without any separator characters.
 

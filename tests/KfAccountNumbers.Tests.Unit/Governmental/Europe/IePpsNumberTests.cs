@@ -35,7 +35,7 @@ public class IePpsNumberTests
    {
       var sum = 0;
       var weight = 8;
-      for(var index = 0; index < 7; index++)
+      for (var index = 0; index < 7; index++)
       {
          var num = ppsNumber[index] - Chars.DigitZero;
          sum += (num * weight);

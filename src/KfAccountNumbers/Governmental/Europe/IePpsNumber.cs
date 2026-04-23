@@ -3,7 +3,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
 ///   Strongly typed business object that represents an Irish Personal Public
-///   Serivce Number (PPS Number or PPSN). The PPS Number is Ireland's national
+///   Service Number (PPS Number or PPSN). The PPS Number is Ireland's national
 ///   identification number.
 /// </summary>
 /// <remarks>
@@ -29,9 +29,10 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>P</term>
+///            <term>E</term>
 ///            <description>
-///               An optional letter in the range of A-I or W.
+///               An optional letter in the range of A-I or W, made permanent in
+///               2013 to expand the available number space for PPS number issuance.
 ///            </description>
 ///         </item>
 ///      </list>
@@ -94,8 +95,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            <description>Check character = P, second letter = A</description>
 ///         </item>
 ///         <item>
-///            <term>9876543XA</term>
-///            <description>Check character = X, second letter = A</description>
+///            <term>9876543QA</term>
+///            <description>Check character = Q, second letter = A</description>
 ///         </item>
 ///      </list>
 ///   </para>
@@ -242,7 +243,7 @@ public record IePpsNumber
       var weight = 8;
 
       // Process leading seven digits.
-      for(var index = 0; index < CheckCharacterOffset; index ++)
+      for (var index = 0; index < CheckCharacterOffset; index ++)
       {
          var num = ppsNumber[index].ToSingleDigit();
          if (!num.IsValidDigit())
