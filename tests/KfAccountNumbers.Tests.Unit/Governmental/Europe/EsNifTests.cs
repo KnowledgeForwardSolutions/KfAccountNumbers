@@ -333,6 +333,28 @@ public class EsNifTests
 
    #endregion
 
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Valid9CharacterDni, Valid9CharacterDni)]
+   [InlineData(Valid10CharacterDni, Valid9CharacterDni)]
+   [InlineData(Valid9CharacterNie, Valid9CharacterNie)]
+   [InlineData(Valid11CharacterNie, Valid9CharacterNie)]
+   public void EsNif_Value_ShouldReturnValidatedNif(
+      String value,
+      String expected)
+   {
+      // Arrange.
+      var sut = new EsNif(value);
+
+      // Act/assert.
+      sut.Value.Should().Be(expected);
+   }
+
+   #endregion
+
    #region Conversion Operator Tests
    // ==========================================================================
    // ==========================================================================

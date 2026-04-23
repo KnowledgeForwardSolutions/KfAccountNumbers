@@ -103,6 +103,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      See https://en.wikipedia.org/wiki/Personal_Public_Service_Number for more info.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(IePpsNumberJsonConverter))]
 public record IePpsNumber
 {
    private const Int32 OriginalLength = 8;
@@ -117,8 +118,7 @@ public record IePpsNumber
    ///   Initialize a new instance of the <see cref="IePpsNumber"/> class.
    /// </summary>
    /// <param name="ppsNumber">
-   ///   String representation of a Spanish Número de Identificación
-   ///   Fiscal (NIF).
+   ///   String representation of an Irish Personal Public Service Number.
    /// </param>
    /// <exception cref="KfValidationException{IePpsNumberValidationResult}">
    ///   <paramref name="ppsNumber"/> is <see langword="null"/>, empty or all 
@@ -160,9 +160,45 @@ public record IePpsNumber
    }
 
    /// <summary>
-   ///   The raw PPS Number value.
+   ///   The raw PPS Number value, normalized to upper-case.
    /// </summary>
    public String Value { get; private init; }
+
+   public static implicit operator String(IePpsNumber ppsNumber)
+      => ppsNumber?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator IePpsNumber(String? ppsNumber) => new(ppsNumber);
+
+   /// <summary>
+   ///   Create a new <see cref="IePpsNumber"/> using the Result pattern.
+   /// </summary>
+   /// <param name="ppsNumber">
+   ///   String representation of an Irish Personal Public Service Number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{IePpsNumber, IePpsNumberValidationResult}"/>.
+   ///   Will contain the new <see cref="IePpsNumber"/> if 
+   ///   <paramref name="ppsNumber"/> is valid or an
+   ///   <see cref="IePpsNumberValidationResult"/> that identifies
+   ///   the validation rule that was failed if <paramref name="ppsNumber"/> is 
+   ///   invalid.
+   /// </returns>
+   public static CreateResult<IePpsNumber, IePpsNumberValidationResult> Create(String? ppsNumber)
+   {
+      IePpsNumberValidationResult validationResult = Validate(ppsNumber);
+      return validationResult == IePpsNumberValidationResult.ValidationPassed
+         ? new IePpsNumber(ppsNumber, validationMode: ValidationMode.BypassValidation)
+         : validationResult;
+   }
+
+   /// <summary>
+   ///   Get a string representation of the PPS number.
+   /// </summary>
+   /// <remarks>
+   ///   Will return the raw PPS number, normalized to upper-case.
+   /// </remarks>
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="ppsNumber"/> to determine if it contains a
@@ -248,4 +284,21 @@ public record IePpsNumber
          ? IePpsNumberValidationResult.ValidationPassed
          : IePpsNumberValidationResult.InvalidCheckDigit;
    }
+}
+
+public class IePpsNumberJsonConverter : JsonConverter<IePpsNumber>
+{
+   public override IePpsNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new IePpsNumber(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, IePpsNumber value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }

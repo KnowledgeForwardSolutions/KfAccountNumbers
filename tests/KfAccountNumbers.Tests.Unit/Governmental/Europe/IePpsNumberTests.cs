@@ -262,6 +262,461 @@ public class IePpsNumberTests
 
    #endregion
 
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidPpsNumberValues))]
+   public void IePpsNumber_Value_ShouldReturnValidatedPpsNumber(String value)
+   {
+      // Arrange.
+      var sut = new IePpsNumber(value);
+      var expected = value.ToUpperInvariant();
+
+      // Act/assert.
+      sut.Value.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void IePpsNumber_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid9CharacterPpsNumber;
+      var sut = new IePpsNumber(value);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(value);
+   }
+
+   [Fact]
+   public void IePpsNumber_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = MixedCaseAltValid9CharacterPpsNumber;
+      var sut = new IePpsNumber(value);
+      var expected = value.ToUpperInvariant();
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void IePpsNumber_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      IePpsNumber sut = null!;
+
+      // Act.
+      String str = sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void IePpsNumber_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      IePpsNumber sut = null!;
+
+      // Act.
+      var str = (String)sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidPpsNumberValues))]
+   public void IePpsNumber_ExplicitCastToIePpsNumber_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = value.ToUpperInvariant();
+
+      // Act.
+      var sut = (IePpsNumber)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidTrailingCharacters))]
+   public void IePpsNumber_ExplicitCastToIePpsNumber_ShouldCreateInstance_WhenValueHasValidTrailingCharacter(String trailingCharacter)
+   {
+      // Arrange.
+      var value = GetPpsNumberWithValidCheckDigit(trailingCharacter: trailingCharacter);
+      var expected = value.ToUpperInvariant();
+
+      // Act.
+      var sut = (IePpsNumber)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void IePpsNumber_ExplicitCastToIePpsNumber_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => _ = (IePpsNumber)value)
+         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
+         .WithMessage(Messages.IePpsNumberEmpty + "*")
+         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void IePpsNumber_ExplicitCastToIePpsNumber_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => _ = (IePpsNumber)value)
+         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
+         .WithMessage(Messages.IePpsNumberInvalidLength + "*")
+         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void IePpsNumber_ExplicitCastToIePpsNumber_ShouldThrowKfValidationException_WhenValueHasInvalidCharacter(String value)
+      => FluentActions
+         .Invoking(() => _ = (IePpsNumber)value)
+         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
+         .WithMessage(Messages.IePpsNumberInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.InvalidCharacter);
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void IePpsNumber_ExplicitCastToIePpsNumber_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
+      => FluentActions
+         .Invoking(() => _ = (IePpsNumber)value)
+         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
+         .WithMessage(Messages.IePpsNumberInvalidCheckDigit + "*")
+         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.InvalidCheckDigit);
+
+   #endregion
+
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void IePpsNumber_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new IePpsNumber(Valid8CharacterPpsNumber);
+      var sut2 = new IePpsNumber(Valid8CharacterPpsNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IePpsNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
+      var sut2 = new IePpsNumber(AltValid8CharacterPpsNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void IePpsNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentCase()
+   {
+      // Arrange. different case versions for same person should still be equal.
+      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
+      var sut2 = new IePpsNumber(MixedCaseValid9CharacterPpsNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void IePpsNumber_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
+      var sut2 = new IePpsNumber(AltValid8CharacterPpsNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IePpsNumber_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentCase()
+   {
+      // Arrange. different case versions for same person should still be equal.
+      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
+      var sut2 = new IePpsNumber(MixedCaseValid9CharacterPpsNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void IePpsNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new IePpsNumber(Valid8CharacterPpsNumber);
+      var sut2 = new IePpsNumber(Valid8CharacterPpsNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidPpsNumberValues))]
+   public void IePpsNumber_Create_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expectedValue = new IePpsNumber(value);
+
+      // Act.
+      var result = IePpsNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidTrailingCharacters))]
+   public void IePpsNumber_Create_ShouldCreateInstance_WhenValueHasValidTrailingCharacter(String trailingCharacter)
+   {
+      // Arrange.
+      var value = GetPpsNumberWithValidCheckDigit(trailingCharacter: trailingCharacter);
+      var expectedValue = new IePpsNumber(value);
+
+      // Act.
+      var result = IePpsNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void IePpsNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
+   {
+      // Act.
+      var result = IePpsNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(IePpsNumberValidationResult.Empty);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void IePpsNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   {
+      // Act.
+      var result = IePpsNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(IePpsNumberValidationResult.InvalidLength);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void IePpsNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidCharacter(String value)
+   {
+      // Act.
+      var result = IePpsNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(IePpsNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void IePpsNumber_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigits(String value)
+   {
+      // Act.
+      var result = IePpsNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(IePpsNumberValidationResult.InvalidCheckDigit);
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void IePpsNumber_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new IePpsNumber(Valid8CharacterPpsNumber);
+      var sut2 = new IePpsNumber(Valid8CharacterPpsNumber);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IePpsNumber_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
+      var sut2 = new IePpsNumber(AltValid8CharacterPpsNumber);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void IePpsNumber_Equals_ShouldReturnTrue_WhenValuesHaveDifferentCase()
+   {
+      // Arrange. different case versions for same person should still be equal.
+      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
+      var sut2 = new IePpsNumber(MixedCaseValid9CharacterPpsNumber);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void IePpsNumber_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new IePpsNumber(Valid8CharacterPpsNumber);
+      var sut2 = new IePpsNumber(Valid8CharacterPpsNumber);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void IePpsNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
+      var sut2 = new IePpsNumber(AltValid8CharacterPpsNumber);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   [Fact]
+   public void IePpsNumber_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentCase()
+   {
+      // Arrange. different case versions for same person should still be equal.
+      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
+      var sut2 = new IePpsNumber(MixedCaseValid9CharacterPpsNumber);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // IePpsNumber does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void IePpsNumber_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
+      var sut2 = new IePpsNumber(Valid9CharacterPpsNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidPpsNumberValues))]
+   public void IePpsNumber_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new IePpsNumber(value);
+      var expected = value.ToUpperInvariant();
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -301,6 +756,104 @@ public class IePpsNumberTests
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void IePpsNumber_Validate_ShouldReturnInvalidCheckDigit_WhenValueHasInvalidCheckDigit(String value)
       => IePpsNumber.Validate(value).Should().Be(IePpsNumberValidationResult.InvalidCheckDigit);
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void IePpsNumber_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new IePpsNumber(Valid8CharacterPpsNumber);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<IePpsNumber>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void IePpsNumber_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new IePpsNumber(Valid9CharacterPpsNumber);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public IePpsNumber PpsNumber { get; set; } = null!;
+   }
+
+   [Fact]
+   public void IePpsNumber_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { PpsNumber = new IePpsNumber(AltValid8CharacterPpsNumber) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void IePpsNumber_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"PpsNumber\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void IePpsNumber_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"PpsNumber\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.PpsNumber.Should().BeNull();
+   }
+
+   [Fact]
+   public void IePpsNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenNifIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"PpsNumber\":\"12345678FA\"}";  // Invalid length
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should()
+         .ThrowExactly<KfValidationException<IePpsNumberValidationResult>>()
+         .WithMessage(Messages.IePpsNumberInvalidLength + "*")
+         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.InvalidLength);
+   }
 
    #endregion
 }
