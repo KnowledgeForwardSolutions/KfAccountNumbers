@@ -417,4 +417,16 @@
   <data name="EsNifInvalidSeparator" xml:space="preserve">
     <value>ES NIF separator character may not be an ASCII digit ('0'-'9'). For NIE both separator characters must be the same</value>
   </data>
+  <data name="IePpsNumberEmpty" xml:space="preserve">
+    <value>IE PPS Number may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="IePpsNumberInvalidLength" xml:space="preserve">
+    <value>IE PPS Number must have length of eight characters or nine characters</value>
+  </data>
+  <data name="IePpsNumberInvalidCharacter" xml:space="preserve">
+    <value>IE PPS Number must have digit characters (0-9) in character positions 0-6 (zero-based), a letter in the range A-W in character position 7 (zero-based) and optionally, a letter in the range A-I or W in character position 8 (zero-based)</value>
+  </data>
+  <data name="IePpsNumberInvalidCheckDigit" xml:space="preserve">
+    <value>IE PPS Number must have valid weighted modulus 23 check character in character position 7 (zero-based)</value>
+  </data>
 </root>
