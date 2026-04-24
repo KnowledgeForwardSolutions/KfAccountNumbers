@@ -60,13 +60,6 @@ public class IePpsNumberTests
       return checkCharacter;
    }
 
-   public static TheoryData<String> InvalidLengthValues =>
-   [
-      "123456T",              // Length 7
-      "12345678FA",           // Length 10
-      new String('1', 100)    // Very long string
-   ];
-
    public static TheoryData<String> ValidPpsNumberValues =>
    [
       Valid8CharacterPpsNumber,
@@ -106,6 +99,13 @@ public class IePpsNumberTests
       "h",
       "i",
       "w",
+   ];
+
+   public static TheoryData<String> InvalidLengthValues =>
+   [
+      "123456T",              // Length 7
+      "12345678FA",           // Length 10
+      new String('1', 100)    // Very long string
    ];
 
    public static TheoryData<String> InvalidCharacterValues =>

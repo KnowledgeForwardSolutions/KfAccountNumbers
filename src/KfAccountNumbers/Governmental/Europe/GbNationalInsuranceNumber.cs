@@ -125,4 +125,50 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </remarks>
 public record GbNationalInsuranceNumber
 {
+   private const Int32 UnformattedWithoutSuffixLength = 8;
+   private const Int32 UnformattedWithSuffixLength = 9;
+   private const Int32 FormattedWithoutSuffixLength = 11;
+   private const Int32 FormattedWithSuffixLength = 13;
+
+   private static HashSet<String>.AlternateLookup<ReadOnlySpan<Char>> _invalidPrefixes =
+      new HashSet<String>() { "BG", "GB", "NK", "KN", "TN", "NT", "ZZ" }.GetAlternateLookup<ReadOnlySpan<Char>>();
+
+   /// <summary>
+   ///   Check the <paramref name="nationaInsuranceNumber"/> to determine if it contains a
+   ///   valid UK National Insurance Number.
+   /// </summary>
+   /// <param name="nationaInsuranceNumber">
+   ///   String representation of a UK National Insurance Number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="GbNationalInsuranceNumberValidationResult"/> enumeration 
+   ///   value that indicates if the <paramref name="nationaInsuranceNumber"/> passed
+   ///   validation or what validation error was encountered.
+   /// </returns>
+   public static GbNationalInsuranceNumberValidationResult Validate(String? nationaInsuranceNumber)
+   {
+      if (String.IsNullOrWhiteSpace(nationaInsuranceNumber))
+      {
+         return GbNationalInsuranceNumberValidationResult.Empty;
+      }
+      else if (!ValidateLength(nationaInsuranceNumber))
+      {
+         return GbNationalInsuranceNumberValidationResult.InvalidLength;
+      }
+      else if (!ValidatePrefix(nationaInsuranceNumber))
+      {
+         return GbNationalInsuranceNumberValidationResult.InvalidPrefix;
+      }
+
+      return GbNationalInsuranceNumberValidationResult.ValidationPassed;
+   }
+
+   private static Boolean ValidateLength(ReadOnlySpan<Char> nationalInsuranceNumber)
+      => nationalInsuranceNumber.Length is UnformattedWithoutSuffixLength
+         or UnformattedWithSuffixLength
+         or FormattedWithoutSuffixLength
+         or FormattedWithSuffixLength;
+
+   private static Boolean ValidatePrefix(ReadOnlySpan<Char> nationalInsuranceNumber)
+      => !_invalidPrefixes.Contains(nationalInsuranceNumber[..2]);
 }

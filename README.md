@@ -340,6 +340,7 @@ A valid National Insurance Number must meet all of the following rules:
   * 9 characters (unformatted, with suffix character)
   * 11 characters (formatted, without suffix character)
   * 13 characters (formatted, with suffix character)
+* The leading (left-most) two characters may not be BG, GB, NK, KN, TN, NT, or ZZ.
 * Character position 0 (zero-based) must be an uppercase letter, A-C, E, G, H, J-P, R-T, W-Z. The letters D, F, I, Q, U and V are not allowed.
 * Character position 1 (zero-based) must be an uppercase letter, A-C, E, G, H, J-N, P, R-T, W-Z. The letters D, F, I, O, Q, U and V are not allowed. (Note O is the only additional excluded character.)
 * Character positions 2-7 (zero-based) must be ASCII digits ('0'-'9').
