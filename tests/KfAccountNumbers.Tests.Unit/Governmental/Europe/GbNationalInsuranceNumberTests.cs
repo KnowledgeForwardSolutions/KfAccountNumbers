@@ -24,6 +24,14 @@ public class GbNationalInsuranceNumberTests
          ? $"{prefix} {digits[..2]} {digits[2..4]} {digits[4..]}{(suffix != String.Empty ? " " : "")}{suffix}"
          : $"{prefix}{digits}{suffix}";
 
+   public static String GetNationalInsuranceNumber(
+      Char prefix1 = 'A',
+      Char prefix2 = 'C',
+      String digits = "123456",
+      String suffix = "",
+      Boolean formatted = false)
+      => GetNationalInsuranceNumber($"{prefix1}{prefix2}", digits, suffix, formatted);
+
    public static TheoryData<String> ValidNationalInsuranceNumberValues =>
    [
       Valid8CharacterValue,
@@ -35,6 +43,106 @@ public class GbNationalInsuranceNumberTests
       AltValid11CharacterValue,
       AltValid13CharacterValue,
    ];
+
+   public static TheoryData<Char, Boolean> ValidPrefixFirstCharacters = new()
+   {
+      { 'A', false },
+      { 'B', false },
+      { 'C', false },
+      { 'E', false },
+      { 'G', false },
+      { 'H', false },
+      { 'J', false },
+      { 'K', false },
+      { 'L', false },
+      { 'M', false },
+      { 'N', false },
+      { 'O', false },
+      { 'P', false },
+      { 'R', false },
+      { 'S', false },
+      { 'T', false },
+      { 'W', false },
+      { 'X', false },
+      { 'Y', false },
+      { 'Z', false },
+      { 'A', true },
+      { 'B', true },
+      { 'C', true },
+      { 'E', true },
+      { 'G', true },
+      { 'H', true },
+      { 'J', true },
+      { 'K', true },
+      { 'L', true },
+      { 'M', true },
+      { 'N', true },
+      { 'O', true },
+      { 'P', true },
+      { 'R', true },
+      { 'S', true },
+      { 'T', true },
+      { 'W', true },
+      { 'X', true },
+      { 'Y', true },
+      { 'Z', true },
+   };
+
+   public static TheoryData<Char, Boolean> ValidPrefixSecondCharacters = new()
+   {
+      { 'A', false },
+      { 'B', false },
+      { 'C', false },
+      { 'E', false },
+      { 'G', false },
+      { 'H', false },
+      { 'J', false },
+      { 'K', false },
+      { 'L', false },
+      { 'M', false },
+      { 'N', false },
+      { 'P', false },
+      { 'R', false },
+      { 'S', false },
+      { 'T', false },
+      { 'W', false },
+      { 'X', false },
+      { 'Y', false },
+      { 'Z', false },
+      { 'A', true },
+      { 'B', true },
+      { 'C', true },
+      { 'E', true },
+      { 'G', true },
+      { 'H', true },
+      { 'J', true },
+      { 'K', true },
+      { 'L', true },
+      { 'M', true },
+      { 'N', true },
+      { 'P', true },
+      { 'R', true },
+      { 'S', true },
+      { 'T', true },
+      { 'W', true },
+      { 'X', true },
+      { 'Y', true },
+      { 'Z', true },
+   };
+
+   public static TheoryData<String, Boolean> ValidSuffixCharacters = new()
+   {
+      { "", false },
+      { "A", false },
+      { "B", false },
+      { "C", false },
+      { "D", false },
+      { "", true },
+      { "A", true },
+      { "B", true },
+      { "C", true },
+      { "D", true },
+   };
 
    public static TheoryData<String> InvalidLengthValues =>
    [
@@ -64,6 +172,84 @@ public class GbNationalInsuranceNumberTests
       { "ZZ", true },
    };
 
+   public static TheoryData<Char, Boolean> InvalidPrefixFirstCharacters = new()
+   {
+      { 'D', false },
+      { 'F', false },
+      { 'I', false },
+      { 'Q', false },
+      { 'U', false },
+      { 'V', false },
+      { 'D', true },
+      { 'F', true },
+      { 'I', true },
+      { 'Q', true },
+      { 'U', true },
+      { 'V', true },
+   };
+
+   public static TheoryData<Char, Boolean> InvalidPrefixSecondCharacters = new()
+   {
+      { 'D', false },
+      { 'F', false },
+      { 'I', false },
+      { 'O', false },
+      { 'Q', false },
+      { 'U', false },
+      { 'V', false },
+      { 'D', true },
+      { 'F', true },
+      { 'I', true },
+      { 'O', true },
+      { 'Q', true },
+      { 'U', true },
+      { 'V', true },
+   };
+
+   public static TheoryData<String, Boolean> InvalidDigits = new()
+   {
+      { " 12345", false },
+      { "0-2345", false },
+      { "01=345", false },
+      { "012A45", false },
+      { "0123b5", false },
+      { "01234~", false },
+      { "01234\u2153", false },       // Unicode fraction 1/3  
+      { "01234\u00D6", false },       // unicode O with umlaut
+      { " 12345", true },
+      { "0-2345", true },
+      { "01=345", true },
+      { "012A45", true },
+      { "0123b5", true },
+      { "01234~", true },
+      { "01234\u2153", true },        // Unicode fraction 1/3  
+      { "01234\u00D6", true },        // unicode O with umlaut
+   };
+
+   public static TheoryData<String, Boolean> InvalidSuffixCharacters = new()
+   {
+      { "a", false },
+      { "b", false },
+      { "c", false },
+      { "d", false },
+      { " ", false },
+      { "=", false },
+      { "1", false },
+      { "0", false },
+      { "\u2153", false },       // Unicode fraction 1/3  
+      { "\u00D6", false },       // unicode O with umlaut
+      { "a", true },
+      { "b", true },
+      { "c", true },
+      { "d", true },
+      { " ", true },
+      { "=", true },
+      { "1", true },
+      { "0", true },
+      { "\u2153", true },       // Unicode fraction 1/3  
+      { "\u00D6", true },       // unicode O with umlaut
+   };
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -72,6 +258,45 @@ public class GbNationalInsuranceNumberTests
    [MemberData(nameof(ValidNationalInsuranceNumberValues))]
    public void GbNationalInsuranceNumber_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
       => GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.ValidationPassed);
+
+   [Theory]
+   [MemberData(nameof(ValidPrefixFirstCharacters))]
+   public void GbNationalInsuranceNumber_Validate_ShouldReturnValidationPassed_WhenValueHasValidFirstPrefixCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(ch, formatted: formatted);
+
+      // Act/assert.
+      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.ValidationPassed);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidPrefixSecondCharacters))]
+   public void GbNationalInsuranceNumber_Validate_ShouldReturnValidationPassed_WhenValueHasValidSecondPrefixCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(prefix2: ch, formatted: formatted);
+
+      // Act/assert.
+      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.ValidationPassed);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSuffixCharacters))]
+   public void GbNationalInsuranceNumber_Validate_ShouldReturnValidationPassed_WhenValueHasValidSuffixCharacter(
+      String suffix,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber("AB", suffix: suffix, formatted: formatted);
+
+      // Act/assert.
+      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.ValidationPassed);
+   }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
@@ -94,6 +319,58 @@ public class GbNationalInsuranceNumberTests
 
       // Act/assert.
       GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidPrefix);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidPrefixFirstCharacters))]
+   public void GbNationalInsuranceNumber_Validate_ShouldReturnInvalidCharacter_WhenValueHasInvalidPrefixFirstCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(ch, formatted: formatted);
+
+      // Act/assert.
+      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidPrefixSecondCharacters))]
+   public void GbNationalInsuranceNumber_Validate_ShouldReturnInvalidCharacter_WhenValueHasInvalidPrefixSecondCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(prefix2: ch, formatted: formatted);
+
+      // Act/assert.
+      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDigits))]
+   public void GbNationalInsuranceNumber_Validate_ShouldReturnInvalidCharacter_WhenValueHasInvalidDigitCharacters(
+      String digits,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber("AB", digits: digits, formatted: formatted);
+
+      // Act/assert.
+      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSuffixCharacters))]
+   public void GbNationalInsuranceNumber_Validate_ShouldReturnInvalidCharacter_WhenValueHasInvalidSuffixCharacter(
+      String suffix,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber("AB", suffix: suffix, formatted: formatted);
+
+      // Act/assert.
+      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
    }
 
    #endregion

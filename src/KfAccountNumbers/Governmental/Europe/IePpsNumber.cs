@@ -1,5 +1,6 @@
-namespace KfAccountNumbers.Governmental.Europe;
+// Ignore Spelling: Json
 
+namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
 ///   Strongly typed business object that represents an Irish Personal Public

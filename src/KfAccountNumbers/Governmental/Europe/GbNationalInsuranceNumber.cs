@@ -130,8 +130,15 @@ public record GbNationalInsuranceNumber
    private const Int32 FormattedWithoutSuffixLength = 11;
    private const Int32 FormattedWithSuffixLength = 13;
 
+   private const Int32 Separator1Offset = 2;
+   private const Int32 Separator2Offset = 5;
+   private const Int32 Separator3Offset = 8;
+   private const Int32 Separator4Offset = 11;
+
    private static HashSet<String>.AlternateLookup<ReadOnlySpan<Char>> _invalidPrefixes =
       new HashSet<String>() { "BG", "GB", "NK", "KN", "TN", "NT", "ZZ" }.GetAlternateLookup<ReadOnlySpan<Char>>();
+   private static HashSet<Char> _validPrefixFirstCharacters = "ABCEGHJKLMNOPRSTWXYZ".ToHashSet();
+   private static HashSet<Char> _validPrefixSecondCharacters = "ABCEGHJKLMNPRSTWXYZ".ToHashSet();
 
    /// <summary>
    ///   Check the <paramref name="nationaInsuranceNumber"/> to determine if it contains a
@@ -159,8 +166,43 @@ public record GbNationalInsuranceNumber
       {
          return GbNationalInsuranceNumberValidationResult.InvalidPrefix;
       }
+      else if (!ValidatePrefixFirstCharacter(nationaInsuranceNumber)
+         || !ValidatePrefixSecondCharacter(nationaInsuranceNumber)
+         || !ValidateDigits(nationaInsuranceNumber)
+         || !ValidateSuffixCharacter(nationaInsuranceNumber))
+      {
+         return GbNationalInsuranceNumberValidationResult.InvalidCharacter;
+      }
 
       return GbNationalInsuranceNumberValidationResult.ValidationPassed;
+   }
+
+   private static Boolean ValidateDigits(ReadOnlySpan<Char> nationalInsuranceNumber)
+   {
+      var isFormatted = nationalInsuranceNumber.Length > UnformattedWithSuffixLength;
+      var start = isFormatted ? 3 : 2;
+      var end = nationalInsuranceNumber.Length switch
+      {
+         UnformattedWithSuffixLength => nationalInsuranceNumber.Length - 1,
+         FormattedWithSuffixLength => nationalInsuranceNumber.Length - 2,
+         _ => nationalInsuranceNumber.Length
+      };
+
+      for (var index = start; index < end; index++)
+      {
+         if (isFormatted
+            && (index is Separator1Offset or Separator2Offset or Separator3Offset or Separator4Offset))
+         {
+            continue;
+         }
+
+         if (!nationalInsuranceNumber[index].IsAsciiDigit())
+         {
+            return false;
+         }
+      }
+
+      return true;
    }
 
    private static Boolean ValidateLength(ReadOnlySpan<Char> nationalInsuranceNumber)
@@ -169,6 +211,21 @@ public record GbNationalInsuranceNumber
          or FormattedWithoutSuffixLength
          or FormattedWithSuffixLength;
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean ValidatePrefix(ReadOnlySpan<Char> nationalInsuranceNumber)
       => !_invalidPrefixes.Contains(nationalInsuranceNumber[..2]);
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean ValidatePrefixFirstCharacter(ReadOnlySpan<Char> nationalInsuranceNumber)
+      => _validPrefixFirstCharacters.Contains(nationalInsuranceNumber[0]);
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean ValidatePrefixSecondCharacter(ReadOnlySpan<Char> nationalInsuranceNumber)
+      => _validPrefixSecondCharacters.Contains(nationalInsuranceNumber[1]);
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean ValidateSuffixCharacter(ReadOnlySpan<Char> nationalInsuranceNumber)
+      => (nationalInsuranceNumber.Length is UnformattedWithoutSuffixLength or FormattedWithoutSuffixLength)
+         || nationalInsuranceNumber[^1] is >= Chars.UpperCaseA and <= Chars.UpperCaseD;
+
 }
