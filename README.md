@@ -336,9 +336,9 @@ is case sensitive and requires the prefix and suffix characters to be uppercase 
 A valid National Insurance Number must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
 * The value must be one of the following lengths:
-  * 8 characters (unformatted, no suffix character)
+  * 8 characters (unformatted, without suffix character)
   * 9 characters (unformatted, with suffix character)
-  * 11 characters (formatted, no suffix character)
+  * 11 characters (formatted, without suffix character)
   * 13 characters (formatted, with suffix character)
 * Character position 0 (zero-based) must be an uppercase letter, A-C, E, G, H, J-P, R-T, W-Z. The letters D, F, I, Q, U and V are not allowed.
 * Character position 1 (zero-based) must be an uppercase letter, A-C, E, G, H, J-N, P, R-T, W-Z. The letters D, F, I, O, Q, U and V are not allowed. (Note O is the only additional excluded character.)
@@ -346,6 +346,8 @@ A valid National Insurance Number must meet all of the following rules:
 * Character position 8 (zero-based), if present, must be an uppercase letter, A-D.
 * Separator characters, if present, may not be ASCII digits ('0'-'9') or uppercase or lowercase letters (A-Z, a-z).
 * The same character must be used in every separator position.
+
+Note that National Insurance Numbers do not include a check digit.
 
 Example values:
 * AB123456C - unformatted, with suffix character
