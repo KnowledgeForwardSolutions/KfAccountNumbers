@@ -45,6 +45,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
         - [EsNif](#esnif)
         - [FiHenkilotunnus](#fihenkilotunnus)
         - [FrInseeNumber](#frinseenumber)
+        - [GbNationalInsuranceNumber](#gbnationalinsurancenumber)
         - [IePpsNumber](#ieppsnumber)
         - [IsKennitala](#iskennitala)
         - [NlBurgerservicenummer](#nlburgerservicenummer)
@@ -316,6 +317,43 @@ Example values:
 
 See [Wikipedia - INSEE code](https://en.wikipedia.org/wiki/INSEE_code) and
 [Wikipedia (French) - Numéro de sécurité sociale en France](https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_s%C3%A9curit%C3%A9_sociale_en_France) for more info.
+
+## GbNationalInsuranceNumber
+
+The `GbNationalInsuranceNumber` type represents a National Insurance Number of the United Kingdom, Guernsey, the Isle of Man,
+and Jersey. While not defined as such, it effectively serves as national identifier in the UK.
+
+A National Insurance Number consists of nine characters structured as PPDDDDDDS, where:
+* PP is a two-letter prefix. See below for valid prefix characters.
+* DDDDDD is a six-digit sequentially assigned number.
+* S is a single suffix letter, either A, B, C, or D. The suffix can be omitted if is unknown as the suffix does not contribute
+  to the uniqueness of the value.
+
+A National Insurance Number is typically displayed as a single string of nine characters but can be formatted for readability
+as groups of two characters with a separator character, typically a space (i.e. PP DD DD DD S). `GbNationalInsuranceNumber`
+is case sensitive and requires the prefix and suffix characters to be uppercase letters.
+
+A valid National Insurance Number must meet all of the following rules:
+* The value may not be null, empty or all whitespace characters.
+* The value must be one of the following lengths:
+  * 8 characters (unformatted, no suffix character)
+  * 9 characters (unformatted, with suffix character)
+  * 11 characters (formatted, no suffix character)
+  * 13 characters (formatted, with suffix character)
+* Character position 0 (zero-based) must be an uppercase letter, A-C, E, G, H, J-P, R-T, W-Z. The letters D, F, I, Q, U and V are not allowed.
+* Character position 1 (zero-based) must be an uppercase letter, A-C, E, G, H, J-N, P, R-T, W-Z. The letters D, F, I, O, Q, U and V are not allowed. (Note O is the only additional excluded character.)
+* Character positions 2-7 (zero-based) must be ASCII digits ('0'-'9').
+* Character position 8 (zero-based), if present, must be an uppercase letter, A-D.
+* Separator characters, if present, may not be ASCII digits ('0'-'9') or uppercase or lowercase letters (A-Z, a-z).
+* The same character must be used in every separator position.
+
+Example values:
+* AB123456C - unformatted, with suffix character
+* GG000123 - unformatted, without suffix character
+* AB 12 34 56 C - formatted, with suffix character
+* GG 00 01 23 - formatted, without suffix character
+
+See [Wikipedia - National Insurance number](https://en.wikipedia.org/wiki/National_Insurance_number) for more info.
 
 ## IePpsNumber
 
