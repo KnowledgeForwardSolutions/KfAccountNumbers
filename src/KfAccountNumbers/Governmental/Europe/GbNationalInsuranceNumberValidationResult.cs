@@ -2,7 +2,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
 ///   Defines the possible results returned when validating a National Insurance
-///   Number used in the UK.
+///   Number, an identifier used in the UK.
 /// </summary>
 public enum GbNationalInsuranceNumberValidationResult
 {
@@ -38,6 +38,15 @@ public enum GbNationalInsuranceNumberValidationResult
    ///   (zero-based), if present, must contain A-D.
    /// </summary>
    InvalidCharacter,
+
+   /// <summary>
+   ///   The value is length 11 or 13 and one of the separator locations (character
+   ///   positions 2, 5, 8, and optionally 11, all zero-based) contains an invalid
+   ///   separator character. Separator characters may not be ASCII digits ('0'-'9')
+   ///   or uppercase or lowercase letters (A-Z, a-z). All separator locations must
+   ///   contain the same character.
+   /// </summary>
+   InvalidSeparator,
 }
 
 /// <summary>
@@ -52,6 +61,7 @@ public static class GbNationalInsuranceNumberValidationResultExtensions
          GbNationalInsuranceNumberValidationResult.InvalidLength => Messages.GbNationalInsuranceNumberInvalidLength,
          GbNationalInsuranceNumberValidationResult.InvalidPrefix => Messages.GbNationalInsuranceNumberInvalidPrefix,
          GbNationalInsuranceNumberValidationResult.InvalidCharacter => Messages.GbNationalInsuranceNumberInvalidCharacter,
+         GbNationalInsuranceNumberValidationResult.InvalidSeparator => Messages.GbNationalInsuranceNumberInvalidSeparator,
          GbNationalInsuranceNumberValidationResult.ValidationPassed => Messages.ValidationPassed,
          _ => throw new SwitchExpressionException()
       };

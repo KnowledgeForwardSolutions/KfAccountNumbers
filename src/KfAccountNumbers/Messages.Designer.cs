@@ -511,6 +511,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to GB National Insurance Number with length 11 or 13 contains an invalid separator character. Separator characters may not be ASCII digits (&apos;0&apos;-&apos;9&apos;) or uppercase or lowercase letters (A-Z, a-z). All separator locations must contain the same character..
+        /// </summary>
+        internal static string GbNationalInsuranceNumberInvalidSeparator {
+            get {
+                return ResourceManager.GetString("GbNationalInsuranceNumberInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to IE PPS Number may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string IePpsNumberEmpty {

@@ -331,7 +331,7 @@ A National Insurance Number consists of nine characters structured as PPDDDDDDS,
 
 A National Insurance Number is typically displayed as a single string of nine characters but can be formatted for readability
 as groups of two characters with a separator character, typically a space (i.e. PP DD DD DD S). `GbNationalInsuranceNumber`
-is case sensitive and requires the prefix and suffix characters to be uppercase letters.
+is case-sensitive and requires the prefix and suffix characters to be uppercase letters.
 
 A valid National Insurance Number must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
