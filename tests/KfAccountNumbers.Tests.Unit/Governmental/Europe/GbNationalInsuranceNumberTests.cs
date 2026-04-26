@@ -1,3 +1,5 @@
+// Ignore Spelling: Kf
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 #pragma warning disable IDE0008 // Use explicit type
@@ -31,6 +33,14 @@ public class GbNationalInsuranceNumberTests
       String suffix = "",
       Boolean formatted = false)
       => GetNationalInsuranceNumber($"{prefix1}{prefix2}", digits, suffix, formatted);
+
+   public static String GetRawNationalInsuranceNumber(String str)
+      => str.Length switch
+      {
+         11 => $"{str[..2]}{str[3..5]}{str[6..8]}{str[9..]}",
+         13 => $"{str[..2]}{str[3..5]}{str[6..8]}{str[9..11]}{str[12]}",
+         _ => str
+      };
 
    public static TheoryData<String> ValidNationalInsuranceNumberValues =>
    [
@@ -249,6 +259,184 @@ public class GbNationalInsuranceNumberTests
       { "\u2153", true },       // Unicode fraction 1/3  
       { "\u00D6", true },       // unicode O with umlaut
    };
+
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidNationalInsuranceNumberValues))]
+   public void GbNationalInsuranceNumber_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawNationalInsuranceNumber(value);
+
+      // Act.
+      var sut = new GbNationalInsuranceNumber(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidPrefixFirstCharacters))]
+   public void GbNationalInsuranceNumber_Constructor_ShouldCreateInstance_WhenValueHasValidFirstPrefixCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(ch, formatted: formatted);
+      var expected = GetRawNationalInsuranceNumber(value);
+
+      // Act.
+      var sut = new GbNationalInsuranceNumber(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidPrefixSecondCharacters))]
+   public void GbNationalInsuranceNumber_Constructor_ShouldCreateInstance_WhenValueHasValidSecondPrefixCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(prefix2: ch, formatted: formatted);
+      var expected = GetRawNationalInsuranceNumber(value);
+
+      // Act.
+      var sut = new GbNationalInsuranceNumber(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSuffixCharacters))]
+   public void GbNationalInsuranceNumber_Constructor_ShouldCreateInstance_WhenValueHasValidSuffixCharacter(
+      String suffix,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber("AB", suffix: suffix, formatted: formatted);
+      var expected = GetRawNationalInsuranceNumber(value);
+
+      // Act.
+      var sut = new GbNationalInsuranceNumber(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void GbNationalInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => new GbNationalInsuranceNumber(value))
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberEmpty + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void GbNationalInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => new GbNationalInsuranceNumber(value))
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidLength + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidPrefixValues))]
+   public void GbNationalInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidPrefix(
+      String prefix,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(prefix, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbNationalInsuranceNumber(value))
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidPrefix + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidPrefix);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidPrefixFirstCharacters))]
+   public void GbNationalInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidPrefixFirstCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(ch, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbNationalInsuranceNumber(value))
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidPrefixSecondCharacters))]
+   public void GbNationalInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidPrefixSecondCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(prefix2: ch, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbNationalInsuranceNumber(value))
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDigits))]
+   public void GbNationalInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDigitCharacters(
+      String digits,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber("AB", digits: digits, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbNationalInsuranceNumber(value))
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSuffixCharacters))]
+   public void GbNationalInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSuffixCharacter(
+      String suffix,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber("AB", suffix: suffix, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbNationalInsuranceNumber(value))
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   #endregion
 
    #region Validate Method Tests
    // ==========================================================================
