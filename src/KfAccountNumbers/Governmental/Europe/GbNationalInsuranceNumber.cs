@@ -196,6 +196,12 @@ public record GbNationalInsuranceNumber
    /// </summary>
    public String Value { get; private init; }
 
+   public static implicit operator String(GbNationalInsuranceNumber nationalInsuranceNumber)
+      => nationalInsuranceNumber?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+
+   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
+   public static explicit operator GbNationalInsuranceNumber(String? nationalInsuranceNumber) => new(nationalInsuranceNumber);
+
    /// <summary>
    ///   Check the <paramref name="nationalInsuranceNumber"/> to determine if it contains a
    ///   valid UK National Insurance Number.
@@ -333,5 +339,4 @@ public record GbNationalInsuranceNumber
    private static Boolean ValidateSuffixCharacter(ReadOnlySpan<Char> nationalInsuranceNumber)
       => (nationalInsuranceNumber.Length is UnformattedWithoutSuffixLength or FormattedWithoutSuffixLength)
          || nationalInsuranceNumber[^1] is >= Chars.UpperCaseA and <= Chars.UpperCaseD;
-
 }

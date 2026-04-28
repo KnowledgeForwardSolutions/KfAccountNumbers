@@ -438,6 +438,257 @@ public class GbNationalInsuranceNumberTests
 
    #endregion
 
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidNationalInsuranceNumberValues))]
+   public void GbNationalInsuranceNumber_Value_ShouldReturnValidatedPpsNumber(String value)
+   {
+      // Arrange.
+      var sut = new GbNationalInsuranceNumber(value);
+      var expected = GetRawNationalInsuranceNumber(value);
+
+      // Act/assert.
+      sut.Value.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbNationalInsuranceNumber_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid9CharacterValue;
+      var sut = new GbNationalInsuranceNumber(value);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(value);
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = Valid11CharacterValue;
+      var sut = new GbNationalInsuranceNumber(value);
+      var expected = GetRawNationalInsuranceNumber(value);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      GbNationalInsuranceNumber sut = null!;
+
+      // Act.
+      String str = sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      GbNationalInsuranceNumber sut = null!;
+
+      // Act.
+      var str = (String)sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidNationalInsuranceNumberValues))]
+   public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = new GbNationalInsuranceNumber(value);
+
+      // Act.
+      var sut = (GbNationalInsuranceNumber)value;
+
+      // Assert.
+      sut.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidPrefixFirstCharacters))]
+   public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldCreateInstance_WhenValueHasValidFirstPrefixCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(ch, formatted: formatted);
+      var expected = new GbNationalInsuranceNumber(value);
+
+      // Act.
+      var sut = (GbNationalInsuranceNumber)value;
+
+      // Assert.
+      sut.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidPrefixSecondCharacters))]
+   public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldCreateInstance_WhenValueHasValidSecondPrefixCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(prefix2: ch, formatted: formatted);
+      var expected = new GbNationalInsuranceNumber(value);
+
+      // Act.
+      var sut = (GbNationalInsuranceNumber)value;
+
+      // Assert.
+      sut.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSuffixCharacters))]
+   public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldCreateInstance_WhenValueHasValidSuffixCharacter(
+      String suffix,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber("AB", suffix: suffix, formatted: formatted);
+      var expected = new GbNationalInsuranceNumber(value);
+
+      // Act.
+      var sut = (GbNationalInsuranceNumber)value;
+
+      // Assert.
+      sut.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+      => FluentActions
+         .Invoking(() => _ = (GbNationalInsuranceNumber)value)
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberEmpty + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.Empty);
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+      => FluentActions
+         .Invoking(() => _ = (GbNationalInsuranceNumber)value)
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidLength + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidLength);
+
+   [Theory]
+   [MemberData(nameof(InvalidPrefixValues))]
+   public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldThrowKfValidationException_WhenValueHasInvalidPrefix(
+      String prefix,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(prefix, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (GbNationalInsuranceNumber)value)
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidPrefix + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidPrefix);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidPrefixFirstCharacters))]
+   public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldThrowKfValidationException_WhenValueHasInvalidPrefixFirstCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(ch, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (GbNationalInsuranceNumber)value)
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidPrefixSecondCharacters))]
+   public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldThrowKfValidationException_WhenValueHasInvalidPrefixSecondCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(prefix2: ch, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (GbNationalInsuranceNumber)value)
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDigits))]
+   public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldThrowKfValidationException_WhenValueHasInvalidDigitCharacters(
+      String digits,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber("AB", digits: digits, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (GbNationalInsuranceNumber)value)
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSuffixCharacters))]
+   public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldThrowKfValidationException_WhenValueHasInvalidSuffixCharacter(
+      String suffix,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber("AB", suffix: suffix, formatted: formatted);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (GbNationalInsuranceNumber)value)
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
