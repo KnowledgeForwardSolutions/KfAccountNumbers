@@ -689,6 +689,92 @@ public class GbNationalInsuranceNumberTests
 
    #endregion
 
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbNationalInsuranceNumber_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(AltValid9CharacterValue);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeFalse();
+   }
+
+   [Theory]
+   [InlineData(Valid8CharacterValue, Valid11CharacterValue)]
+   [InlineData(Valid9CharacterValue, Valid13CharacterValue)]
+   public void GbNationalInsuranceNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths(
+      String value1,
+      String value2)
+   {
+      // Arrange. Formatted and unformatted versions for same person should still be equal.
+      var sut1 = new GbNationalInsuranceNumber(value1);
+      var sut2 = new GbNationalInsuranceNumber(value2);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbNationalInsuranceNumber_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(AltValid8CharacterValue);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeTrue();
+   }
+
+   [Theory]
+   [InlineData(Valid8CharacterValue, Valid11CharacterValue)]
+   [InlineData(Valid9CharacterValue, Valid13CharacterValue)]
+   public void GbNationalInsuranceNumber_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths(
+      String value1,
+      String value2)
+   {
+      // Arrange. Formatted and unformatted versions for same person should still be equal.
+      var sut1 = new GbNationalInsuranceNumber(value1);
+      var sut2 = new GbNationalInsuranceNumber(value2);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
