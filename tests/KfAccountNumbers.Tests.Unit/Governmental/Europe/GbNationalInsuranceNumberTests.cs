@@ -1,4 +1,4 @@
-// Ignore Spelling: Kf
+// Ignore Spelling: Deserialize Deserialization Json Kf
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -775,6 +775,350 @@ public class GbNationalInsuranceNumberTests
 
    #endregion
 
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidNationalInsuranceNumberValues))]
+   public void GbNationalInsuranceNumber_Create_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expectedValue = new GbNationalInsuranceNumber(value);
+
+      // Act.
+      var result = GbNationalInsuranceNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidPrefixFirstCharacters))]
+   public void GbNationalInsuranceNumber_Create_ShouldCreateInstance_WhenValueHasValidFirstPrefixCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(ch, formatted: formatted);
+      var expectedValue = new GbNationalInsuranceNumber(value);
+
+      // Act.
+      var result = GbNationalInsuranceNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidPrefixSecondCharacters))]
+   public void GbNationalInsuranceNumber_Create_ShouldCreateInstance_WhenValueHasValidSecondPrefixCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(prefix2: ch, formatted: formatted);
+      var expectedValue = new GbNationalInsuranceNumber(value);
+
+      // Act.
+      var result = GbNationalInsuranceNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSuffixCharacters))]
+   public void GbNationalInsuranceNumber_Create_ShouldCreateInstance_WhenValueHasValidSuffixCharacter(
+      String suffix,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber("AB", suffix: suffix, formatted: formatted);
+      var expectedValue = new GbNationalInsuranceNumber(value);
+
+      // Act.
+      var result = GbNationalInsuranceNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeTrue();
+      result.Value.Should().BeEquivalentTo(expectedValue);
+      result.ValidationFailure.Should().Be(default);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void GbNationalInsuranceNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
+   {
+      // Act.
+      var result = GbNationalInsuranceNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.Empty);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void GbNationalInsuranceNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   {
+      // Act.
+      var result = GbNationalInsuranceNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidLength);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidPrefixValues))]
+   public void GbNationalInsuranceNumber_Create_ShouldReturnInvalidPrefixValidationResult_WhenValueHasInvalidPrefix(
+      String prefix,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(prefix, formatted: formatted);
+
+      // Act.
+      var result = GbNationalInsuranceNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidPrefix);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidPrefixFirstCharacters))]
+   public void GbNationalInsuranceNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidPrefixFirstCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(ch, formatted: formatted);
+
+      // Act.
+      var result = GbNationalInsuranceNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidPrefixSecondCharacters))]
+   public void GbNationalInsuranceNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidPrefixSecondCharacter(
+      Char ch,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber(prefix2: ch, formatted: formatted);
+
+      // Act.
+      var result = GbNationalInsuranceNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDigits))]
+   public void GbNationalInsuranceNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidDigitCharacters(
+      String digits,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber("AB", digits: digits, formatted: formatted);
+
+      // Act.
+      var result = GbNationalInsuranceNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSuffixCharacters))]
+   public void GbNationalInsuranceNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidSuffixCharacter(
+      String suffix,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetNationalInsuranceNumber("AB", suffix: suffix, formatted: formatted);
+
+      // Act.
+      var result = GbNationalInsuranceNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbNationalInsuranceNumber_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(AltValid9CharacterValue);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeFalse();
+   }
+
+   [Theory]
+   [InlineData(Valid8CharacterValue, Valid11CharacterValue)]
+   [InlineData(Valid9CharacterValue, Valid13CharacterValue)]
+   public void GbNationalInsuranceNumber_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths(
+      String value1,
+      String value2)
+   {
+      // Arrange. Formatted and unformatted versions for same person should still be equal.
+      var sut1 = new GbNationalInsuranceNumber(value1);
+      var sut2 = new GbNationalInsuranceNumber(value2);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbNationalInsuranceNumber_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(AltValid9CharacterValue);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   [Theory]
+   [InlineData(Valid8CharacterValue, Valid11CharacterValue)]
+   [InlineData(Valid9CharacterValue, Valid13CharacterValue)]
+   public void GbNationalInsuranceNumber_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths(
+      String value1,
+      String value2)
+   {
+      // Arrange. Formatted and unformatted versions for same person should still be equal.
+      var sut1 = new GbNationalInsuranceNumber(value1);
+      var sut2 = new GbNationalInsuranceNumber(value2);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // GbNationalInsuranceNumber does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void GbNationalInsuranceNumber_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidNationalInsuranceNumberValues))]
+   public void GbNationalInsuranceNumber_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new GbNationalInsuranceNumber(value);
+      var expected = GetRawNationalInsuranceNumber(value);
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -896,6 +1240,104 @@ public class GbNationalInsuranceNumberTests
 
       // Act/assert.
       GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbNationalInsuranceNumber_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new GbNationalInsuranceNumber(Valid9CharacterValue);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<GbNationalInsuranceNumber>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public GbNationalInsuranceNumber NationalInsuranceNumber { get; set; } = null!;
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { NationalInsuranceNumber = new GbNationalInsuranceNumber(AltValid9CharacterValue) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"NationalInsuranceNumber\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"NationalInsuranceNumber\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.NationalInsuranceNumber.Should().BeNull();
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenPpsNumberIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"NationalInsuranceNumber\":\"AB123456CB\"}";  // Invalid length
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should()
+         .ThrowExactly<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidLength + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidLength);
    }
 
    #endregion

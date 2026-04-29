@@ -123,6 +123,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      See https://en.wikipedia.org/wiki/National_Insurance_number for more info.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(GbNationalInsuranceNumberJsonConverter))]
 public record GbNationalInsuranceNumber
 {
    private const Int32 UnformattedWithoutSuffixLength = 8;
@@ -201,6 +202,36 @@ public record GbNationalInsuranceNumber
 
    // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
    public static explicit operator GbNationalInsuranceNumber(String? nationalInsuranceNumber) => new(nationalInsuranceNumber);
+
+   /// <summary>
+   ///   Create a new <see cref="GbNationalInsuranceNumber"/> using the Result pattern.
+   /// </summary>
+   /// <param name="nationalInsuranceNumber">
+   ///   String representation of a UK National Insurance Number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{GbNationalInsuranceNumber, GbNationalInsuranceNumberValidationResult}"/>.
+   ///   Will contain the new <see cref="GbNationalInsuranceNumber"/> if 
+   ///   <paramref name="nationalInsuranceNumber"/> is valid or an
+   ///   <see cref="GbNationalInsuranceNumberValidationResult"/> that identifies
+   ///   the validation rule that was failed if <paramref name="nationalInsuranceNumber"/> is 
+   ///   invalid.
+   /// </returns>
+   public static CreateResult<GbNationalInsuranceNumber, GbNationalInsuranceNumberValidationResult> Create(String? nationalInsuranceNumber)
+   {
+      GbNationalInsuranceNumberValidationResult validationResult = Validate(nationalInsuranceNumber);
+      return validationResult == GbNationalInsuranceNumberValidationResult.ValidationPassed
+         ? new GbNationalInsuranceNumber(nationalInsuranceNumber, validationMode: ValidationMode.BypassValidation)
+         : validationResult;
+   }
+
+   /// <summary>
+   ///   Get a string representation of the National Insurance Number.
+   /// </summary>
+   /// <remarks>
+   ///   Will return the raw National Insurance Number.
+   /// </remarks>
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="nationalInsuranceNumber"/> to determine if it contains a
@@ -339,4 +370,21 @@ public record GbNationalInsuranceNumber
    private static Boolean ValidateSuffixCharacter(ReadOnlySpan<Char> nationalInsuranceNumber)
       => (nationalInsuranceNumber.Length is UnformattedWithoutSuffixLength or FormattedWithoutSuffixLength)
          || nationalInsuranceNumber[^1] is >= Chars.UpperCaseA and <= Chars.UpperCaseD;
+}
+
+public class GbNationalInsuranceNumberJsonConverter : JsonConverter<GbNationalInsuranceNumber>
+{
+   public override GbNationalInsuranceNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new GbNationalInsuranceNumber(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, GbNationalInsuranceNumber value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }
