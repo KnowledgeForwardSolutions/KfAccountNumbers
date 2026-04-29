@@ -718,7 +718,7 @@ public class GbNationalInsuranceNumberTests
    [Theory]
    [InlineData(Valid8CharacterValue, Valid11CharacterValue)]
    [InlineData(Valid9CharacterValue, Valid13CharacterValue)]
-   public void GbNationalInsuranceNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths(
+   public void GbNationalInsuranceNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentFormats(
       String value1,
       String value2)
    {
@@ -728,6 +728,17 @@ public class GbNationalInsuranceNumberTests
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_EqualityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 8 and 9 characters versions for same person are not considered equal.
+      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeFalse();
    }
 
    #endregion
@@ -747,10 +758,21 @@ public class GbNationalInsuranceNumberTests
       (sut1 != sut2).Should().BeTrue();
    }
 
+   [Fact]
+   public void GbNationalInsuranceNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
    [Theory]
    [InlineData(Valid8CharacterValue, Valid11CharacterValue)]
    [InlineData(Valid9CharacterValue, Valid13CharacterValue)]
-   public void GbNationalInsuranceNumber_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths(
+   public void GbNationalInsuranceNumber_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentFormats(
       String value1,
       String value2)
    {
@@ -763,14 +785,14 @@ public class GbNationalInsuranceNumberTests
    }
 
    [Fact]
-   public void GbNationalInsuranceNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   public void GbNationalInsuranceNumber_InequalityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
-      // Arrange.
+      // Arrange. 8 and 9 characters versions for same person are not considered equal.
       var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
 
       // Act/assert.
-      (sut1 != sut2).Should().BeFalse();
+      (sut1 != sut2).Should().BeTrue();
    }
 
    #endregion
@@ -1010,7 +1032,7 @@ public class GbNationalInsuranceNumberTests
    [Theory]
    [InlineData(Valid8CharacterValue, Valid11CharacterValue)]
    [InlineData(Valid9CharacterValue, Valid13CharacterValue)]
-   public void GbNationalInsuranceNumber_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths(
+   public void GbNationalInsuranceNumber_Equals_ShouldReturnTrue_WhenValuesHaveDifferentFormats(
       String value1,
       String value2)
    {
@@ -1020,6 +1042,131 @@ public class GbNationalInsuranceNumberTests
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_Equals_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 8 and 9 characters versions for same person are not considered equal.
+      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region EqualsNonSuffix Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnTrue_WhenValuesWithSuffixesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+
+      // Act/assert.
+      sut1.EqualsNonSuffix(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnTrue_WhenValuesWithoutSuffixesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+
+      // Act/assert.
+      sut1.EqualsNonSuffix(sut2).Should().BeTrue();
+   }
+
+   [Theory]
+   [InlineData(Valid9CharacterValue, Valid8CharacterValue)]
+   [InlineData(Valid8CharacterValue, Valid9CharacterValue)]
+   public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnTrue_WhenValuesWithAndWithoutSuffixesAreEqual(
+      String value1,
+      String value2)
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(value1);
+      var sut2 = new GbNationalInsuranceNumber(value2);
+
+      // Act/assert.
+      sut1.EqualsNonSuffix(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnTrue_WhenValuesDifferOnlyBySuffix()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber("AB123456A");
+      var sut2 = new GbNationalInsuranceNumber("AB123456B");
+
+      // Act/assert.
+      sut1.EqualsNonSuffix(sut2).Should().BeTrue();
+   }
+
+   [Theory]
+   [InlineData(Valid9CharacterValue)]
+   [InlineData(Valid8CharacterValue)]
+   public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnTrue_WhenValuesAreReferenceEqual(String value)
+   {
+      // Arrange.
+      var sut = new GbNationalInsuranceNumber(value);
+
+      // Act/assert.
+      sut.EqualsNonSuffix(sut).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnFalse_WhenValuesWithSuffixesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(AltValid9CharacterValue);
+
+      // Act/assert.
+      sut1.EqualsNonSuffix(sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnFalse_WhenValuesWithoutSuffixesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(AltValid8CharacterValue);
+
+      // Act/assert.
+      sut1.EqualsNonSuffix(sut2).Should().BeFalse();
+   }
+
+   [Theory]
+   [InlineData(Valid9CharacterValue, AltValid8CharacterValue)]
+   [InlineData(Valid8CharacterValue, AltValid9CharacterValue)]
+   public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnFalse_WhenValuesWithAndWithoutSuffixesAreNotEqual(
+      String value1,
+      String value2)
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(value1);
+      var sut2 = new GbNationalInsuranceNumber(value2);
+
+      // Act/assert.
+      sut1.EqualsNonSuffix(sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnFalse_WhenComparedToNull()
+   {
+      // Arrange.
+      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      GbNationalInsuranceNumber? sut2 = null;
+
+      // Act/assert.
+      sut1.EqualsNonSuffix(sut2).Should().BeFalse();
    }
 
    #endregion
@@ -1061,7 +1208,7 @@ public class GbNationalInsuranceNumberTests
    [Theory]
    [InlineData(Valid8CharacterValue, Valid11CharacterValue)]
    [InlineData(Valid9CharacterValue, Valid13CharacterValue)]
-   public void GbNationalInsuranceNumber_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths(
+   public void GbNationalInsuranceNumber_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentFormats(
       String value1,
       String value2)
    {
@@ -1075,6 +1222,21 @@ public class GbNationalInsuranceNumberTests
 
       // Assert.
       hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void GbNationalInsuranceNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 8 and 9 characters versions for same person are not considered equal.
+      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
    }
 
    #endregion

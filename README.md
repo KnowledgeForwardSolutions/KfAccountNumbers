@@ -326,7 +326,7 @@ and Jersey. While not defined as such, it effectively serves as national identif
 A National Insurance Number consists of nine characters structured as PPDDDDDDS, where:
 * PP is a two-letter prefix. See below for valid prefix characters.
 * DDDDDD is a six-digit sequentially assigned number.
-* S is a single suffix letter, either A, B, C, or D. The suffix can be omitted if is unknown as the suffix does not contribute
+* S is a single suffix letter, either A, B, C, or D. The suffix can be omitted if it is unknown as the suffix does not contribute
   to the uniqueness of the value.
 
 A National Insurance Number is typically displayed as a single string of nine characters but can be formatted for readability
@@ -349,6 +349,15 @@ A valid National Insurance Number must meet all of the following rules:
 * The same character must be used in every separator position.
 
 Note that National Insurance Numbers do not include a check digit.
+
+Also note that since suffix characters do not contribute to the uniqueness of National Insurance numbers, then it is
+technically accurate to say that two values that differ only by one having a suffix character and the other not should
+be considered equal. However, if `GbNationalInsuranceNumber` were to override the normal record equality to support this
+case there would be other implications, such as hashing or equality where two values have suffix character but only differ
+by suffix character. In the end, `GbNationalInsuranceNumber` uses normal record equality and two values that differ only
+by the presence or absence of a suffix character will still not be considered equal. But `GbNationalInsuranceNumber` does
+attempt to support this case by including an `EqualsNonSuffix` method that performs an equality check only on the first
+eight characters (two prefix characters and six digits) of both values.
 
 Example values:
 * AB123456C - unformatted, with suffix character

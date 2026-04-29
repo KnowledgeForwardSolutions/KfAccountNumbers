@@ -26,7 +26,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            <term>S</term>
 ///            <description>
 ///               is a single suffix letter, either A, B, C, or D. The suffix
-///               can be omitted if is unknown as the suffix does not contribute
+///               can be omitted if it is unknown as the suffix does not contribute
 ///               to the uniqueness of the value.
 ///            </description>
 ///         </item>
@@ -97,6 +97,17 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      Note that National Insurance Numbers do not include a check digit.
+///   </para>
+///   <para>
+///      Also note that since suffix characters do not contribute to the uniqueness of National Insurance numbers, then
+///      it is technically accurate to say that two values that differ only by one having a suffix character and the
+///      other not should be considered equal. However, if <see cref="GbNationalInsuranceNumber"/> were to override the
+///      normal record equality to support this case there would be other implications, such as hashing or equality where
+///      two values have suffix character but only differ by suffix character. In the end, <see cref="GbNationalInsuranceNumber"/>
+///      uses normal record equality and two values that differ only by the presence or absence of a suffix character
+///      will still not be considered equal. But <see cref="GbNationalInsuranceNumber"/> does attempt to support this case by
+///      including an `EqualsNonSuffix` method that performs an equality check only on the first eight characters (two
+///      prefix characters and six digits) of both values.
 ///   </para>
 ///   <para>
 ///      Example values:
@@ -223,6 +234,39 @@ public record GbNationalInsuranceNumber
       return validationResult == GbNationalInsuranceNumberValidationResult.ValidationPassed
          ? new GbNationalInsuranceNumber(nationalInsuranceNumber, validationMode: ValidationMode.BypassValidation)
          : validationResult;
+   }
+
+   /// <summary>
+   ///   Determines whether the current National Insurance number is equal to
+   ///   another, ignoring the suffix.
+   /// </summary>
+   /// <remarks>
+   ///   The comparison is case-insensitive and does not consider the suffix
+   ///   portion of the National Insurance number.
+   /// </remarks>
+   /// <param name="other">
+   ///   The National Insurance number to compare with the current instance.
+   ///   Can be <see langword="null"/>.
+   /// </param>
+   /// <returns>
+   ///   <see langword="true"/> if the main parts of the two National Insurance
+   ///   numbers are equal, ignoring the suffix; otherwise, <see langword="false"/>.
+   /// </returns>
+   public Boolean EqualsNonSuffix(GbNationalInsuranceNumber? other)
+   {
+      if (other is null)
+      {
+         return false;
+      }
+      if (ReferenceEquals(this, other))
+      {
+         return true;
+      }
+
+      ReadOnlySpan<Char> span1 = this.Value.AsSpan(..UnformattedWithoutSuffixLength);
+      ReadOnlySpan<Char> span2 = other.Value.AsSpan(..UnformattedWithoutSuffixLength);
+
+      return span1.Equals(span2, StringComparison.OrdinalIgnoreCase);
    }
 
    /// <summary>
