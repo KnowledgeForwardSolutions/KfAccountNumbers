@@ -1,3 +1,5 @@
+// Ignore Spelling: Json
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -242,8 +244,8 @@ public record GbNationalInsuranceNumber
    /// </summary>
    /// <remarks>
    ///   <para>
-   ///      The comparison is case-insensitive and does not consider the suffix
-   ///      portion of the National Insurance number.
+   ///      The comparison does not consider the suffix portion of the National
+   ///      Insurance number.
    ///   </para>
    ///   <para>
    ///      The alphabetic suffix of a National Insurance Number is a historical
@@ -277,7 +279,7 @@ public record GbNationalInsuranceNumber
       ReadOnlySpan<Char> span1 = this.Value.AsSpan(..UnformattedWithoutSuffixLength);
       ReadOnlySpan<Char> span2 = other.Value.AsSpan(..UnformattedWithoutSuffixLength);
 
-      return span1.Equals(span2, StringComparison.OrdinalIgnoreCase);
+      return span1.Equals(span2, StringComparison.Ordinal);
    }
 
    /// <summary>
@@ -297,7 +299,7 @@ public record GbNationalInsuranceNumber
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the personnummer.
+   ///   details on creating a mask to format the national insurance number.
    /// </remarks>
    public String Format(String? mask = null)
    {
@@ -348,6 +350,10 @@ public record GbNationalInsuranceNumber
          || !ValidateSuffixCharacter(nationalInsuranceNumber))
       {
          return GbNationalInsuranceNumberValidationResult.InvalidCharacter;
+      }
+      else if (!ValidateSeparators(nationalInsuranceNumber))
+      {
+         return GbNationalInsuranceNumberValidationResult.InvalidSeparator;
       }
 
       return GbNationalInsuranceNumberValidationResult.ValidationPassed;
@@ -448,6 +454,27 @@ public record GbNationalInsuranceNumber
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean ValidatePrefixSecondCharacter(ReadOnlySpan<Char> nationalInsuranceNumber)
       => AllowedPrefixSecondCharacters.Contains(nationalInsuranceNumber[1]);
+
+   private static Boolean ValidateSeparators(ReadOnlySpan<Char> nationalInsuranceNumber)
+   {
+      if (nationalInsuranceNumber.Length < FormattedWithoutSuffixLength)
+      {
+         return true;
+      }
+
+      var ch = nationalInsuranceNumber[Separator1Offset];
+      if (ch is >= Chars.DigitZero and Chars.DigitNine
+         or >= Chars.UpperCaseA and Chars.UpperCaseZ
+         or >= Chars.LowerCaseA and Chars.LowerCaseZ)
+      {
+         return false;
+      }
+
+      return ch == nationalInsuranceNumber[Separator2Offset]
+         && ch == nationalInsuranceNumber[Separator3Offset]
+         && (nationalInsuranceNumber.Length == FormattedWithoutSuffixLength
+            || ch == nationalInsuranceNumber[Separator4Offset]);
+   }
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean ValidateSuffixCharacter(ReadOnlySpan<Char> nationalInsuranceNumber)

@@ -260,6 +260,58 @@ public class GbNationalInsuranceNumberTests
       { "\u00D6", true },       // unicode O with umlaut
    };
 
+   public static TheoryData<String> InvalidSeparatorValues =>
+   [
+      "AB012 34 56 A",
+      "AB912 34 56 A",
+      "ABA12 34 56 A",
+      "ABZ12 34 56 A",
+      "ABa12 34 56 A",
+      "ABz12 34 56 A",
+
+      "AB 12034 56 A",
+      "AB 12934 56 A",
+      "AB 12A34 56 A",
+      "AB 12Z34 56 A",
+      "AB 12a34 56 A",
+      "AB 12z34 56 A",
+
+      "AB 12 34056 A",
+      "AB 12 34956 A",
+      "AB 12 34A56 A",
+      "AB 12 34Z56 A",
+      "AB 12 34a56 A",
+      "AB 12 34z56 A",
+
+      "AB 12 34 560A",
+      "AB 12 34 569A",
+      "AB 12 34 56AA",
+      "AB 12 34 56ZA",
+      "AB 12 34 56aA",
+      "AB 12 34 56zA",
+
+      "AB012 34 56",
+      "AB912 34 56",
+      "ABA12 34 56",
+      "ABZ12 34 56",
+      "ABa12 34 56",
+      "ABz12 34 56",
+
+      "AB 12034 56",
+      "AB 12934 56",
+      "AB 12A34 56",
+      "AB 12Z34 56",
+      "AB 12a34 56",
+      "AB 12z34 56",
+
+      "AB 12 34056",
+      "AB 12 34956",
+      "AB 12 34A56",
+      "AB 12 34Z56",
+      "AB 12 34a56",
+      "AB 12 34z56",
+   ];
+
    #region Constructor Tests
    // ==========================================================================
    // ==========================================================================
@@ -436,6 +488,15 @@ public class GbNationalInsuranceNumberTests
          .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
    }
 
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void GbNationalInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
+      => FluentActions
+         .Invoking(() => new GbNationalInsuranceNumber(value))
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidSeparator + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidSeparator);
+
    #endregion
 
    #region Value Property Tests
@@ -444,7 +505,7 @@ public class GbNationalInsuranceNumberTests
 
    [Theory]
    [MemberData(nameof(ValidNationalInsuranceNumberValues))]
-   public void GbNationalInsuranceNumber_Value_ShouldReturnValidatedPpsNumber(String value)
+   public void GbNationalInsuranceNumber_Value_ShouldReturnValidatedNationalInsuranceNumber(String value)
    {
       // Arrange.
       var sut = new GbNationalInsuranceNumber(value);
@@ -686,6 +747,15 @@ public class GbNationalInsuranceNumberTests
          .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
          .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
    }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
+      => FluentActions
+         .Invoking(() => _ = (GbNationalInsuranceNumber)value)
+         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
+         .WithMessage(Messages.GbNationalInsuranceNumberInvalidSeparator + "*")
+         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidSeparator);
 
    #endregion
 
@@ -999,6 +1069,20 @@ public class GbNationalInsuranceNumberTests
       result.IsSuccess.Should().BeFalse();
       result.Value.Should().Be(null);
       result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void GbNationalInsuranceNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidSeparator(String value)
+   {
+      // Act.
+      var result = GbNationalInsuranceNumber.Create(value);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.IsSuccess.Should().BeFalse();
+      result.Value.Should().Be(null);
+      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidSeparator);
    }
 
    #endregion
@@ -1465,6 +1549,11 @@ public class GbNationalInsuranceNumberTests
       GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
    }
 
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void GbNationalInsuranceNumber_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(String value)
+      => GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidSeparator);  
+   
    #endregion
 
    #region Json Serialization Tests
@@ -1549,7 +1638,7 @@ public class GbNationalInsuranceNumberTests
    }
 
    [Fact]
-   public void GbNationalInsuranceNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenPpsNumberIsInvalid()
+   public void GbNationalInsuranceNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenNationalInsuranceNumberIsInvalid()
    {
       // Arrange.
       var json = "{\"NationalInsuranceNumber\":\"AB123456CB\"}";  // Invalid length
