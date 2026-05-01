@@ -451,7 +451,7 @@ public record GbNationalInsuranceNumber
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean ValidateSuffixCharacter(ReadOnlySpan<Char> nationalInsuranceNumber)
-      => (nationalInsuranceNumber.Length is UnformattedWithoutSuffixLength or FormattedWithoutSuffixLength)
+      => nationalInsuranceNumber.Length is UnformattedWithoutSuffixLength or FormattedWithoutSuffixLength
          || nationalInsuranceNumber[^1] is >= Chars.UpperCaseA and <= Chars.UpperCaseD;
 }
 
