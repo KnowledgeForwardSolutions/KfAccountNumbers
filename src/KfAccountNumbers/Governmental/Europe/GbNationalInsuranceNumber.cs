@@ -238,11 +238,22 @@ public record GbNationalInsuranceNumber
 
    /// <summary>
    ///   Determines whether the current National Insurance number is equal to
-   ///   another, ignoring the suffix.
+   ///   another, ignoring the suffix (if it exists).
    /// </summary>
    /// <remarks>
-   ///   The comparison is case-insensitive and does not consider the suffix
-   ///   portion of the National Insurance number.
+   ///   <para>
+   ///      The comparison is case-insensitive and does not consider the suffix
+   ///      portion of the National Insurance number.
+   ///   </para>
+   ///   <para>
+   ///      The alphabetic suffix of a National Insurance Number is a historical
+   ///      artifact and does not contribute to the uniqueness of the value so
+   ///      it can be safely dropped from the value if it is unknown. This
+   ///      method exists to support cases where values that may not have suffix
+   ///      characters need to be compared for equality without having to alter
+   ///      the base value type equality of the <see cref="GbNationalInsuranceNumber"/>
+   ///      type.
+   ///   </para>
    /// </remarks>
    /// <param name="other">
    ///   The National Insurance number to compare with the current instance.
@@ -267,6 +278,34 @@ public record GbNationalInsuranceNumber
       ReadOnlySpan<Char> span2 = other.Value.AsSpan(..UnformattedWithoutSuffixLength);
 
       return span1.Equals(span2, StringComparison.OrdinalIgnoreCase);
+   }
+
+   /// <summary>
+   ///   Format the national insurance number using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then the default mask "__ __ __ __ _" (or "__ __ __ __" for values
+   ///   without suffixes) will be used instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted national insurance number.
+   /// </returns>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the personnummer.
+   /// </remarks>
+   public String Format(String? mask = null)
+   {
+      mask ??= HasSuffix(Value)
+         ? "__ __ __ __ _"
+         : "__ __ __ __";
+
+      return Value.FormatWithMask(mask);
    }
 
    /// <summary>

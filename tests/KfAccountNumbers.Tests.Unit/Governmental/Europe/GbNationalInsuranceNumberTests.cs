@@ -1171,6 +1171,67 @@ public class GbNationalInsuranceNumberTests
 
    #endregion
 
+   #region Format Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Valid8CharacterValue, Valid11CharacterValue)]
+   [InlineData(Valid9CharacterValue, Valid13CharacterValue)]
+   [InlineData(Valid11CharacterValue, Valid11CharacterValue)]
+   [InlineData(Valid13CharacterValue, Valid13CharacterValue)]
+   public void GbNationalInsuranceNumber_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed(
+      String value,
+      String expected)
+   {
+      // Arrange.
+      var sut = new GbNationalInsuranceNumber(value);
+
+      // Act.
+      var str = sut.Format();
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData(Valid8CharacterValue, Valid8CharacterValue)]
+   [InlineData(Valid9CharacterValue, Valid9CharacterValue)]
+   [InlineData(Valid11CharacterValue, Valid8CharacterValue)]
+   [InlineData(Valid13CharacterValue, Valid9CharacterValue)]
+   public void GbNationalInsuranceNumber_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed(
+      String value,
+      String expected)
+   {
+      // Arrange.
+      var sut = new GbNationalInsuranceNumber(value);
+      var mask = "_________";
+
+      // Act.
+      var str = sut.Format(mask);
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void GbNationalInsuranceNumber_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
+   {
+      // Arrange.
+      var sut = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+      var act = () => _ = sut.Format(mask);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   #endregion
+
    #region GetHashCode Method Tests
    // ==========================================================================
    // ==========================================================================
