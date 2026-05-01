@@ -429,4 +429,19 @@
   <data name="IePpsNumberInvalidCheckDigit" xml:space="preserve">
     <value>IE PPS Number must have valid weighted modulus 23 check character in character position 7 (zero-based)</value>
   </data>
+  <data name="GbNationalInsuranceNumberEmpty" xml:space="preserve">
+    <value>GB National Insurance Number may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="GbNationalInsuranceNumberInvalidLength" xml:space="preserve">
+    <value>GB National Insurance Number must have length 8 (unformatted, without suffix), 9 (unformatted, with suffix), 11 (formatted, without suffix) or 13 (formatted, with suffix)</value>
+  </data>
+  <data name="GbNationalInsuranceNumberInvalidPrefix" xml:space="preserve">
+    <value>GB National Insurance Number leading (left-most) two characters may not be BG, GB, NK, KN, TN, NT, or ZZ</value>
+  </data>
+  <data name="GbNationalInsuranceNumberInvalidCharacter" xml:space="preserve">
+    <value>GB National Insurance Number contains one or more invalid characters. Offset 0 must contain A-C, E, G, H, J-P, R-T, W-Z. Offset 1 must contain A-C, E, G, H, J-N, P, R-T, W-Z. Offsets 2-7 must contain ASCII digits. Offset 8, if present, must contain A-D.</value>
+  </data>
+  <data name="GbNationalInsuranceNumberInvalidSeparator" xml:space="preserve">
+    <value>GB National Insurance Number with length 11 or 13 contains an invalid separator character. Separator characters may not be ASCII digits ('0'-'9') or uppercase or lowercase letters (A-Z, a-z). All separator locations must contain the same character.</value>
+  </data>
 </root>

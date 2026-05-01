@@ -326,26 +326,38 @@ and Jersey. While not defined as such, it effectively serves as national identif
 A National Insurance Number consists of nine characters structured as PPDDDDDDS, where:
 * PP is a two-letter prefix. See below for valid prefix characters.
 * DDDDDD is a six-digit sequentially assigned number.
-* S is a single suffix letter, either A, B, C, or D. The suffix can be omitted if is unknown as the suffix does not contribute
+* S is a single suffix letter, either A, B, C, or D. The suffix can be omitted if it is unknown as the suffix does not contribute
   to the uniqueness of the value.
 
 A National Insurance Number is typically displayed as a single string of nine characters but can be formatted for readability
 as groups of two characters with a separator character, typically a space (i.e. PP DD DD DD S). `GbNationalInsuranceNumber`
-is case sensitive and requires the prefix and suffix characters to be uppercase letters.
+is case-sensitive and requires the prefix and suffix characters to be uppercase letters.
 
 A valid National Insurance Number must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
 * The value must be one of the following lengths:
-  * 8 characters (unformatted, no suffix character)
+  * 8 characters (unformatted, without suffix character)
   * 9 characters (unformatted, with suffix character)
-  * 11 characters (formatted, no suffix character)
+  * 11 characters (formatted, without suffix character)
   * 13 characters (formatted, with suffix character)
+* The leading (left-most) two characters may not be BG, GB, NK, KN, TN, NT, or ZZ.
 * Character position 0 (zero-based) must be an uppercase letter, A-C, E, G, H, J-P, R-T, W-Z. The letters D, F, I, Q, U and V are not allowed.
 * Character position 1 (zero-based) must be an uppercase letter, A-C, E, G, H, J-N, P, R-T, W-Z. The letters D, F, I, O, Q, U and V are not allowed. (Note O is the only additional excluded character.)
 * Character positions 2-7 (zero-based) must be ASCII digits ('0'-'9').
 * Character position 8 (zero-based), if present, must be an uppercase letter, A-D.
 * Separator characters, if present, may not be ASCII digits ('0'-'9') or uppercase or lowercase letters (A-Z, a-z).
 * The same character must be used in every separator position.
+
+Note that National Insurance Numbers do not include a check digit.
+
+Also note that since suffix characters do not contribute to the uniqueness of National Insurance numbers, then it is
+technically accurate to say that two values that differ only by one having a suffix character and the other not should
+be considered equal. However, if `GbNationalInsuranceNumber` were to override the normal record equality to support this
+case there would be other implications, such as hashing or equality where two values have suffix character but only differ
+by suffix character. In the end, `GbNationalInsuranceNumber` uses normal record equality and two values that differ only
+by the presence or absence of a suffix character will still not be considered equal. But `GbNationalInsuranceNumber` does
+attempt to support this case by including an `EqualsNonSuffix` method that performs an equality check only on the first
+eight characters (two prefix characters and six digits) of both values.
 
 Example values:
 * AB123456C - unformatted, with suffix character

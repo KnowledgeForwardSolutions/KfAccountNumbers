@@ -475,6 +475,51 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to GB National Insurance Number may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string GbNationalInsuranceNumberEmpty {
+            get {
+                return ResourceManager.GetString("GbNationalInsuranceNumberEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB National Insurance Number contains one or more invalid characters. Offset 0 must contain A-C, E, G, H, J-P, R-T, W-Z. Offset 1 must contain A-C, E, G, H, J-N, P, R-T, W-Z. Offsets 2-7 must contain ASCII digits. Offset 8, if present, must contain A-D..
+        /// </summary>
+        internal static string GbNationalInsuranceNumberInvalidCharacter {
+            get {
+                return ResourceManager.GetString("GbNationalInsuranceNumberInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB National Insurance Number must have length 8 (unformatted, without suffix), 9 (unformatted, with suffix), 11 (formatted, without suffix) or 13 (formatted, with suffix).
+        /// </summary>
+        internal static string GbNationalInsuranceNumberInvalidLength {
+            get {
+                return ResourceManager.GetString("GbNationalInsuranceNumberInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB National Insurance Number leading (left-most) two characters may not be BG, GB, NK, KN, TN, NT, or ZZ.
+        /// </summary>
+        internal static string GbNationalInsuranceNumberInvalidPrefix {
+            get {
+                return ResourceManager.GetString("GbNationalInsuranceNumberInvalidPrefix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB National Insurance Number with length 11 or 13 contains an invalid separator character. Separator characters may not be ASCII digits (&apos;0&apos;-&apos;9&apos;) or uppercase or lowercase letters (A-Z, a-z). All separator locations must contain the same character..
+        /// </summary>
+        internal static string GbNationalInsuranceNumberInvalidSeparator {
+            get {
+                return ResourceManager.GetString("GbNationalInsuranceNumberInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to IE PPS Number may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string IePpsNumberEmpty {
