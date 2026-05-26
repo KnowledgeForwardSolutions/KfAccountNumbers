@@ -45,8 +45,11 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 		- [EsNif](#esnif)
 		- [FiHenkilotunnus](#fihenkilotunnus)
 		- [FrInseeNumber](#frinseenumber)
+		- [GbChiNumber](#gbchinumber)
+		- [GbHcNumber](#gbhcnumber)
 		- [GbNationalInsuranceNumber](#gbnationalinsurancenumber)
-		- [GbNhsNumber](#gbnhsenumber)
+		- [GbNhsNumber](#gbnhsnumber)
+		- [GbPatientNumber](#gbpatientnumber)
 		- [IePpsNumber](#ieppsnumber)
 		- [IsKennitala](#iskennitala)
 		- [NlBurgerservicenummer](#nlburgerservicenummer)
@@ -319,6 +322,14 @@ Example values:
 See [Wikipedia - INSEE code](https://en.wikipedia.org/wiki/INSEE_code) and
 [Wikipedia (French) - Numéro de sécurité sociale en France](https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_s%C3%A9curit%C3%A9_sociale_en_France) for more info.
 
+## GbChiNumber
+
+Future
+
+## GbHcNumber
+
+Future
+
 ## GbNationalInsuranceNumber
 
 The `GbNationalInsuranceNumber` type represents a National Insurance Number of the United Kingdom, Guernsey, the Isle of Man,
@@ -374,13 +385,13 @@ The `GbNhsNumber` type represents the identifier used by the National Health Ser
 
 A NHS Number consists of 10 digits structured as NNNNNNNNNC, where
 * NNNNNNNNN is a unique nine digit number
-* C is a Modulus 11 check digit
+* C is a Modulus 11 check digit calculated from the preceding nine digits
 
 NHS Numbers can be displayed as a string of 10 digits or formatted for readability as three groups of digits in a '3 3 4'
-pattern (e.g. "123 456 7890"). The optional separator characters can be any non-ASCII digit ('0' - '9'), but both separator
-characters must be the same. The typical separator character is a space.
+pattern (e.g. "123 456 7890"). The optional separator characters can be any character that is not an ASCII digit ('0' - '9'),
+but both separator characters must be the same. The typical separator character is a space (' ').
 
-Each of the public health services in Great Britain (NHS, Scottish CHI and North Ireland H&C) are allocated separate blocks of
+Each of the public health services in Great Britain (NHS, Scottish CHI and Northern Ireland H&C) are allocated separate blocks of
 10 digit numbers so it is possible to determine what service issued the number by comparing the number to a list of valid ranges
 for each service. For NHS, the valid ranges are 400 000 000 to 499 999 999 and 600 000 000 to 799 999 999 (excluding the
 trailing check digit). `GbNhsNumber` also allows a range of numbers from 900 000 000 to 999 999 999 which are reserved for
@@ -392,7 +403,7 @@ A valid NHS Number must meet all of the following rules:
 * All characters (except the optional separator characters) must be ASCII digits ('0' - '9').
 * The trailing (right-most) digit must be a valid Modulus 11 check digit.
 * If the value is 12 characters long, character positions 3 and 7 (zero-based) must not be ASCII digits ('0' - '9'). The same character must be used in each separator position.
-* The first nine digits must fall in one of the following ranges: 400 000 000 to 499 999 999, 600 000 000 to 799 999 999 or 900 000 000 to 999 999 999.
+* The first nine digits must fall in one of the following ranges: 400 000 000 to 499 999 999, 600 000 000 to 799 999 999, or 900 000 000 to 999 999 999.
 
 The Modulus 11 check digit algorithm used by NHS numbers can generate a check value of 10 which can not be encoded as a 
 single decimal digit. The National Health Service and other issuing authorities avoid this issue by not issuing any number
@@ -406,6 +417,12 @@ Example values:
 See [Wikipedia - NHS Number](https://en.wikipedia.org/wiki/NHS_number),
 [NHS Data Model and Dictionary](https://www.datadictionary.nhs.uk/attributes/nhs_number.html) and
 [Allocated Ranges for NHS Numbers](https://webarchive.nationalarchives.gov.uk/ukgwa/20231221081503/https://digital.nhs.uk/about-nhs-digital/contact-us/freedom-of-information/freedom-of-information-disclosure-log/december-2022/nic-690159-k8h4z)
+
+Also see [GbChiNumber](#gbchinumber), [GbHcNumber](#gbhcnumber) and [GbPatientNumber](#gbpatientnumber) for other associated business objects.
+
+## GbPatientNumber
+
+Future
 
 ## IePpsNumber
 
