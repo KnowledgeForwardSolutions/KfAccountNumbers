@@ -40,22 +40,23 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Asia (future)
 	- Australia (future)
 	- Europe
-        - [BeRijksregisternummer](#berijksregisternummer) 
-        - [DkPersonnummer](#dkpersonnummer)
-        - [EsNif](#esnif)
-        - [FiHenkilotunnus](#fihenkilotunnus)
-        - [FrInseeNumber](#frinseenumber)
-        - [GbNationalInsuranceNumber](#gbnationalinsurancenumber)
-        - [IePpsNumber](#ieppsnumber)
-        - [IsKennitala](#iskennitala)
-        - [NlBurgerservicenummer](#nlburgerservicenummer)
-        - [NoFoedselsnummer](#nofoedselsnummer) 
-        - [SePersonnummer](#sepersonnummer)
+		- [BeRijksregisternummer](#berijksregisternummer) 
+		- [DkPersonnummer](#dkpersonnummer)
+		- [EsNif](#esnif)
+		- [FiHenkilotunnus](#fihenkilotunnus)
+		- [FrInseeNumber](#frinseenumber)
+		- [GbNationalInsuranceNumber](#gbnationalinsurancenumber)
+		- [GbNhsNumber](#gbnhsenumber)
+		- [IePpsNumber](#ieppsnumber)
+		- [IsKennitala](#iskennitala)
+		- [NlBurgerservicenummer](#nlburgerservicenummer)
+		- [NoFoedselsnummer](#nofoedselsnummer) 
+		- [SePersonnummer](#sepersonnummer)
 	- NorthAmerica
 		- [CaSocialInsuranceNumber](#casocialinsurancenumber) 
 		- [MxCurp](#mxcurp)
-        - [UsIndividualTaxpayerIdentificationNumber](#usindividualtaxpayeridentificationnumber)
-        - [UsNationalProviderIdentifier](#usnationalprovideridentifier)
+		- [UsIndividualTaxpayerIdentificationNumber](#usindividualtaxpayeridentificationnumber)
+		- [UsNationalProviderIdentifier](#usnationalprovideridentifier)
 		- [UsSocialSecurityNumber](#ussocialsecuritynumber)
 	- South America
 * Utility
@@ -366,6 +367,8 @@ Example values:
 * GG 00 01 23 - formatted, without suffix character
 
 See [Wikipedia - National Insurance number](https://en.wikipedia.org/wiki/National_Insurance_number) for more info.
+
+## GbNhsNumber
 
 ## IePpsNumber
 
