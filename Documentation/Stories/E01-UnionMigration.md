@@ -3,6 +3,8 @@
 Epic E01-UnionMigration defines the migration from the current enum based validation
 to using the new union keyword being introduced in C# 15.
 
+E01-UnionMigration will act as the main branch until C# 15 is released and then will be merged into main after.
+
 ## Migration Path
 
 1. Update solution to use preview C# 15.
