@@ -370,6 +370,43 @@ See [Wikipedia - National Insurance number](https://en.wikipedia.org/wiki/Nation
 
 ## GbNhsNumber
 
+The `GbNhsNumber` type represents the identifier used by the National Health Service (NHS) of England, Wales and the Isle of Man.
+
+A NHS Number consists of 10 digits structured as NNNNNNNNNC, where
+* NNNNNNNNN is a unique nine digit number
+* C is a Modulus 11 check digit
+
+NHS Numbers can be displayed as a string of 10 digits or formatted for readability as three groups of digits in a '3 3 4'
+pattern (e.g. "123 456 7890"). The optional separator characters can be any non-ASCII digit ('0' - '9'), but both separator
+characters must be the same. The typical separator character is a space.
+
+Each of the public health services in Great Britain (NHS, Scottish CHI and North Ireland H&C) are allocated separate blocks of
+10 digit numbers so it is possible to determine what service issued the number by comparing the number to a list of valid ranges
+for each service. For NHS, the valid ranges are 400 000 000 to 499 999 999 and 600 000 000 to 799 999 999 (excluding the
+trailing check digit). `GbNhsNumber` also allows a range of numbers from 900 000 000 to 999 999 999 which are reserved for
+test purposes and not issued to the public.
+
+A valid NHS Number must meet all of the following rules:
+* The value may not be null, empty or all whitespace characters.
+* The value must be either 10 characters long (without separators) or 12 characters long (with separators).
+* All characters (except the optional separator characters) must be ASCII digits ('0' - '9').
+* The trailing (right-most) digit must be a valid Modulus 11 check digit.
+* If the value is 12 characters long, character positions 3 and 7 (zero-based) must not be ASCII digits ('0' - '9'). The same character must be used in each separator position.
+* The first nine digits must fall in one of the following ranges: 400 000 000 to 499 999 999, 600 000 000 to 799 999 999 or 900 000 000 to 999 999 999.
+
+The Modulus 11 check digit algorithm used by NHS numbers can generate a check value of 10 which can not be encoded as a 
+single decimal digit. The National Health Service and other issuing authorities avoid this issue by not issuing any number
+that would result in a check value of 10. This means that approximately 9.09% of all possible values are never issued.
+
+Example values:
+* 4000000004 - unformatted
+* 799 999 9997 - formatted
+* 9000000009 - unformatted, test number
+
+See [Wikipedia - NHS Number](https://en.wikipedia.org/wiki/NHS_number),
+[NHS Data Model and Dictionary](https://www.datadictionary.nhs.uk/attributes/nhs_number.html) and
+[Allocated Ranges for NHS Numbers](https://webarchive.nationalarchives.gov.uk/ukgwa/20231221081503/https://digital.nhs.uk/about-nhs-digital/contact-us/freedom-of-information/freedom-of-information-disclosure-log/december-2022/nic-690159-k8h4z)
+
 ## IePpsNumber
 
 The `IePpsNumber` type represents an Irish Personal Public Service number, the national identification number used by Ireland.
