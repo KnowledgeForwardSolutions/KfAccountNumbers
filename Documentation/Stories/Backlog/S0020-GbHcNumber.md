@@ -18,7 +18,7 @@ I can validate, parse, and work with H&C numbers in a type-safe manner with comp
   - 10th digit = check digit calculated using modulus 11 algorithm
 - [ ] Total length is 10 digits (unformatted) or 12 characters (formatted with spaces)
 - [ ] Constructor accepts string representation and throws `UKfValidationException<GbHcNumber.ValidationError>` if invalid
-- [ ] Static `Validate` method returns `GbHcNumber.ValidationResult` enumeration value
+- [ ] Static `Validate` method returns `GbHcNumber.ValidationResult` union value
 - [ ] Static `Create` method uses Result pattern returning `CreateResult<GbHcNumber, GbHcNumber.ValidationError>`
 - [ ] `GbHcNumber.ValidationError` is a union of the following types: `EmptyValue`, `InvalidLength`, `InvalidCharacter`, `InvalidCheckSum`, `InvalidSeparator` and `GbUniquePatientIdentifierInvalidRange`
 - [ ] `GbHcNumber.ValidationResult` extends `GbHcNumber.ValidationError` with the type `ValidValue` to indicate a sucessful validation.
@@ -33,7 +33,8 @@ I can validate, parse, and work with H&C numbers in a type-safe manner with comp
 - [ ] The first nine digits must be in one of the allowed ranges: 320 000 000 to 399 999 999 or 900 000 000 to 999 999 999 (900 series block reserved for testing purposes)
 
 ### Check Digit Algorithm (Modulus 11)
-The check digit is calculated using the modulus 11 algorithm:
+GbHcNumber should use the CheckDigits.Net Modulus11Decimal algorithm for validation of
+the check digit. For reference, the check digit is calculated using the modulus 11 algorithm:
 1. Multiply each of the first 9 digits by a weight (11 - position), where position is 1-based:
    - Digit 1 × 10
    - Digit 2 × 9
@@ -53,7 +54,7 @@ The check digit is calculated using the modulus 11 algorithm:
 
 ### Format Support
 - [ ] Accept unformatted: 3200000007
-- [ ] Accept formatted with spaces: 320 000 0007
+- [ ] Accept formatted with separator characters: 320 000 0007
 - [ ] `Format` method with optional mask parameter (default: "___ ___ ____")
 
 ### Properties
@@ -84,7 +85,7 @@ The check digit is calculated using the modulus 11 algorithm:
 - [ ] Invalid check digits
 - [ ] Check digit edge case: calculated digit would be 11 (should use 0)
 - [ ] Check digit edge case: calculated digit would be 10 (should be invalid number)
-- [ ] Standard number range (4320 000 000 to 399 999 999)
+- [ ] Standard number range (320 000 000 to 399 999 999)
 - [ ] Test number range (900 000 0000 to 999 999 9999)
 - [ ] H&C numbers with other valid prefixes
 - [ ] Both formatted and unformatted inputs
@@ -152,6 +153,7 @@ The check digit is calculated using the modulus 11 algorithm:
   - `tests/KfAccountNumbers.Tests.Unit/Governmental/Europe/GbHcNumberTests.cs`
 - JSON converter: `GbHcNumberJsonConverter`
 - Target: .NET 11, C# 15.0
+- External library: CheckDigits.Net 3.1.0
 - Pattern similar to `GbNhsNumber` (same check digit algorithm and structure)
 - ISO 3166-1 alpha-2 code: GB (Great Britain, commonly used for UK including Northern Ireland)
 
@@ -191,7 +193,6 @@ The check digit is calculated using the modulus 11 algorithm:
 8. Store value in unformatted 10-digit format
 9. The check digit validation is mandatory - no valid H&C number has invalid check digit
 10. Implement prefix detection (32 = standard, 36 = temporary) with properties
-11. Preserve leading zeros if applicable
 12. Document that this is for Northern Ireland only (not England, Wales, Scotland, Isle of Man)
 13. Comprehensive test coverage for check digit algorithm including edge cases
 14. Note similarity to NHS Number but with different prefix conventions

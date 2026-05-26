@@ -18,8 +18,8 @@ I can validate, parse, and work with NHS numbers in a type-safe manner with comp
   - 10th digit = check digit calculated using modulus 11 algorithm
 - [ ] Total length is 10 digits (unformatted) or 12 characters (formatted with spaces)
 - [ ] Constructor accepts string representation and throws `UKfValidationException<GbNhsNumber.ValidationError>` if invalid
-- [ ] Static `Validate` method returns `GbNhsNumber.ValidationResult` enumeration value
-- [ ] Static `Create` method uses Result pattern returning `CreateResult<GbNhsNumber, GbNhsNumber.ValidationError>`
+- [ ] Static `Validate` method returns `GbNhsNumber.ValidationResult` union value
+- [ ] Static `Create` method uses Result pattern returning `UCreateResult<GbNhsNumber, GbNhsNumber.ValidationError>`
 - [ ] `GbNhsNumber.ValidationError` is a union of the following types: `EmptyValue`, `InvalidLength`, `InvalidCharacter`, `InvalidCheckSum`, `InvalidSeparator` and `GbUniquePatientIdentifierInvalidRange`
 - [ ] `GbNhsNumber.ValidationResult` extends `GbNhsNumber.ValidationError` with the type `ValidValue` to indicate a sucessful validation.
 
@@ -54,7 +54,7 @@ the check digit. For reference, the check digit is calculated as follows:
 
 ### Format Support
 - [ ] Accept unformatted: 1234567881
-- [ ] Accept formatted with spaces: 123 456 7881
+- [ ] Accept formatted with separator characters: 123 456 7881
 - [ ] `Format` method with optional mask parameter (default: "___ ___ ____")
 
 ### Properties
@@ -150,6 +150,7 @@ the check digit. For reference, the check digit is calculated as follows:
   - `tests/KfAccountNumbers.Tests.Unit/Governmental/Europe/GbNhsNumberTests.cs`
 - JSON converter: `GbNhsNumberJsonConverter`
 - Target: .NET 11, C# 15.0
+- External library: CheckDigits.Net 3.1.0
 - Pattern similar to `GbNino` for structure, but with check digit like `NlBurgerservicenummer`
 - ISO 3166-1 alpha-2 code: GB (Great Britain, commonly used for UK)
 
