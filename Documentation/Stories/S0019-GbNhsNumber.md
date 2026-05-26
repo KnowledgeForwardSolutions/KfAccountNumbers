@@ -1,186 +1,210 @@
 # S0019-GbNhsNumber Business Object
 
 ## As a
-Developer integrating UK healthcare identification numbers into my application
+Developer integrating UK National Health Service patient identification numbers into my application
 
 ## I want
-A strongly typed business object that represents a UK NHS Number
+A strongly typed business object that represents a UK NHS Number (National Health Service number for England, Wales, and the Isle of Man)
 
 ## So that
-I can validate, parse, and work with UK National Health Service numbers in a type-safe manner with comprehensive validation including check digit verification
+I can validate, parse, and work with NHS numbers in a type-safe manner with comprehensive validation including check digit verification
 
 ## Acceptance Criteria
 
 ### Structure and Validation
 - [ ] The `GbNhsNumber` type represents a UK NHS Number
-- [ ] The number is structured as 10 digits (NNNNNNNNNN) where:
-  - First 9 digits are the identifier
-  - 10th digit is a check digit calculated using modulus 11 algorithm
-- [ ] Constructor accepts string representation and throws `KfValidationException<GbNhsNumberValidationResult>` if invalid
-- [ ] Static `Validate` method returns `GbNhsNumberValidationResult` enumeration value
-- [ ] Static `Create` method uses Result pattern returning `CreateResult<GbNhsNumber, GbNhsNumberValidationResult>`
+- [ ] The number is a 10-digit identifier where:
+  - First 9 digits = unique identifier
+  - 10th digit = check digit calculated using modulus 11 algorithm
+- [ ] Total length is 10 digits (unformatted) or 12 characters (formatted with spaces)
+- [ ] Constructor accepts string representation and throws `UKfValidationException<GbNhsNumber.ValidationError>` if invalid
+- [ ] Static `Validate` method returns `GbNhsNumber.ValidationResult` union value
+- [ ] Static `Create` method uses Result pattern returning `UCreateResult<GbNhsNumber, GbNhsNumber.ValidationError>`
+- [ ] `GbNhsNumber.ValidationError` is a union of the following types: `EmptyValue`, `InvalidLength`, `InvalidCharacter`, `InvalidCheckSum`, `InvalidSeparator` and `GbUniquePatientIdentifierInvalidRange`
+- [ ] `GbNhsNumber.ValidationResult` extends `GbNhsNumber.ValidationError` with the type `ValidValue` to indicate a sucessful validation.
 
 ### Validation Rules
 - [ ] Value may not be null, empty, or all whitespace
-- [ ] Value must be either 10 characters (unformatted) or 12 characters (formatted with spaces/dashes)
-- [ ] All digits must be ASCII digits ('0'-'9')
-- [ ] If separators present, must be at positions 3 and 6 (zero-based), forming pattern: NNN-NNN-NNNN
-- [ ] Separator character can be dash, space, or any non-digit character (must be consistent)
-- [ ] Check digit must be valid according to modulus 11 algorithm
-- [ ] Numbers with calculated check digit of 10 are invalid (rejected by the algorithm)
+- [ ] Value must be either 10 characters (unformatted) or 12 characters (formatted with separator characters)
+- [ ] All 10 characters must be ASCII digits ('0'-'9')
+- [ ] If separator characters present, must be at positions 3 and 7 (zero-based) forming pattern: NNN NNN NNNN
+- [ ] If separator characters are present, they must not be ASCII digits ('0'-'9') and both separators must be the same character
+- [ ] Check digit (10th digit) must be valid according to modulus 11 algorithm
+- [ ] The first nine digits must be in one of the allowed ranges: 400 000 000 to 499 999 999 or 600 000 000 to 799 999 999 or 900 000 000 to 999 999 999 (900 series block reserved for testing purposes)
+
+### Check Digit Algorithm (Modulus 11)
+GbNhsNumber should use the CheckDigits.Net Modulus11Decimal algorithm for validation of
+the check digit. For reference, the check digit is calculated as follows:
+1. Multiply each of the first 9 digits by a weight (11 - position), where position is 1-based:
+   - Digit 1 Ã— 10
+   - Digit 2 Ã— 9
+   - Digit 3 Ã— 8
+   - Digit 4 Ã— 7
+   - Digit 5 Ã— 6
+   - Digit 6 Ã— 5
+   - Digit 7 Ã— 4
+   - Digit 8 Ã— 3
+   - Digit 9 Ã— 2
+2. Sum all the products
+3. Calculate remainder: sum modulo 11
+4. Subtract remainder from 11: check digit = 11 - remainder
+5. If check digit is 11, use 0 instead
+6. If check digit is 10, the number is **invalid** (no NHS number should have check digit 10)
+7. The calculated check digit must match the 10th digit
 
 ### Format Support
 - [ ] Accept unformatted: 1234567881
-- [ ] Accept formatted with dashes: 123-456-7881
-- [ ] Accept formatted with spaces: 123 456 7881
-- [ ] Accept other non-digit separators: 123.456.7881
-- [ ] `Format` method with optional mask parameter (default: "___-___-____")
+- [ ] Accept formatted with separator characters: 123 456 7881
+- [ ] `Format` method with optional mask parameter (default: "___ ___ ____")
 
 ### Properties
-- [ ] `Value` property returns raw 10-character string (digits only, no separators)
-- [ ] `CheckDigit` property returns the check digit (10th digit) as int
+- [ ] `Value` property returns raw 10-character string (digits only, no spaces)
+- [ ] `IdentifierType` property returns a union of NhsNumber and TestNumber
 
-### Check Digit Algorithm
-- [ ] Use weighted modulus 11 algorithm
-- [ ] Weights applied left to right: 10, 9, 8, 7, 6, 5, 4, 3, 2 for the first 9 digits
-- [ ] Sum = (d1 × 10) + (d2 × 9) + (d3 × 8) + (d4 × 7) + (d5 × 6) + (d6 × 5) + (d7 × 4) + (d8 × 3) + (d9 × 2)
-- [ ] Remainder = Sum mod 11
-- [ ] Check digit = 11 - Remainder
-- [ ] If check digit = 11, then check digit = 0
-- [ ] If check digit = 10, the number is invalid and should be rejected
-- [ ] Validate that the 10th digit matches the calculated check digit
+### No Embedded Intelligence
+- [ ] NHS number does not encode date of birth
+- [ ] NHS number does not encode gender
+- [ ] NHS number does not encode geographic information
+- [ ] Only validation intelligence is the check digit and valid range
 
 ### Operators and Methods
 - [ ] Implicit conversion to string
 - [ ] Explicit conversion from string
-- [ ] `ToString` returns raw value (10 digits, no separators)
-- [ ] Proper equality implementation
+- [ ] `ToString` returns raw value (10 digits, no spaces)
+- [ ] Proper equality implementation (space-insensitive)
 - [ ] JSON serialization/deserialization support via `GbNhsNumberJsonConverter`
 
 ### Special Cases
-- [ ] Handle various separator characters (-, space, etc.) during validation
-- [ ] Numbers with check digit 10 are never valid (algorithm constraint)
-- [ ] Leading zeros are valid and must be preserved
-- [ ] No embedded personal information (purely sequential)
-- [ ] Old-style NHS numbers (9 digits) are not supported
+- [ ] Normalize separators during validation
+- [ ] Reject numbers where calculated check digit would be 10
+- [ ] Test numbers (900 million range) should validate but be identifiable via property
 
 ### Test Coverage
-- [ ] All validation rules with valid and invalid data
-- [ ] Check digit algorithm verification
-- [ ] Test cases where calculated check digit would be 10 (should be rejected)
-- [ ] Test case where calculated check digit is 11 (should become 0)
+- [ ] Valid NHS numbers with correct check digits
+- [ ] Invalid check digits
+- [ ] Check digit edge case: calculated digit would be 11 (should use 0)
+- [ ] Check digit edge case: calculated digit would be 10 (should be invalid number)
+- [ ] Standard number range (400 000 000 to 499 999 999 or 600 000 000 to 799 999 999)
+- [ ] Test number range (900 000 0000 to 999 999 9999)
 - [ ] Both formatted and unformatted inputs
-- [ ] Various separator characters (dash, space, period, etc.)
 - [ ] Format and ToString methods
-- [ ] CheckDigit property
-- [ ] Equality and hash code
+- [ ] Separator normalization
+- [ ] Invalid separator characters
+- [ ] Equality and hash code (space-insensitive)
 - [ ] JSON serialization round-trip
 - [ ] Conversion operators
 - [ ] Create method Result pattern
-- [ ] Error detection: single digit transcription, transposition, etc.
-- [ ] Leading zeros preservation
-- [ ] Comprehensive check digit validation (all possible valid check digits 0-9)
+- [ ] Null, empty, and whitespace inputs
+- [ ] Invalid lengths
+- [ ] Non-digit characters
 
 ### Documentation
 - [ ] XML documentation for all public members
 - [ ] README.md section with:
-  - Structure explanation (10 digits with check digit)
+  - Structure explanation (9-digit identifier + check digit)
   - Validation rules
-  - Format examples (with various separators)
-  - Modulus 11 check digit algorithm with weights
-  - Special case: check digit 10 makes number invalid
-  - Special case: check digit 11 becomes 0
-  - Historical context (introduced 1996 with NHS Wide Clearing Service)
-  - Purpose (patient identification in NHS)
-  - No embedded personal information
-  - Difference from old 9-digit format (not supported)
+  - Format examples (with and without spaces)
+  - Valid number ranges (standard and test)
+  - Purpose (NHS patient identification in England, Wales, Isle of Man)
+  - Historical context (introduced 1996, replaced older systems)
+  - Check digit calculation example with step-by-step walkthrough
+  - Note about Scotland using CHI number instead
+  - Note about Northern Ireland using H&C number instead
+  - Geographic coverage (England, Wales, Isle of Man only)
+  - No personal information encoded
   - Example values with descriptions
   - NHS Digital and Wikipedia references
-  - Note about sequential allocation (no intelligence)
 
 ### Performance
 - [ ] Use `ReadOnlySpan<Char>` for validation and parsing
-- [ ] Efficient check digit algorithm
+- [ ] Efficient check digit calculation
 - [ ] Single-pass validation where possible
 - [ ] Minimal string allocations
 - [ ] Separator normalization efficient
 
 ## Notes
 - NHS Number = National Health Service Number
-- Introduced in 1996 as part of NHS Wide Clearing Service
-- Used to uniquely identify patients in the NHS in England, Wales, and Isle of Man
-- Scotland uses CHI (Community Health Index) number instead (different format)
-- Northern Ireland uses H&C number (different format)
-- Format: 10 digits with modulus 11 check digit
-- Commonly formatted as: NNN-NNN-NNNN or NNN NNN NNNN
-- Check digit algorithm: weights 10, 9, 8, 7, 6, 5, 4, 3, 2
-- Numbers where check digit calculates to 10 are invalid and discarded
-- Numbers where check digit calculates to 11 have check digit 0
-- No embedded personal information (sequential allocation)
-- Replaced older 9-digit local NHS numbers
-- Universal across NHS in England and Wales (Isle of Man uses same system)
+- Introduced in 1996 to replace previous patient identification systems
+- Used for patient identification in England, Wales, and the Isle of Man
+- Scotland uses CHI (Community Health Index) number instead
+- Northern Ireland uses Health and Care Number (H&C Number) instead
+- Format: 9 digits + 1 check digit
+- Standard display format with spaces: NNN NNN NNNN
+- Check digit uses modulus 11 algorithm with weights [10,9,8,7,6,5,4,3,2]
+- Check digit of 10 makes the NHS number invalid
+- Numbers 000 000 0000 to 009 999 9999 reserved for testing
+- Numbers 999 000 0000 to 999 999 9999 reserved for temporary registrations
+- No embedded personal information (unlike some other national IDs)
+- Unique per patient and not reused
 - Leading zeros are significant and must be preserved
 - See: https://en.wikipedia.org/wiki/NHS_number
 - See: https://www.nhs.uk/using-the-nhs/about-the-nhs/what-is-an-nhs-number/
 - See: https://www.datadictionary.nhs.uk/attributes/nhs_number.html
-- See: https://digital.nhs.uk/services/demographics
+- See: https://digital.nhs.uk/services/nhs-number (NHS Digital)
+- See: https://webarchive.nationalarchives.gov.uk/ukgwa/20231221081503/https://digital.nhs.uk/about-nhs-digital/contact-us/freedom-of-information/freedom-of-information-disclosure-log/december-2022/nic-690159-k8h4z
 
 ## Technical Details
 - Namespace: `KfAccountNumbers.Governmental.Europe`
 - Files:
   - `src/KfAccountNumbers/Governmental/Europe/GbNhsNumber.cs`
-  - `src/KfAccountNumbers/Governmental/Europe/GbNhsNumberValidationResult.cs`
   - `tests/KfAccountNumbers.Tests.Unit/Governmental/Europe/GbNhsNumberTests.cs`
 - JSON converter: `GbNhsNumberJsonConverter`
-- Target: .NET 10, C# 14.0
-- Pattern similar to `CaSocialInsuranceNumber` and `UsSocialSecurityNumber` (format with check digit)
+- Target: .NET 11, C# 15.0
+- External library: CheckDigits.Net 3.1.0
+- Pattern similar to `GbNino` for structure, but with check digit like `NlBurgerservicenummer`
 - ISO 3166-1 alpha-2 code: GB (Great Britain, commonly used for UK)
 
 ## Example Values
-### Standard Format (Unformatted)
-- 4505577104 - Valid NHS number (check digit 4)
-- 9434765919 - Valid NHS number (check digit 9)
-- 5301194917 - Valid NHS number (check digit 7)
-- 9999999999 - May be used for testing/training (verify if valid check digit)
 
-### Formatted with Dashes
-- 450-557-7104 - Standard formatted NHS number
-- 943-476-5919 - Formatted NHS number
-- 530-119-4917 - Formatted NHS number
+### Standard NHS Numbers (Valid)
+- 4000000004 - Minimum standard NHS number with valid check digit
+- 400 000 0004 - Same, formatted with spaces
+- 7999999997 - Maximum valid NHS number with valid check digit
+- 799 999 9997 - Same, formatted
 
-### Formatted with Spaces
-- 450 557 7104 - Space-separated NHS number
-- 943 476 5919 - Space-separated NHS number
-- 530 119 4917 - Space-separated NHS number
-
-### With Leading Zeros
-- 0123456789 - Valid if check digit matches (preserve leading zero)
-- 000-000-0008 - Valid if check digit 8 is correct
+### Test Numbers (Valid but Special)
+- 9000000009 - Minimum test number with valid check digit
+- 900 000 0009 - Same, formatted
+- 9999999980 - Maximum test number with valid check digit
+- 999 999 9980 - Same, formatted
 
 ### Invalid Examples
-- 123456789X - Non-digit character 'X'
-- 123456789 - Too few digits (9 instead of 10)
-- 12345678901 - Too many digits (11 instead of 10)
-- 4505577105 - Invalid check digit (should be 4, not 5)
-- 1234567890 - Invalid if check digit 0 doesn't match calculation
-- XXXXXXXXXX - All non-digits
-- 450-55-77104 - Incorrect separator positions
-- 450-557-710 - Missing last digit
+- 450557710**5** - Invalid check digit (should be 4)
+- 450 557 710**3** - Invalid check digit (should be 4)
+- 450557710 - Too short (9 digits instead of 10)
+- 45055771041 - Too long (11 digits instead of 10)
+- 450A557104 - Non-digit character
+- 4505577104X - Non-digit character
+- 4505 577104 - Invalid space positions
+- (Check digit 10 example if one exists) - Invalid because check digit cannot be 10
 
-## Additional Considerations
-### Check Digit Edge Cases
-- [ ] When Sum mod 11 = 1, check digit = 11 - 1 = 10 (INVALID, reject number)
-- [ ] When Sum mod 11 = 0, check digit = 11 - 0 = 11, which becomes 0
-- [ ] Test comprehensive set covering all possible remainders (0-10)
-- [ ] Document that check digit 10 means the number cannot exist
+## Implementation Notes
+1. Place in namespace: `KfAccountNumbers.Governmental.Europe`
+2. Use ISO country code: `Gb` (Great Britain/UK)
+3. Follow the same patterns as `NlBurgerservicenummer` (also has check digit) and `GbNino` (same country)
+4. Create corresponding error union: `GbNhsNumber.ValidationError`
+1. Create corresponding validtion union `GbNhsNumber.ValidationResult`
+5. Implement full unit test coverage similar to other European national identifiers
+6. Support both formatted (with separator characters) and unformatted input
+7. Store value in unformatted 10-digit format
+8. The check digit validation is mandatory - no valid NHS number has invalid check digit
+9. Implement special range detection (test) with IdentifierType property
+11. Document that this is for England, Wales, and Isle of Man only (not Scotland or Northern Ireland)
+12. Comprehensive test coverage for check digit algorithm including edge cases
 
-### Algorithm Example
-
-Example: 450-557-7104 Digits:     4    5    0    5    5    7    7    1    0    [4] Weights:   10    9    8    7    6    5    4    3    2 Products:  40 + 45 +  0 + 35 + 30 + 35 + 28 +  3 +  0 = 216 216 mod 11 = 7 Check digit = 11 - 7 = 4 
-
-### Validation Strategy
-- [ ] Single-pass validation combining length, character, and check digit checks
-- [ ] Early exit on invalid characters or length
-- [ ] Check digit validation as final step
-- [ ] Clear error messages for each validation failure type
-- [ ] Document in comments that check digit 10 causes rejection
+## Special Considerations
+- **Check Digit 10**: If the modulus 11 algorithm produces check digit 10, the number is invalid
+  - No valid NHS number can have check digit 10
+  - This is different from some other modulus 11 systems that substitute a letter
+- **Check Digit 11**: If algorithm produces 11, use 0 as the check digit
+- **Geographic Scope**: Only valid for England, Wales, and Isle of Man
+  - Scotland uses CHI (Community Health Index) number - different format
+  - Northern Ireland uses H&C (Health and Care) Number - different format
+  - Document this clearly to avoid confusion
+- **Special Ranges**: 
+  - Test numbers (900 000 000 to 999 999 999) are valid but should be identifiable
+- **No Intelligence**: Unlike some national IDs, NHS numbers contain no encoded personal information
+  - No date of birth
+  - No gender indicator
+  - No geographic information
+  - Only the check digit provides validation intelligence
