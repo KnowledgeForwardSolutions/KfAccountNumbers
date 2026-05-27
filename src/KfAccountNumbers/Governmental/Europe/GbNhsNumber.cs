@@ -120,7 +120,84 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      and https://webarchive.nationalarchives.gov.uk/ukgwa/20231221081503/https://digital.nhs.uk/about-nhs-digital/contact-us/freedom-of-information/freedom-of-information-disclosure-log/december-2022/nic-690159-k8h4z
 ///      for more info.
 ///   </para>
+///   <para>
+///      Also see <see cref="GbChiNumber"/>, <see cref="GbHcNumber"/> and
+///      <see cref="GbPatientNumber"/> for associated patient identifier business
+///      objects.
+///   </para>
 /// </remarks>
-public record GbNhsNumber
+public record GbNhsNumber : GbPatientNumberBase
 {
+   /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="GbNhsNumber"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      GbPatientNumberInvalidRange)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="GbNhsNumber"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      GbPatientNumberInvalidRange)
+   {
+   }
+
+   /// <summary>
+   ///   Check the <paramref name="value"/> to determine if it contains a valid
+   ///   NHS number.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a NHS number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
+   /// </returns>
+   public static ValidationResult Validate(String? value)
+   {
+      if (String.IsNullOrWhiteSpace(value))
+      {
+         return default(EmptyValue);
+      }
+
+      if (!ValidateLength(value))
+      {
+         return GetInvalidLengthResult(value.Length);
+      }
+
+      if (!ValidateCheckDigit(value, out var invalidCharacterPosition))
+      {
+         return invalidCharacterPosition == -1
+            ? GetInvalidChecksumResult()
+            : GetInvalidCharacterResult(value[invalidCharacterPosition], invalidCharacterPosition);
+      }
+
+      if (!ValidateSeparators(value, out var invalidSeparatorPosition))
+      {
+         return GetInvalidSeparatorResult(value[invalidSeparatorPosition], invalidSeparatorPosition);
+      }
+
+      if (GetIdentifierCategory(value) is not IdentifierRangeCategory.Nhs and not IdentifierRangeCategory.Test)
+      {
+         return new GbPatientNumberInvalidRange(Messages.GbNhsNumberInvalidRange);
+      }
+
+      return default(ValidValue);
+   }
 }

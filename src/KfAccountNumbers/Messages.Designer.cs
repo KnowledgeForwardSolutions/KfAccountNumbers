@@ -277,6 +277,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Value may not be null, empty (&quot;&quot;) or all whitespace characters.
+        /// </summary>
+        internal static string EmptyValueDescription {
+            get {
+                return ResourceManager.GetString("EmptyValueDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ES NIF may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string EsNifEmpty {
@@ -516,6 +525,69 @@ namespace KfAccountNumbers {
         internal static string GbNationalInsuranceNumberInvalidSeparator {
             get {
                 return ResourceManager.GetString("GbNationalInsuranceNumberInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB NHS Number must be in the range 400 000 000 to 499 999 999, 600 000 000 to 799 999 999, or 900 000 000 to 999 999 999, excluding trailing check digit.
+        /// </summary>
+        internal static string GbNhsNumberInvalidRange {
+            get {
+                return ResourceManager.GetString("GbNhsNumberInvalidRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A formatted GB patient number must be 12 characters in length.
+        /// </summary>
+        internal static string GbPatientNumberFormattedLength {
+            get {
+                return ResourceManager.GetString("GbPatientNumberFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB patient number must have only digit characters (0-9) in non-separator positions.
+        /// </summary>
+        internal static string GbPatientNumberInvalidCharacter {
+            get {
+                return ResourceManager.GetString("GbPatientNumberInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB patient number must have a valid Modulus 11 check digit in the trailing (right-most) character position.
+        /// </summary>
+        internal static string GbPatientNumberInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("GbPatientNumberInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB patient number must must have a length of 10 (without separators) or 12 (with separators).
+        /// </summary>
+        internal static string GbPatientNumberInvalidLength {
+            get {
+                return ResourceManager.GetString("GbPatientNumberInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB patient number may not contain an ASCII digit (0-9) in a separator position and both separator positions must contain the same non-digit character.
+        /// </summary>
+        internal static string GbPatientNumberInvalidSeparator {
+            get {
+                return ResourceManager.GetString("GbPatientNumberInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unformatted GB patient number must be 10 characters in length.
+        /// </summary>
+        internal static string GbPatientNumberUnformattedLength {
+            get {
+                return ResourceManager.GetString("GbPatientNumberUnformattedLength", resourceCulture);
             }
         }
         
@@ -1029,6 +1101,15 @@ namespace KfAccountNumbers {
         internal static string ValidationPassed {
             get {
                 return ResourceManager.GetString("ValidationPassed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value is valid.
+        /// </summary>
+        internal static string ValidValueDescription {
+            get {
+                return ResourceManager.GetString("ValidValueDescription", resourceCulture);
             }
         }
         

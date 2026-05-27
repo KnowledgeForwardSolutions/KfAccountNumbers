@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 		<PropertyGroup>
-				<TargetFramework>net11.0</TargetFramework>
-				<LangVersion>preview</LangVersion>
-				<ImplicitUsings>enable</ImplicitUsings>
-				<Nullable>enable</Nullable>
 				<IsPackable>false</IsPackable>
 		</PropertyGroup>
 
@@ -17,13 +13,13 @@
 		</PropertyGroup>
 
 		<ItemGroup>
-				<PackageReference Include="coverlet.collector" Version="8.0.1">
+				<PackageReference Include="coverlet.collector" Version="10.0.1">
 						<PrivateAssets>all</PrivateAssets>
 						<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 				</PackageReference>
 			<PackageReference Include="FluentAssertions" Version="[7.0.0]" />
-			<PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.4.0" />
-				<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+			<PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.6.0" />
+				<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
 				<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
 						<PrivateAssets>all</PrivateAssets>
 						<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -37,6 +33,14 @@
 
 		<ItemGroup>
 				<Using Include="Xunit" />
+		</ItemGroup>
+
+		<ItemGroup>
+		  <EditorConfigFiles Remove="C:\Projects\KfAccountNumbers\tests\KfAccountNumbers.Tests.Unit\.editorconfig" />
+		</ItemGroup>
+
+		<ItemGroup>
+		  <None Include="C:\Projects\KfAccountNumbers\tests\KfAccountNumbers.Tests.Unit\.editorconfig" />
 		</ItemGroup>
 
 </Project>
