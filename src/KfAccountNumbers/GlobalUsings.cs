@@ -6,4 +6,5 @@ global using System.Text.Json.Serialization;
 
 global using CheckDigits.Net;
 
+global using KfAccountNumbers.Results;
 global using KfAccountNumbers.Utility;
