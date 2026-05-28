@@ -20,6 +20,9 @@ public class GbNhsNumberTests
    private const String AltValidUnformattedTestNumber = "9999999980";
    private const String AltValidFormattedTestNumber = "999-999-9980";
 
+   private const String UnformattedModulus11CheckDigitZeroValue = "4000000020";     // Edge case, modulus 11 with remainder 11 should result in 0 check digit
+   private const String FormattedModulus11CheckDigitZeroValue = "400 000 0020";
+
    private static Char GetCheckDigit(String value)
    {
       var str = value.Length == GbPatientNumberBase.UnformattedLength - 1
@@ -49,7 +52,10 @@ public class GbNhsNumberTests
       ValidUnformattedTestNumber,
       ValidFormattedTestNumber,
       AltValidUnformattedTestNumber,
-      AltValidFormattedTestNumber
+      AltValidFormattedTestNumber,
+
+      UnformattedModulus11CheckDigitZeroValue,
+      FormattedModulus11CheckDigitZeroValue,
    ];
 
    public static TheoryData<String> InvalidLengthValues =>
@@ -96,6 +102,7 @@ public class GbNhsNumberTests
       "9434761959",        // 9434765919 with jump transposition error 591 -> 195
       "7515568242",        // 7514468242 with twin error 44 -> 55
       "9990099980",        // 9999999980 with twin error 99 -> 00
+      "4000000110",        // 4000000110 is invalid because check digit would be 10
 
       "400 090 0004",      // 4000000004 with single digit transcription error, 0 -> 9
       "611 199 9998",      // 6112999998 with single digit transcription error, 2 -> 1
@@ -105,6 +112,7 @@ public class GbNhsNumberTests
       "943 476 1959",      // 9434765919 with jump transposition error 591 -> 195
       "751 556 8242",      // 7514468242 with twin error 44 -> 55
       "999 009 9980",      // 9999999980 with twin error 99 -> 00
+      "400 000 0110",      // 4000000110 is invalid because check digit would be 10
    ];
 
    public static TheoryData<String, Int32> InvalidSeparatorValues = new()
