@@ -7,6 +7,12 @@ namespace KfAccountNumbers.Governmental.Europe;
 public abstract record GbPatientNumberBase
 {
    /// <summary>
+   ///   The default format mask that will render the patient number as a
+   ///   "3 3 4" value.
+   /// </summary>
+   public const String DefaultFormatMask = "___ ___ ____";
+
+   /// <summary>
    ///   The length of a valid patient number that is not formatted for readability.
    /// </summary>
    internal const Int32 UnformattedLength = 10;

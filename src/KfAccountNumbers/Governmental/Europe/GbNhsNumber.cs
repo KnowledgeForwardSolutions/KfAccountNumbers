@@ -168,7 +168,7 @@ public record GbNhsNumber : GbPatientNumberBase
    ///   Initializes a new instance of the <see cref="GbNhsNumber"/> class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a NHS number.
+   ///   String representation of a UK National Health Service number.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
@@ -220,7 +220,7 @@ public record GbNhsNumber : GbPatientNumberBase
          }
       }
 
-      this.Value = GetRawValue(value!);
+      Value = GetRawValue(value!);
    }
 
    /// <summary>
@@ -228,7 +228,7 @@ public record GbNhsNumber : GbPatientNumberBase
    /// </summary>
    public IdentifierCategory IdentifierType
    {
-      get => GetIdentifierCategory(this.Value) switch
+      get => GetIdentifierCategory(Value) switch
       {
          IdentifierRangeCategory.Nhs => default(GbHealthService.Nhs),
          IdentifierRangeCategory.Test => default(GbHealthService.Test),
@@ -255,12 +255,67 @@ public record GbNhsNumber : GbPatientNumberBase
    ///   Defines an explicit conversion of a string to a <see cref="GbNhsNumber"/>.
    /// </summary>
    /// <param name="value">
-   ///   The string representation of the NHS number.
+   ///   String representation of a UK National Health Service number.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is not a valid NHS number.
    /// </exception>
    public static explicit operator GbNhsNumber(String value) => new(value);
+
+   /// <summary>
+   ///   Create a new <see cref="GbNhsNumber"/> using the Result pattern.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a UK National Health Service number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="UCreateResult{GbNhsNumber, ValidationError}"/>. Will
+   ///   contain the new <see cref="GbNhsNumber"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
+   /// </returns>
+   public static UCreateResult<GbNhsNumber, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new GbNhsNumber(value!, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         GbPatientNumberInvalidRange invalidRange => (ValidationError)invalidRange,
+      };
+
+   /// <summary>
+   ///   Format the NHS number using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then the default mask "___ ___ ____" will be used instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted UK National Health Service number.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the rijksregisternummer.
+   /// </remarks>
+   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Get a string representation of the NHS number.
+   /// </summary>
+   /// <returns>
+   ///   The raw NHS number, without separator characters.
+   /// </returns>
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid

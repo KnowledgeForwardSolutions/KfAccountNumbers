@@ -1,5 +1,8 @@
-namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
+using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+   KfAccountNumbers.Governmental.Europe.GbNhsNumber, 
+   KfAccountNumbers.Governmental.Europe.GbNhsNumber.ValidationError>;
 
+namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 public class GbNhsNumberTests
 {
    private const String ValidUnformattedNhsNumberBlock1 = "4000000004";
@@ -475,7 +478,7 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void GbNhsNumber_ExplicitCastToBeGbNhsNumber_ShouldThrowValidationError_WhenValueHasInvalidCSeparator(
+   public void GbNhsNumber_ExplicitCastToBeGbNhsNumber_ShouldThrowValidationError_WhenValueHasInvalidSeparator(
       String value,
       Int32 position)
    {
@@ -523,6 +526,404 @@ public class GbNhsNumberTests
 
       // Act/ssert.
       sut.Value.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbNhsNumber_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbNhsNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
+      var sut2 = new GbNhsNumber(ValidFormattedTestNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbNhsNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 12 character versions for same person should still be equal.
+      var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbNhsNumber_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
+      var sut2 = new GbNhsNumber(ValidFormattedTestNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbNhsNumber_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 12 character versions for same person should still be equal.
+      var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbNhsNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbNhsNumber_Create_ShouldReturnNewInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = new GbNhsNumber(value);
+
+      // Act.
+      var result = GbNhsNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void GbNhsNumber_Create_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (GbNhsNumber.ValidationError)default(EmptyValue);
+
+      // Act.
+      var result = GbNhsNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void GbNhsNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (GbNhsNumber.ValidationError)new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         value.Length,
+         GbNhsNumber.ValidLengthDefinitions);
+
+      // Act.
+      var result = GbNhsNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterData))]
+   public void GbNhsNumber_Create_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalCreateResult expected = (GbNhsNumber.ValidationError)new InvalidCharacter(
+         Messages.GbPatientNumberInvalidCharacter,
+         value[position],
+         position);
+
+      // Act.
+      var result = GbNhsNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void GbNhsNumber_Create_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (GbNhsNumber.ValidationError)new InvalidChecksum(
+         Messages.GbPatientNumberInvalidCheckDigit,
+         Algorithms.Modulus11Decimal.AlgorithmName);
+
+      // Act.
+      var result = GbNhsNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void GbNhsNumber_Create_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalCreateResult expected = (GbNhsNumber.ValidationError)new InvalidSeparator(
+         Messages.GbPatientNumberInvalidSeparator,
+         value[position],
+         position);
+
+      // Act.
+      var result = GbNhsNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidRangeValues))]
+   public void GbNhsNumber_Create_ShouldReturnInvalidRange_WhenValueIsOutsideOfValidRanges(String nineDigits)
+   {
+      // Arrange.
+      var value = nineDigits + GetCheckDigit(nineDigits);
+      LocalCreateResult expected = (GbNhsNumber.ValidationError)new GbPatientNumberInvalidRange(
+         Messages.GbNhsNumberInvalidRange);
+
+      // Act.
+      var result = GbNhsNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbNhsNumber_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock2);
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock2);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbNhsNumber_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(AltValidUnformattedNhsNumberBlock1);
+      var sut2 = new GbNhsNumber(ValidUnformattedTestNumber);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbNhsNumber_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 12 character versions for same person should still be equal.
+      var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock2);
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock2);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Format Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbNhsNumber_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
+      var expected = ValidFormattedNhsNumberBlock1;
+
+      // Act.
+      var str = sut.Format();
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void GbNhsNumber_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
+      var mask = "__________";
+      var expected = ValidUnformattedNhsNumberBlock1;
+
+      // Act.
+      var str = sut.Format(mask);
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void GbNhsNumber_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
+   {
+      // Arrange.
+      var sut = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
+      String mask = null!;
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = sut.Format(mask))
+         .Should()
+         .ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(Messages.FormatMaskEmpty + "*");
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void GbNhsNumber_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
+   {
+      // Arrange.
+      var sut = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = sut.Format(mask))
+         .Should()
+         .ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbNhsNumber_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock2);
+      var sut2 = new GbNhsNumber(ValidUnformattedNhsNumberBlock2);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void GbNhsNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock2);
+      var sut2 = new GbNhsNumber(ValidUnformattedTestNumber);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   [Fact]
+   public void GbNhsNumber_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 12 character versions for same person should still be equal.
+      var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock2);
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock2);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // GbNhsNumber does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void GbNhsNumber_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidUnformattedTestNumber);
+      var sut2 = new GbNhsNumber(ValidUnformattedTestNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbNhsNumber_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new GbNhsNumber(value);
+      var expected = GetRawValue(value);
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
    }
 
    #endregion
@@ -613,7 +1014,7 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void GbNhsNumber_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidCSeparator(
+   public void GbNhsNumber_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
       String value,
       Int32 position)
    {
