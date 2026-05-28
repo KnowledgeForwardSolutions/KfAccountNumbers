@@ -190,11 +190,130 @@ public class GbNhsNumberTests
       result.Should().BeTrue();
    }
 
-   /* ==========================================================================
-   =============================================================================
-   == Validate Method Tests
-   =============================================================================
-   ========================================================================== */
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbNhsNumber_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawValue(value);
+
+      // Act.
+      var sut = new GbNhsNumber(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueIsEmpty(String value)
+   {
+      // Arrange.
+      GbNhsNumber.ValidationError expected = new EmptyValue();
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbNhsNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      GbNhsNumber.ValidationError expected = new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         value.Length,
+         GbPatientNumberBase.ValidLengthDefinitions);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbNhsNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterData))]
+   public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      GbNhsNumber.ValidationError expected = new InvalidCharacter(
+         Messages.GbPatientNumberInvalidCharacter,
+         value[position],
+         position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbNhsNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      GbNhsNumber.ValidationError expected = new InvalidChecksum(
+         Messages.GbPatientNumberInvalidCheckDigit,
+         Algorithms.Modulus11Decimal.AlgorithmName);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbNhsNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidCSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      GbNhsNumber.ValidationError expected = new InvalidSeparator(
+         Messages.GbPatientNumberInvalidSeparator,
+         value[position],
+         position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbNhsNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidRangeValues))]
+   public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueIsOutsideOfValidRanges(String nineDigits)
+   {
+      // Arrange.
+      var value = nineDigits + GetCheckDigit(nineDigits);
+      GbNhsNumber.ValidationError expected = new GbPatientNumberInvalidRange(Messages.GbNhsNumberInvalidRange);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbNhsNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Validate Method Tests
+   // ==========================================================================
+   // ==========================================================================
 
    [Theory]
    [MemberData(nameof(ValidValues))]
@@ -309,4 +428,6 @@ public class GbNhsNumberTests
       // Assert.
       result.Should().BeEquivalentTo(expected);
    }
+
+   #endregion
 }

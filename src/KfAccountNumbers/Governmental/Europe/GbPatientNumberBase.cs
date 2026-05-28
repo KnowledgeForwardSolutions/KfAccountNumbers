@@ -99,8 +99,8 @@ public abstract record GbPatientNumberBase
    /// <summary>
    ///   Create an invalid character result for a GB patient number.
    /// </summary>
-   /// <param name="invalidCharacter">
-   ///   The exact invalid character.
+   /// <param name="value">
+   ///   The value containing the invalid character.
    /// </param>
    /// <param name="position">
    ///   The zero-based offset of the invalid character.
@@ -110,9 +110,9 @@ public abstract record GbPatientNumberBase
    ///   and validation details.
    /// </returns>
    protected static InvalidCharacter GetInvalidCharacterResult(
-      Char invalidCharacter,
+      String value,
       Int32 position)
-      => new(Messages.GbPatientNumberInvalidCharacter, invalidCharacter, position);
+      => new(Messages.GbPatientNumberInvalidCharacter, value[position], position);
 
    /// <summary>
    ///   Create an invalid checksum result for a GB patient number.
@@ -140,8 +140,8 @@ public abstract record GbPatientNumberBase
    /// <summary>
    ///   Create an invalid separator result for a GB patient number.
    /// </summary>
-   /// <param name="invalidSeparator">
-   ///   The exact invalid separator character.
+   /// <param name="value">
+   ///   The value containing the invalid separator.
    /// </param>
    /// <param name="position">
    ///   The zero-based offset of the invalid separator.
@@ -151,9 +151,23 @@ public abstract record GbPatientNumberBase
    ///   and validation details.
    /// </returns>
    protected static InvalidSeparator GetInvalidSeparatorResult(
-      Char invalidSeparator,
+      String value,
       Int32 position)
-      => new(Messages.GbPatientNumberInvalidSeparator, invalidSeparator, position);
+      => new(Messages.GbPatientNumberInvalidSeparator, value[position], position);
+
+   /// <summary>
+   ///   Get the raw patient number value, stripped of any formatting.
+   /// </summary>
+   /// <param name="value">
+   ///   The original patient number value.
+   /// </param>
+   /// <returns>
+   ///   The raw patient number value, stripped of any formatting.
+   /// </returns>
+   protected static String GetRawValue(String value)
+      => value.Length == UnformattedLength
+         ? value
+         : String.Concat(value.AsSpan(..3), value.AsSpan(4..7), value.AsSpan(8..));
 
    /// <summary>
    ///   Determines whether the value contains format characters (based on

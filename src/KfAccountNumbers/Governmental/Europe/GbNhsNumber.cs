@@ -158,6 +158,70 @@ public record GbNhsNumber : GbPatientNumberBase
    }
 
    /// <summary>
+   ///   Initializes a new instance of the <see cref="GbNhsNumber"/> class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a NHS number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="value"/> is not length 10 (or 12 if separator
+   ///   characters are used).
+   ///   - or -
+   ///   <paramref name="value"/> contains a non-digit character in any
+   ///   position other than the separator locations.
+   ///   - or -
+   ///   <paramref name="value"/> has invalid modulus 11 check digit character
+   ///   in the trailing (right-most) character position.
+   ///   - or -
+   ///   <paramref name="value"/> is 12 characters in length and has an ASCII
+   ///   digit character ('0'-'9') in a separator location or uses a different
+   ///   character in each separator location.
+   ///   - or -
+   ///   The first nine digits of <paramref name="value"/> are not in one of the
+   ///   valid ranges for a NHH number (400 000 000 to 499 999 999, 600 000 000
+   ///   to 799 999 999, or 900 000 000 to 999 999 999).
+   /// </exception>
+   public GbNhsNumber(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="GbNhsNumber"/> class.
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private GbNhsNumber(String? value, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         var exception = Validate(value) switch
+         {
+            EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+            InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+            InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+            InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+            InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+            GbPatientNumberInvalidRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
+            _ => null,
+         };
+         if (exception is not null)
+         {
+            throw exception;
+         }
+      }
+
+      this.Value = GetRawValue(value!);
+   }
+
+   /// <summary>
+   ///   Gets the raw patient number, without any formatting.
+   /// </summary>
+   public String Value { get; private init; }
+
+   /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid
    ///   NHS number.
    /// </summary>
@@ -185,12 +249,12 @@ public record GbNhsNumber : GbPatientNumberBase
       {
          return invalidCharacterPosition == -1
             ? GetInvalidChecksumResult()
-            : GetInvalidCharacterResult(value[invalidCharacterPosition], invalidCharacterPosition);
+            : GetInvalidCharacterResult(value, invalidCharacterPosition);
       }
 
       if (!ValidateSeparators(value, out var invalidSeparatorPosition))
       {
-         return GetInvalidSeparatorResult(value[invalidSeparatorPosition], invalidSeparatorPosition);
+         return GetInvalidSeparatorResult(value, invalidSeparatorPosition);
       }
 
       if (GetIdentifierCategory(value) is not IdentifierRangeCategory.Nhs and not IdentifierRangeCategory.Test)

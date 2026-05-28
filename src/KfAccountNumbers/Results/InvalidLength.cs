@@ -9,7 +9,7 @@ namespace KfAccountNumbers.Results;
 ///   Description of the length validation error.
 ///   </param>
 /// <param name="Length">
-///   The invalid length value that failed validation.
+///   The actual length of the value that failed validation.
 /// </param>
 /// <param name="ValidLengths">
 ///   Valid length definitions that specify the expected length constraints.
