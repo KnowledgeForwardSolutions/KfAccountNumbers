@@ -216,7 +216,7 @@ public record GbNhsNumber : GbPatientNumberBase
                InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
                GbPatientNumberInvalidRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
-               _ => throw new SwitchExpressionException("Should never reach this point"),
+               _ => throw new SwitchExpressionException("This branch should never be reached"),
             };
          }
       }

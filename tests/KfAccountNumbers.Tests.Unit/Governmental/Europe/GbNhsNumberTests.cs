@@ -1130,7 +1130,7 @@ public class GbNhsNumberTests
    }
 
    [Fact]
-   public void GbNhsNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenRijksregisternummerIsInvalid()
+   public void GbNhsNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenValueIsInvalid()
    {
       // Arrange.
       var json = "{\"NhsNumber\":\"123-456-78901\"}";  // Invalid length
