@@ -129,6 +129,13 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record GbNhsNumber : GbPatientNumberBase
 {
    /// <summary>
+   ///   Discriminated union defining the types of identifier that
+   ///   <see cref="GbNhsNumber"/> can represent. Either a NHS number or a test
+   ///   number.
+   /// </summary>
+   public union IdentifierCategory(GbHealthService.Nhs, GbHealthService.Test) { }
+
+   /// <summary>
    ///   Discriminated union defining the possible validation errors that can
    ///   occur when creating a new <see cref="GbNhsNumber"/>.
    /// </summary>
@@ -217,9 +224,43 @@ public record GbNhsNumber : GbPatientNumberBase
    }
 
    /// <summary>
+   ///   Gets the specific type of identifier that this instance represents.
+   /// </summary>
+   public IdentifierCategory IdentifierType
+   {
+      get => GetIdentifierCategory(this.Value) switch
+      {
+         IdentifierRangeCategory.Nhs => default(GbHealthService.Nhs),
+         IdentifierRangeCategory.Test => default(GbHealthService.Test),
+         _ => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
+      };
+   }
+
+   /// <summary>
    ///   Gets the raw patient number, without any formatting.
    /// </summary>
    public String Value { get; private init; }
+
+   /// <summary>
+   ///   Implicitly converts a <see cref="GbNhsNumber"/> to a <see cref="String"/>,
+   ///   returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="GbNhsNumber"/> to convert.
+   /// </param>
+   public static implicit operator String(GbNhsNumber source)
+      => source?.Value ?? String.Empty;         // Handle null object gracefully by returning empty string
+
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="GbNhsNumber"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   The string representation of the NHS number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid NHS number.
+   /// </exception>
+   public static explicit operator GbNhsNumber(String value) => new(value);
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid
