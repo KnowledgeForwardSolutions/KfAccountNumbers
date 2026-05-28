@@ -189,7 +189,7 @@ public record GbNhsNumber : GbPatientNumberBase
    ///   character in each separator location.
    ///   - or -
    ///   The first nine digits of <paramref name="value"/> are not in one of the
-   ///   valid ranges for a NHH number (400 000 000 to 499 999 999, 600 000 000
+   ///   valid ranges for a NHS number (400 000 000 to 499 999 999, 600 000 000
    ///   to 799 999 999, or 900 000 000 to 999 999 999).
    /// </exception>
    public GbNhsNumber(String? value)
@@ -205,19 +205,19 @@ public record GbNhsNumber : GbPatientNumberBase
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         var exception = Validate(value) switch
+         var validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
-            InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
-            InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
-            InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
-            InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
-            GbPatientNumberInvalidRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
-            _ => null,
-         };
-         if (exception is not null)
-         {
-            throw exception;
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               GbPatientNumberInvalidRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
+               _ => throw new SwitchExpressionException("Should never reach this point"),
+            };
          }
       }
 
@@ -306,7 +306,7 @@ public record GbNhsNumber : GbPatientNumberBase
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the rijksregisternummer.
+   ///   details on creating a mask to format the NHS number.
    /// </remarks>
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 
