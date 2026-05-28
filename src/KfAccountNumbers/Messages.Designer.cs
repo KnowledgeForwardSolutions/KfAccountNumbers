@@ -565,7 +565,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to GB patient number must must have a length of 10 (without separators) or 12 (with separators).
+        ///   Looks up a localized string similar to GB patient number must have a length of 10 (without separators) or 12 (with separators).
         /// </summary>
         internal static string GbPatientNumberInvalidLength {
             get {

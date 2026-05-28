@@ -205,7 +205,7 @@ public record GbNhsNumber : GbPatientNumberBase
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         var validationResult = Validate(value);
+         ValidationResult validationResult = Validate(value);
          if (validationResult.Value is not ValidValue)
          {
             throw validationResult switch
@@ -216,7 +216,7 @@ public record GbNhsNumber : GbPatientNumberBase
                InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
                GbPatientNumberInvalidRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
-               _ => throw new SwitchExpressionException("This branch should never be reached"),
+               _ => new SwitchExpressionException("This branch should never be reached"),
             };
          }
       }
@@ -285,6 +285,7 @@ public record GbNhsNumber : GbPatientNumberBase
          InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
          InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
          GbPatientNumberInvalidRange invalidRange => (ValidationError)invalidRange,
+         _ => throw new SwitchExpressionException("This branch should never be reached"),
       };
 
    /// <summary>
@@ -354,12 +355,9 @@ public record GbNhsNumber : GbPatientNumberBase
          return GetInvalidSeparatorResult(value, invalidSeparatorPosition);
       }
 
-      if (GetIdentifierCategory(value) is not IdentifierRangeCategory.Nhs and not IdentifierRangeCategory.Test)
-      {
-         return new GbPatientNumberInvalidRange(Messages.GbNhsNumberInvalidRange);
-      }
-
-      return default(ValidValue);
+      return GetIdentifierCategory(value) is not IdentifierRangeCategory.Nhs and not IdentifierRangeCategory.Test
+         ? new GbPatientNumberInvalidRange(Messages.GbNhsNumberInvalidRange)
+         : default(ValidValue);
    }
 }
 

@@ -24,3 +24,6 @@ dotnet_diagnostic.SA1124.severity = none
 
 # SA1512: Single-line comments should not be followed by blank line
 dotnet_diagnostic.SA1512.severity = none
+
+# IDE0008: Use explicit type
+dotnet_diagnostic.IDE0008.severity = none

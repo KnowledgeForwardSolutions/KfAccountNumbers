@@ -1,8 +1,9 @@
 using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
-   KfAccountNumbers.Governmental.Europe.GbNhsNumber, 
+   KfAccountNumbers.Governmental.Europe.GbNhsNumber,
    KfAccountNumbers.Governmental.Europe.GbNhsNumber.ValidationError>;
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
+
 public class GbNhsNumberTests
 {
    private const String ValidUnformattedNhsNumberBlock1 = "4000000004";
@@ -532,7 +533,7 @@ public class GbNhsNumberTests
       var sut = new GbNhsNumber(value);
       var expected = GetRawValue(value);
 
-      // Act/ssert.
+      // Act/assert.
       sut.Value.Should().BeEquivalentTo(expected);
    }
 
@@ -1068,7 +1069,7 @@ public class GbNhsNumberTests
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
-      GbNhsNumber? result = JsonSerializer.Deserialize<GbNhsNumber>(json);
+      var result = JsonSerializer.Deserialize<GbNhsNumber>(json);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1102,7 +1103,7 @@ public class GbNhsNumberTests
       var json = JsonSerializer.Serialize(foo);
 
       // Act.
-      Foo? result = JsonSerializer.Deserialize<Foo>(json);
+      var result = JsonSerializer.Deserialize<Foo>(json);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1130,7 +1131,7 @@ public class GbNhsNumberTests
       var json = "{\"NhsNumber\":null}";
 
       // Act.
-      Foo? result = JsonSerializer.Deserialize<Foo>(json);
+      var result = JsonSerializer.Deserialize<Foo>(json);
 
       // Assert.
       result.Should().NotBeNull();

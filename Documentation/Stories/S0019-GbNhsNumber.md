@@ -20,7 +20,7 @@ I can validate, parse, and work with NHS numbers in a type-safe manner with comp
 - [x] Constructor accepts string representation and throws `UKfValidationException<GbNhsNumber.ValidationError>` if invalid
 - [x] Static `Validate` method returns `GbNhsNumber.ValidationResult` union value
 - [x] Static `Create` method uses Result pattern returning `UCreateResult<GbNhsNumber, GbNhsNumber.ValidationError>`
-- [s] `GbNhsNumber.ValidationError` is a union of the following types: `EmptyValue`, `InvalidLength`, `InvalidCharacter`, `InvalidCheckSum`, `InvalidSeparator` and `GbPatientIdentifierInvalidRange`
+- [x] `GbNhsNumber.ValidationError` is a union of the following types: `EmptyValue`, `InvalidLength`, `InvalidCharacter`, `InvalidCheckSum`, `InvalidSeparator` and `GbPatientIdentifierInvalidRange`
 - [x] `GbNhsNumber.ValidationResult` extends `GbNhsNumber.ValidationError` with the type `ValidValue` to indicate a sucessful validation.
 
 ### Validation Rules

@@ -457,7 +457,7 @@
     <value>Value is valid</value>
   </data>
   <data name="GbPatientNumberInvalidLength" xml:space="preserve">
-    <value>GB patient number must must have a length of 10 (without separators) or 12 (with separators)</value>
+    <value>GB patient number must have a length of 10 (without separators) or 12 (with separators)</value>
   </data>
   <data name="GbPatientNumberInvalidCharacter" xml:space="preserve">
     <value>GB patient number must have only digit characters (0-9) in non-separator positions</value>

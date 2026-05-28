@@ -35,12 +35,4 @@
 				<Using Include="Xunit" />
 		</ItemGroup>
 
-		<ItemGroup>
-		  <EditorConfigFiles Remove="C:\Projects\KfAccountNumbers\tests\KfAccountNumbers.Tests.Unit\.editorconfig" />
-		</ItemGroup>
-
-		<ItemGroup>
-		  <None Include="C:\Projects\KfAccountNumbers\tests\KfAccountNumbers.Tests.Unit\.editorconfig" />
-		</ItemGroup>
-
 </Project>

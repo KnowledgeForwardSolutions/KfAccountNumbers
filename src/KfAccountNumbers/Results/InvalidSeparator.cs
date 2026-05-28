@@ -3,9 +3,9 @@ namespace KfAccountNumbers.Results;
 /// <summary>
 ///   Represents a validation error indicating that the input value contains an
 ///   optional separator character that is invalid. Generally indicates that a
-///   character indisguishable from a valid character used in an unformatted
-///   was found in a separator position, or the formatted value uses multiple
-///   separator characters that not all separators are the same character.
+///   character indistinguishable from a valid character was found in a
+///   separator position, or that the formatted value uses different characters
+///   in the two separator positions.
 /// </summary>
 /// <param name="Description">
 ///   Message describing the validation error, indicating that one or more
