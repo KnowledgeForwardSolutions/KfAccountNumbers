@@ -77,8 +77,11 @@ dotnet_diagnostic.SA1121.severity = none
 # SA1309: Field names should not begin with underscore
 dotnet_diagnostic.SA1309.severity = none
 
-# SA1101: Prefix local calls with this
+# SA1101: Prefix local calls with this      Disable because we're oldschool and prefer to use _localField naming convention
 dotnet_diagnostic.SA1101.severity = none
+
+# SA1402: File may only contain a single type       Support JSON converters in same file as type if applies to
+dotnet_diagnostic.SA1402.severity = none
 
 [*.{csproj,props,targets}]
 indent_style = space

@@ -1047,4 +1047,104 @@ public class GbNhsNumberTests
    }
 
    #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbNhsNumber_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new GbNhsNumber(ValidUnformattedNhsNumberBlock2);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      GbNhsNumber? result = JsonSerializer.Deserialize<GbNhsNumber>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void GbNhsNumber_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new GbNhsNumber(AltValidFormattedNhsNumberBlock1);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public GbNhsNumber NhsNumber { get; set; } = null!;
+   }
+
+   [Fact]
+   public void GbNhsNumber_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { NhsNumber = new GbNhsNumber(AltValidFormattedTestNumber) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      Foo? result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void GbNhsNumber_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"NhsNumber\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void GbNhsNumber_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"NhsNumber\":null}";
+
+      // Act.
+      Foo? result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.NhsNumber.Should().BeNull();
+   }
+
+   [Fact]
+   public void GbNhsNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenRijksregisternummerIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"NhsNumber\":\"123-456-78901\"}";  // Invalid length
+      GbNhsNumber.ValidationError expected = new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         13,
+         GbPatientNumberBase.ValidLengthDefinitions);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
 }
