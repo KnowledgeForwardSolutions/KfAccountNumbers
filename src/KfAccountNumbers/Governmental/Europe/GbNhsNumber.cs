@@ -6,7 +6,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A NHS Number consists of 10 digits, structured as NNNNNNNNNC, where
+///      A NHS Number consists of 10 digits, structured as NNNNNNNNNC, where:
 ///      <list type="bullet">
 ///         <item>
 ///            <term>NNNNNNNNN</term>

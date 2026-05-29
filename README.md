@@ -330,7 +330,7 @@ The three public health services in the United Kingdom are:
 * Northern Ireland Health and Care (H&C).
 
 A patient number from one of these services consists of 10 digits structured as NNNNNNNNNC, where
-* NNNNNNNNN is a unique nine digit number
+* NNNNNNNNN is a unique nine-digit number
 * C is a Modulus 11 check digit calculated from the preceding nine digits
 
 Patient numbers can be displayed as a string of 10 digits or formatted for readability as three groups of digits in a '3 3 4'
@@ -380,10 +380,10 @@ as date of birth or gender in the number.
 ### GbChiNumber
 
 `GbChiNumber` represents a patient number issued by CHI. A CHI patient number encodes both date of birth and gender in the
-patient number and the NNNNNNNNN component described above is futher subdivided into DDMMYYNNG where
+patient number and the NNNNNNNNN component described above is further subdivided into DDMMYYNNG where
 * DDMMYY is the patient date of birth encoded in DDMMYY format.
 * NNG are three digits used to differentiate between two persons born on the same day. The third digit (G) also indicates
- the persons gender, where odd numbers = male and even numbers = female.
+ the person's gender, where odd numbers = male and even numbers = female.
 
 `GbChiNumber` has an additional validation rule where the initial six digits of the number must be a valid date. `GbChiNumber`
 does not allow numbers from the test block because they would fail date of birth validation.
