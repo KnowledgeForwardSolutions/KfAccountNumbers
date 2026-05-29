@@ -198,6 +198,127 @@ public class GbHcNumberTests
       "899 999 999",
    ];
 
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbHcNumber_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawValue(value);
+
+      // Act.
+      var sut = new GbHcNumber(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void GbHcNumber_Constructor_ShouldThrowValidationError_WhenValueIsEmpty(String value)
+   {
+      // Arrange.
+      GbHcNumber.ValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbHcNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void GbHcNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      GbHcNumber.ValidationError expected = new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         value.Length,
+         GbPatientNumberBase.ValidLengthDefinitions);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbHcNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterData))]
+   public void GbHcNumber_Constructor_ShouldThrowValidationError_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      GbHcNumber.ValidationError expected = new InvalidCharacter(
+         Messages.GbPatientNumberInvalidCharacter,
+         value[position],
+         position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbHcNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void GbHcNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      GbHcNumber.ValidationError expected = new InvalidChecksum(
+         Messages.GbPatientNumberInvalidCheckDigit,
+         Algorithms.Modulus11Decimal.AlgorithmName);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbHcNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void GbHcNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      GbHcNumber.ValidationError expected = new InvalidSeparator(
+         Messages.GbPatientNumberInvalidSeparator,
+         value[position],
+         position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbHcNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidRangeValues))]
+   public void GbHcNumber_Constructor_ShouldThrowValidationError_WhenValueIsOutsideOfValidRanges(String nineDigits)
+   {
+      // Arrange.
+      var value = nineDigits + GetCheckDigit(nineDigits);
+      GbHcNumber.ValidationError expected = new GbPatientNumberInvalidRange(Messages.GbHcNumberInvalidRange);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbHcNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================

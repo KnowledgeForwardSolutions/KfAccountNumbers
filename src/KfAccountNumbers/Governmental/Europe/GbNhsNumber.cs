@@ -238,7 +238,7 @@ public record GbNhsNumber : GbPatientNumberBase
    }
 
    /// <summary>
-   ///   Gets the raw patient number, without any formatting.
+   ///   Gets the NHS number, without any formatting.
    /// </summary>
    public String Value { get; private init; }
 

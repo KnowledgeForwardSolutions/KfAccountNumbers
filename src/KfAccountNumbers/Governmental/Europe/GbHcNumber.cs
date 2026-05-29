@@ -164,6 +164,70 @@ public record GbHcNumber : GbPatientNumberBase
    }
 
    /// <summary>
+   ///   Initializes a new instance of the <see cref="GbHcNumber"/> class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a UK National Health Service number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="value"/> is not length 10 (or 12 if separator
+   ///   characters are used).
+   ///   - or -
+   ///   <paramref name="value"/> contains a non-digit character in any
+   ///   position other than the separator locations.
+   ///   - or -
+   ///   <paramref name="value"/> has invalid modulus 11 check digit character
+   ///   in the trailing (right-most) character position.
+   ///   - or -
+   ///   <paramref name="value"/> is 12 characters in length and has an ASCII
+   ///   digit character ('0'-'9') in a separator location or uses a different
+   ///   character in each separator location.
+   ///   - or -
+   ///   The first nine digits of <paramref name="value"/> are not in one of the
+   ///   valid ranges for a H&amp;C number (320 000 000 to 399 999 999 or
+   ///   900 000 000 to 999 999 999).
+   /// </exception>
+   public GbHcNumber(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="GbHcNumber"/> class.
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private GbHcNumber(String? value, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
+         {
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               GbPatientNumberInvalidRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
+               _ => new SwitchExpressionException("This branch should never be reached"),
+            };
+         }
+      }
+
+      Value = GetRawValue(value!);
+   }
+
+   /// <summary>
+   ///   Gets the H&amp;C number, without any formatting.
+   /// </summary>
+   public String Value { get; private init; }
+
+   /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid
    ///   H&amp;C number.
    /// </summary>
