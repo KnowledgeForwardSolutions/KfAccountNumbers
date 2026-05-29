@@ -21,7 +21,7 @@ public class GbNhsNumberTests
    private const String AltValidUnformattedTestNumber = "9999999980";
    private const String AltValidFormattedTestNumber = "999-999-9980";
 
-   private const String UnformattedModulus11CheckDigitZeroValue = "4000000020";     // Edge case, modulus 11 with remainder 11 should result in 0 check digit
+   private const String UnformattedModulus11CheckDigitZeroValue = "4000000020";     // Edge case, modulus 11 with remainder 0 should result in 0 check digit
    private const String FormattedModulus11CheckDigitZeroValue = "400 000 0020";
 
    private static Char GetCheckDigit(String value)
@@ -156,6 +156,10 @@ public class GbNhsNumberTests
       "009999999",
 
       // CHI number block
+      "010000000",
+      "311299999",
+
+      // Gap between CHI number block and HC number block
       "311300000",
       "319999999",
 
@@ -176,6 +180,10 @@ public class GbNhsNumberTests
       "009 999 999",
 
       // CHI number block
+      "010 000 000",
+      "311 299 999",
+
+      // Gap between CHI number block and HC number block
       "311 300 000",
       "319 999 999",
 

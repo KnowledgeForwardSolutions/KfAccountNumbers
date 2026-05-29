@@ -127,4 +127,80 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </remarks>
 public record GbHcNumber : GbPatientNumberBase
 {
+   /// <summary>
+   ///   Discriminated union defining the types of identifier that
+   ///   <see cref="GbHcNumber"/> can represent. Either a H&C number or a test
+   ///   number.
+   /// </summary>
+   public union IdentifierCategory(GbHealthService.Hc, GbHealthService.Test) { }
+
+   /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="GbHcNumber"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      GbPatientNumberInvalidRange)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="GbHcNumber"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      GbPatientNumberInvalidRange)
+   {
+   }
+
+   /// <summary>
+   ///   Check the <paramref name="value"/> to determine if it contains a valid
+   ///   H&amp;C number.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a H&amp;C number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
+   /// </returns>
+   public static ValidationResult Validate(String? value)
+   {
+      if (String.IsNullOrWhiteSpace(value))
+      {
+         return default(EmptyValue);
+      }
+
+      if (!ValidateLength(value))
+      {
+         return GetInvalidLengthResult(value.Length);
+      }
+
+      if (!ValidateCheckDigit(value, out var invalidCharacterPosition))
+      {
+         return invalidCharacterPosition == -1
+            ? GetInvalidChecksumResult()
+            : GetInvalidCharacterResult(value, invalidCharacterPosition);
+      }
+
+      if (!ValidateSeparators(value, out var invalidSeparatorPosition))
+      {
+         return GetInvalidSeparatorResult(value, invalidSeparatorPosition);
+      }
+
+      return GetIdentifierCategory(value) is not IdentifierRangeCategory.Hc and not IdentifierRangeCategory.Test
+         ? new GbPatientNumberInvalidRange(Messages.GbHcNumberInvalidRange)
+         : default(ValidValue);
+   }
 }
