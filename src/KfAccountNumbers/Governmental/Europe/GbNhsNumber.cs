@@ -31,7 +31,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      characters must be the same. The typical separator character is a space (' ').
 ///   </para>
 ///   <para>
-///      Each of the public health services in Great Britain (NHS, Scottish CHI
+///      Each of the public health services in the United Kingdom (NHS, Scottish CHI
 ///      and Northern Ireland H&amp;C) are allocated separate blocks of 10-digit
 ///      numbers so it is possible to determine what service issued the number by
 ///      comparing the number to a list of valid ranges for each service. For NHS,

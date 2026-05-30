@@ -31,7 +31,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      characters must be the same. The typical separator character is a space (' ').
 ///   </para>
 ///   <para>
-///      Each of the public health services in Great Britain (NHS, Scottish CHI
+///      Each of the public health services in the United Kingdom (NHS, Scottish CHI
 ///      and Northern Ireland H&amp;C) are allocated separate blocks of 10-digit
 ///      numbers so it is possible to determine what service issued the number by
 ///      comparing the number to a list of valid ranges for each service. For
@@ -257,7 +257,7 @@ public record GbHcNumber : GbPatientNumberBase
    ///   String representation of a H&amp;C number.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
-   ///   <paramref name="value"/> is not a valid NHS number.
+   ///   <paramref name="value"/> is not a valid H&amp;C number.
    /// </exception>
    public static explicit operator GbHcNumber(String value) => new(value);
 
@@ -287,7 +287,7 @@ public record GbHcNumber : GbPatientNumberBase
       };
 
    /// <summary>
-   ///   Format the NHS number using the supplied <paramref name="mask"/>.
+   ///   Format the H&amp;C number using the supplied <paramref name="mask"/>.
    /// </summary>
    /// <param name="mask">
    ///   Optional. The mask that specifies the final output. If not supplied
@@ -310,10 +310,10 @@ public record GbHcNumber : GbPatientNumberBase
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
-   ///   Get a string representation of the NHS number.
+   ///   Get a string representation of the H&amp;C number.
    /// </summary>
    /// <returns>
-   ///   The raw NHS number, without separator characters.
+   ///   The raw H*amp;C number, without separator characters.
    /// </returns>
    public override String ToString() => Value;
 

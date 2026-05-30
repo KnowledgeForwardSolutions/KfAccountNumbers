@@ -484,7 +484,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to GB NHS Number must be in the range 320 000 000 to 399 999 999 or 900 000 000 to 999 999 999, excluding trailing check digit.
+        ///   Looks up a localized string similar to GB H&amp;C Number must be in the range 320 000 000 to 399 999 999 or 900 000 000 to 999 999 999, excluding trailing check digit.
         /// </summary>
         internal static string GbHcNumberInvalidRange {
             get {
