@@ -484,6 +484,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to GB H&amp;C Number must be in the range 320 000 000 to 399 999 999 or 900 000 000 to 999 999 999, excluding trailing check digit.
+        /// </summary>
+        internal static string GbHcNumberInvalidRange {
+            get {
+                return ResourceManager.GetString("GbHcNumberInvalidRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to GB National Insurance Number may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string GbNationalInsuranceNumberEmpty {

@@ -1,17 +1,17 @@
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
-///   Strongly typed business object that represents the identifier used by the
-///   National Health Service (NHS) of England, Wales and the Isle of Man.
+///   Strongly typed business object that represents the identifier used by
+///   Northern Ireland's public health service, Health and Care (H&amp;C).
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A NHS Number consists of 10 digits, structured as NNNNNNNNNC, where:
+///      A H&amp;C Number consists of 10 digits, structured as NNNNNNNNNC, where:
 ///      <list type="bullet">
 ///         <item>
 ///            <term>NNNNNNNNN</term>
 ///            <description>
-///               A unique nine-digit number assigned by the NHS.
+///               A unique nine-digit number assigned by the H&amp;C.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -24,7 +24,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      </list>
 ///   </para>
 ///   <para>
-///      NHS Numbers can be displayed as a string of 10 digits or formatted for
+///      H&amp;C Numbers can be displayed as a string of 10 digits or formatted for
 ///      readability as three groups of digits in a '3 3 4' pattern
 ///      (e.g. "123 456 7890"). The optional separator characters can be any
 ///      character that is not an ASCII digit ('0' - '9'), but both separator
@@ -34,14 +34,14 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      Each of the public health services in the United Kingdom (NHS, Scottish CHI
 ///      and Northern Ireland H&amp;C) are allocated separate blocks of 10-digit
 ///      numbers so it is possible to determine what service issued the number by
-///      comparing the number to a list of valid ranges for each service. For NHS,
-///      the valid ranges are 400 000 000 to 499 999 999 and 600 000 000 to
-///      799 999 999 (excluding the trailing check digit). <see cref="GbNhsNumber"/>
-///      also allows a range of numbers from 900 000 000 to 999 999 999 which are
-///      reserved for test purposes and not issued to the public.
+///      comparing the number to a list of valid ranges for each service. For
+///      H&amp;C, the valid ranges are 320 000 000 to 399 999 999 (excluding the
+///      trailing check digit). <see cref="GbHcNumber"/> also allows a range of
+///      numbers from 900 000 000 to 999 999 999 which are reserved for test
+///      purposes and not issued to the public.
 ///   </para>
 ///   <para>
-///      When creating a new <see cref="GbNhsNumber"/>, the following validation
+///      When creating a new <see cref="GbHcNumber"/>, the following validation
 ///      rules are applied:
 ///      <list type="bullet">
 ///         <item>
@@ -77,33 +77,31 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <description>
 ///               The first nine digits must fall in one of the following ranges:
-///               400 000 000 to 499 999 999, 600 000 000 to 799 999 999, or
-///               900 000 000 to 999 999 999.
+///               320 000 000 to 399 999 999 or 900 000 000 to 999 999 999.
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
-///      The Modulus 11 check digit algorithm used by NHS numbers can generate a
-///      check value of 10 which can not be encoded as a single decimal digit.
-///      The National Health Service and other issuing authorities avoid this
-///      issue by not issuing any number that would result in a check value of
-///      10. This means that approximately 9.09% of all possible values are never
-///      issued.
+///      The Modulus 11 check digit algorithm used by H&amp;C numbers can generate
+///      a check value of 10 which can not be encoded as a single decimal digit.
+///      Health and Care and other issuing authorities avoid this issue by not
+///      issuing any number that would result in a check value of 10. This means
+///      that approximately 9.09% of all possible values are never issued.
 ///   </para>
 ///   <para>
 ///      Example values:
 ///      <list type="bullet">
 ///         <item>
-///            <term>4000000004</term>
+///            <term>3200000007</term>
 ///            <description>
-///               Standard NHS number without formatting.
+///               Standard H&amp;C number without formatting.
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>799 999 9997</term>
+///            <term>320 000 0007</term>
 ///            <description>
-///               Standard NHS number, formatted for readability.
+///               Standard H&amp;C number, formatted for readability.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -121,24 +119,24 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      for more info.
 ///   </para>
 ///   <para>
-///      Also see <see cref="GbChiNumber"/>, <see cref="GbHcNumber"/> and
+///      Also see <see cref="GbChiNumber"/>, <see cref="GbNhsNumber"/> and
 ///      <see cref="GbPatientNumber"/> for associated patient identifier business
 ///      objects.
 ///   </para>
 /// </remarks>
-[JsonConverter(typeof(GbNhsNumberJsonConverter))]
-public record GbNhsNumber : GbPatientNumberBase
+[JsonConverter(typeof(GbHcNumberJsonConverter))]
+public record GbHcNumber : GbPatientNumberBase
 {
    /// <summary>
    ///   Discriminated union defining the types of identifier that
-   ///   <see cref="GbNhsNumber"/> can represent. Either a NHS number or a test
+   ///   <see cref="GbHcNumber"/> can represent. Either a H&C number or a test
    ///   number.
    /// </summary>
-   public union IdentifierCategory(GbHealthService.Nhs, GbHealthService.Test) { }
+   public union IdentifierCategory(GbHealthService.Hc, GbHealthService.Test) { }
 
    /// <summary>
    ///   Discriminated union defining the possible validation errors that can
-   ///   occur when creating a new <see cref="GbNhsNumber"/>.
+   ///   occur when creating a new <see cref="GbHcNumber"/>.
    /// </summary>
    public union ValidationError(
       EmptyValue,
@@ -152,7 +150,7 @@ public record GbNhsNumber : GbPatientNumberBase
 
    /// <summary>
    ///   Discriminated union defining the possible results that can occur when
-   ///   validating a <see cref="GbNhsNumber"/>.
+   ///   validating a <see cref="GbHcNumber"/>.
    /// </summary>
    public union ValidationResult(
       ValidValue,
@@ -166,10 +164,10 @@ public record GbNhsNumber : GbPatientNumberBase
    }
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="GbNhsNumber"/> class.
+   ///   Initializes a new instance of the <see cref="GbHcNumber"/> class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a UK National Health Service number.
+   ///   String representation of a Northern Ireland H&amp;C number.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
@@ -189,19 +187,19 @@ public record GbNhsNumber : GbPatientNumberBase
    ///   character in each separator location.
    ///   - or -
    ///   The first nine digits of <paramref name="value"/> are not in one of the
-   ///   valid ranges for a NHS number (400 000 000 to 499 999 999, 600 000 000
-   ///   to 799 999 999, or 900 000 000 to 999 999 999).
+   ///   valid ranges for a H&amp;C number (320 000 000 to 399 999 999 or
+   ///   900 000 000 to 999 999 999).
    /// </exception>
-   public GbNhsNumber(String? value)
+   public GbHcNumber(String? value)
       : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="GbNhsNumber"/> class.
+   ///   Initializes a new instance of the <see cref="GbHcNumber"/> class.
    ///   Private constructor that actually does the work. Supports bypassing
    ///   validation when creating a new instance from a value that has already
    ///   been validated.
    /// </summary>
-   private GbNhsNumber(String? value, ValidationMode validationMode)
+   private GbHcNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
@@ -231,54 +229,54 @@ public record GbNhsNumber : GbPatientNumberBase
    {
       get => GetIdentifierCategory(Value) switch
       {
-         IdentifierRangeCategory.Nhs => default(GbHealthService.Nhs),
+         IdentifierRangeCategory.Hc => default(GbHealthService.Hc),
          IdentifierRangeCategory.Test => default(GbHealthService.Test),
          _ => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
       };
    }
 
    /// <summary>
-   ///   Gets the NHS number, without any formatting.
+   ///   Gets the H&amp;C number, without any formatting.
    /// </summary>
    public String Value { get; private init; }
 
    /// <summary>
-   ///   Implicitly converts a <see cref="GbNhsNumber"/> to a <see cref="String"/>,
+   ///   Implicitly converts a <see cref="GbHcNumber"/> to a <see cref="String"/>,
    ///   returning an empty string if the source is null.
    /// </summary>
    /// <param name="source">
-   ///   The <see cref="GbNhsNumber"/> to convert.
+   ///   The <see cref="GbHcNumber"/> to convert.
    /// </param>
-   public static implicit operator String(GbNhsNumber source)
+   public static implicit operator String(GbHcNumber source)
       => source?.Value ?? String.Empty;         // Handle null object gracefully by returning empty string
 
    /// <summary>
-   ///   Defines an explicit conversion of a string to a <see cref="GbNhsNumber"/>.
+   ///   Defines an explicit conversion of a string to a <see cref="GbHcNumber"/>.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a UK National Health Service number.
+   ///   String representation of a H&amp;C number.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
-   ///   <paramref name="value"/> is not a valid NHS number.
+   ///   <paramref name="value"/> is not a valid H&amp;C number.
    /// </exception>
-   public static explicit operator GbNhsNumber(String value) => new(value);
+   public static explicit operator GbHcNumber(String value) => new(value);
 
    /// <summary>
-   ///   Create a new <see cref="GbNhsNumber"/> using the Result pattern.
+   ///   Create a new <see cref="GbHcNumber"/> using the Result pattern.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a UK National Health Service number.
+   ///   String representation of a H&amp;C number.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{GbNhsNumber, ValidationError}"/>. Will
-   ///   contain the new <see cref="GbNhsNumber"/> if <paramref name="value"/>
+   ///   A <see cref="UCreateResult{GbHcNumber, ValidationError}"/>. Will
+   ///   contain the new <see cref="GbHcNumber"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<GbNhsNumber, ValidationError> Create(String? value)
+   public static UCreateResult<GbHcNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
-         ValidValue => new GbNhsNumber(value!, ValidationMode.BypassValidation),
+         ValidValue => new GbHcNumber(value!, ValidationMode.BypassValidation),
          EmptyValue emptyValue => (ValidationError)emptyValue,
          InvalidLength invalidLength => (ValidationError)invalidLength,
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
@@ -289,14 +287,14 @@ public record GbNhsNumber : GbPatientNumberBase
       };
 
    /// <summary>
-   ///   Format the NHS number using the supplied <paramref name="mask"/>.
+   ///   Format the H&amp;C number using the supplied <paramref name="mask"/>.
    /// </summary>
    /// <param name="mask">
    ///   Optional. The mask that specifies the final output. If not supplied
    ///   then the default mask "___ ___ ____" will be used instead.
    /// </param>
    /// <returns>
-   ///   A formatted UK National Health Service number.
+   ///   A formatted H&amp;C number.
    /// </returns>
    /// <exception cref="ArgumentNullException">
    ///   <paramref name="mask"/> is <see langword="null"/>.
@@ -307,24 +305,24 @@ public record GbNhsNumber : GbPatientNumberBase
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the NHS number.
+   ///   details on creating a mask to format the H&amp;C number.
    /// </remarks>
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
-   ///   Get a string representation of the NHS number.
+   ///   Get a string representation of the H&amp;C number.
    /// </summary>
    /// <returns>
-   ///   The raw NHS number, without separator characters.
+   ///   The raw H*amp;C number, without separator characters.
    /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid
-   ///   NHS number.
+   ///   H&amp;C number.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a NHS number.
+   ///   String representation of a H&amp;C number.
    /// </param>
    /// <returns>
    ///   A <see cref="ValidationResult"/> union that indicates if the
@@ -355,17 +353,17 @@ public record GbNhsNumber : GbPatientNumberBase
          return GetInvalidSeparatorResult(value, invalidSeparatorPosition);
       }
 
-      return GetIdentifierCategory(value) is not IdentifierRangeCategory.Nhs and not IdentifierRangeCategory.Test
-         ? new GbPatientNumberInvalidRange(Messages.GbNhsNumberInvalidRange)
+      return GetIdentifierCategory(value) is not IdentifierRangeCategory.Hc and not IdentifierRangeCategory.Test
+         ? new GbPatientNumberInvalidRange(Messages.GbHcNumberInvalidRange)
          : default(ValidValue);
    }
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable SA1600 // Elements should be documented
-public class GbNhsNumberJsonConverter : JsonConverter<GbNhsNumber>
+public class GbHcNumberJsonConverter : JsonConverter<GbHcNumber>
 {
-   public override GbNhsNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   public override GbHcNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
       if (reader.TokenType == JsonTokenType.Null)
       {
@@ -373,9 +371,9 @@ public class GbNhsNumberJsonConverter : JsonConverter<GbNhsNumber>
       }
 
       var str = reader.GetString();
-      return new GbNhsNumber(str);
+      return new GbHcNumber(str);
    }
 
-   public override void Write(Utf8JsonWriter writer, GbNhsNumber value, JsonSerializerOptions options)
+   public override void Write(Utf8JsonWriter writer, GbHcNumber value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
 }

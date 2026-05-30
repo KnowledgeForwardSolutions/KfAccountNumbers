@@ -1,28 +1,23 @@
-using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
-   KfAccountNumbers.Governmental.Europe.GbNhsNumber,
-   KfAccountNumbers.Governmental.Europe.GbNhsNumber.ValidationError>;
+﻿using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+   KfAccountNumbers.Governmental.Europe.GbHcNumber,
+   KfAccountNumbers.Governmental.Europe.GbHcNumber.ValidationError>;
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
-public class GbNhsNumberTests
+public class GbHcNumberTests
 {
-   private const String ValidUnformattedNhsNumberBlock1 = "4000000004";
-   private const String ValidFormattedNhsNumberBlock1 = "400 000 0004";
-   private const String AltValidUnformattedNhsNumberBlock1 = "4999999994";
-   private const String AltValidFormattedNhsNumberBlock1 = "499-999-9994";
-
-   private const String ValidUnformattedNhsNumberBlock2 = "6000000006";
-   private const String ValidFormattedNhsNumberBlock2 = "600 000 0006";
-   private const String AltValidUnformattedNhsNumberBlock2 = "7999999997";
-   private const String AltValidFormattedNhsNumberBlock2 = "799-999-9997";
+   private const String ValidUnformattedHcNumber = "3200000007";
+   private const String ValidFormattedHcNumber = "320 000 0007";
+   private const String AltValidUnformattedHcNumber = "3999999993";
+   private const String AltValidFormattedHcNumber = "399-999-9993";
 
    private const String ValidUnformattedTestNumber = "9000000009";
    private const String ValidFormattedTestNumber = "900 000 0009";
    private const String AltValidUnformattedTestNumber = "9999999980";
    private const String AltValidFormattedTestNumber = "999-999-9980";
 
-   private const String UnformattedModulus11CheckDigitZeroValue = "4000000020";     // Edge case, modulus 11 with remainder 0 should result in 0 check digit
-   private const String FormattedModulus11CheckDigitZeroValue = "400 000 0020";
+   private const String UnformattedModulus11CheckDigitZeroValue = "3200000120";     // Edge case, modulus 11 with remainder 0 should result in 0 check digit
+   private const String FormattedModulus11CheckDigitZeroValue = "320 000 0120";
 
    private static Char GetCheckDigit(String value)
    {
@@ -41,14 +36,10 @@ public class GbNhsNumberTests
 
    public static TheoryData<String> ValidValues =>
    [
-      ValidUnformattedNhsNumberBlock1,
-      ValidFormattedNhsNumberBlock1,
-      AltValidUnformattedNhsNumberBlock1,
-      AltValidFormattedNhsNumberBlock1,
-      ValidUnformattedNhsNumberBlock2,
-      ValidFormattedNhsNumberBlock2,
-      AltValidUnformattedNhsNumberBlock2,
-      AltValidFormattedNhsNumberBlock2,
+      ValidUnformattedHcNumber,
+      ValidFormattedHcNumber,
+      AltValidUnformattedHcNumber,
+      AltValidFormattedHcNumber,
 
       ValidUnformattedTestNumber,
       ValidFormattedTestNumber,
@@ -70,27 +61,27 @@ public class GbNhsNumberTests
 
    public static TheoryData<String, Int32> InvalidCharacterData = new()
    {
-      { ".000000004", 0 },          // Non-digit character '.'
-      { "4 00000004", 1 },          // Non-digit character ' '
-      { "40A0000004", 2 },          // Non-digit character 'A'
-      { "400Z000004", 3 },          // Non-digit character 'Z'
-      { "4000^00004", 4 },          // Non-digit character '^'
-      { "40000a0004", 5 },          // Non-digit character 'a'
-      { "400000z004", 6 },          // Non-digit character 'z'
-      { "4000000~04", 7 },          // Non-digit character '~'
-      { "40000000\u21534", 8 },     // Non-digit character Unicode fraction 1/3
-      { "400000000\u00D6", 9 },     // Invalid character unicode O with umlaut
+      { ".200000007", 0 },          // Non-digit character '.'
+      { "3 00000007", 1 },          // Non-digit character ' '
+      { "32A0000007", 2 },          // Non-digit character 'A'
+      { "320Z000007", 3 },          // Non-digit character 'Z'
+      { "3200^00007", 4 },          // Non-digit character '^'
+      { "32000a0007", 5 },          // Non-digit character 'a'
+      { "320000z007", 6 },          // Non-digit character 'z'
+      { "3200000~07", 7 },          // Non-digit character '~'
+      { "32000000\u21537", 8 },     // Non-digit character Unicode fraction 1/3
+      { "320000000\u00D6", 9 },     // Invalid character unicode O with umlaut
 
-      { ".00 000 0004", 0 },        // Non-digit character '.'
-      { "4 0 000 0004", 1 },        // Non-digit character ' '
-      { "40A 000 0004", 2 },        // Non-digit character 'A'
-      { "400 Z00 0004", 4 },        // Non-digit character 'Z'
-      { "400 0^0 0004", 5 },        // Non-digit character '^'
-      { "400-00a-0004", 6 },        // Non-digit character 'a'
-      { "400-000-z004", 8 },        // Non-digit character 'z'
-      { "400-000-0~04", 9 },        // Non-digit character '~'
-      { "400-000-00\u21534", 10 },  // Non-digit character Unicode fraction 1/3
-      { "400-000-000\u00D6", 11 },  // Invalid character unicode O with umlaut
+      { ".20 000 0007", 0 },        // Non-digit character '.'
+      { "3 0 000 0007", 1 },        // Non-digit character ' '
+      { "32A 000 0007", 2 },        // Non-digit character 'A'
+      { "320 Z00 0007", 4 },        // Non-digit character 'Z'
+      { "320 0^0 0007", 5 },        // Non-digit character '^'
+      { "320-00a-0007", 6 },        // Non-digit character 'a'
+      { "320-000-z007", 8 },        // Non-digit character 'z'
+      { "320-000-0~07", 9 },        // Non-digit character '~'
+      { "320-000-00\u21537", 10 },  // Non-digit character Unicode fraction 1/3
+      { "320-000-000\u00D6", 11 },  // Invalid character unicode O with umlaut
    };
 
    public static TheoryData<String> InvalidCheckDigitValues =>
@@ -119,32 +110,32 @@ public class GbNhsNumberTests
    public static TheoryData<String, Int32> InvalidSeparatorValues = new()
    {
       // First separator position
-      { "4000000 0004", 3 },
-      { "4001000 0004", 3 },
-      { "4002000 0004", 3 },
-      { "4003000 0004", 3 },
-      { "4004000 0004", 3 },
-      { "4005000 0004", 3 },
-      { "4006000 0004", 3 },
-      { "4007000 0004", 3 },
-      { "4008000 0004", 3 },
-      { "4009000 0004", 3 },
+      { "3200000 0007", 3 },
+      { "3201000 0007", 3 },
+      { "3202000 0007", 3 },
+      { "3203000 0007", 3 },
+      { "3204000 0007", 3 },
+      { "3205000 0007", 3 },
+      { "3206000 0007", 3 },
+      { "3207000 0007", 3 },
+      { "3208000 0007", 3 },
+      { "3209000 0007", 3 },
 
       // Second separator position
-      { "400 00000004", 7 },
-      { "400 00010004", 7 },
-      { "400 00020004", 7 },
-      { "400 00030004", 7 },
-      { "400 00040004", 7 },
-      { "400 00050004", 7 },
-      { "400 00060004", 7 },
-      { "400 00070004", 7 },
-      { "400 00080004", 7 },
-      { "400 00090004", 7 },
+      { "320 00000007", 7 },
+      { "320 00010007", 7 },
+      { "320 00020007", 7 },
+      { "320 00030007", 7 },
+      { "320 00040007", 7 },
+      { "320 00050007", 7 },
+      { "320 00060007", 7 },
+      { "320 00070007", 7 },
+      { "320 00080007", 7 },
+      { "320 00090007", 7 },
 
       // Mixed separators
-      { "400 000-0004", 7 },
-      { "400-000 0004", 7 },
+      { "320 000-0007", 7 },
+      { "320-000 0007", 7 },
    };
 
    public static TheoryData<String> InvalidRangeValues =>
@@ -163,13 +154,17 @@ public class GbNhsNumberTests
       "311300000",
       "319999999",
 
-      // HC number block
-      "320000000",
-      "399999999",
+      // First NHS number block
+      "400000000",
+      "499999999",
 
       // Gap in NHS numbers
       "500000000",
       "599999999",
+
+      // Second NHS number block
+      "600000000",
+      "799999999",
 
       // Gap between NHS numbers and test numbers
       "800000000",
@@ -187,13 +182,16 @@ public class GbNhsNumberTests
       "311 300 000",
       "319 999 999",
 
-      // HC number block
-      "320 000 000",
-      "399 999 999",
+      // First NHS number block
+      "400 000 000",
+      "499 999 999",
 
       // Gap in NHS numbers
       "500 000 000",
-      "599 999 999",
+
+      // Second NHS number block
+      "600 000 000",
+      "799 999 999",
 
       // Gap between NHS numbers and test numbers
       "800 000 000",
@@ -206,13 +204,13 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(ValidValues))]
-   public void GbNhsNumber_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   public void GbHcNumber_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
       var expected = GetRawValue(value);
 
       // Act.
-      var sut = new GbNhsNumber(value);
+      var sut = new GbHcNumber(value);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -221,101 +219,101 @@ public class GbNhsNumberTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueIsEmpty(String value)
+   public void GbHcNumber_Constructor_ShouldThrowValidationError_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = default(EmptyValue);
+      GbHcNumber.ValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new GbNhsNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Invoking(() => new GbHcNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
+   public void GbHcNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = new InvalidLength(
+      GbHcNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
          GbPatientNumberBase.ValidLengthDefinitions);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new GbNhsNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Invoking(() => new GbHcNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterData))]
-   public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueHasNonDigitCharacter(
+   public void GbHcNumber_Constructor_ShouldThrowValidationError_WhenValueHasNonDigitCharacter(
       String value,
       Int32 position)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = new InvalidCharacter(
+      GbHcNumber.ValidationError expected = new InvalidCharacter(
          Messages.GbPatientNumberInvalidCharacter,
          value[position],
          position);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new GbNhsNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Invoking(() => new GbHcNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
+   public void GbHcNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = new InvalidChecksum(
+      GbHcNumber.ValidationError expected = new InvalidChecksum(
          Messages.GbPatientNumberInvalidCheckDigit,
          Algorithms.Modulus11Decimal.AlgorithmName);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new GbNhsNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Invoking(() => new GbHcNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidSeparator(
+   public void GbHcNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidSeparator(
       String value,
       Int32 position)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = new InvalidSeparator(
+      GbHcNumber.ValidationError expected = new InvalidSeparator(
          Messages.GbPatientNumberInvalidSeparator,
          value[position],
          position);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new GbNhsNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Invoking(() => new GbHcNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidRangeValues))]
-   public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueIsOutsideOfValidRanges(String nineDigits)
+   public void GbHcNumber_Constructor_ShouldThrowValidationError_WhenValueIsOutsideOfValidRanges(String nineDigits)
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbNhsNumber.ValidationError expected = new GbPatientNumberInvalidRange(Messages.GbNhsNumberInvalidRange);
+      GbHcNumber.ValidationError expected = new GbPatientNumberInvalidRange(Messages.GbHcNumberInvalidRange);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new GbNhsNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Invoking(() => new GbHcNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -325,24 +323,22 @@ public class GbNhsNumberTests
    // ==========================================================================
    // ==========================================================================
 
-   public static TheoryData<String, GbNhsNumber.IdentifierCategory> IdentifierTypeTestData = new()
+   public static TheoryData<String, GbHcNumber.IdentifierCategory> IdentifierTypeTestData = new()
    {
-      { ValidUnformattedNhsNumberBlock1, default(GbHealthService.Nhs) },
-      { ValidUnformattedNhsNumberBlock2, default(GbHealthService.Nhs) },
+      { ValidUnformattedHcNumber, default(GbHealthService.Hc) },
       { ValidUnformattedTestNumber, default(GbHealthService.Test) },
-      { ValidFormattedNhsNumberBlock1, default(GbHealthService.Nhs) },
-      { ValidFormattedNhsNumberBlock2, default(GbHealthService.Nhs) },
+      { ValidFormattedHcNumber, default(GbHealthService.Hc) },
       { ValidFormattedTestNumber, default(GbHealthService.Test) },
    };
 
    [Theory]
    [MemberData(nameof(IdentifierTypeTestData))]
-   public void GbNhsNumber_IdentifierType_ShouldReturnExpectedIdentifierType(
+   public void GbHcNumber_IdentifierType_ShouldReturnExpectedIdentifierType(
       String value,
-      GbNhsNumber.IdentifierCategory expected)
+      GbHcNumber.IdentifierCategory expected)
    {
       // Arrange.
-      var sut = new GbNhsNumber(value);
+      var sut = new GbHcNumber(value);
 
       // Act/assert.
       sut.IdentifierType.Should().Be(expected);
@@ -356,10 +352,10 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(ValidValues))]
-   public void GbNhsNumber_Value_ShouldReturnValidIdentifier(String value)
+   public void GbHcNumber_Value_ShouldReturnValidIdentifier(String value)
    {
       // Arrange.
-      var sut = new GbNhsNumber(value);
+      var sut = new GbHcNumber(value);
       var expected = GetRawValue(value);
 
       // Act/assert.
@@ -373,11 +369,11 @@ public class GbNhsNumberTests
    // ==========================================================================
 
    [Fact]
-   public void GbNhsNumber_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   public void GbHcNumber_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = ValidFormattedNhsNumberBlock1;
-      var sut = new GbNhsNumber(value);
+      var value = ValidFormattedHcNumber;
+      var sut = new GbHcNumber(value);
 
       // Act.
       String str = sut;
@@ -388,11 +384,11 @@ public class GbNhsNumberTests
    }
 
    [Fact]
-   public void GbNhsNumber_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   public void GbHcNumber_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = ValidFormattedNhsNumberBlock1;
-      var sut = new GbNhsNumber(value);
+      var value = ValidUnformattedHcNumber;
+      var sut = new GbHcNumber(value);
 
       // Act.
       var str = (String)sut;
@@ -403,10 +399,10 @@ public class GbNhsNumberTests
    }
 
    [Fact]
-   public void GbNhsNumber_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   public void GbHcNumber_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      GbNhsNumber sut = null!;
+      GbHcNumber sut = null!;
 
       // Act.
       String str = sut;
@@ -417,10 +413,10 @@ public class GbNhsNumberTests
    }
 
    [Fact]
-   public void GbNhsNumber_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   public void GbHcNumber_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      GbNhsNumber sut = null!;
+      GbHcNumber sut = null!;
 
       // Act.
       var str = (String)sut;
@@ -432,13 +428,13 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(ValidValues))]
-   public void GbNhsNumber_ExplicitCastToBeGbNhsNumber_ShouldCreateInstance_WhenValueIsValid(String value)
+   public void GbHcNumber_ExplicitCastToBeGbHcNumber_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expected = new GbNhsNumber(value);
+      var expected = new GbHcNumber(value);
 
       // Act.
-      var sut = (GbNhsNumber)value;
+      var sut = (GbHcNumber)value;
 
       // Assert.
       sut.Should().NotBeNull();
@@ -447,101 +443,101 @@ public class GbNhsNumberTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void GbNhsNumber_ExplicitCastToBeGbNhsNumber_ShouldThrowValidationError_WhenValueIsEmpty(String value)
+   public void GbHcNumber_ExplicitCastToBeGbHcNumber_ShouldThrowValidationError_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = default(EmptyValue);
+      GbHcNumber.ValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => (GbNhsNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Invoking(() => (GbHcNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void GbNhsNumber_ExplicitCastToBeGbNhsNumber_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
+   public void GbHcNumber_ExplicitCastToBeGbHcNumber_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = new InvalidLength(
+      GbHcNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
          GbPatientNumberBase.ValidLengthDefinitions);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => (GbNhsNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Invoking(() => (GbHcNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterData))]
-   public void GbNhsNumber_ExplicitCastToBeGbNhsNumber_ShouldThrowValidationError_WhenValueHasNonDigitCharacter(
+   public void GbHcNumber_ExplicitCastToBeGbHcNumber_ShouldThrowValidationError_WhenValueHasNonDigitCharacter(
       String value,
       Int32 position)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = new InvalidCharacter(
+      GbHcNumber.ValidationError expected = new InvalidCharacter(
          Messages.GbPatientNumberInvalidCharacter,
          value[position],
          position);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => (GbNhsNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Invoking(() => (GbHcNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void GbNhsNumber_ExplicitCastToBeGbNhsNumber_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
+   public void GbHcNumber_ExplicitCastToBeGbHcNumber_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = new InvalidChecksum(
+      GbHcNumber.ValidationError expected = new InvalidChecksum(
          Messages.GbPatientNumberInvalidCheckDigit,
          Algorithms.Modulus11Decimal.AlgorithmName);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => (GbNhsNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Invoking(() => (GbHcNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void GbNhsNumber_ExplicitCastToBeGbNhsNumber_ShouldThrowValidationError_WhenValueHasInvalidSeparator(
+   public void GbHcNumber_ExplicitCastToBeGbHcNumber_ShouldThrowValidationError_WhenValueHasInvalidSeparator(
       String value,
       Int32 position)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = new InvalidSeparator(
+      GbHcNumber.ValidationError expected = new InvalidSeparator(
          Messages.GbPatientNumberInvalidSeparator,
          value[position],
          position);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => (GbNhsNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Invoking(() => (GbHcNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidRangeValues))]
-   public void GbNhsNumber_ExplicitCastToBeGbNhsNumber_ShouldThrowValidationError_WhenValueIsOutsideOfValidRanges(String nineDigits)
+   public void GbHcNumber_ExplicitCastToBeGbHcNumber_ShouldThrowValidationError_WhenValueIsOutsideOfValidRanges(String nineDigits)
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbNhsNumber.ValidationError expected = new GbPatientNumberInvalidRange(Messages.GbNhsNumberInvalidRange);
+      GbHcNumber.ValidationError expected = new GbPatientNumberInvalidRange(Messages.GbHcNumberInvalidRange);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => (GbNhsNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Invoking(() => (GbHcNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -552,33 +548,33 @@ public class GbNhsNumberTests
    // ==========================================================================
 
    [Fact]
-   public void GbNhsNumber_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   public void GbHcNumber_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
-      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
+      var sut1 = new GbHcNumber(ValidUnformattedHcNumber);
+      var sut2 = new GbHcNumber(ValidUnformattedHcNumber);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
    }
 
    [Fact]
-   public void GbNhsNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   public void GbHcNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
-      var sut2 = new GbNhsNumber(ValidFormattedTestNumber);
+      var sut1 = new GbHcNumber(ValidUnformattedHcNumber);
+      var sut2 = new GbHcNumber(AltValidUnformattedHcNumber);
 
       // Act/assert.
       (sut1 == sut2).Should().BeFalse();
    }
 
    [Fact]
-   public void GbNhsNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   public void GbHcNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 12 character versions for same person should still be equal.
-      var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
-      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
+      var sut1 = new GbHcNumber(ValidUnformattedHcNumber);
+      var sut2 = new GbHcNumber(ValidFormattedHcNumber);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -591,33 +587,33 @@ public class GbNhsNumberTests
    // ==========================================================================
 
    [Fact]
-   public void GbNhsNumber_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   public void GbHcNumber_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
-      var sut2 = new GbNhsNumber(ValidFormattedTestNumber);
+      var sut1 = new GbHcNumber(AltValidUnformattedHcNumber);
+      var sut2 = new GbHcNumber(ValidFormattedTestNumber);
 
       // Act/assert.
       (sut1 != sut2).Should().BeTrue();
    }
 
    [Fact]
-   public void GbNhsNumber_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   public void GbHcNumber_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 12 character versions for same person should still be equal.
-      var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
-      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
+      var sut1 = new GbHcNumber(ValidUnformattedHcNumber);
+      var sut2 = new GbHcNumber(ValidFormattedHcNumber);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
    }
 
    [Fact]
-   public void GbNhsNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   public void GbHcNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
-      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
+      var sut1 = new GbHcNumber(ValidUnformattedHcNumber);
+      var sut2 = new GbHcNumber(ValidUnformattedHcNumber);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -631,13 +627,13 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(ValidValues))]
-   public void GbNhsNumber_Create_ShouldReturnNewInstance_WhenValueIsValid(String value)
+   public void GbHcNumber_Create_ShouldReturnNewInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      LocalCreateResult expected = new GbNhsNumber(value);
+      LocalCreateResult expected = new GbHcNumber(value);
 
       // Act.
-      var result = GbNhsNumber.Create(value);
+      var result = GbHcNumber.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -645,13 +641,13 @@ public class GbNhsNumberTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void GbNhsNumber_Create_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
+   public void GbHcNumber_Create_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbNhsNumber.ValidationError)default(EmptyValue);
+      LocalCreateResult expected = (GbHcNumber.ValidationError)default(EmptyValue);
 
       // Act.
-      var result = GbNhsNumber.Create(value);
+      var result = GbHcNumber.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -659,16 +655,16 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void GbNhsNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
+   public void GbHcNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbNhsNumber.ValidationError)new InvalidLength(
+      LocalCreateResult expected = (GbHcNumber.ValidationError)new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbNhsNumber.ValidLengthDefinitions);
+         GbHcNumber.ValidLengthDefinitions);
 
       // Act.
-      var result = GbNhsNumber.Create(value);
+      var result = GbHcNumber.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -676,18 +672,18 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterData))]
-   public void GbNhsNumber_Create_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
+   public void GbHcNumber_Create_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
       String value,
       Int32 position)
    {
       // Arrange.
-      LocalCreateResult expected = (GbNhsNumber.ValidationError)new InvalidCharacter(
+      LocalCreateResult expected = (GbHcNumber.ValidationError)new InvalidCharacter(
          Messages.GbPatientNumberInvalidCharacter,
          value[position],
          position);
 
       // Act.
-      var result = GbNhsNumber.Create(value);
+      var result = GbHcNumber.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -695,15 +691,15 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void GbNhsNumber_Create_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
+   public void GbHcNumber_Create_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbNhsNumber.ValidationError)new InvalidChecksum(
+      LocalCreateResult expected = (GbHcNumber.ValidationError)new InvalidChecksum(
          Messages.GbPatientNumberInvalidCheckDigit,
          Algorithms.Modulus11Decimal.AlgorithmName);
 
       // Act.
-      var result = GbNhsNumber.Create(value);
+      var result = GbHcNumber.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -711,18 +707,18 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void GbNhsNumber_Create_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
+   public void GbHcNumber_Create_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
       String value,
       Int32 position)
    {
       // Arrange.
-      LocalCreateResult expected = (GbNhsNumber.ValidationError)new InvalidSeparator(
+      LocalCreateResult expected = (GbHcNumber.ValidationError)new InvalidSeparator(
          Messages.GbPatientNumberInvalidSeparator,
          value[position],
          position);
 
       // Act.
-      var result = GbNhsNumber.Create(value);
+      var result = GbHcNumber.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -730,15 +726,15 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidRangeValues))]
-   public void GbNhsNumber_Create_ShouldReturnInvalidRange_WhenValueIsOutsideOfValidRanges(String nineDigits)
+   public void GbHcNumber_Create_ShouldReturnInvalidRange_WhenValueIsOutsideOfValidRanges(String nineDigits)
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      LocalCreateResult expected = (GbNhsNumber.ValidationError)new GbPatientNumberInvalidRange(
-         Messages.GbNhsNumberInvalidRange);
+      LocalCreateResult expected = (GbHcNumber.ValidationError)new GbPatientNumberInvalidRange(
+         Messages.GbHcNumberInvalidRange);
 
       // Act.
-      var result = GbNhsNumber.Create(value);
+      var result = GbHcNumber.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -751,33 +747,33 @@ public class GbNhsNumberTests
    // ==========================================================================
 
    [Fact]
-   public void GbNhsNumber_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   public void GbHcNumber_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock2);
-      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock2);
+      var sut1 = new GbHcNumber(ValidFormattedHcNumber);
+      var sut2 = new GbHcNumber(ValidFormattedHcNumber);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
    }
 
    [Fact]
-   public void GbNhsNumber_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   public void GbHcNumber_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new GbNhsNumber(AltValidUnformattedNhsNumberBlock1);
-      var sut2 = new GbNhsNumber(ValidUnformattedTestNumber);
+      var sut1 = new GbHcNumber(ValidFormattedHcNumber);
+      var sut2 = new GbHcNumber(AltValidUnformattedHcNumber);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeFalse();
    }
 
    [Fact]
-   public void GbNhsNumber_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   public void GbHcNumber_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 12 character versions for same person should still be equal.
-      var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock2);
-      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock2);
+      var sut1 = new GbHcNumber(ValidFormattedHcNumber);
+      var sut2 = new GbHcNumber(ValidUnformattedHcNumber);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -790,11 +786,11 @@ public class GbNhsNumberTests
    // ==========================================================================
 
    [Fact]
-   public void GbNhsNumber_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
+   public void GbHcNumber_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
    {
       // Arrange.
-      var sut = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
-      var expected = ValidFormattedNhsNumberBlock1;
+      var sut = new GbHcNumber(ValidUnformattedHcNumber);
+      var expected = ValidFormattedHcNumber;
 
       // Act.
       var str = sut.Format();
@@ -804,12 +800,12 @@ public class GbNhsNumberTests
    }
 
    [Fact]
-   public void GbNhsNumber_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
+   public void GbHcNumber_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
    {
       // Arrange.
-      var sut = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
+      var sut = new GbHcNumber(ValidUnformattedHcNumber);
       var mask = "__________";
-      var expected = ValidUnformattedNhsNumberBlock1;
+      var expected = ValidUnformattedHcNumber;
 
       // Act.
       var str = sut.Format(mask);
@@ -819,10 +815,10 @@ public class GbNhsNumberTests
    }
 
    [Fact]
-   public void GbNhsNumber_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
+   public void GbHcNumber_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
    {
       // Arrange.
-      var sut = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
+      var sut = new GbHcNumber(ValidUnformattedHcNumber);
       String mask = null!;
 
       // Act/assert.
@@ -837,10 +833,10 @@ public class GbNhsNumberTests
    [Theory]
    [InlineData("")]
    [InlineData("\t")]
-   public void GbNhsNumber_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
+   public void GbHcNumber_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
    {
       // Arrange.
-      var sut = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
+      var sut = new GbHcNumber(ValidUnformattedHcNumber);
       var expectedMessage = Messages.FormatMaskEmpty + "*";
 
       // Act/assert.
@@ -859,11 +855,11 @@ public class GbNhsNumberTests
    // ==========================================================================
 
    [Fact]
-   public void GbNhsNumber_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   public void GbHcNumber_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock2);
-      var sut2 = new GbNhsNumber(ValidUnformattedNhsNumberBlock2);
+      var sut1 = new GbHcNumber(ValidUnformattedHcNumber);
+      var sut2 = new GbHcNumber(ValidUnformattedHcNumber);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -874,11 +870,11 @@ public class GbNhsNumberTests
    }
 
    [Fact]
-   public void GbNhsNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   public void GbHcNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock2);
-      var sut2 = new GbNhsNumber(ValidUnformattedTestNumber);
+      var sut1 = new GbHcNumber(ValidUnformattedHcNumber);
+      var sut2 = new GbHcNumber(AltValidUnformattedHcNumber);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -889,11 +885,11 @@ public class GbNhsNumberTests
    }
 
    [Fact]
-   public void GbNhsNumber_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
+   public void GbHcNumber_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 12 character versions for same person should still be equal.
-      var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock2);
-      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock2);
+      var sut1 = new GbHcNumber(ValidUnformattedHcNumber);
+      var sut2 = new GbHcNumber(ValidFormattedHcNumber);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -909,16 +905,16 @@ public class GbNhsNumberTests
    // ==========================================================================
    // ==========================================================================
 
-   // GbNhsNumber does not override Object.ReferenceEquals, so this test just
+   // GbHcNumber does not override Object.ReferenceEquals, so this test just
    // confirms that two different instances with the same value are not
    // considered reference equal.
 
    [Fact]
-   public void GbNhsNumber_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   public void GbHcNumber_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var sut1 = new GbNhsNumber(ValidUnformattedTestNumber);
-      var sut2 = new GbNhsNumber(ValidUnformattedTestNumber);
+      var sut1 = new GbHcNumber(ValidUnformattedTestNumber);
+      var sut2 = new GbHcNumber(ValidUnformattedTestNumber);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
@@ -933,10 +929,10 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(ValidValues))]
-   public void GbNhsNumber_ToString_ShouldReturnExpectedValue(String value)
+   public void GbHcNumber_ToString_ShouldReturnExpectedValue(String value)
    {
       // Arrange.
-      var sut = new GbNhsNumber(value);
+      var sut = new GbHcNumber(value);
       var expected = GetRawValue(value);
 
       // Act/assert.
@@ -951,13 +947,13 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(ValidValues))]
-   public void GbNhsNumber_Validate_ShouldReturnValidValue_WhenValueIsValid(String value)
+   public void GbHcNumber_Validate_ShouldReturnValidValue_WhenValueIsValid(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationResult expected = default(ValidValue);
+      GbHcNumber.ValidationResult expected = default(ValidValue);
 
       // Act.
-      var result = GbNhsNumber.Validate(value);
+      var result = GbHcNumber.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -965,13 +961,13 @@ public class GbNhsNumberTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void GbNhsNumber_Validate_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
+   public void GbHcNumber_Validate_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationResult expected = default(EmptyValue);
+      GbHcNumber.ValidationResult expected = default(EmptyValue);
 
       // Act.
-      var result = GbNhsNumber.Validate(value);
+      var result = GbHcNumber.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -979,16 +975,16 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void GbNhsNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
+   public void GbHcNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationResult expected = new InvalidLength(
+      GbHcNumber.ValidationResult expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
          GbPatientNumberBase.ValidLengthDefinitions);
 
       // Act.
-      var result = GbNhsNumber.Validate(value);
+      var result = GbHcNumber.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -996,18 +992,18 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterData))]
-   public void GbNhsNumber_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
+   public void GbHcNumber_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
       String value,
       Int32 position)
    {
       // Arrange.
-      GbNhsNumber.ValidationResult expected = new InvalidCharacter(
+      GbHcNumber.ValidationResult expected = new InvalidCharacter(
          Messages.GbPatientNumberInvalidCharacter,
          value[position],
          position);
 
       // Act.
-      var result = GbNhsNumber.Validate(value);
+      var result = GbHcNumber.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -1015,15 +1011,15 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void GbNhsNumber_Validate_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
+   public void GbHcNumber_Validate_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationResult expected = new InvalidChecksum(
+      GbHcNumber.ValidationResult expected = new InvalidChecksum(
          Messages.GbPatientNumberInvalidCheckDigit,
          Algorithms.Modulus11Decimal.AlgorithmName);
 
       // Act.
-      var result = GbNhsNumber.Validate(value);
+      var result = GbHcNumber.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -1031,18 +1027,18 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void GbNhsNumber_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
+   public void GbHcNumber_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
       String value,
       Int32 position)
    {
       // Arrange.
-      GbNhsNumber.ValidationResult expected = new InvalidSeparator(
+      GbHcNumber.ValidationResult expected = new InvalidSeparator(
          Messages.GbPatientNumberInvalidSeparator,
          value[position],
          position);
 
       // Act.
-      var result = GbNhsNumber.Validate(value);
+      var result = GbHcNumber.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -1050,14 +1046,14 @@ public class GbNhsNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidRangeValues))]
-   public void GbNhsNumber_Validate_ShouldReturnInvalidRange_WhenValueIsOutsideOfValidRanges(String nineDigits)
+   public void GbHcNumber_Validate_ShouldReturnInvalidRange_WhenValueIsOutsideOfValidRanges(String nineDigits)
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbNhsNumber.ValidationResult expected = new GbPatientNumberInvalidRange(Messages.GbNhsNumberInvalidRange);
+      GbHcNumber.ValidationResult expected = new GbPatientNumberInvalidRange(Messages.GbHcNumberInvalidRange);
 
       // Act.
-      var result = GbNhsNumber.Validate(value);
+      var result = GbHcNumber.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -1070,14 +1066,14 @@ public class GbNhsNumberTests
    // ==========================================================================
 
    [Fact]
-   public void GbNhsNumber_JsonSerialization_ShouldRoundTripSuccessfully()
+   public void GbHcNumber_JsonSerialization_ShouldRoundTripSuccessfully()
    {
       // Arrange.
-      var sut = new GbNhsNumber(ValidUnformattedNhsNumberBlock2);
+      var sut = new GbHcNumber(ValidUnformattedHcNumber);
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
-      var result = JsonSerializer.Deserialize<GbNhsNumber>(json);
+      var result = JsonSerializer.Deserialize<GbHcNumber>(json);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1085,10 +1081,10 @@ public class GbNhsNumberTests
    }
 
    [Fact]
-   public void GbNhsNumber_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   public void GbHcNumber_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
    {
       // Arrange.
-      var sut = new GbNhsNumber(AltValidFormattedNhsNumberBlock1);
+      var sut = new GbHcNumber(AltValidUnformattedHcNumber);
       var expected = sut.Value;
 
       // Act.
@@ -1100,14 +1096,14 @@ public class GbNhsNumberTests
 
    public class Foo
    {
-      public GbNhsNumber NhsNumber { get; set; } = null!;
+      public GbHcNumber HcNumber { get; set; } = null!;
    }
 
    [Fact]
-   public void GbNhsNumber_JsonSerialization_ShouldDeserializeComplexObject()
+   public void GbHcNumber_JsonSerialization_ShouldDeserializeComplexObject()
    {
       // Arrange.
-      var foo = new Foo { NhsNumber = new GbNhsNumber(AltValidFormattedTestNumber) };
+      var foo = new Foo { HcNumber = new GbHcNumber(AltValidFormattedTestNumber) };
       var json = JsonSerializer.Serialize(foo);
 
       // Act.
@@ -1119,10 +1115,10 @@ public class GbNhsNumberTests
    }
 
    [Fact]
-   public void GbNhsNumber_JsonSerialization_ShouldSerializeNullGracefully()
+   public void GbHcNumber_JsonSerialization_ShouldSerializeNullGracefully()
    {
       // Arrange.
-      var expected = /*lang=json,strict*/ "{\"NhsNumber\":null}";
+      var expected = /*lang=json,strict*/ "{\"HcNumber\":null}";
       var foo = new Foo();
 
       // Act.
@@ -1133,25 +1129,25 @@ public class GbNhsNumberTests
    }
 
    [Fact]
-   public void GbNhsNumber_JsonDeserialization_ShouldDeserializeNullGracefully()
+   public void GbHcNumber_JsonDeserialization_ShouldDeserializeNullGracefully()
    {
       // Arrange.
-      var json = "{\"NhsNumber\":null}";
+      var json = "{\"HcNumber\":null}";
 
       // Act.
       var result = JsonSerializer.Deserialize<Foo>(json);
 
       // Assert.
       result.Should().NotBeNull();
-      result!.NhsNumber.Should().BeNull();
+      result!.HcNumber.Should().BeNull();
    }
 
    [Fact]
-   public void GbNhsNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenValueIsInvalid()
+   public void GbHcNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenValueIsInvalid()
    {
       // Arrange.
-      var json = "{\"NhsNumber\":\"123-456-78901\"}";  // Invalid length
-      GbNhsNumber.ValidationError expected = new InvalidLength(
+      var json = "{\"HcNumber\":\"123-456-78901\"}";  // Invalid length
+      GbHcNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          13,
          GbPatientNumberBase.ValidLengthDefinitions);
@@ -1159,7 +1155,7 @@ public class GbNhsNumberTests
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Should().ThrowExactly<UKfValidationException<GbHcNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 

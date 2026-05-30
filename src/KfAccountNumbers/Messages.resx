@@ -471,4 +471,7 @@
   <data name="GbNhsNumberInvalidRange" xml:space="preserve">
     <value>GB NHS Number must be in the range 400 000 000 to 499 999 999, 600 000 000 to 799 999 999, or 900 000 000 to 999 999 999, excluding trailing check digit</value>
   </data>
+  <data name="GbHcNumberInvalidRange" xml:space="preserve">
+    <value>GB H&amp;C Number must be in the range 320 000 000 to 399 999 999 or 900 000 000 to 999 999 999, excluding trailing check digit</value>
+  </data>
 </root>

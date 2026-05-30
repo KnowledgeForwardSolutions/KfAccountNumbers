@@ -45,11 +45,8 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 		- [EsNif](#esnif)
 		- [FiHenkilotunnus](#fihenkilotunnus)
 		- [FrInseeNumber](#frinseenumber)
-		- [GbChiNumber](#gbchinumber)
-		- [GbHcNumber](#gbhcnumber)
+		- [Gb National Health Service Patient Numbers (GbChiNumber, GbHcNumber, GbNhsNumber, GbPatientNumber)](#gb-national-health-service-patient-numbers-gbchinumber-gbhcnumber-gbnhsnumber-gbpatientnumber)
 		- [GbNationalInsuranceNumber](#gbnationalinsurancenumber)
-		- [GbNhsNumber](#gbnhsnumber)
-		- [GbPatientNumber](#gbpatientnumber)
 		- [IePpsNumber](#ieppsnumber)
 		- [IsKennitala](#iskennitala)
 		- [NlBurgerservicenummer](#nlburgerservicenummer)
@@ -322,13 +319,103 @@ Example values:
 See [Wikipedia - INSEE code](https://en.wikipedia.org/wiki/INSEE_code) and
 [Wikipedia (French) - Numéro de sécurité sociale en France](https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_s%C3%A9curit%C3%A9_sociale_en_France) for more info.
 
-## GbChiNumber
+## Gb National Health Service Patient Numbers (GbChiNumber, GbHcNumber, GbNhsNumber, GbPatientNumber)
 
-Future
+The multiple public health services in the United Kingdom use patient numbers with significant similarities so the
+various types are all described in this one section.
 
-## GbHcNumber
+The three public health services in the United Kingdom are:
+* The National Health Service (NHS) of England, Wales and the Isle of Man.
+* The Scottish Community Health Index (CHI).
+* Northern Ireland Health and Care (H&C).
 
-Future
+A patient number from one of these services consists of 10 digits structured as NNNNNNNNNC, where
+* NNNNNNNNN is a unique nine-digit number
+* C is a Modulus 11 check digit calculated from the preceding nine digits
+
+Patient numbers can be displayed as a string of 10 digits or formatted for readability as three groups of digits in a '3 3 4'
+pattern (e.g. "123 456 7890"). The optional separator characters can be any character that is not an ASCII digit ('0' - '9'),
+but both separator characters must be the same. The typical separator character is a space (' ').
+
+Each of the services are allocated one or more non-overlapping blocks of nine-digit numbers so it is possible to determine what service
+issued the number by comparing the number to a list of valid ranges for each service. There is also a block of numbers that
+is reserved for test purposes and is not issued to the public.
+
+The current assigned blocks of numbers are:
+* 010 000 000 to 311 299 999 - Scottish CHI
+* 320 000 000 to 399 999 999 - Northern Irish H&C
+* 400 000 000 to 499 999 999 - NHS
+* 600 000 000 to 799 999 999 - NHS
+* 900 000 000 to 999 999 999 - Test
+
+The actual patient number is a nine-digit number selected from the block of numbers allocated to the issuing service,
+to which a Modulus 11 check digit is appended, resulting in a 10-digit final number. Note that the Modulus 11 algorithm
+can generate a final checksum equal to 10, which can not be represented with a single decimal digit. In this case, the
+number is not issued and another number is selected. In practice this means that approximately 9.09% of all possible
+numbers are never issued.
+
+A valid patient number for any of the UK public health services must meet all of the following rules:
+* The value may not be null, empty or all whitespace characters.
+* The value must be either 10 characters long (without separators) or 12 characters long (with separators).
+* All characters (except the optional separator characters) must be ASCII digits ('0' - '9').
+* The trailing (right-most) digit must be a valid Modulus 11 check digit.
+* If the value is 12 characters long, character positions 3 and 7 (zero-based) must not be ASCII digits ('0' - '9'). The same character must be used in each separator position.
+* The first nine digits must be in a range appropriate to the issuing service (or the test range in the case of NHS or H&C).
+
+KfAccountNumbers includes types for the patient numbers for each of the UK public health services and an additional type
+that can represent a patient number from any of the health services.
+
+### GbNhsNumber
+
+`GbNhsNumber` represents a patient number issued by the NHS. The actual number may be from one of the two blocks of numbers
+allocated to the NHS or a number from the test block. A NHS patient number does not encode any additional information such
+as date of birth or gender in the number.
+
+### GbHcNumber
+
+`GbHcNumber` represents a patient number issued by H&C. The actual number may be from the block of numbers allocated to
+H&C or a number from the test block. A H&C patient number does not encode any additional information such
+as date of birth or gender in the number.
+
+### GbChiNumber
+
+`GbChiNumber` represents a patient number issued by CHI. A CHI patient number encodes both date of birth and gender in the
+patient number and the NNNNNNNNN component described above is further subdivided into DDMMYYNNG where
+* DDMMYY is the patient date of birth encoded in DDMMYY format.
+* NNG are three digits used to differentiate between two persons born on the same day. The third digit (G) also indicates
+ the person's gender, where odd numbers = male and even numbers = female.
+
+`GbChiNumber` has an additional validation rule where the initial six digits of the number must be a valid date. `GbChiNumber`
+does not allow numbers from the test block because they would fail date of birth validation.
+
+`GbChiNumber` has an additional property for retrieving the patient's gender and a method for retrieving the patient's date
+of birth.
+
+### GbPatientNumber
+
+`GbPatientNumber` represents a patient number issued by any of the UK public health services. `GbPatientNumber` uses all of
+the validation rules described above, including date of birth validation if the number is in the CHI block.
+
+`GbPatientNumber` has an `IdentifierType` property that allows the user to determine the service that issued the number.
+`GbPatientNumber` allows implicit conversion from `GbNhsNumber`, `GbHcNumber` and `GbChiNumber` and implements 
+`ToGbNhsNumber`, `ToGbHcNumber` and `ToGbChiNumber` methods that support converting `GbPatientNumber` to a more specific
+type using the option pattern. For example, if `GbPatientNumber` contains a CHI number and you want to get the patient's
+gender, you would use the `ToGbChiNumber` method to convert to an instance of `GbChiNumber` from which you can use the
+Gender property.
+
+Example values:
+* 4000000004 - unformatted NHS number
+* 400 000 0004 - formatted NHS number
+* 3200000007 - unformatted H&C number
+* 320 000 0007 - formatted H&C number
+* 3112999991 - unformatted CHI number, date of birth December 31, 1999, gender = male
+* 311 299 9991 - formatted CHI number, date of birth December 31, 1999, gender = male
+* 9000000009 - unformatted test number
+* 900 000 0009 - formatted test number
+
+See [Wikipedia - NHS Number](https://en.wikipedia.org/wiki/NHS_number),
+[NHS Data Model and Dictionary](https://www.datadictionary.nhs.uk/attributes/nhs_number.html) and
+[Allocated Ranges for NHS Numbers](https://webarchive.nationalarchives.gov.uk/ukgwa/20231221081503/https://digital.nhs.uk/about-nhs-digital/contact-us/freedom-of-information/freedom-of-information-disclosure-log/december-2022/nic-690159-k8h4z)
 
 ## GbNationalInsuranceNumber
 
@@ -378,51 +465,6 @@ Example values:
 * GG 00 01 23 - formatted, without suffix character
 
 See [Wikipedia - National Insurance number](https://en.wikipedia.org/wiki/National_Insurance_number) for more info.
-
-## GbNhsNumber
-
-The `GbNhsNumber` type represents the identifier used by the National Health Service (NHS) of England, Wales and the Isle of Man.
-
-A NHS Number consists of 10 digits structured as NNNNNNNNNC, where
-* NNNNNNNNN is a unique nine digit number
-* C is a Modulus 11 check digit calculated from the preceding nine digits
-
-NHS Numbers can be displayed as a string of 10 digits or formatted for readability as three groups of digits in a '3 3 4'
-pattern (e.g. "123 456 7890"). The optional separator characters can be any character that is not an ASCII digit ('0' - '9'),
-but both separator characters must be the same. The typical separator character is a space (' ').
-
-Each of the public health services in Great Britain (NHS, Scottish CHI and Northern Ireland H&C) are allocated separate blocks of
-10 digit numbers so it is possible to determine what service issued the number by comparing the number to a list of valid ranges
-for each service. For NHS, the valid ranges are 400 000 000 to 499 999 999 and 600 000 000 to 799 999 999 (excluding the
-trailing check digit). `GbNhsNumber` also allows a range of numbers from 900 000 000 to 999 999 999 which are reserved for
-test purposes and not issued to the public.
-
-A valid NHS Number must meet all of the following rules:
-* The value may not be null, empty or all whitespace characters.
-* The value must be either 10 characters long (without separators) or 12 characters long (with separators).
-* All characters (except the optional separator characters) must be ASCII digits ('0' - '9').
-* The trailing (right-most) digit must be a valid Modulus 11 check digit.
-* If the value is 12 characters long, character positions 3 and 7 (zero-based) must not be ASCII digits ('0' - '9'). The same character must be used in each separator position.
-* The first nine digits must fall in one of the following ranges: 400 000 000 to 499 999 999, 600 000 000 to 799 999 999, or 900 000 000 to 999 999 999.
-
-The Modulus 11 check digit algorithm used by NHS numbers can generate a check value of 10 which can not be encoded as a 
-single decimal digit. The National Health Service and other issuing authorities avoid this issue by not issuing any number
-that would result in a check value of 10. This means that approximately 9.09% of all possible values are never issued.
-
-Example values:
-* 4000000004 - unformatted
-* 799 999 9997 - formatted
-* 9000000009 - unformatted, test number
-
-See [Wikipedia - NHS Number](https://en.wikipedia.org/wiki/NHS_number),
-[NHS Data Model and Dictionary](https://www.datadictionary.nhs.uk/attributes/nhs_number.html) and
-[Allocated Ranges for NHS Numbers](https://webarchive.nationalarchives.gov.uk/ukgwa/20231221081503/https://digital.nhs.uk/about-nhs-digital/contact-us/freedom-of-information/freedom-of-information-disclosure-log/december-2022/nic-690159-k8h4z)
-
-Also see [GbChiNumber](#gbchinumber), [GbHcNumber](#gbhcnumber) and [GbPatientNumber](#gbpatientnumber) for other associated business objects.
-
-## GbPatientNumber
-
-Future
 
 ## IePpsNumber
 
