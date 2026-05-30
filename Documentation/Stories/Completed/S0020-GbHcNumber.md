@@ -12,25 +12,25 @@ I can validate, parse, and work with H&C numbers in a type-safe manner with comp
 ## Acceptance Criteria
 
 ### Structure and Validation
-- [ ] The `GbHcNumber` type represents a Northern Ireland Health and Care Number (H&C Number)
-- [ ] The number is a 10-digit identifier where:
+- [x] The `GbHcNumber` type represents a Northern Ireland Health and Care Number (H&C Number)
+- [x] The number is a 10-digit identifier where:
   - First 9 digits = unique identifier
   - 10th digit = check digit calculated using modulus 11 algorithm
-- [ ] Total length is 10 digits (unformatted) or 12 characters (formatted with spaces)
-- [ ] Constructor accepts string representation and throws `UKfValidationException<GbHcNumber.ValidationError>` if invalid
-- [ ] Static `Validate` method returns `GbHcNumber.ValidationResult` union value
-- [ ] Static `Create` method uses Result pattern returning `CreateResult<GbHcNumber, GbHcNumber.ValidationError>`
-- [ ] `GbHcNumber.ValidationError` is a union of the following types: `EmptyValue`, `InvalidLength`, `InvalidCharacter`, `InvalidCheckSum`, `InvalidSeparator` and `GbUniquePatientIdentifierInvalidRange`
-- [ ] `GbHcNumber.ValidationResult` extends `GbHcNumber.ValidationError` with the type `ValidValue` to indicate a sucessful validation.
+- [x] Total length is 10 digits (unformatted) or 12 characters (formatted with spaces)
+- [x] Constructor accepts string representation and throws `UKfValidationException<GbHcNumber.ValidationError>` if invalid
+- [x] Static `Validate` method returns `GbHcNumber.ValidationResult` union value
+- [x] Static `Create` method uses Result pattern returning `CreateResult<GbHcNumber, GbHcNumber.ValidationError>`
+- [x] `GbHcNumber.ValidationError` is a union of the following types: `EmptyValue`, `InvalidLength`, `InvalidCharacter`, `InvalidCheckSum`, `InvalidSeparator` and `GbUniquePatientIdentifierInvalidRange`
+- [x] `GbHcNumber.ValidationResult` extends `GbHcNumber.ValidationError` with the type `ValidValue` to indicate a sucessful validation.
 
 ### Validation Rules
-- [ ] Value may not be null, empty, or all whitespace
-- [ ] Value must be either 10 characters (unformatted) or 12 characters (formatted with separator characters)
-- [ ] All 10 characters must be ASCII digits ('0'-'9')
-- [ ] If separator characers are present, must be at positions 3 and 7 (zero-based) forming pattern: NNN NNN NNNN
-- [ ] If separator characters are present, they must not be ASCII digits ('0'-'9') and both separators must be the same character
-- [ ] Check digit (10th digit) must be valid according to modulus 11 algorithm
-- [ ] The first nine digits must be in one of the allowed ranges: 320 000 000 to 399 999 999 or 900 000 000 to 999 999 999 (900 series block reserved for testing purposes)
+- [x] Value may not be null, empty, or all whitespace
+- [x] Value must be either 10 characters (unformatted) or 12 characters (formatted with separator characters)
+- [x] All 10 characters must be ASCII digits ('0'-'9')
+- [x] If separator characers are present, must be at positions 3 and 7 (zero-based) forming pattern: NNN NNN NNNN
+- [x] If separator characters are present, they must not be ASCII digits ('0'-'9') and both separators must be the same character
+- [x] Check digit (10th digit) must be valid according to modulus 11 algorithm
+- [x] The first nine digits must be in one of the allowed ranges: 320 000 000 to 399 999 999 or 900 000 000 to 999 999 999 (900 series block reserved for testing purposes)
 
 ### Check Digit Algorithm (Modulus 11)
 GbHcNumber should use the CheckDigits.Net Modulus11Decimal algorithm for validation of
@@ -53,56 +53,55 @@ the check digit. For reference, the check digit is calculated using the modulus 
 7. The calculated check digit must match the 10th digit
 
 ### Format Support
-- [ ] Accept unformatted: 3200000007
-- [ ] Accept formatted with separator characters: 320 000 0007
-- [ ] `Format` method with optional mask parameter (default: "___ ___ ____")
+- [x] Accept unformatted: 3200000007
+- [x] Accept formatted with separator characters: 320 000 0007
+- [x] `Format` method with optional mask parameter (default: "___ ___ ____")
 
 ### Properties
-- [ ] `Value` property returns raw 10-character string (digits only, no spaces)
-- [ ] `IdentifierType` property returns a union of HcNumber and TestNumber
+- [x] `Value` property returns raw 10-character string (digits only, no spaces)
+- [x] `IdentifierType` property returns a union of HcNumber and TestNumber
 
 ### No Embedded Intelligence
-- [ ] H&C number does not encode date of birth
-- [ ] H&C number does not encode gender
-- [ ] H&C number does not encode specific geographic information beyond Northern Ireland
-- [ ] Only validation intelligence is the check digit and valid range
+- [x] H&C number does not encode date of birth
+- [x] H&C number does not encode gender
+- [x] H&C number does not encode specific geographic information beyond Northern Ireland
+- [x] Only validation intelligence is the check digit and valid range
 
 ### Operators and Methods
-- [ ] Implicit conversion to string
-- [ ] Explicit conversion from string
-- [ ] `ToString` returns raw value (10 digits, no spaces)
-- [ ] Proper equality implementation (space-insensitive)
-- [ ] JSON serialization/deserialization support via `GbHcNumberJsonConverter`
+- [x] Implicit conversion to string
+- [x] Explicit conversion from string
+- [x] `ToString` returns raw value (10 digits, no spaces)
+- [x] Proper equality implementation (space-insensitive)
+- [x] JSON serialization/deserialization support via `GbHcNumberJsonConverter`
 
 ### Special Cases
-- [ ] Normalize separator characters during validation
-- [ ] Reject numbers where calculated check digit would be 10
-- [ ] Standard numbers (320 000 000 to 399 999 999) should be identifiable via property
-- [ ] Test numbers (900 000 000 to 399 999 999) should be identifiable via property
+- [x] Normalize separator characters during validation
+- [x] Reject numbers where calculated check digit would be 10
+- [x] Standard numbers (320 000 000 to 399 999 999) should be identifiable via property
+- [x] Test numbers (900 000 000 to 399 999 999) should be identifiable via property
 
 ### Test Coverage
-- [ ] Valid H&C numbers with correct check digits
-- [ ] Invalid check digits
-- [ ] Check digit edge case: calculated digit would be 11 (should use 0)
-- [ ] Check digit edge case: calculated digit would be 10 (should be invalid number)
-- [ ] Standard number range (320 000 000 to 399 999 999)
-- [ ] Test number range (900 000 0000 to 999 999 9999)
-- [ ] H&C numbers with other valid prefixes
-- [ ] Both formatted and unformatted inputs
-- [ ] Format and ToString methods
-- [ ] Separator character normalization
-- [ ] Invalid separator characters
-- [ ] Equality and hash code (space-insensitive)
-- [ ] JSON serialization round-trip
-- [ ] Conversion operators
-- [ ] Create method Result pattern
-- [ ] Null, empty, and whitespace inputs
-- [ ] Invalid lengths
-- [ ] Non-digit characters
+- [x] Valid H&C numbers with correct check digits
+- [x] Invalid check digits
+- [x] Check digit edge case: calculated digit would be 11 (should use 0)
+- [x] Check digit edge case: calculated digit would be 10 (should be invalid number)
+- [x] Standard number range (320 000 000 to 399 999 999)
+- [x] Test number range (900 000 0000 to 999 999 9999)
+- [x] Both formatted and unformatted inputs
+- [x] Format and ToString methods
+- [x] Separator character normalization
+- [x] Invalid separator characters
+- [x] Equality and hash code (space-insensitive)
+- [x] JSON serialization round-trip
+- [x] Conversion operators
+- [x] Create method Result pattern
+- [x] Null, empty, and whitespace inputs
+- [x] Invalid lengths
+- [x] Non-digit characters
 
 ### Documentation
-- [ ] XML documentation for all public members
-- [ ] README.md section with:
+- [x] XML documentation for all public members
+- [x] README.md section with:
   - Structure explanation (9-digit identifier + check digit)
   - Validation rules
   - Format examples (with and without spaces)
@@ -116,12 +115,11 @@ the check digit. For reference, the check digit is calculated using the modulus 
   - HSC Northern Ireland and relevant references
 
 ### Performance
-- [ ] Use `ReadOnlySpan<Char>` for validation and parsing
-- [ ] Efficient check digit calculation
-- [ ] Single-pass validation where possible
-- [ ] Minimal string allocations
-- [ ] Space normalization efficient
-- [ ] Efficient prefix checking
+- [x] Use `ReadOnlySpan<Char>` for validation and parsing
+- [x] Efficient check digit calculation
+- [x] Single-pass validation where possible
+- [x] Minimal string allocations
+- [x] Space normalization efficient
 
 ## Notes
 - H&C Number = Health and Care Number
