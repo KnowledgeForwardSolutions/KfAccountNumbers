@@ -350,6 +350,24 @@ public class GbNhsNumberTests
 
    #endregion
 
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbNhsNumber_Value_ShouldReturnValidIdentifier(String value)
+   {
+      // Arrange.
+      var sut = new GbNhsNumber(value);
+      var expected = GetRawValue(value);
+
+      // Act/assert.
+      sut.Value.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
    #region Conversion Operator Tests
    // ==========================================================================
    // ==========================================================================
@@ -525,24 +543,6 @@ public class GbNhsNumberTests
          .Invoking(() => (GbNhsNumber)value)
          .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
-   }
-
-   #endregion
-
-   #region Value Property Tests
-   // ==========================================================================
-   // ==========================================================================
-
-   [Theory]
-   [MemberData(nameof(ValidValues))]
-   public void GbNhsNumber_Value_ShouldReturnValidIdentifier(String value)
-   {
-      // Arrange.
-      var sut = new GbNhsNumber(value);
-      var expected = GetRawValue(value);
-
-      // Act/assert.
-      sut.Value.Should().BeEquivalentTo(expected);
    }
 
    #endregion

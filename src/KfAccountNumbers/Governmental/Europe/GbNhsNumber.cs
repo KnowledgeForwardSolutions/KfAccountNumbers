@@ -361,26 +361,10 @@ public record GbNhsNumber : GbPatientNumberBase
    }
 }
 
-/// <summary>
-///   Support serialization and deserialization of <see cref="GbNhsNumber"/>.
-/// </summary>
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class GbNhsNumberJsonConverter : JsonConverter<GbNhsNumber>
 {
-   /// <summary>
-   ///   Reads and converts the JSON to <see cref="GbNhsNumber"/>.
-   /// </summary>
-   /// <param name="reader">
-   ///   The reader.
-   /// </param>
-   /// <param name="typeToConvert">
-   ///   The type to convert.
-   /// </param>
-   /// <param name="options">
-   ///   An object that specifies serialization options to use.
-   /// </param>
-   /// <returns>
-   ///   The converted value.
-   /// </returns>
    public override GbNhsNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
       if (reader.TokenType == JsonTokenType.Null)
@@ -392,18 +376,6 @@ public class GbNhsNumberJsonConverter : JsonConverter<GbNhsNumber>
       return new GbNhsNumber(str);
    }
 
-   /// <summary>
-   ///   Write a specified value as JSON.
-   /// </summary>
-   /// <param name="writer">
-   ///   The writer to write to.
-   /// </param>
-   /// <param name="value">
-   ///   The value to convert to JSON.
-   /// </param>
-   /// <param name="options">
-   ///   An object that specifies serialization options to use.
-   /// </param>
    public override void Write(Utf8JsonWriter writer, GbNhsNumber value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
 }

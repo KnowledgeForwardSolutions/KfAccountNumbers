@@ -120,11 +120,12 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      for more info.
 ///   </para>
 ///   <para>
-///      Also see <see cref="GbChiNumber"/>, <see cref="GbNhsNumber"/> and
+///      Also see <see cref="GbChiNumber"/>, <see cref="GbHcNumber"/> and
 ///      <see cref="GbPatientNumber"/> for associated patient identifier business
 ///      objects.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(GbHcNumberJsonConverter))]
 public record GbHcNumber : GbPatientNumberBase
 {
    /// <summary>
@@ -223,9 +224,99 @@ public record GbHcNumber : GbPatientNumberBase
    }
 
    /// <summary>
+   ///   Gets the specific type of identifier that this instance represents.
+   /// </summary>
+   public IdentifierCategory IdentifierType
+   {
+      get => GetIdentifierCategory(Value) switch
+      {
+         IdentifierRangeCategory.Hc => default(GbHealthService.Hc),
+         IdentifierRangeCategory.Test => default(GbHealthService.Test),
+         _ => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
+      };
+   }
+
+   /// <summary>
    ///   Gets the H&amp;C number, without any formatting.
    /// </summary>
    public String Value { get; private init; }
+
+   /// <summary>
+   ///   Implicitly converts a <see cref="GbHcNumber"/> to a <see cref="String"/>,
+   ///   returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="GbHcNumber"/> to convert.
+   /// </param>
+   public static implicit operator String(GbHcNumber source)
+      => source?.Value ?? String.Empty;         // Handle null object gracefully by returning empty string
+
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="GbHcNumber"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a H&amp;C number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid NHS number.
+   /// </exception>
+   public static explicit operator GbHcNumber(String value) => new(value);
+
+   /// <summary>
+   ///   Create a new <see cref="GbHcNumber"/> using the Result pattern.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a H&amp;C number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="UCreateResult{GbHcNumber, ValidationError}"/>. Will
+   ///   contain the new <see cref="GbHcNumber"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
+   /// </returns>
+   public static UCreateResult<GbHcNumber, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new GbHcNumber(value!, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         GbPatientNumberInvalidRange invalidRange => (ValidationError)invalidRange,
+         _ => throw new SwitchExpressionException("This branch should never be reached"),
+      };
+
+   /// <summary>
+   ///   Format the NHS number using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then the default mask "___ ___ ____" will be used instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted UK National Health Service number.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the NHS number.
+   /// </remarks>
+   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Get a string representation of the NHS number.
+   /// </summary>
+   /// <returns>
+   ///   The raw NHS number, without separator characters.
+   /// </returns>
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid
@@ -267,4 +358,23 @@ public record GbHcNumber : GbPatientNumberBase
          ? new GbPatientNumberInvalidRange(Messages.GbHcNumberInvalidRange)
          : default(ValidValue);
    }
+}
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
+public class GbHcNumberJsonConverter : JsonConverter<GbHcNumber>
+{
+   public override GbHcNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new GbHcNumber(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, GbHcNumber value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }
