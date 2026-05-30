@@ -6,7 +6,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A NHS Number consists of 10 digits, structured as NNNNNNNNNC, where:
+///      A H&amp;C Number consists of 10 digits, structured as NNNNNNNNNC, where:
 ///      <list type="bullet">
 ///         <item>
 ///            <term>NNNNNNNNN</term>
@@ -77,8 +77,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <description>
 ///               The first nine digits must fall in one of the following ranges:
-///               400 000 000 to 320 000 000 to 399 999 999 or 900 000 000 to
-///               999 999 999.
+///               320 000 000 to 399 999 999 or 900 000 000 to 999 999 999.
 ///            </description>
 ///         </item>
 ///      </list>
@@ -120,7 +119,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      for more info.
 ///   </para>
 ///   <para>
-///      Also see <see cref="GbChiNumber"/>, <see cref="GbHcNumber"/> and
+///      Also see <see cref="GbChiNumber"/>, <see cref="GbNhsNumber"/> and
 ///      <see cref="GbPatientNumber"/> for associated patient identifier business
 ///      objects.
 ///   </para>
@@ -168,7 +167,7 @@ public record GbHcNumber : GbPatientNumberBase
    ///   Initializes a new instance of the <see cref="GbHcNumber"/> class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a UK National Health Service number.
+   ///   String representation of a Northern Ireland H&amp;C number.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
@@ -295,7 +294,7 @@ public record GbHcNumber : GbPatientNumberBase
    ///   then the default mask "___ ___ ____" will be used instead.
    /// </param>
    /// <returns>
-   ///   A formatted UK National Health Service number.
+   ///   A formatted H&amp;C number.
    /// </returns>
    /// <exception cref="ArgumentNullException">
    ///   <paramref name="mask"/> is <see langword="null"/>.
@@ -306,7 +305,7 @@ public record GbHcNumber : GbPatientNumberBase
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the NHS number.
+   ///   details on creating a mask to format the H&amp;C number.
    /// </remarks>
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 

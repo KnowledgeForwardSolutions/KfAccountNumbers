@@ -134,8 +134,6 @@ the check digit. For reference, the check digit is calculated using the modulus 
 - Standard display format with spaces: NNN NNN NNNN
 - Check digit uses modulus 11 algorithm with weights [10,9,8,7,6,5,4,3,2]
 - Check digit of 10 makes the H&C number invalid
-- Numbers beginning with 32 are standard Northern Ireland registrations
-- Numbers beginning with 36 are temporary registrations
 - Other prefixes may be valid for special administrative purposes
 - No embedded personal information (unlike some other national IDs)
 - Unique per patient and not reused
@@ -187,12 +185,10 @@ the check digit. For reference, the check digit is calculated using the modulus 
 2. Use ISO country code: `Gb` (Great Britain/UK)
 3. Follow the same patterns as `GbNhsNumber` (same check digit algorithm and structure)
 4. Create corresponding enum: `GbHcNumberValidationResult`
-5. Create enum: `GbHcNumberRegistrationType` with values: Standard, Temporary, Other
 6. Implement full unit test coverage similar to `GbNhsNumber`
 7. Support both formatted (with spaces) and unformatted input
 8. Store value in unformatted 10-digit format
 9. The check digit validation is mandatory - no valid H&C number has invalid check digit
-10. Implement prefix detection (32 = standard, 36 = temporary) with properties
 12. Document that this is for Northern Ireland only (not England, Wales, Scotland, Isle of Man)
 13. Comprehensive test coverage for check digit algorithm including edge cases
 14. Note similarity to NHS Number but with different prefix conventions
@@ -207,16 +203,6 @@ the check digit. For reference, the check digit is calculated using the modulus 
   - Scotland uses CHI Number
   - Northern Ireland uses H&C Number (this system)
   - Document this clearly to avoid confusion
-- **Prefix Conventions**:
-  - 32 prefix = Standard Northern Ireland registrations
-  - 36 prefix = Temporary registrations
-  - Other prefixes may exist for administrative purposes
-  - System designed to be extensible for future prefix allocations
-  - Do not restrict to only 32 and 36 - allow other valid prefixes
-- **Registration Type Detection**:
-  - Provide `RegistrationType` property returning enum value
-  - Provide `IsTemporaryNumber` property for convenience (boolean check for 36 prefix)
-  - Allow for "Other" category for future expansion
 - **No Intelligence**: Like NHS Number, H&C numbers contain no encoded personal information
   - No date of birth
   - No gender indicator
@@ -239,7 +225,6 @@ the check digit. For reference, the check digit is calculated using the modulus 
 2. **Phase 2**: Check digit algorithm implementation (can share with GbNhsNumber if appropriate)
 3. **Phase 3**: Prefix detection and RegistrationType enum implementation
 4. **Phase 4**: Format support (with spaces), space normalization
-5. **Phase 5**: Properties including `IsTemporaryNumber` and `RegistrationType`
 6. **Phase 6**: Conversion operators, equality
 7. **Phase 7**: JSON serialization support
 8. **Phase 8**: Full test coverage including all edge cases and prefixes
