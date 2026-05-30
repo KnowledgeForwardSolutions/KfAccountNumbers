@@ -1,0 +1,139 @@
+namespace KfAccountNumbers.Governmental.Europe;
+
+/// <summary>
+///   Strongly typed business object that represents the identifier used by the
+///   Scottish Community Health Index (CHI).
+/// </summary>
+/// <remarks>
+///   <para>
+///      A CHI Number consists of 10 digits, structured as DDMMYYNNGC, where:
+///      <list type="bullet">
+///         <item>
+///            <term>DDMMYY</term>
+///            <description>
+///               The patient date of birth encoded in DDMMYY format.
+///            </description>
+///         </item>
+///         <item>
+///            <term>NNG</term>
+///            <description>
+///               Three digits used to differentiate between two persons born on
+///               the same day. The third digit (G) also indicates the person's
+///               gender, where odd numbers = male and even numbers = female.
+///            </description>
+///         </item>
+///         <item>
+///            <term>C</term>
+///            <description>
+///               A modulus 11 check digit calculated from the preceding nine
+///               digits.
+///            </description>
+///         </item>
+///      </list>
+///   </para>
+///   <para>
+///      CHI Numbers can be displayed as a string of 10 digits or formatted for
+///      readability as three groups of digits in a '3 3 4' pattern
+///      (e.g. "123 456 7890"). The optional separator characters can be any
+///      character that is not an ASCII digit ('0' - '9'), but both separator
+///      characters must be the same. The typical separator character is a space (' ').
+///   </para>
+///   <para>
+///      Each of the public health services in the United Kingdom (NHS, Scottish CHI
+///      and Northern Ireland H&amp;C) are allocated separate blocks of 10-digit
+///      numbers so it is possible to determine what service issued the number by
+///      comparing the number to a list of valid ranges for each service. For CHI,
+///      the valid range is 010 000 000 to 311 299 999 (excluding the trailing check
+///      digit). Unlike <see cref="GbNhsNumber"/> and <see cref="GbHcNumber"/>,
+///      <see cref="GbChiNumber"/> does not allow test numbers in the range of
+///      900 000 000 to 999 999 999 because those numbers would not contain a valid
+///      date of birth.
+///   </para>
+///   <para>
+///      When creating a new <see cref="GbChiNumber"/>, the following validation
+///      rules are applied:
+///      <list type="bullet">
+///         <item>
+///            <description>
+///               The value may not be null, empty or all whitespace characters.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The value must be either 10 characters (without separators) or
+///               12 characters (with separators) in length.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               All characters (except the optional separator characters) must
+///               be ASCII digits ('0'-'9').
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The trailing (right-most) digit must be a valid Modulus 11
+///               check digit.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               If the value is 12 characters long, character positions 3 and 7
+///               (zero-based) must not be ASCII digits ('0' - '9'). The same
+///               character must be used in each separator position.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The first nine digits must fall in the following range:
+///               010 000 000 to 311 299 999.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The first six digits must represent a valid date in DDMMYY format.
+///            </description>
+///         </item>
+///      </list>
+///   </para>
+///   <para>
+///      The Modulus 11 check digit algorithm used by CHI numbers can generate a
+///      check value of 10 which can not be encoded as a single decimal digit.
+///      Community Health Index and other issuing authorities avoid this
+///      issue by not issuing any number that would result in a check value of
+///      10. This means that approximately 9.09% of all possible values are never
+///      issued.
+///   </para>
+///   <para>
+///      Example values:
+///      <list type="bullet">
+///         <item>
+///            <term>3112999991</term>
+///            <description>
+///               CHI number without formatting. Date of birth December 31, 1999,
+///               gender = male.
+///            </description>
+///         </item>
+///         <item>
+///            <term>311 299 9991</term>
+///            <description>
+///               The same, but with format characters.
+///            </description>
+///         </item>
+///      </list>
+///   </para>
+///   <para>
+///      See https://en.wikipedia.org/wiki/NHS_number,
+///      https://www.datadictionary.nhs.uk/attributes/nhs_number.html
+///      and https://webarchive.nationalarchives.gov.uk/ukgwa/20231221081503/https://digital.nhs.uk/about-nhs-digital/contact-us/freedom-of-information/freedom-of-information-disclosure-log/december-2022/nic-690159-k8h4z
+///      for more info.
+///   </para>
+///   <para>
+///      Also see <see cref="GbHcNumber"/>, <see cref="GbNhsNumber"/> and
+///      <see cref="GbPatientNumber"/> for associated patient identifier business
+///      objects.
+///   </para>
+/// </remarks>
+public record class GbChiNumber : GbPatientNumberBase
+{
+}
