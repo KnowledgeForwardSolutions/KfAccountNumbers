@@ -1,3 +1,5 @@
+#pragma warning disable IDE0250 // Make struct 'readonly'
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>

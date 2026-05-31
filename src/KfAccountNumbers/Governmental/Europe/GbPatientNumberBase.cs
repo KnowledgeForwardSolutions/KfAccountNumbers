@@ -38,6 +38,11 @@ public abstract record GbPatientNumberBase
    internal const Int32 SeparatorPosition2 = 7;
 
    /// <summary>
+   ///   The zero-based offset for the digit that encodes gender for CHI numbers.
+   /// </summary>
+   internal const Int32 GenderOffset = 8;
+
+   /// <summary>
    ///   Predefined array used when reporting invalid length values.
    /// </summary>
    internal static readonly ValidLengthDefinition[] ValidLengthDefinitions =

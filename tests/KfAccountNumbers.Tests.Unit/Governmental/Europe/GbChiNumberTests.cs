@@ -258,6 +258,488 @@ public class GbChiNumberTests
       // { "321204", "-" },            // Invalid day of for December, any year, will be considered a valid H & C number instead
    };
 
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbChiNumber_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawValue(value);
+
+      // Act.
+      var sut = new GbChiNumber(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void GbChiNumber_Constructor_ShouldThrowValidationError_WhenValueIsEmpty(String value)
+   {
+      // Arrange.
+      GbChiNumber.ValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbChiNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void GbChiNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      GbChiNumber.ValidationError expected = new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         value.Length,
+         GbPatientNumberBase.ValidLengthDefinitions);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbChiNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterData))]
+   public void GbChiNumber_Constructor_ShouldThrowValidationError_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      GbChiNumber.ValidationError expected = new InvalidCharacter(
+         Messages.GbPatientNumberInvalidCharacter,
+         value[position],
+         position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbChiNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void GbChiNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      GbChiNumber.ValidationError expected = new InvalidChecksum(
+         Messages.GbPatientNumberInvalidCheckDigit,
+         Algorithms.Modulus11Decimal.AlgorithmName);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbChiNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void GbChiNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      GbChiNumber.ValidationError expected = new InvalidSeparator(
+         Messages.GbPatientNumberInvalidSeparator,
+         value[position],
+         position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbChiNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidRangeValues))]
+   public void GbChiNumber_Constructor_ShouldThrowValidationError_WhenValueIsOutsideOfValidRanges(String nineDigits)
+   {
+      // Arrange.
+      var value = nineDigits + GetCheckDigit(nineDigits);
+      GbChiNumber.ValidationError expected = new GbPatientNumberInvalidRange(Messages.GbChiNumberInvalidRange);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbChiNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidChiNumberDateOfBirthValues))]
+   public void GbChiNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      String separator)
+   {
+      // Arrange.
+      var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
+      var invalidDateOfBirth = value.Length == GbPatientNumberBase.UnformattedLength
+         ? value[..6]
+         : value[..7];
+      GbChiNumber.ValidationError expected = new InvalidDateOfBirth(
+         Messages.GbChiNumberInvalidDateOfBirth,
+         invalidDateOfBirth,
+         GbPatientNumberBase.ChiNumberDateFormat);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbChiNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Gender Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData('1')]
+   [InlineData('3')]
+   [InlineData('5')]
+   [InlineData('7')]
+   [InlineData('9')]
+   public void GbChiNumber_Gender_ShouldReturnMale_ForValuesWithOddGenderIndicator(Char gender)
+   {
+      // Arrange.
+      var value = GetChiNumberWithValidCheckDigit(gender: gender);
+      var sut = new GbChiNumber(value);
+      Gender.BinaryGender expected = default(Gender.Male);
+
+      // Act/assert.
+      sut.Gender.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData('0')]
+   [InlineData('2')]
+   [InlineData('4')]
+   [InlineData('6')]
+   [InlineData('8')]
+   public void GbChiNumber_Gender_ShouldReturnFemale_ForValuesWithEvenGenderIndicator(Char gender)
+   {
+      // Arrange.
+      var value = GetChiNumberWithValidCheckDigit(gender: gender);
+      var sut = new GbChiNumber(value);
+      Gender.BinaryGender expected = default(Gender.Female);
+
+      // Act/assert.
+      sut.Gender.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbChiNumber_Value_ShouldReturnValidIdentifier(String value)
+   {
+      // Arrange.
+      var sut = new GbChiNumber(value);
+      var expected = GetRawValue(value);
+
+      // Act/assert.
+      sut.Value.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbChiNumber_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = ValidUnformattedChiNumber;
+      var sut = new GbChiNumber(value);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(sut.Value);
+   }
+
+   [Fact]
+   public void GbChiNumber_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = AltValidFormattedChiNumber;
+      var sut = new GbChiNumber(value);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(sut.Value);
+   }
+
+   [Fact]
+   public void GbChiNumber_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      GbChiNumber sut = null!;
+
+      // Act.
+      String str = sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void GbChiNumber_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      GbChiNumber sut = null!;
+
+      // Act.
+      var str = (String)sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbChiNumber_ExplicitCastToBeGbChiNumber_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = new GbChiNumber(value);
+
+      // Act.
+      var sut = (GbChiNumber)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void GbChiNumber_ExplicitCastToBeGbChiNumber_ShouldThrowValidationError_WhenValueIsEmpty(String value)
+   {
+      // Arrange.
+      GbChiNumber.ValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbChiNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void GbChiNumber_ExplicitCastToBeGbChiNumber_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      GbChiNumber.ValidationError expected = new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         value.Length,
+         GbPatientNumberBase.ValidLengthDefinitions);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbChiNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterData))]
+   public void GbChiNumber_ExplicitCastToBeGbChiNumber_ShouldThrowValidationError_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      GbChiNumber.ValidationError expected = new InvalidCharacter(
+         Messages.GbPatientNumberInvalidCharacter,
+         value[position],
+         position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbChiNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void GbChiNumber_ExplicitCastToBeGbChiNumber_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      GbChiNumber.ValidationError expected = new InvalidChecksum(
+         Messages.GbPatientNumberInvalidCheckDigit,
+         Algorithms.Modulus11Decimal.AlgorithmName);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbChiNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void GbChiNumber_ExplicitCastToBeGbChiNumber_ShouldThrowValidationError_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      GbChiNumber.ValidationError expected = new InvalidSeparator(
+         Messages.GbPatientNumberInvalidSeparator,
+         value[position],
+         position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbChiNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidRangeValues))]
+   public void GbChiNumber_ExplicitCastToBeGbChiNumber_ShouldThrowValidationError_WhenValueIsOutsideOfValidRanges(String nineDigits)
+   {
+      // Arrange.
+      var value = nineDigits + GetCheckDigit(nineDigits);
+      GbChiNumber.ValidationError expected = new GbPatientNumberInvalidRange(Messages.GbChiNumberInvalidRange);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbChiNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidChiNumberDateOfBirthValues))]
+   public void GbChiNumber_ExplicitCastToBeGbChiNumber_ShouldThrowValidationError_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      String separator)
+   {
+      // Arrange.
+      var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
+      var invalidDateOfBirth = value.Length == GbPatientNumberBase.UnformattedLength
+         ? value[..6]
+         : value[..7];
+      GbChiNumber.ValidationError expected = new InvalidDateOfBirth(
+         Messages.GbChiNumberInvalidDateOfBirth,
+         invalidDateOfBirth,
+         GbPatientNumberBase.ChiNumberDateFormat);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbChiNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbChiNumber_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidUnformattedChiNumber);
+      var sut2 = new GbChiNumber(ValidUnformattedChiNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbChiNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidUnformattedChiNumber);
+      var sut2 = new GbChiNumber(AltValidUnformattedChiNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbChiNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 12 character versions for same person should still be equal.
+      var sut1 = new GbChiNumber(ValidUnformattedChiNumber);
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbChiNumber_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidUnformattedChiNumber);
+      var sut2 = new GbChiNumber(AltValidUnformattedChiNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbChiNumber_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 12 character versions for same person should still be equal.
+      var sut1 = new GbChiNumber(ValidUnformattedChiNumber);
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbChiNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidUnformattedChiNumber);
+      var sut2 = new GbChiNumber(ValidUnformattedChiNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================

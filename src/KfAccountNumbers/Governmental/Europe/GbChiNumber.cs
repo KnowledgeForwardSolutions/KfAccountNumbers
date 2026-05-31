@@ -1,3 +1,5 @@
+#pragma warning disable IDE0250 // Make struct 'readonly'
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -44,7 +46,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      numbers so it is possible to determine what service issued the number by
 ///      comparing the number to a list of valid ranges for each service. For CHI,
 ///      the valid range is 010 000 000 to 311 299 999 (excluding the trailing check
-///      digit). Unlike <see cref="GbNhsNumber"/> and <see cref="GbHcNumber"/>,
+///      digit). Unlike <see cref="GbChiNumber"/> and <see cref="GbHcNumber"/>,
 ///      <see cref="GbChiNumber"/> does not allow test numbers in the range of
 ///      900 000 000 to 999 999 999 because those numbers would not contain a valid
 ///      date of birth.
@@ -129,7 +131,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      for more info.
 ///   </para>
 ///   <para>
-///      Also see <see cref="GbHcNumber"/>, <see cref="GbNhsNumber"/> and
+///      Also see <see cref="GbHcNumber"/>, <see cref="GbChiNumber"/> and
 ///      <see cref="GbPatientNumber"/> for associated patient identifier business
 ///      objects.
 ///   </para>
@@ -169,9 +171,98 @@ public record class GbChiNumber : GbPatientNumberBase
    }
 
    /// <summary>
-   ///   Gets the NHS number, without any formatting.
+   ///   Initializes a new instance of the <see cref="GbChiNumber"/> class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Scottish CHI number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="value"/> is not length 10 (or 12 if separator
+   ///   characters are used).
+   ///   - or -
+   ///   <paramref name="value"/> contains a non-digit character in any
+   ///   position other than the separator locations.
+   ///   - or -
+   ///   <paramref name="value"/> has invalid modulus 11 check digit character
+   ///   in the trailing (right-most) character position.
+   ///   - or -
+   ///   <paramref name="value"/> is 12 characters in length and has an ASCII
+   ///   digit character ('0'-'9') in a separator location or uses a different
+   ///   character in each separator location.
+   ///   - or -
+   ///   The first nine digits of <paramref name="value"/> are not in the range
+   ///   of 010 000 000 to 311 299 999.
+   ///   - or -
+   ///   The first six digits of <paramref name="value"/> do not represent a
+   ///   valid date in DDMMYY format.
+   /// </exception>
+   public GbChiNumber(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="GbChiNumber"/> class.
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private GbChiNumber(String? value, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
+         {
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               GbPatientNumberInvalidRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               _ => new SwitchExpressionException("This branch should never be reached"),
+            };
+         }
+      }
+
+      Value = GetRawValue(value!);
+   }
+
+   /// <summary>
+   ///   Gets the binary gender extracted from the CHI number.
+   /// </summary>
+   public Gender.BinaryGender Gender
+      => Value[GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);    // This works because the ASCII character values for digits have the same odd/even pattern
+
+   /// <summary>
+   ///   Gets the CHI number, without any formatting.
    /// </summary>
    public String Value { get; private init; }
+
+   /// <summary>
+   ///   Implicitly converts a <see cref="GbChiNumber"/> to a <see cref="String"/>,
+   ///   returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="GbChiNumber"/> to convert.
+   /// </param>
+   public static implicit operator String(GbChiNumber source)
+      => source?.Value ?? String.Empty;         // Handle null object gracefully by returning empty string
+
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="GbChiNumber"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Scottish CHI number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid CHI number.
+   /// </exception>
+   public static explicit operator GbChiNumber(String value) => new(value);
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid
