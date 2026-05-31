@@ -484,6 +484,24 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to GB CHI Number must contain a valid date of birth (in DDMMYY format) as the first six digits.
+        /// </summary>
+        internal static string GbChiNumberInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("GbChiNumberInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB CHI Number must be in the range 010 000 000 to 311 299 999, excluding trailing check digit.
+        /// </summary>
+        internal static string GbChiNumberInvalidRange {
+            get {
+                return ResourceManager.GetString("GbChiNumberInvalidRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to GB H&amp;C Number must be in the range 320 000 000 to 399 999 999 or 900 000 000 to 999 999 999, excluding trailing check digit.
         /// </summary>
         internal static string GbHcNumberInvalidRange {

@@ -136,4 +136,86 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </remarks>
 public record class GbChiNumber : GbPatientNumberBase
 {
+
+   /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="GbChiNumber"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      GbPatientNumberInvalidRange,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="GbChiNumber"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      GbPatientNumberInvalidRange,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   Gets the NHS number, without any formatting.
+   /// </summary>
+   public String Value { get; private init; }
+
+   /// <summary>
+   ///   Check the <paramref name="value"/> to determine if it contains a valid
+   ///   CHI number.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a CHI number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
+   /// </returns>
+   public static ValidationResult Validate(String? value)
+   {
+      if (String.IsNullOrWhiteSpace(value))
+      {
+         return default(EmptyValue);
+      }
+
+      if (!ValidateLength(value))
+      {
+         return GetInvalidLengthResult(value.Length);
+      }
+
+      if (!ValidateCheckDigit(value, out var invalidCharacterPosition))
+      {
+         return invalidCharacterPosition == -1
+            ? GetInvalidChecksumResult()
+            : GetInvalidCharacterResult(value, invalidCharacterPosition);
+      }
+
+      if (!ValidateSeparators(value, out var invalidSeparatorPosition))
+      {
+         return GetInvalidSeparatorResult(value, invalidSeparatorPosition);
+      }
+
+      if (GetIdentifierCategory(value) is not IdentifierRangeCategory.Chi)
+      {
+         return new GbPatientNumberInvalidRange(Messages.GbChiNumberInvalidRange);
+      }
+
+      return ValidateChiNumberDateOfBirth(value)
+         ? default(ValidValue)
+         : GetInvalidDateOfBirthResult(value, Messages.GbChiNumberInvalidDateOfBirth);
+   }
 }
