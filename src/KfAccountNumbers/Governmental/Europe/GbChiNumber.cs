@@ -265,6 +265,63 @@ public record class GbChiNumber : GbPatientNumberBase
    public static explicit operator GbChiNumber(String value) => new(value);
 
    /// <summary>
+   ///   Create a new <see cref="GbChiNumber"/> using the Result pattern.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Scottish CHI number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="UCreateResult{GbChiNumber, ValidationError}"/>. Will
+   ///   contain the new <see cref="GbChiNumber"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
+   /// </returns>
+   public static UCreateResult<GbChiNumber, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new GbChiNumber(value!, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         GbPatientNumberInvalidRange invalidRange => (ValidationError)invalidRange,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         _ => throw new SwitchExpressionException("This branch should never be reached"),
+      };
+
+   /// <summary>
+   ///   Format the CHI number using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then the default mask "___ ___ ____" will be used instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted Scottish CHI number.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the CHI number.
+   /// </remarks>
+   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Get a string representation of the CHI number.
+   /// </summary>
+   /// <returns>
+   ///   The raw CHI number, without separator characters.
+   /// </returns>
+   public override String ToString() => Value;
+
+   /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid
    ///   CHI number.
    /// </summary>

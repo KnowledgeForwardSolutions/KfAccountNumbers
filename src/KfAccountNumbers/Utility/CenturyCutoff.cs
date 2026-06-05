@@ -54,6 +54,8 @@ public record CenturyCutoff
    /// </summary>
    internal const Int32 CutoffMaxValue = 100;
 
+   private static readonly Lazy<CenturyCutoff> _defaultInstance = new(() => new CenturyCutoff(DefaultCutoff));
+
    /// <summary>
    ///   Initializes a new instance of the <see cref="CenturyCutoff"/> class
    ///   with the specified cutoff value.
@@ -73,6 +75,12 @@ public record CenturyCutoff
    ///   Gets the cutoff value.
    /// </summary>
    public Int32 Cutoff { get; private init; }
+
+   /// <summary>
+   ///   Gets a lazily created singleton instance of <see cref="CenturyCutoff"/>
+   ///   that uses the <see cref="DefaultCutoff"/>.
+   /// </summary>
+   public static CenturyCutoff DefaultInstance => _defaultInstance.Value;
 
    /// <summary>
    ///   Explicitly converts an <see cref="Int32"/> to a

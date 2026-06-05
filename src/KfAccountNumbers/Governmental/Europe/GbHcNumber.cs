@@ -131,7 +131,7 @@ public record GbHcNumber : GbPatientNumberBase
 {
    /// <summary>
    ///   Discriminated union defining the types of identifier that
-   ///   <see cref="GbHcNumber"/> can represent. Either a H&C number or a test
+   ///   <see cref="GbHcNumber"/> can represent. Either a H&amp;C number or a test
    ///   number.
    /// </summary>
    public union IdentifierCategory(GbHealthService.Hc, GbHealthService.Test) { }

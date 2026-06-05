@@ -64,6 +64,34 @@ public class CenturyCutoffTests
 
    #endregion
 
+   #region DefaultInstance Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void CenturyCutoff_DefaultInstance_ShouldReturnInstanceWithExpectedCutoff()
+   {
+      // Act.
+      var sut = CenturyCutoff.DefaultInstance;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Cutoff.Should().Be(CenturyCutoff.DefaultCutoff);
+   }
+
+   [Fact]
+   public void CenturyCutoff_DefaultInstance_ShouldReturnSameObject_WhenMultipleCallsMade()
+   {
+      // Act.
+      var sut1 = CenturyCutoff.DefaultInstance;
+      var sut2 = CenturyCutoff.DefaultInstance;
+
+      // Assert.
+      sut1.Should().BeSameAs(sut2);
+   }
+
+   #endregion
+
    #region Conversion Operator Tests
    // ==========================================================================
    // ==========================================================================

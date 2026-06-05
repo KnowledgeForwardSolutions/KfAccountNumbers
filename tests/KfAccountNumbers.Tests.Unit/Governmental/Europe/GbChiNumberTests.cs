@@ -1,4 +1,4 @@
-﻿using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
    KfAccountNumbers.Governmental.Europe.GbChiNumber,
    KfAccountNumbers.Governmental.Europe.GbChiNumber.ValidationError>;
 
@@ -736,6 +736,349 @@ public class GbChiNumberTests
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbChiNumber_Create_ShouldReturnNewInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = new GbChiNumber(value);
+
+      // Act.
+      var result = GbChiNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void GbChiNumber_Create_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (GbChiNumber.ValidationError)default(EmptyValue);
+
+      // Act.
+      var result = GbChiNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void GbChiNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (GbChiNumber.ValidationError)new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         value.Length,
+         GbChiNumber.ValidLengthDefinitions);
+
+      // Act.
+      var result = GbChiNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterData))]
+   public void GbChiNumber_Create_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalCreateResult expected = (GbChiNumber.ValidationError)new InvalidCharacter(
+         Messages.GbPatientNumberInvalidCharacter,
+         value[position],
+         position);
+
+      // Act.
+      var result = GbChiNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void GbChiNumber_Create_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (GbChiNumber.ValidationError)new InvalidChecksum(
+         Messages.GbPatientNumberInvalidCheckDigit,
+         Algorithms.Modulus11Decimal.AlgorithmName);
+
+      // Act.
+      var result = GbChiNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void GbChiNumber_Create_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalCreateResult expected = (GbChiNumber.ValidationError)new InvalidSeparator(
+         Messages.GbPatientNumberInvalidSeparator,
+         value[position],
+         position);
+
+      // Act.
+      var result = GbChiNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidRangeValues))]
+   public void GbChiNumber_Create_ShouldReturnInvalidRange_WhenValueIsOutsideOfValidRanges(String nineDigits)
+   {
+      // Arrange.
+      var value = nineDigits + GetCheckDigit(nineDigits);
+      LocalCreateResult expected = (GbChiNumber.ValidationError)new GbPatientNumberInvalidRange(
+         Messages.GbChiNumberInvalidRange);
+
+      // Act.
+      var result = GbChiNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidChiNumberDateOfBirthValues))]
+   public void GbChiNumber_Create_ShouldReturnInvalidRange_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      String separator)
+   {
+      // Arrange.
+      var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
+      var invalidDateOfBirth = value.Length == GbPatientNumberBase.UnformattedLength
+         ? value[..6]
+         : value[..7];
+      LocalCreateResult expected = (GbChiNumber.ValidationError)new InvalidDateOfBirth(
+         Messages.GbChiNumberInvalidDateOfBirth,
+         invalidDateOfBirth,
+         GbPatientNumberBase.ChiNumberDateFormat);
+
+      // Act.
+      var result = GbChiNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbChiNumber_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidFormattedChiNumber);
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbChiNumber_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(AltValidUnformattedChiNumber);
+      var sut2 = new GbChiNumber(ValidUnformattedChiNumber);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbChiNumber_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 12 character versions for same person should still be equal.
+      var sut1 = new GbChiNumber(ValidUnformattedChiNumber);
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Format Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbChiNumber_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new GbChiNumber(ValidUnformattedChiNumber);
+      var expected = ValidFormattedChiNumber;
+
+      // Act.
+      var str = sut.Format();
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void GbChiNumber_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new GbChiNumber(ValidUnformattedChiNumber);
+      var mask = "__________";
+      var expected = ValidUnformattedChiNumber;
+
+      // Act.
+      var str = sut.Format(mask);
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void GbChiNumber_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
+   {
+      // Arrange.
+      var sut = new GbChiNumber(ValidUnformattedChiNumber);
+      String mask = null!;
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = sut.Format(mask))
+         .Should()
+         .ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(Messages.FormatMaskEmpty + "*");
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void GbChiNumber_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
+   {
+      // Arrange.
+      var sut = new GbChiNumber(ValidUnformattedChiNumber);
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = sut.Format(mask))
+         .Should()
+         .ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbChiNumber_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidFormattedChiNumber);
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void GbChiNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidFormattedChiNumber);
+      var sut2 = new GbChiNumber(AltValidFormattedChiNumber);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   [Fact]
+   public void GbChiNumber_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 12 character versions for same person should still be equal.
+      var sut1 = new GbChiNumber(ValidUnformattedChiNumber);
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // GbChiNumber does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void GbChiNumber_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidFormattedChiNumber);
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbChiNumber_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new GbChiNumber(value);
+      var expected = GetRawValue(value);
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
    }
 
    #endregion
