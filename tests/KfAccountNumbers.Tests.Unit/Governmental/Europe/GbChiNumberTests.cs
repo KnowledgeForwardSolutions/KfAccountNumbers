@@ -219,6 +219,10 @@ public class GbChiNumberTests
 
    public static TheoryData<String, String> InvalidChiNumberDateOfBirthValues = new()
    {
+      // Note - certain combinations are commented out because they will fail CHI number range
+      // validation before reaching date of birth validation. They are left here to show that
+      // those cases have been considered.
+
       // Unformatted
       { "110004", String.Empty },   // month = 0
       // { "311304", String.Empty },   // month = 13, will fail invalid range instead
@@ -226,7 +230,7 @@ public class GbChiNumberTests
       // { "320104", String.Empty },   // Invalid day of month for January, any year, will be considered a valid H & C number instead
       { "290201", String.Empty },   // Invalid day of for February, non-leap year
       { "300204", String.Empty },   // Invalid day of for February, leap year
-      { "300204", String.Empty },   // Invalid day of for February, leap year (2000 is leap-year)
+      { "300200", String.Empty },   // Invalid day of for February, leap year (2000 is leap-year)
       // { "320304", String.Empty },   // Invalid day of for March, any year, will be considered a valid H & C number instead
       { "310404", String.Empty },   // Invalid day of for April, any year
       // { "320504", String.Empty },   // Invalid day of for May, any year, will be considered a valid H & C number instead
@@ -240,12 +244,12 @@ public class GbChiNumberTests
 
       // Formatted
       { "110004", " " },            // month = 0
-      // { "311304", " " },            // month = 13, will fail invalid range instead  
-      // { "000104", " " },            // day = 0, will fail invalid range instead  
+      // { "311304", " " },            // month = 13, will fail invalid range instead
+      // { "000104", " " },            // day = 0, will fail invalid range instead
       // { "320104", " " },            // Invalid day of month for January, any year, will be considered a valid H & C number instead
       { "290201", " " },            // Invalid day of for February, non-leap year
       { "300204", " " },            // Invalid day of for February, leap year
-      { "300204", " " },            // Invalid day of for February, leap year (2000 is leap-year)
+      { "300200", " " },            // Invalid day of for February, leap year (2000 is leap-year)
       // { "320304", " " },            // Invalid day of for March, any year, will be considered a valid H & C number instead
       { "310404", " " },            // Invalid day of for April, any year
       // { "320504", "-" },            // Invalid day of for May, any year, will be considered a valid H & C number instead

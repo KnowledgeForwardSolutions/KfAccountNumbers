@@ -116,7 +116,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      See https://en.wikipedia.org/wiki/NHS_number,
-///      https://www.datadictionary.nhs.uk/attributes/nhs_number.html
+///      https://www.datadictionary.nhs.uk/attributes/health_and_care_number.html?hl=number
 ///      and https://webarchive.nationalarchives.gov.uk/ukgwa/20231221081503/https://digital.nhs.uk/about-nhs-digital/contact-us/freedom-of-information/freedom-of-information-disclosure-log/december-2022/nic-690159-k8h4z
 ///      for more info.
 ///   </para>

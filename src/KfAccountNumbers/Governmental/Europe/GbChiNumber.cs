@@ -46,7 +46,9 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      numbers so it is possible to determine what service issued the number by
 ///      comparing the number to a list of valid ranges for each service. For CHI,
 ///      the valid range is 010 000 000 to 311 299 999 (excluding the trailing check
-///      digit). Unlike <see cref="GbChiNumber"/> and <see cref="GbHcNumber"/>,
+///      digit). The leading two digits of the valid range correspond to the
+///      valid date format (DDMMYY) where 01-31 are allowed for the day component.
+///      Unlike <see cref="GbNhsNumber"/> and <see cref="GbHcNumber"/>,
 ///      <see cref="GbChiNumber"/> does not allow test numbers in the range of
 ///      900 000 000 to 999 999 999 because those numbers would not contain a valid
 ///      date of birth.
@@ -126,7 +128,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      See https://en.wikipedia.org/wiki/NHS_number,
-///      https://www.datadictionary.nhs.uk/attributes/nhs_number.html
+///      https://en.wikipedia.org/wiki/National_Health_Service_Central_Register#Community_Health_Index,
+///      https://www.datadictionary.nhs.uk/attributes/community_health_index_number.html?hl=chi%2Cnumber
 ///      and https://webarchive.nationalarchives.gov.uk/ukgwa/20231221081503/https://digital.nhs.uk/about-nhs-digital/contact-us/freedom-of-information/freedom-of-information-disclosure-log/december-2022/nic-690159-k8h4z
 ///      for more info.
 ///   </para>
@@ -235,6 +238,10 @@ public record class GbChiNumber : GbPatientNumberBase
    /// <summary>
    ///   Gets the binary gender extracted from the CHI number.
    /// </summary>
+   /// <remarks>
+   ///   The eigth digit (zero-based) is used to indicate the person's gender.
+   ///   Odd digits indicate male and even digits indicate female.
+   /// </remarks>
    public Gender.BinaryGender Gender
       => Value[GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);    // This works because the ASCII character values for digits have the same odd/even pattern
 
