@@ -480,4 +480,10 @@
   <data name="GbChiNumberInvalidDateOfBirth" xml:space="preserve">
     <value>GB CHI Number must contain a valid date of birth (in DDMMYY format) as the first six digits</value>
   </data>
+  <data name="InvalidCenturyCutoff" xml:space="preserve">
+    <value>Century cutoff must be an integer between 1 and 100 (inclusive)</value>
+  </data>
+  <data name="InvalidYearForYyToYyyyConversion" xml:space="preserve">
+    <value>The value to convert from a two-digit year to a four-digit year must be in the range 0-99 or 1000-9999</value>
+  </data>
 </root>

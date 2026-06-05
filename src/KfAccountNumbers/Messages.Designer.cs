@@ -655,6 +655,24 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Century cutoff must be an integer between 1 and 100 (inclusive).
+        /// </summary>
+        internal static string InvalidCenturyCutoff {
+            get {
+                return ResourceManager.GetString("InvalidCenturyCutoff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value to convert from a two-digit year to a four-digit year must be in the range 0-99 or 1000-9999.
+        /// </summary>
+        internal static string InvalidYearForYyToYyyyConversion {
+            get {
+                return ResourceManager.GetString("InvalidYearForYyToYyyyConversion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to IS Kennitala may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string IsKennitalaEmpty {
