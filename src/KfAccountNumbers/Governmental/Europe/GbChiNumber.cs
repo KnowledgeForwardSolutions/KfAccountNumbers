@@ -136,9 +136,9 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      objects.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(GbChiNumberJsonConverter))]
 public record class GbChiNumber : GbPatientNumberBase
 {
-
    /// <summary>
    ///   Discriminated union defining the possible validation errors that can
    ///   occur when creating a new <see cref="GbChiNumber"/>.
@@ -314,6 +314,28 @@ public record class GbChiNumber : GbPatientNumberBase
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
+   ///   Extracts the date of birth from the CHI number.
+   /// </summary>
+   /// <param name="centuryCutoff">
+   ///   Optional. <see cref="CenturyCutoff"/> used to convert the two-digit
+   ///   year in the CHI number to a four-digit year. Will default to
+   ///   <see cref="CenturyCutoff.DefaultInstance"/> (with cutoff value of 50)
+   ///   if not supplied.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="DateOnly"/> containing the extracted date of birth.
+   /// </returns>
+   public DateOnly GetDateOfBirth(CenturyCutoff? centuryCutoff = null)
+   {
+      centuryCutoff ??= CenturyCutoff.DefaultInstance;
+
+      var (day, month, twoDigitYear) = GetDayMonthYear(Value);
+      var fourDigitYear = centuryCutoff.ToFourDigitYear(twoDigitYear);
+
+      return new DateOnly(fourDigitYear, month, day);
+   }
+
+   /// <summary>
    ///   Get a string representation of the CHI number.
    /// </summary>
    /// <returns>
@@ -366,4 +388,23 @@ public record class GbChiNumber : GbPatientNumberBase
          ? default(ValidValue)
          : GetInvalidDateOfBirthResult(value, Messages.GbChiNumberInvalidDateOfBirth);
    }
+}
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
+public class GbChiNumberJsonConverter : JsonConverter<GbChiNumber>
+{
+   public override GbChiNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new GbChiNumber(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, GbChiNumber value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }

@@ -992,6 +992,84 @@ public class GbChiNumberTests
 
    #endregion
 
+   #region GetDateOfBirth Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData("010100", "2000/01/01")]
+   [InlineData("311299", "1999/12/31")]
+   [InlineData("290200", "2000/02/29")]
+   [InlineData("010150", "1950/01/01")]
+   [InlineData("311249", "2049/12/31")]
+   public void GbChiNumber_GetDateOfBirth_ShouldReturnExpectedValue_WhenCenturyCutoffIsDefault(
+      String dateOfBirth,
+      String expectedStringDob)
+   {
+      // Arrange.
+      var value = GetChiNumberWithValidCheckDigit(dateOfBirth);
+      var sut = new GbChiNumber(value);
+      var expected = DateOnly.ParseExact(expectedStringDob, "yyyy/MM/dd", CultureInfo.InvariantCulture);
+
+      // Act/assert.
+      sut.GetDateOfBirth().Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("010100",  30, "2000/01/01")]
+   [InlineData("311299",  30, "1999/12/31")]
+   [InlineData("290200",  30, "2000/02/29")]
+   [InlineData("010130",  30, "1930/01/01")]
+   [InlineData("311229",  30, "2029/12/31")]
+   public void GbChiNumber_GetDateOfBirth_ShouldReturnExpectedValue_WhenCenturyCutoffIsSupplied(
+      String dateOfBirth,
+      Int32 centuryCutoff,
+      String expectedStringDob)
+   {
+      // Arrange.
+      var value = GetChiNumberWithValidCheckDigit(dateOfBirth);
+      var sut = new GbChiNumber(value);
+      var expected = DateOnly.ParseExact(expectedStringDob, "yyyy/MM/dd", CultureInfo.InvariantCulture);
+
+      // Act/assert.
+      sut.GetDateOfBirth((CenturyCutoff)centuryCutoff).Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("010101", "1901/01/01")]
+   [InlineData("311200", "2000/12/31")]
+   public void GbChiNumber_GetDateOfBirth_ShouldReturnExpectedValue_WhenCenturyCutoffIsMinimumValidValue(
+      String dateOfBirth,
+      String expectedStringDob)
+   {
+      // Arrange.
+      var value = GetChiNumberWithValidCheckDigit(dateOfBirth);
+      var sut = new GbChiNumber(value);
+      var centuryCutoff = 1;
+      var expected = DateOnly.ParseExact(expectedStringDob, "yyyy/MM/dd", CultureInfo.InvariantCulture);
+
+      // Act/assert.
+      sut.GetDateOfBirth((CenturyCutoff)centuryCutoff).Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("311299", "2099/12/31")]
+   public void GbChiNumber_GetDateOfBirth_ShouldReturnExpectedValue_WhenCenturyCutoffIsMaximumValidValue(
+      String dateOfBirth,
+      String expectedStringDob)
+   {
+      // Arrange.
+      var value = GetChiNumberWithValidCheckDigit(dateOfBirth);
+      var sut = new GbChiNumber(value);
+      var centuryCutoff = 100;
+      var expected = DateOnly.ParseExact(expectedStringDob, "yyyy/MM/dd", CultureInfo.InvariantCulture);
+
+      // Act/assert.
+      sut.GetDateOfBirth((CenturyCutoff)centuryCutoff).Should().Be(expected);
+   }
+
+   #endregion
+
    #region GetHashCode Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -1222,6 +1300,106 @@ public class GbChiNumberTests
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbChiNumber_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new GbChiNumber(ValidUnformattedChiNumber);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<GbChiNumber>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void GbChiNumber_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new GbChiNumber(AltValidFormattedChiNumber);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public GbChiNumber ChiNumber { get; set; } = null!;
+   }
+
+   [Fact]
+   public void GbChiNumber_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { ChiNumber = new GbChiNumber(ValidUnformattedChiNumber) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void GbChiNumber_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"ChiNumber\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void GbChiNumber_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"ChiNumber\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.ChiNumber.Should().BeNull();
+   }
+
+   [Fact]
+   public void GbChiNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenValueIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"ChiNumber\":\"123-456-78901\"}";  // Invalid length
+      GbChiNumber.ValidationError expected = new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         13,
+         GbPatientNumberBase.ValidLengthDefinitions);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
