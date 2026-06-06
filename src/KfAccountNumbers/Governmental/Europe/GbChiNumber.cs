@@ -134,7 +134,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      for more info.
 ///   </para>
 ///   <para>
-///      Also see <see cref="GbHcNumber"/>, <see cref="GbChiNumber"/> and
+///      Also see <see cref="GbHcNumber"/>, <see cref="GbNhsNumber"/> and
 ///      <see cref="GbPatientNumber"/> for associated patient identifier business
 ///      objects.
 ///   </para>
@@ -239,7 +239,7 @@ public record class GbChiNumber : GbPatientNumberBase
    ///   Gets the binary gender extracted from the CHI number.
    /// </summary>
    /// <remarks>
-   ///   The eigth digit (zero-based) is used to indicate the person's gender.
+   ///   The eighth digit (zero-based) is used to indicate the person's gender.
    ///   Odd digits indicate male and even digits indicate female.
    /// </remarks>
    public Gender.BinaryGender Gender

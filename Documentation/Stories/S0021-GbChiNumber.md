@@ -13,20 +13,20 @@ I can validate, parse, and work with CHI numbers in a type-safe manner with comp
 
 ### Structure and Validation
 - [x] The `GbChiNumber` type represents a Scottish CHI Number (Community Health Index Number)
-- [x] The number is a 10-digit identifier in the format DDMMYYNNNNC where:
+- [x] The number is a 10-digit identifier in the format DDMMYYNNNC where:
   - **DDMMYY**: Date of birth (day, month, year - 2 digits each)
-  - **NNNN**: Four-digit sequence number (unique identifier for individuals born on the same date). Odd trailing digits indicate gender = male and even trailing digits indicate gender = female.
+  - **NNN**: Four-digit sequence number (unique identifier for individuals born on the same date). Odd trailing digits indicate gender = male and even trailing digits indicate gender = female.
   - **C**: Check digit calculated using modulus 11 algorithm
 - [x] Total length is 10 digits (unformatted) or 12 characters (formatted with separator)
 - [x] Constructor accepts string representation and throws `UKfValidationException<GbChiNumber.ValidationError>` if invalid
 - [x] Static `Validate` method returns `GbChiNumber.ValidationResult` union value
 - [x] Static `Create` method uses Result pattern returning `CreateResult<GbChiNumber, GbChiNumber.ValidationError>`
 - [x] `GbChiNumber.ValidationError` is a union of the following types: `EmptyValue`, `InvalidLength`, `InvalidCharacter`, `InvalidCheckSum`, `InvalidSeparator`, `InvalidDateOfBirth` and `GbUniquePatientIdentifierInvalidRange`
-- [x] `GbChiNumber.ValidationResult` extends `GbChiNumber.ValidationError` with the type `ValidValue` to indicate a sucessful validation.
+- [x] `GbChiNumber.ValidationResult` extends `GbChiNumber.ValidationError` with the type `ValidValue` to indicate a successful validation.
 
 ### Validation Rules
 - [x] Value may not be null, empty, or all whitespace
-- [x] Value must be either 10 digits or 11 characters with a dash separator in position 6
+- [x] Value must be either 10 digits or 12 characters with separator characters in positions 3 and 7 (zero-based)
 - [x] Characters 0-1 (DD) must be digits 01-31
 - [x] Characters 2-3 (MM) must be digits 01-12
 - [x] Characters 4-5 (YY) must be digits 00-99

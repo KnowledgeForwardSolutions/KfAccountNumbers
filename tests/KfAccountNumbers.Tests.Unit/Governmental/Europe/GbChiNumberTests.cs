@@ -909,7 +909,7 @@ public class GbChiNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidChiNumberDateOfBirthValues))]
-   public void GbChiNumber_Create_ShouldReturnInvalidRange_WhenValueHasInvalidDateOfBirth(
+   public void GbChiNumber_Create_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidDateOfBirth(
       String dateOfBirth,
       String separator)
    {

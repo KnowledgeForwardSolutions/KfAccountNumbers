@@ -1,3 +1,5 @@
+using Microsoft.Win32.SafeHandles;
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -307,11 +309,10 @@ public abstract record GbPatientNumberBase
          return false;
       }
 
-      // Assume 21st century (2000s) because the only difference between 1900s
-      // and 2000s is 29/20/00 (valid in the 2000's because 2000 is a leap year
-      // while 1900 is not a leap year). Since there are no living persons born
-      // in 1900, we can safely treat all possible dates of birth as being in
-      // the 2000s.
+      // Treat YY as 20YY for date validation: within 00-99, the only leap-year
+      // difference between 19YY and 20YY is YY=00 (1900 is not a leap year;
+      // 2000 is). Since the CenturyCutoff helper treats 00 = 2000, we do the
+      // same here to keep this check consistent with GetDateOfBirth.
       year += 2000;
 
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);

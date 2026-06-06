@@ -4,8 +4,8 @@ Some basic guidelines to promote code uniformity.
 
 ## General Guidelines
 
-* Prefer .Net system types over C# language types to promote consistent use of
-   Pascal casing for all typenames. I.e. prefer Int32 over int; Double over double.
+* Prefer .NET system types over C# language types to promote consistent use of
+   Pascal casing for all type names. I.e. prefer Int32 over int; Double over double.
 * Prefer `var` for built-in and apparent types
 * Use C# 10 global usings and file-scoped namespaces to reduce code boilerplate.
 * Use 3-space indentation, UTF-8, LF line endings
@@ -58,7 +58,7 @@ the '_When'. For example, instead of:
 use
 
 ```text
-    CheckDigitAlgirithm_Validate_ShouldApplyCorrectWeightsToEachCharacter
+    CheckDigitAlgorithm_Validate_ShouldApplyCorrectWeightsToEachCharacter
 ```
 
 Use the name "value" for a string being passed to the object's constructor, Create or Validate method.
