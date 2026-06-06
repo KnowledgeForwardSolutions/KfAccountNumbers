@@ -1,3 +1,5 @@
+using Microsoft.Win32.SafeHandles;
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -6,6 +8,11 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </summary>
 public abstract record GbPatientNumberBase
 {
+   /// <summary>
+   ///   The six-digit date format used by CHI numbers.
+   /// </summary>
+   public const String ChiNumberDateFormat = "DDMMYY";
+
    /// <summary>
    ///   The default format mask that will render the patient number as a
    ///   "3 3 4" value.
@@ -31,6 +38,11 @@ public abstract record GbPatientNumberBase
    ///   The zero-based offset of the second separator character in a formatted patient number.
    /// </summary>
    internal const Int32 SeparatorPosition2 = 7;
+
+   /// <summary>
+   ///   The zero-based offset for the digit that encodes gender for CHI numbers.
+   /// </summary>
+   internal const Int32 GenderOffset = 8;
 
    /// <summary>
    ///   Predefined array used when reporting invalid length values.
@@ -71,6 +83,38 @@ public abstract record GbPatientNumberBase
       ///   Reserved test block: 900 000 000 to 999 999 999.
       /// </summary>
       Test,
+   }
+
+   /// <summary>
+   ///   Extract the two-digit day, month and year elements from a formatted or
+   ///   unformatted patient number <paramref name="value"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   The patient number containing the day, month and year values.
+   /// </param>
+   /// <returns>
+   ///   A tuple containing the two-digit day, month and year elements contained
+   ///   in the first six digits of the <paramref name="value"/>.
+   /// </returns>
+   protected static (Int32 Day, Int32 Month, Int32 Year) GetDayMonthYear(ReadOnlySpan<Char> value)
+   {
+      var day = value.ParseTwoDigits();
+      Int32 month, year;
+      if (IsFormatted(value))
+      {
+         // When formatted, the month value is split across the trailing
+         // character of the first group of three digits and the first character
+         // of the second group of three digits.
+         month = (value[2].ToSingleDigit() * 10) + value[4].ToSingleDigit();
+         year = value[5..].ParseTwoDigits();
+      }
+      else
+      {
+         month = value[2..].ParseTwoDigits();
+         year = value[4..].ParseTwoDigits();
+      }
+
+      return (day, month, year);
    }
 
    /// <summary>
@@ -129,6 +173,24 @@ public abstract record GbPatientNumberBase
    /// </returns>
    protected static InvalidChecksum GetInvalidChecksumResult()
       => new(Messages.GbPatientNumberInvalidCheckDigit, Algorithms.Modulus11Decimal.AlgorithmName);
+
+   /// <summary>
+   ///   Create a new invalid date of birth result for a GB patient number.
+   /// </summary>
+   /// <param name="value">
+   ///   The value containing the invalid date of birth.
+   /// </param>
+   /// <param name="description">
+   ///   Message describing the validation failure.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="InvalidDateOfBirth"/> result containing the error message
+   ///   and validation details.
+   /// </returns>
+   protected static InvalidDateOfBirth GetInvalidDateOfBirthResult(
+      String value,
+      String description)
+      => new(description, value[..(IsFormatted(value) ? 7 : 6)], ChiNumberDateFormat);
 
    /// <summary>
    ///   Creates an invalid length result for a GB patient number.
@@ -223,6 +285,37 @@ public abstract record GbPatientNumberBase
          : LocateInvalidCharacter(value);
 
       return validCheckDigit;
+   }
+
+   /// <summary>
+   ///   Validates that the value date of birth component represents a valid
+   ///   date.
+   /// </summary>
+   /// <param name="value">
+   ///   The character span to validate.
+   /// </param>
+   /// <returns>
+   ///   <see langword="true"/> if the value's date of birth component represents
+   ///   a valid date; otherwise <see langword="false"/>.
+   /// </returns>
+   protected static Boolean ValidateChiNumberDateOfBirth(ReadOnlySpan<Char> value)
+   {
+#pragma warning disable IDE0008 // Use explicit type
+      var (day, month, year) = GetDayMonthYear(value);
+#pragma warning restore IDE0008 // Use explicit type
+
+      if (month is < 1 or > 12)
+      {
+         return false;
+      }
+
+      // Treat YY as 20YY for date validation: within 00-99, the only leap-year
+      // difference between 19YY and 20YY is YY=00 (1900 is not a leap year;
+      // 2000 is). Since the CenturyCutoff helper treats 00 = 2000, we do the
+      // same here to keep this check consistent with GetDateOfBirth.
+      year += 2000;
+
+      return day >= 1 && day <= DateTime.DaysInMonth(year, month);
    }
 
    /// <summary>

@@ -12,34 +12,34 @@ I can validate, parse, and work with CHI numbers in a type-safe manner with comp
 ## Acceptance Criteria
 
 ### Structure and Validation
-- [ ] The `GbChiNumber` type represents a Scottish CHI Number (Community Health Index Number)
-- [ ] The number is a 10-digit identifier in the format DDMMYYNNNNC where:
+- [x] The `GbChiNumber` type represents a Scottish CHI Number (Community Health Index Number)
+- [x] The number is a 10-digit identifier in the format DDMMYYNNNC where:
   - **DDMMYY**: Date of birth (day, month, year - 2 digits each)
-  - **NNNN**: Four-digit sequence number (unique identifier for individuals born on the same date). Odd trailing digits indicate gender = male and even trailing digits indicate gender = female.
+  - **NNN**: Four-digit sequence number (unique identifier for individuals born on the same date). Odd trailing digits indicate gender = male and even trailing digits indicate gender = female.
   - **C**: Check digit calculated using modulus 11 algorithm
-- [ ] Total length is 10 digits (unformatted) or 12 characters (formatted with separator)
-- [ ] Constructor accepts string representation and throws `UKfValidationException<GbChiNumber.ValidationError>` if invalid
-- [ ] Static `Validate` method returns `GbChiNumber.ValidationResult` union value
-- [ ] Static `Create` method uses Result pattern returning `CreateResult<GbChiNumber, GbChiNumber.ValidationError>`
-- [ ] `GbChiNumber.ValidationError` is a union of the following types: `EmptyValue`, `InvalidLength`, `InvalidCharacter`, `InvalidCheckSum`, `InvalidSeparator`, `InvalidDateOfBirth` and `GbUniquePatientIdentifierInvalidRange`
-- [ ] `GbChiNumber.ValidationResult` extends `GbChiNumber.ValidationError` with the type `ValidValue` to indicate a sucessful validation.
+- [x] Total length is 10 digits (unformatted) or 12 characters (formatted with separator)
+- [x] Constructor accepts string representation and throws `UKfValidationException<GbChiNumber.ValidationError>` if invalid
+- [x] Static `Validate` method returns `GbChiNumber.ValidationResult` union value
+- [x] Static `Create` method uses Result pattern returning `CreateResult<GbChiNumber, GbChiNumber.ValidationError>`
+- [x] `GbChiNumber.ValidationError` is a union of the following types: `EmptyValue`, `InvalidLength`, `InvalidCharacter`, `InvalidCheckSum`, `InvalidSeparator`, `InvalidDateOfBirth` and `GbUniquePatientIdentifierInvalidRange`
+- [x] `GbChiNumber.ValidationResult` extends `GbChiNumber.ValidationError` with the type `ValidValue` to indicate a successful validation.
 
 ### Validation Rules
-- [ ] Value may not be null, empty, or all whitespace
-- [ ] Value must be either 10 digits or 11 characters with a dash separator in position 6
-- [ ] Characters 0-1 (DD) must be digits 01-31
-- [ ] Characters 2-3 (MM) must be digits 01-12
-- [ ] Characters 4-5 (YY) must be digits 00-99
-- [ ] If separator characers are present, must be at positions 3 and 7 (zero-based) forming pattern: NNN NNN NNNN
-- [ ] If separator characters are present, they must not be ASCII digits ('0'-'9') and both separators must be the same character
-- [ ] Characters 7-9 (NNNN first 3 digits) must be digits 000-999
-- [ ] Character 10 (NNNN last digit/check digit C) must be a digit 0-9
-- [ ] The date portion (DDMMYY) must represent a valid calendar date
-- [ ] Date validation must account for leap years
-- [ ] Future dates are allowed even though CHI numbers are assigned at birth/registration. This eliminates any requirement for GbChiNumber to be aware of the current date/time.
-- [ ] Check digit (10th digit) must be valid according to modulus 11 algorithm
-- [ ] The first nine digits must be in the allowed range: 010 000 000 to 311 299 999
-- [ ] **Test numbers are NOT supported**: Numbers that would have invalid date components (e.g., day 90, month 00) are rejected
+- [x] Value may not be null, empty, or all whitespace
+- [x] Value must be either 10 digits or 12 characters with separator characters in positions 3 and 7 (zero-based)
+- [x] Characters 0-1 (DD) must be digits 01-31
+- [x] Characters 2-3 (MM) must be digits 01-12
+- [x] Characters 4-5 (YY) must be digits 00-99
+- [x] If separator characers are present, must be at positions 3 and 7 (zero-based) forming pattern: NNN NNN NNNN
+- [x] If separator characters are present, they must not be ASCII digits ('0'-'9') and both separators must be the same character
+- [x] Characters 7-9 (NNNN first 3 digits) must be digits 000-999
+- [x] Character 10 (NNNN last digit/check digit C) must be a digit 0-9
+- [x] The date portion (DDMMYY) must represent a valid calendar date
+- [x] Date validation must account for leap years
+- [x] Future dates are allowed even though CHI numbers are assigned at birth/registration. This eliminates any requirement for GbChiNumber to be aware of the current date/time.
+- [x] Check digit (10th digit) must be valid according to modulus 11 algorithm
+- [x] The first nine digits must be in the allowed range: 010 000 000 to 311 299 999
+- [x] **Test numbers are NOT supported**: Numbers that would have invalid date components (e.g., day 90, month 00) are rejected
 
 ### Check Digit Algorithm (Modulus 11)
 GbChisNumber should use the CheckDigits.Net Modulus11Decimal algorithm for validation of
@@ -62,66 +62,66 @@ the check digit. For reference, the check digit is calculated using the modulus 
 7. The calculated check digit must match the 10th digit
 
 ### Format Support
-- [ ] Accept unformatted: 0101901234
-- [ ] Accept formatted with separator characters: 010 190 1234
-- [ ] `Format` method with optional mask parameter (default: "___ ___ ____")
+- [x] Accept unformatted: 0101901234
+- [x] Accept formatted with separator characters: 010 190 1234
+- [x] `Format` method with optional mask parameter (default: "___ ___ ____")
 
 ### Properties
-- [ ] `Value` property returns the raw CHI number string as stored (10 digits or with dash if originally provided)
-- [ ] `Gender` property returns a GbChiNumber.GenderUnion composed of types Male and Female. The ninth digit determines the gender with odd values = Male and even value = Female.
+- [x] `Value` property returns the raw CHI number string as stored (10 digits or with dash if originally provided)
+- [x] `Gender` property returns a GbChiNumber.GenderUnion composed of types Male and Female. The ninth digit determines the gender with odd values = Male and even value = Female.
 
 ### Date of Birth Intelligence
-- [ ] CHI number encodes actual date of birth in first 6 digits (DDMMYY)
-- [ ] Constructor century determination logic uses the default century cutoff of 50
+- [x] CHI number encodes actual date of birth in first 6 digits (DDMMYY)
+- [x] Constructor century determination logic uses the default century cutoff of 50
   - Years 00-49: Assumed to be 2000-2049 (current century)
   - Years 50-99: Assumed to be 1950-1999 (previous century)
-- [ ] Date must be valid calendar date (handle leap years correctly)
-- [ ] **No test number range**: Unlike NHS numbers, CHI does not have test ranges because date component must be valid
+- [x] Date must be valid calendar date (handle leap years correctly)
+- [x] **No test number range**: Unlike NHS numbers, CHI does not have test ranges because date component must be valid
 
 ### Operators and Methods
-- [ ] Implicit conversion to string
-- [ ] Explicit conversion from string
-- [ ] `ToString` returns the value as stored (with or without dash)
-- [ ] Proper equality implementation (separator-insensitive: with/without dash are equal)
-- [ ] JSON serialization/deserialization support via `GbChiNumberJsonConverter`
-- [ ] `GetDateOfBirth` method returns a `DateOnly` value. Accepts an option `CenturyCutoff` object that is used to determine the exact century. The default century cutoff is 50.
+- [x] Implicit conversion to string
+- [x] Explicit conversion from string
+- [x] `ToString` returns the value as stored (without formatting characters)
+- [x] Proper equality implementation (separator-insensitive: with/without dash are equal)
+- [x] JSON serialization/deserialization support via `GbChiNumberJsonConverter`
+- [x] `GetDateOfBirth` method returns a `DateOnly` value. Accepts an option `CenturyCutoff` object that is used to determine the exact century. The default century cutoff is 50.
 
 ### Special Cases
-- [ ] Normalize separator characters during validation
-- [ ] Reject numbers where calculated check digit would be 10
-- [ ] Handle leap year validation correctly for all centuries
-- [ ] Leading zeros in sequence number and date components are significant
+- [x] Normalize separator characters during validation
+- [x] Reject numbers where calculated check digit would be 10
+- [x] Handle leap year validation correctly for all centuries
+- [x] Leading zeros in sequence number and date components are significant
 
 ### Test Coverage
-- [ ] Standard number range (010 000 000 to 311 299 999)
-- [ ] Valid CHI numbers with correct check digits from 1900s
-- [ ] Valid CHI numbers with correct check digits from 2000s
-- [ ] Invalid check digits
-- [ ] Check digit edge case: calculated digit would be 11 (should use 0)
-- [ ] Check digit edge case: calculated digit would be 10 (should be invalid number)
-- [ ] Valid dates in different centuries (1950-1999, 2000-2049)
-- [ ] Leap year dates (Feb 29 in leap years)
-- [ ] Invalid leap year dates (Feb 29 in non-leap years)
-- [ ] Invalid dates (day 32, month 13, day 00, month 00)
-- [ ] Century boundary dates (1999/2000, 1949/1950)
-- [ ] Both formatted (with dash) and unformatted inputs
-- [ ] Format and ToString methods
-- [ ] Separator character normalization
-- [ ] Equality and hash code (separator-insensitive)
-- [ ] JSON serialization round-trip
-- [ ] Conversion operators
-- [ ] Create method Result pattern
-- [ ] Leading zeros preservation
-- [ ] Null, empty, and whitespace inputs
-- [ ] Invalid lengths
-- [ ] Non-digit characters (except separator characters in correct position)
-- [ ] Invalid separator position or character
-- [ ] GetDateOfBirth extraction for various dates
-- [ ] Gender property, odd and even digits
+- [x] Standard number range (010 000 000 to 311 299 999)
+- [x] Valid CHI numbers with correct check digits from 1900s
+- [x] Valid CHI numbers with correct check digits from 2000s
+- [x] Invalid check digits
+- [x] Check digit edge case: calculated digit would be 11 (should use 0)
+- [x] Check digit edge case: calculated digit would be 10 (should be invalid number)
+- [x] Valid dates in different centuries (1950-1999, 2000-2049)
+- [x] Leap year dates (Feb 29 in leap years)
+- [x] Invalid leap year dates (Feb 29 in non-leap years)
+- [x] Invalid dates (day 32, month 13, day 00, month 00)
+- [x] Century boundary dates (1999/2000, 1949/1950)
+- [x] Both formatted (with dash) and unformatted inputs
+- [x] Format and ToString methods
+- [x] Separator character normalization
+- [x] Equality and hash code (separator-insensitive)
+- [x] JSON serialization round-trip
+- [x] Conversion operators
+- [x] Create method Result pattern
+- [x] Leading zeros preservation
+- [x] Null, empty, and whitespace inputs
+- [x] Invalid lengths
+- [x] Non-digit characters (except separator characters in correct position)
+- [x] Invalid separator position or character
+- [x] GetDateOfBirth extraction for various dates
+- [x] Gender property, odd and even digits
 
 ### Documentation
-- [ ] XML documentation for all public members
-- [ ] README.md section with:
+- [x] XML documentation for all public members
+- [x] README.md section with:
   - Structure explanation (DDMMYYNNNNC format)
   - Date of birth encoding (first 6 digits)
   - Century determination logic (threshold approach)
@@ -140,12 +140,12 @@ the check digit. For reference, the check digit is calculated using the modulus 
   - Note about century determination threshold
 
 ### Performance
-- [ ] Use `ReadOnlySpan<Char>` for validation and parsing
-- [ ] Efficient check digit calculation
-- [ ] Efficient date validation
-- [ ] Single-pass validation where possible
-- [ ] Minimal string allocations
-- [ ] separator character normalization efficient
+- [x] Use `ReadOnlySpan<Char>` for validation and parsing
+- [x] Efficient check digit calculation
+- [x] Efficient date validation
+- [x] Single-pass validation where possible
+- [x] Minimal string allocations
+- [x] separator character normalization efficient
 
 ## Notes
 - CHI Number = Community Health Index Number

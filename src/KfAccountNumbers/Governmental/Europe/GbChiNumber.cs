@@ -3,17 +3,25 @@
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
-///   Strongly typed business object that represents the identifier used by
-///   Northern Ireland's public health service, Health and Care (H&amp;C).
+///   Strongly typed business object that represents the identifier used by the
+///   Scottish Community Health Index (CHI).
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A H&amp;C Number consists of 10 digits, structured as NNNNNNNNNC, where:
+///      A CHI Number consists of 10 digits, structured as DDMMYYNNGC, where:
 ///      <list type="bullet">
 ///         <item>
-///            <term>NNNNNNNNN</term>
+///            <term>DDMMYY</term>
 ///            <description>
-///               A unique nine-digit number assigned by the H&amp;C.
+///               The patient date of birth encoded in DDMMYY format.
+///            </description>
+///         </item>
+///         <item>
+///            <term>NNG</term>
+///            <description>
+///               Three digits used to differentiate between two persons born on
+///               the same day. The third digit (G) also indicates the person's
+///               gender, where odd numbers = male and even numbers = female.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -26,7 +34,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      </list>
 ///   </para>
 ///   <para>
-///      H&amp;C Numbers can be displayed as a string of 10 digits or formatted for
+///      CHI Numbers can be displayed as a string of 10 digits or formatted for
 ///      readability as three groups of digits in a '3 3 4' pattern
 ///      (e.g. "123 456 7890"). The optional separator characters can be any
 ///      character that is not an ASCII digit ('0' - '9'), but both separator
@@ -36,14 +44,17 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      Each of the public health services in the United Kingdom (NHS, Scottish CHI
 ///      and Northern Ireland H&amp;C) are allocated separate blocks of 10-digit
 ///      numbers so it is possible to determine what service issued the number by
-///      comparing the number to a list of valid ranges for each service. For
-///      H&amp;C, the valid ranges are 320 000 000 to 399 999 999 (excluding the
-///      trailing check digit). <see cref="GbHcNumber"/> also allows a range of
-///      numbers from 900 000 000 to 999 999 999 which are reserved for test
-///      purposes and not issued to the public.
+///      comparing the number to a list of valid ranges for each service. For CHI,
+///      the valid range is 010 000 000 to 311 299 999 (excluding the trailing check
+///      digit). The leading two digits of the valid range correspond to the
+///      valid date format (DDMMYY) where 01-31 are allowed for the day component.
+///      Unlike <see cref="GbNhsNumber"/> and <see cref="GbHcNumber"/>,
+///      <see cref="GbChiNumber"/> does not allow test numbers in the range of
+///      900 000 000 to 999 999 999 because those numbers would not contain a valid
+///      date of birth.
 ///   </para>
 ///   <para>
-///      When creating a new <see cref="GbHcNumber"/>, the following validation
+///      When creating a new <see cref="GbChiNumber"/>, the following validation
 ///      rules are applied:
 ///      <list type="bullet">
 ///         <item>
@@ -78,67 +89,62 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The first nine digits must fall in one of the following ranges:
-///               320 000 000 to 399 999 999 or 900 000 000 to 999 999 999.
+///               The first nine digits must fall in the following range:
+///               010 000 000 to 311 299 999.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The first six digits must represent a valid date in DDMMYY format.
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
-///      The Modulus 11 check digit algorithm used by H&amp;C numbers can generate
-///      a check value of 10 which can not be encoded as a single decimal digit.
-///      Health and Care and other issuing authorities avoid this issue by not
-///      issuing any number that would result in a check value of 10. This means
-///      that approximately 9.09% of all possible values are never issued.
+///      The Modulus 11 check digit algorithm used by CHI numbers can generate a
+///      check value of 10 which can not be encoded as a single decimal digit.
+///      Community Health Index and other issuing authorities avoid this
+///      issue by not issuing any number that would result in a check value of
+///      10. This means that approximately 9.09% of all possible values are never
+///      issued.
 ///   </para>
 ///   <para>
 ///      Example values:
 ///      <list type="bullet">
 ///         <item>
-///            <term>3200000007</term>
+///            <term>3112999991</term>
 ///            <description>
-///               Standard H&amp;C number without formatting.
+///               CHI number without formatting. Date of birth December 31, 1999,
+///               gender = male.
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>320 000 0007</term>
+///            <term>311 299 9991</term>
 ///            <description>
-///               Standard H&amp;C number, formatted for readability.
-///            </description>
-///         </item>
-///         <item>
-///            <term>9000000009</term>
-///            <description>
-///               Test number without formatting.
+///               The same, but with format characters.
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
 ///      See https://en.wikipedia.org/wiki/NHS_number,
-///      https://www.datadictionary.nhs.uk/attributes/health_and_care_number.html?hl=number
+///      https://en.wikipedia.org/wiki/National_Health_Service_Central_Register#Community_Health_Index,
+///      https://www.datadictionary.nhs.uk/attributes/community_health_index_number.html?hl=chi%2Cnumber
 ///      and https://webarchive.nationalarchives.gov.uk/ukgwa/20231221081503/https://digital.nhs.uk/about-nhs-digital/contact-us/freedom-of-information/freedom-of-information-disclosure-log/december-2022/nic-690159-k8h4z
 ///      for more info.
 ///   </para>
 ///   <para>
-///      Also see <see cref="GbChiNumber"/>, <see cref="GbNhsNumber"/> and
+///      Also see <see cref="GbHcNumber"/>, <see cref="GbNhsNumber"/> and
 ///      <see cref="GbPatientNumber"/> for associated patient identifier business
 ///      objects.
 ///   </para>
 /// </remarks>
-[JsonConverter(typeof(GbHcNumberJsonConverter))]
-public record GbHcNumber : GbPatientNumberBase
+[JsonConverter(typeof(GbChiNumberJsonConverter))]
+public record class GbChiNumber : GbPatientNumberBase
 {
    /// <summary>
-   ///   Discriminated union defining the types of identifier that
-   ///   <see cref="GbHcNumber"/> can represent. Either a H&amp;C number or a test
-   ///   number.
-   /// </summary>
-   public union IdentifierCategory(GbHealthService.Hc, GbHealthService.Test) { }
-
-   /// <summary>
    ///   Discriminated union defining the possible validation errors that can
-   ///   occur when creating a new <see cref="GbHcNumber"/>.
+   ///   occur when creating a new <see cref="GbChiNumber"/>.
    /// </summary>
    public union ValidationError(
       EmptyValue,
@@ -146,13 +152,14 @@ public record GbHcNumber : GbPatientNumberBase
       InvalidCharacter,
       InvalidChecksum,
       InvalidSeparator,
-      GbPatientNumberInvalidRange)
+      GbPatientNumberInvalidRange,
+      InvalidDateOfBirth)
    {
    }
 
    /// <summary>
    ///   Discriminated union defining the possible results that can occur when
-   ///   validating a <see cref="GbHcNumber"/>.
+   ///   validating a <see cref="GbChiNumber"/>.
    /// </summary>
    public union ValidationResult(
       ValidValue,
@@ -161,15 +168,16 @@ public record GbHcNumber : GbPatientNumberBase
       InvalidCharacter,
       InvalidChecksum,
       InvalidSeparator,
-      GbPatientNumberInvalidRange)
+      GbPatientNumberInvalidRange,
+      InvalidDateOfBirth)
    {
    }
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="GbHcNumber"/> class.
+   ///   Initializes a new instance of the <see cref="GbChiNumber"/> class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Northern Ireland H&amp;C number.
+   ///   String representation of a Scottish CHI number.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
@@ -188,20 +196,22 @@ public record GbHcNumber : GbPatientNumberBase
    ///   digit character ('0'-'9') in a separator location or uses a different
    ///   character in each separator location.
    ///   - or -
-   ///   The first nine digits of <paramref name="value"/> are not in one of the
-   ///   valid ranges for a H&amp;C number (320 000 000 to 399 999 999 or
-   ///   900 000 000 to 999 999 999).
+   ///   The first nine digits of <paramref name="value"/> are not in the range
+   ///   of 010 000 000 to 311 299 999.
+   ///   - or -
+   ///   The first six digits of <paramref name="value"/> do not represent a
+   ///   valid date in DDMMYY format.
    /// </exception>
-   public GbHcNumber(String? value)
+   public GbChiNumber(String? value)
       : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="GbHcNumber"/> class.
+   ///   Initializes a new instance of the <see cref="GbChiNumber"/> class.
    ///   Private constructor that actually does the work. Supports bypassing
    ///   validation when creating a new instance from a value that has already
    ///   been validated.
    /// </summary>
-   private GbHcNumber(String? value, ValidationMode validationMode)
+   private GbChiNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
@@ -216,6 +226,7 @@ public record GbHcNumber : GbPatientNumberBase
                InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
                GbPatientNumberInvalidRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
                _ => new SwitchExpressionException("This branch should never be reached"),
             };
          }
@@ -225,78 +236,76 @@ public record GbHcNumber : GbPatientNumberBase
    }
 
    /// <summary>
-   ///   Gets the specific type of identifier that this instance represents.
+   ///   Gets the binary gender extracted from the CHI number.
    /// </summary>
-   public IdentifierCategory IdentifierType
-   {
-      get => GetIdentifierCategory(Value) switch
-      {
-         IdentifierRangeCategory.Hc => default(GbHealthService.Hc),
-         IdentifierRangeCategory.Test => default(GbHealthService.Test),
-         _ => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
-      };
-   }
+   /// <remarks>
+   ///   The eighth digit (zero-based) is used to indicate the person's gender.
+   ///   Odd digits indicate male and even digits indicate female.
+   /// </remarks>
+   public Gender.BinaryGender Gender
+      => Value[GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);    // This works because the ASCII character values for digits have the same odd/even pattern
 
    /// <summary>
-   ///   Gets the H&amp;C number, without any formatting.
+   ///   Gets the CHI number, without any formatting.
    /// </summary>
    public String Value { get; private init; }
 
    /// <summary>
-   ///   Implicitly converts a <see cref="GbHcNumber"/> to a <see cref="String"/>,
+   ///   Implicitly converts a <see cref="GbChiNumber"/> to a <see cref="String"/>,
    ///   returning an empty string if the source is null.
    /// </summary>
    /// <param name="source">
-   ///   The <see cref="GbHcNumber"/> to convert.
+   ///   The <see cref="GbChiNumber"/> to convert.
    /// </param>
-   public static implicit operator String(GbHcNumber source)
+   public static implicit operator String(GbChiNumber source)
       => source?.Value ?? String.Empty;         // Handle null object gracefully by returning empty string
 
    /// <summary>
-   ///   Defines an explicit conversion of a string to a <see cref="GbHcNumber"/>.
+   ///   Defines an explicit conversion of a string to a <see cref="GbChiNumber"/>.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a H&amp;C number.
+   ///   String representation of a Scottish CHI number.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
-   ///   <paramref name="value"/> is not a valid H&amp;C number.
+   ///   <paramref name="value"/> is not a valid CHI number.
    /// </exception>
-   public static explicit operator GbHcNumber(String value) => new(value);
+   public static explicit operator GbChiNumber(String value) => new(value);
 
    /// <summary>
-   ///   Create a new <see cref="GbHcNumber"/> using the Result pattern.
+   ///   Create a new <see cref="GbChiNumber"/> using the Result pattern.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a H&amp;C number.
+   ///   String representation of a Scottish CHI number.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{GbHcNumber, ValidationError}"/>. Will
-   ///   contain the new <see cref="GbHcNumber"/> if <paramref name="value"/>
+   ///   A <see cref="UCreateResult{GbChiNumber, ValidationError}"/>. Will
+   ///   contain the new <see cref="GbChiNumber"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<GbHcNumber, ValidationError> Create(String? value)
+   public static UCreateResult<GbChiNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
-         ValidValue => new GbHcNumber(value!, ValidationMode.BypassValidation),
+         ValidValue => new GbChiNumber(value!, ValidationMode.BypassValidation),
          EmptyValue emptyValue => (ValidationError)emptyValue,
          InvalidLength invalidLength => (ValidationError)invalidLength,
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
          InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
          InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
          GbPatientNumberInvalidRange invalidRange => (ValidationError)invalidRange,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
          _ => throw new SwitchExpressionException("This branch should never be reached"),
       };
 
    /// <summary>
-   ///   Format the H&amp;C number using the supplied <paramref name="mask"/>.
+   ///   Format the CHI number using the supplied <paramref name="mask"/>.
    /// </summary>
    /// <param name="mask">
    ///   Optional. The mask that specifies the final output. If not supplied
    ///   then the default mask "___ ___ ____" will be used instead.
    /// </param>
    /// <returns>
-   ///   A formatted H&amp;C number.
+   ///   A formatted Scottish CHI number.
    /// </returns>
    /// <exception cref="ArgumentNullException">
    ///   <paramref name="mask"/> is <see langword="null"/>.
@@ -307,24 +316,48 @@ public record GbHcNumber : GbPatientNumberBase
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the H&amp;C number.
+   ///   details on creating a mask to format the CHI number.
    /// </remarks>
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
-   ///   Get a string representation of the H&amp;C number.
+   ///   Extracts the date of birth from the CHI number.
+   /// </summary>
+   /// <param name="centuryCutoff">
+   ///   Optional. <see cref="CenturyCutoff"/> used to convert the two-digit
+   ///   year in the CHI number to a four-digit year. Will default to
+   ///   <see cref="CenturyCutoff.DefaultInstance"/> (with cutoff value of 50)
+   ///   if not supplied.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="DateOnly"/> containing the extracted date of birth.
+   /// </returns>
+   public DateOnly GetDateOfBirth(CenturyCutoff? centuryCutoff = null)
+   {
+      centuryCutoff ??= CenturyCutoff.DefaultInstance;
+
+#pragma warning disable IDE0008 // Use explicit type
+      var (day, month, twoDigitYear) = GetDayMonthYear(Value);
+#pragma warning restore IDE0008 // Use explicit type
+      var fourDigitYear = centuryCutoff.ToFourDigitYear(twoDigitYear);
+
+      return new DateOnly(fourDigitYear, month, day);
+   }
+
+   /// <summary>
+   ///   Get a string representation of the CHI number.
    /// </summary>
    /// <returns>
-   ///   The raw H*amp;C number, without separator characters.
+   ///   The raw CHI number, without separator characters.
    /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid
-   ///   H&amp;C number.
+   ///   CHI number.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a H&amp;C number.
+   ///   String representation of a CHI number.
    /// </param>
    /// <returns>
    ///   A <see cref="ValidationResult"/> union that indicates if the
@@ -355,17 +388,22 @@ public record GbHcNumber : GbPatientNumberBase
          return GetInvalidSeparatorResult(value, invalidSeparatorPosition);
       }
 
-      return GetIdentifierCategory(value) is not IdentifierRangeCategory.Hc and not IdentifierRangeCategory.Test
-         ? new GbPatientNumberInvalidRange(Messages.GbHcNumberInvalidRange)
-         : default(ValidValue);
+      if (GetIdentifierCategory(value) is not IdentifierRangeCategory.Chi)
+      {
+         return new GbPatientNumberInvalidRange(Messages.GbChiNumberInvalidRange);
+      }
+
+      return ValidateChiNumberDateOfBirth(value)
+         ? default(ValidValue)
+         : GetInvalidDateOfBirthResult(value, Messages.GbChiNumberInvalidDateOfBirth);
    }
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable SA1600 // Elements should be documented
-public class GbHcNumberJsonConverter : JsonConverter<GbHcNumber>
+public class GbChiNumberJsonConverter : JsonConverter<GbChiNumber>
 {
-   public override GbHcNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   public override GbChiNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
       if (reader.TokenType == JsonTokenType.Null)
       {
@@ -373,9 +411,9 @@ public class GbHcNumberJsonConverter : JsonConverter<GbHcNumber>
       }
 
       var str = reader.GetString();
-      return new GbHcNumber(str);
+      return new GbChiNumber(str);
    }
 
-   public override void Write(Utf8JsonWriter writer, GbHcNumber value, JsonSerializerOptions options)
+   public override void Write(Utf8JsonWriter writer, GbChiNumber value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
 }

@@ -583,6 +583,27 @@ public class GbNhsNumberTests
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
    }
+   [Fact]
+   public void GbNhsNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock1.Replace(' ', '.'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbNhsNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock1.Replace(' ', 'A'));
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock1.Replace(' ', 'a'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
 
    #endregion
 
@@ -618,6 +639,28 @@ public class GbNhsNumberTests
       // Arrange.
       var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
       var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbNhsNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock1);
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock1.Replace(' ', '.'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbNhsNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock1.Replace(' ', 'A'));
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock1.Replace(' ', 'a'));
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -783,6 +826,28 @@ public class GbNhsNumberTests
       sut1.Equals(sut2).Should().BeTrue();
    }
 
+   [Fact]
+   public void GbNhsNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock2);
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock2.Replace(' ', '.'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbNhsNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock2.Replace(' ', 'A'));
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock2.Replace(' ', 'a'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
    #endregion
 
    #region Format Method Tests
@@ -894,6 +959,36 @@ public class GbNhsNumberTests
       // Arrange. 10 and 12 character versions for same person should still be equal.
       var sut1 = new GbNhsNumber(ValidUnformattedNhsNumberBlock2);
       var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock2);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void GbNhsNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock2);
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock2.Replace(' ', '.'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void GbNhsNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbNhsNumber(ValidFormattedNhsNumberBlock2.Replace(' ', 'A'));
+      var sut2 = new GbNhsNumber(ValidFormattedNhsNumberBlock2.Replace(' ', 'a'));
 
       // Act.
       var hash1 = sut1.GetHashCode();
