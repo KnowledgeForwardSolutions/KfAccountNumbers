@@ -1,4 +1,4 @@
-﻿using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
    KfAccountNumbers.Governmental.Europe.GbHcNumber,
    KfAccountNumbers.Governmental.Europe.GbHcNumber.ValidationError>;
 
@@ -580,6 +580,28 @@ public class GbHcNumberTests
       (sut1 == sut2).Should().BeTrue();
    }
 
+   [Fact]
+   public void GbHcNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbHcNumber(ValidFormattedHcNumber);
+      var sut2 = new GbHcNumber(ValidFormattedHcNumber.Replace(' ', '.'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbHcNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbHcNumber(ValidFormattedHcNumber.Replace(' ', 'A'));
+      var sut2 = new GbHcNumber(ValidFormattedHcNumber.Replace(' ', 'a'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
    #endregion
 
    #region Inequality Operator Tests
@@ -614,6 +636,28 @@ public class GbHcNumberTests
       // Arrange.
       var sut1 = new GbHcNumber(ValidUnformattedHcNumber);
       var sut2 = new GbHcNumber(ValidUnformattedHcNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbHcNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbHcNumber(ValidFormattedHcNumber);
+      var sut2 = new GbHcNumber(ValidFormattedHcNumber.Replace(' ', '.'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbHcNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbHcNumber(ValidFormattedHcNumber.Replace(' ', 'A'));
+      var sut2 = new GbHcNumber(ValidFormattedHcNumber.Replace(' ', 'a'));
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -779,6 +823,28 @@ public class GbHcNumberTests
       sut1.Equals(sut2).Should().BeTrue();
    }
 
+   [Fact]
+   public void GbHcNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbHcNumber(ValidFormattedHcNumber);
+      var sut2 = new GbHcNumber(ValidFormattedHcNumber.Replace(' ', '.'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbHcNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbHcNumber(ValidFormattedHcNumber.Replace(' ', 'A'));
+      var sut2 = new GbHcNumber(ValidFormattedHcNumber.Replace(' ', 'a'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
    #endregion
 
    #region Format Method Tests
@@ -890,6 +956,36 @@ public class GbHcNumberTests
       // Arrange. 10 and 12 character versions for same person should still be equal.
       var sut1 = new GbHcNumber(ValidUnformattedHcNumber);
       var sut2 = new GbHcNumber(ValidFormattedHcNumber);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void GbHcNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbHcNumber(ValidFormattedHcNumber);
+      var sut2 = new GbHcNumber(ValidFormattedHcNumber.Replace(' ', '.'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void GbHcNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbHcNumber(ValidFormattedHcNumber.Replace(' ', 'A'));
+      var sut2 = new GbHcNumber(ValidFormattedHcNumber.Replace(' ', 'a'));
 
       // Act.
       var hash1 = sut1.GetHashCode();

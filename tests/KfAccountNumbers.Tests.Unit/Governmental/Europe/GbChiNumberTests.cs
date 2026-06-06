@@ -703,6 +703,28 @@ public class GbChiNumberTests
       (sut1 == sut2).Should().BeTrue();
    }
 
+   [Fact]
+   public void GbChiNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidFormattedChiNumber);
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber.Replace(' ', '.'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbChiNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidFormattedChiNumber.Replace(' ', 'A'));
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber.Replace(' ', 'a'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
    #endregion
 
    #region Inequality Operator Tests
@@ -737,6 +759,28 @@ public class GbChiNumberTests
       // Arrange.
       var sut1 = new GbChiNumber(ValidUnformattedChiNumber);
       var sut2 = new GbChiNumber(ValidUnformattedChiNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbChiNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidFormattedChiNumber);
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber.Replace(' ', '.'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbChiNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidFormattedChiNumber.Replace(' ', 'A'));
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber.Replace(' ', 'a'));
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -920,6 +964,28 @@ public class GbChiNumberTests
       // Arrange. 10 and 12 character versions for same person should still be equal.
       var sut1 = new GbChiNumber(ValidUnformattedChiNumber);
       var sut2 = new GbChiNumber(ValidFormattedChiNumber);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbChiNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidFormattedChiNumber);
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber.Replace(' ', '.'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbChiNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidFormattedChiNumber.Replace(' ', 'A'));
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber.Replace(' ', 'a'));
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -1114,6 +1180,36 @@ public class GbChiNumberTests
       // Arrange. 10 and 12 character versions for same person should still be equal.
       var sut1 = new GbChiNumber(ValidUnformattedChiNumber);
       var sut2 = new GbChiNumber(ValidFormattedChiNumber);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void GbChiNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidFormattedChiNumber);
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber.Replace(' ', '.'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void GbChiNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbChiNumber(ValidFormattedChiNumber.Replace(' ', 'A'));
+      var sut2 = new GbChiNumber(ValidFormattedChiNumber.Replace(' ', 'a'));
 
       // Act.
       var hash1 = sut1.GetHashCode();

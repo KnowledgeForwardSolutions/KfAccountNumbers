@@ -336,7 +336,9 @@ public record class GbChiNumber : GbPatientNumberBase
    {
       centuryCutoff ??= CenturyCutoff.DefaultInstance;
 
+#pragma warning disable IDE0008 // Use explicit type
       var (day, month, twoDigitYear) = GetDayMonthYear(Value);
+#pragma warning restore IDE0008 // Use explicit type
       var fourDigitYear = centuryCutoff.ToFourDigitYear(twoDigitYear);
 
       return new DateOnly(fourDigitYear, month, day);
