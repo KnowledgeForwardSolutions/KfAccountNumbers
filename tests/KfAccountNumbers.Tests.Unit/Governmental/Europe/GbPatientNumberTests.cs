@@ -69,6 +69,14 @@ public class GbPatientNumberTests
       throw new InvalidOperationException("Can't generate valid check digit");
    }
 
+   private static String GetRawValue(String value)
+      => value.Length switch
+      {
+         GbPatientNumberBase.UnformattedLength => value,
+         GbPatientNumberBase.ChiFormattedLength => $"{value[..6]}{value[7..]}",
+         GbPatientNumberBase.NhsFormattedLength => $"{value[..3]}{value[4..7]}{value[8..]}",
+      };
+
    public static TheoryData<String> ValidValues =>
    [
       ValidUnformattedChiNumber,
@@ -262,6 +270,29 @@ public class GbPatientNumberTests
       "899 999 999",
    ];
 
+   public static TheoryData<String> InvalidLengthForRangeValues =>
+   [
+      // CHI number block
+      "010 000 000",
+      "311 299 999",
+
+      // HC number block
+      "320000 000",
+      "399999 999",
+
+      // First NHS number block
+      "400000 000",
+      "499999 999",
+
+      // Second NHS number block
+      "600000 000",
+      "799999 999",
+
+      // Test numbers
+      "900000 000",
+      "999999 999",
+   ];
+
    public static TheoryData<String, String> InvalidChiNumberDateOfBirthValues = new()
    {
       // Note - certain combinations are commented out because they will fail range
@@ -306,6 +337,166 @@ public class GbPatientNumberTests
       { "311104", "-" },            // Invalid day of for November, any year
       // { "321204", "-" },            // Invalid day of for December, any year, will be considered a valid H & C number instead
    };
+
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbPatientNumber_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawValue(value);
+
+      // Act.
+      var sut = new GbPatientNumber(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void GbPatientNumber_Constructor_ShouldThrowValidationError_WhenValueIsEmpty(String value)
+   {
+      // Arrange.
+      GbPatientNumber.ValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbPatientNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void GbPatientNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      GbPatientNumber.ValidationError expected = new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         value.Length,
+         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbPatientNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Value.Should().BeEquivalentTo(expected.Value);              // Issue with FluentAssertions resolving nested types, so compare Value to Value
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterData))]
+   public void GbPatientNumber_Constructor_ShouldThrowValidationError_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      GbPatientNumber.ValidationError expected = new InvalidCharacter(
+         Messages.GbPatientNumberInvalidCharacter,
+         value[position],
+         position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbPatientNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void GbPatientNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      GbPatientNumber.ValidationError expected = new InvalidChecksum(
+         Messages.GbPatientNumberInvalidCheckDigit,
+         Algorithms.Modulus11Decimal.AlgorithmName);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbPatientNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void GbPatientNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      GbPatientNumber.ValidationError expected = new InvalidSeparator(
+         Messages.GbPatientNumberInvalidSeparator,
+         value[position],
+         position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbPatientNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidRangeValues))]
+   public void GbPatientNumber_Constructor_ShouldThrowValidationError_WhenValueIsOutsideOfValidRanges(String nineDigits)
+   {
+      // Arrange.
+      var value = nineDigits + GetCheckDigit(nineDigits);
+      GbPatientNumber.ValidationError expected = new GbPatientNumberInvalidRange(Messages.GbPatientNumberInvalidRange);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbPatientNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthForRangeValues))]
+   public void GbPatientNumber_Constructor_ShouldThrowValidationError_WhenLengthIsInvalidForRange(String nineDigits)
+   {
+      // Arrange.
+      var value = nineDigits + GetCheckDigit(nineDigits);
+      GbPatientNumber.ValidationError expected = new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         value.Length,
+         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbPatientNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Value.Should().BeEquivalentTo(expected.Value);              // Issue with FluentAssertions resolving nested types, so compare Value to Value
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidChiNumberDateOfBirthValues))]
+   public void GbPatientNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      String separator)
+   {
+      // Arrange.
+      var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
+      var invalidDateOfBirth = value[..6];
+      GbPatientNumber.ValidationError expected = new InvalidDateOfBirth(
+         Messages.GbChiNumberInvalidDateOfBirth,
+         invalidDateOfBirth,
+         GbPatientNumberBase.ChiNumberDateFormat);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new GbPatientNumber(value))
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
 
    #region Validate Method Tests
    // ==========================================================================
@@ -427,27 +618,8 @@ public class GbPatientNumberTests
    }
 
    [Theory]
-
-   // CHI number block
-   [InlineData("010 000 000")]
-   [InlineData("311 299 999")]
-
-   // HC number block
-   [InlineData("320000 000")]
-   [InlineData("399999 999")]
-
-   // First NHS number block
-   [InlineData("400000 000")]
-   [InlineData("499999 999")]
-
-   // Second NHS number block
-   [InlineData("600000 000")]
-   [InlineData("799999 999")]
-
-   // Test numbers
-   [InlineData("900000 000")]
-   [InlineData("999999 999")]
-   public void GbPatientNumber_Validate_ShouldReturnInvalidLength_WhenLengthIsInvalidForNumberType(String nineDigits)
+   [MemberData(nameof(InvalidLengthForRangeValues))]
+   public void GbPatientNumber_Validate_ShouldReturnInvalidLength_WhenLengthIsInvalidForRange(String nineDigits)
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);

@@ -393,8 +393,10 @@ of birth.
 
 ### GbPatientNumber
 
-`GbPatientNumber` represents a patient number issued by any of the UK public health services. `GbPatientNumber` uses all of
-the validation rules described above, including date of birth validation if the number is in the CHI block.
+`GbPatientNumber` represents a patient number issued by any of the UK public health services. `GbPatientNumber` uses all
+of the validation rules described above, including ensuring that the length of formatted values is appropriate for the
+specific number block (length 11 for values in the CHI block and 12 for values in other blocks) and ensuring that date
+of birth is valid if the number is in the CHI block.
 
 `GbPatientNumber` has an `IdentifierType` property that allows the user to determine the service that issued the number.
 `GbPatientNumber` allows implicit conversion from `GbNhsNumber`, `GbHcNumber` and `GbChiNumber` and implements 

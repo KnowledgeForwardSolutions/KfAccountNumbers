@@ -235,6 +235,9 @@ public record GbNhsNumber : GbPatientNumberBase
       {
          IdentifierRangeCategory.Nhs => default(GbHealthService.Nhs),
          IdentifierRangeCategory.Test => default(GbHealthService.Test),
+         IdentifierRangeCategory.Invalid => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
+         IdentifierRangeCategory.Chi => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
+         IdentifierRangeCategory.Hc => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
          _ => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
       };
    }
@@ -352,10 +355,12 @@ public record GbNhsNumber : GbPatientNumberBase
             : GetInvalidCharacterResult(value, invalidCharacterPosition);
       }
 
+#pragma warning disable IDE0046 // Convert to conditional expression
       if (!ValidateSeparators(value, out var invalidSeparatorPosition))
       {
          return GetInvalidSeparatorResult(value, invalidSeparatorPosition);
       }
+#pragma warning restore IDE0046 // Convert to conditional expression
 
       return GetIdentifierCategory(value) is not IdentifierRangeCategory.Nhs and not IdentifierRangeCategory.Test
          ? new GbPatientNumberInvalidRange(Messages.GbNhsNumberInvalidRange)

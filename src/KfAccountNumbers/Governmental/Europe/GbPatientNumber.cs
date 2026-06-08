@@ -1,3 +1,5 @@
+#pragma warning disable IDE0250 // Make struct 'readonly'
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -88,7 +90,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      indicates the exact type of identifier, based on the ranges listed
 ///      above. GbPatientNumber also includes methods to convert to the specific
 ///      identifier type (<see cref="ToGbNhsNumber"/>,
-///      <see cref="ToGbChiNumber"/> and see cref="ToGbHcNumber"/>).
+///      <see cref="ToGbChiNumber"/> and <see cref="ToGbHcNumber"/>).
 ///   </para>
 ///   <para>
 ///      When creating a new <see cref="GbPatientNumber"/>, the following
@@ -236,7 +238,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      Also see <see cref="GbChiNumber"/>, <see cref="GbHcNumber"/> and
-///      <see cref="GbNhsNumber"/> for associated patient identifier business
+///      <see cref="GbPatientNumber"/> for associated patient identifier business
 ///      objects.
 ///   </para>
 /// </remarks>
@@ -284,6 +286,83 @@ public record GbPatientNumber : GbPatientNumberBase
       InvalidDateOfBirth)
    {
    }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="GbPatientNumber"/> class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a GB patient number, either a NHS number,
+   ///   H&amp;C number, CHI number or a test number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="value"/> is not length 10 (or 11/12 if separator
+   ///   characters are used).
+   ///   - or -
+   ///   <paramref name="value"/> contains a non-digit character in any
+   ///   position other than the separator locations.
+   ///   - or -
+   ///   <paramref name="value"/> has invalid modulus 11 check digit character
+   ///   in the trailing (right-most) character position.
+   ///   - or -
+   ///   <paramref name="value"/> is greater than 10 characters in length and
+   ///   has an ASCII digit character ('0'-'9') in a separator location or uses
+   ///   a different character in each separator location.
+   ///   - or -
+   ///   The first nine digits of <paramref name="value"/> are not in one of the
+   ///   valid ranges for a CHI number (010 000 000 to 311 299 999), H&amp;C
+   ///   number (320 000 000 to 399 999 999), NHS number (400 000 000 to
+   ///   499 999 999, 600 000 000 to 799 999 999), or test numbers 900 000 000
+   ///   to 999 999 999.
+   ///   - or -
+   ///   <paramref name="value"/> is greater than 10 characters in length and
+   ///   the length does not match the expected length as determined by the
+   ///   range that the number falls into (11 for CHI numbers, 12 for other than
+   ///   CHI numbers).
+   ///   - or -
+   ///   <paramref name="value"/> is a CHI number (as determined by the range
+   ///   that the number falls into) and the first six digits are not a valid
+   ///   date in DDMMYY format.
+   /// </exception>
+   public GbPatientNumber(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="GbPatientNumber"/> class.
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has already
+   ///   been validated.
+   /// </summary>
+   private GbPatientNumber(String? value, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
+         {
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               GbPatientNumberInvalidRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               _ => new SwitchExpressionException("This branch should never be reached"),
+            };
+         }
+      }
+
+      Value = GetRawValue(value!);
+   }
+
+   /// <summary>
+   ///   Gets the patient number, without any formatting.
+   /// </summary>
+   public String Value { get; private init; }
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid
@@ -335,10 +414,12 @@ public record GbPatientNumber : GbPatientNumberBase
          return GetInvalidLengthResult(value);
       }
 
+#pragma warning disable IDE0046 // Convert to conditional expression
       if (identifierCategory is IdentifierRangeCategory.Chi && !ValidateChiNumberDateOfBirth(value))
       {
          return GetInvalidDateOfBirthResult(value, Messages.GbChiNumberInvalidDateOfBirth);
       }
+#pragma warning restore IDE0046 // Convert to conditional expression
 
       return default(ValidValue);
    }
