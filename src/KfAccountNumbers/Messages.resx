@@ -445,10 +445,10 @@
     <value>GB National Insurance Number with length 11 or 13 contains an invalid separator character. Separator characters may not be ASCII digits ('0'-'9') or uppercase or lowercase letters (A-Z, a-z). All separator locations must contain the same character.</value>
   </data>
   <data name="GbPatientNumberUnformattedLength" xml:space="preserve">
-    <value>An unformatted GB patient number must be 10 characters in length</value>
+    <value>An unformatted GB patient number (NHS, CHI or H&amp;C)</value>
   </data>
-  <data name="GbPatientNumberFormattedLength" xml:space="preserve">
-    <value>A formatted GB patient number must be 12 characters in length</value>
+  <data name="GbPatientNumberDoubleSeparatorFormattedLength" xml:space="preserve">
+    <value>A formatted NHS, H&amp;C or test patient number</value>
   </data>
   <data name="EmptyValueDescription" xml:space="preserve">
     <value>Value may not be null, empty ("") or all whitespace characters</value>
@@ -457,7 +457,7 @@
     <value>Value is valid</value>
   </data>
   <data name="GbPatientNumberInvalidLength" xml:space="preserve">
-    <value>GB patient number must have a length of 10 (without separators) or 12 (with separators)</value>
+    <value>GB patient number must have a length of 10 (without separators), 11 (CHI number with separator) or 12 (NHS, H&amp;C or test number with separators)</value>
   </data>
   <data name="GbPatientNumberInvalidCharacter" xml:space="preserve">
     <value>GB patient number must have only digit characters (0-9) in non-separator positions</value>
@@ -485,5 +485,11 @@
   </data>
   <data name="InvalidYearForYyToYyyyConversion" xml:space="preserve">
     <value>The value to convert from a two-digit year to a four-digit year must be in the range 0-99 or 1000-9999</value>
+  </data>
+  <data name="GbPatientNumberSingleSeparatorFormattedLength" xml:space="preserve">
+    <value>A formatted CHI number</value>
+  </data>
+  <data name="GbPatientNumberInvalidRange" xml:space="preserve">
+    <value>GB patient number must be in the range 010 000 000 to 311 299 999, 320 000 000 to 399 999 999, 400 000 000 to 499 999 999, 600 000 000 to 799 999 999, or 900 000 000 to 999 999 999, excluding trailing check digit</value>
   </data>
 </root>

@@ -7,18 +7,18 @@ namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 public class GbChiNumberTests
 {
    private const String ValidUnformattedChiNumber = "0101000006";
-   private const String ValidFormattedChiNumber = "010 100 0006";
+   private const String ValidFormattedChiNumber = "010100 0006";
    private const String AltValidUnformattedChiNumber = "3112999991";
-   private const String AltValidFormattedChiNumber = "311-299-9991";
+   private const String AltValidFormattedChiNumber = "311299-9991";
 
    private const String UnformattedModulus11CheckDigitZeroValue = "0101000200";     // Edge case, modulus 11 with remainder 0 should result in 0 check digit
-   private const String FormattedModulus11CheckDigitZeroValue = "010 100 0200";
+   private const String FormattedModulus11CheckDigitZeroValue = "010100 0200";
 
    private static Char GetCheckDigit(String value)
    {
       var str = value.Length == GbPatientNumberBase.UnformattedLength - 1
          ? value
-         : value[..3] + value[4..7] + value[8..];
+         : value[..6] + value[7..];
       return Algorithms.Modulus11Decimal.TryCalculateCheckDigit(str, out var ch)
          ? ch
          : throw new InvalidOperationException("Can't generate valid check digit");
@@ -35,7 +35,7 @@ public class GbChiNumberTests
          var str = $"{dateOfBirth}{random:D2}{gender}";
          if (Algorithms.Modulus11Decimal.TryCalculateCheckDigit(str, out var checkDigit))
          {
-            return $"{str[..3]}{separator}{str[3..6]}{separator}{str[6..]}{checkDigit}";
+            return $"{str[..6]}{separator}{str[6..]}{checkDigit}";
          }
 
          random++;
@@ -47,7 +47,7 @@ public class GbChiNumberTests
    private static String GetRawValue(String value)
       => value.Length == GbPatientNumberBase.UnformattedLength
          ? value
-         : $"{value[..3]}{value[4..7]}{value[8..]}";
+         : $"{value[..6]}{value[7..]}";
 
    public static TheoryData<String> ValidValues =>
    [
@@ -63,8 +63,7 @@ public class GbChiNumberTests
    public static TheoryData<String> InvalidLengthValues =>
    [
       "123456789",            // Length 9, too short
-      "12345678901",          // Length 11, too long
-      "123 456 789",          // Length 11, too long for unformatted, too short for formatted
+      "123 456 7890",         // Length 12, too long
       "123-456-78901",        // Length 13, too long,
       new String('1', 100),   // Very long value
    ];
@@ -82,16 +81,16 @@ public class GbChiNumberTests
       { "40000000\u21534", 8 },     // Non-digit character Unicode fraction 1/3
       { "400000000\u00D6", 9 },     // Invalid character unicode O with umlaut
 
-      { ".00 000 0004", 0 },        // Non-digit character '.'
-      { "4 0 000 0004", 1 },        // Non-digit character ' '
-      { "40A 000 0004", 2 },        // Non-digit character 'A'
-      { "400 Z00 0004", 4 },        // Non-digit character 'Z'
-      { "400 0^0 0004", 5 },        // Non-digit character '^'
-      { "400-00a-0004", 6 },        // Non-digit character 'a'
-      { "400-000-z004", 8 },        // Non-digit character 'z'
-      { "400-000-0~04", 9 },        // Non-digit character '~'
-      { "400-000-00\u21534", 10 },  // Non-digit character Unicode fraction 1/3
-      { "400-000-000\u00D6", 11 },  // Invalid character unicode O with umlaut
+      { ".00000 0004", 0 },         // Non-digit character '.'
+      { "4 0000 0004", 1 },         // Non-digit character ' '
+      { "40A000 0004", 2 },         // Non-digit character 'A'
+      { "400Z00 0004", 3 },         // Non-digit character 'Z'
+      { "4000^0 0004", 4 },         // Non-digit character '^'
+      { "40000a-0004", 5 },         // Non-digit character 'a'
+      { "400000-z004", 7 },         // Non-digit character 'z'
+      { "400000-0~04", 8 },         // Non-digit character '~'
+      { "400000-00\u21534", 9 },    // Non-digit character Unicode fraction 1/3
+      { "400000-000\u00D6", 10 },   // Invalid character unicode O with umlaut
    };
 
    public static TheoryData<String> InvalidCheckDigitValues =>
@@ -106,46 +105,29 @@ public class GbChiNumberTests
       "9990099980",        // 9999999980 with twin error 99 -> 00
       "4000000110",        // 4000000110 is invalid because check digit would be 10
 
-      "400 090 0004",      // 4000000004 with single digit transcription error, 0 -> 9
-      "611 199 9998",      // 6112999998 with single digit transcription error, 2 -> 1
-      "744 105 0604",      // 7441005604 with two digit transposition error 05 -> 50
-      "493 476 5919",      // 9434765919 with two digit transposition error 94 -> 49
-      "494 768 7882",      // 4967487882 with jump transposition error 674 -> 476
-      "943 476 1959",      // 9434765919 with jump transposition error 591 -> 195
-      "751 556 8242",      // 7514468242 with twin error 44 -> 55
-      "999 009 9980",      // 9999999980 with twin error 99 -> 00
-      "400 000 0110",      // 4000000110 is invalid because check digit would be 10
+      "400090 0004",       // 4000000004 with single digit transcription error, 0 -> 9
+      "611199 9998",       // 6112999998 with single digit transcription error, 2 -> 1
+      "744105 0604",       // 7441005604 with two digit transposition error 05 -> 50
+      "493476 5919",       // 9434765919 with two digit transposition error 94 -> 49
+      "494768 7882",       // 4967487882 with jump transposition error 674 -> 476
+      "943476 1959",       // 9434765919 with jump transposition error 591 -> 195
+      "751556 8242",       // 7514468242 with twin error 44 -> 55
+      "999009 9980",       // 9999999980 with twin error 99 -> 00
+      "400000 0110",       // 4000000110 is invalid because check digit would be 10
    ];
 
    public static TheoryData<String, Int32> InvalidSeparatorValues = new()
    {
-      // First separator position
-      { "4000000 0004", 3 },
-      { "4001000 0004", 3 },
-      { "4002000 0004", 3 },
-      { "4003000 0004", 3 },
-      { "4004000 0004", 3 },
-      { "4005000 0004", 3 },
-      { "4006000 0004", 3 },
-      { "4007000 0004", 3 },
-      { "4008000 0004", 3 },
-      { "4009000 0004", 3 },
-
-      // Second separator position
-      { "400 00000004", 7 },
-      { "400 00010004", 7 },
-      { "400 00020004", 7 },
-      { "400 00030004", 7 },
-      { "400 00040004", 7 },
-      { "400 00050004", 7 },
-      { "400 00060004", 7 },
-      { "400 00070004", 7 },
-      { "400 00080004", 7 },
-      { "400 00090004", 7 },
-
-      // Mixed separators
-      { "400 000-0004", 7 },
-      { "400-000 0004", 7 },
+      { "40000000004", 6 },
+      { "40000010004", 6 },
+      { "40000020004", 6 },
+      { "40000030004", 6 },
+      { "40000040004", 6 },
+      { "40000050004", 6 },
+      { "40000060004", 6 },
+      { "40000070004", 6 },
+      { "40000080004", 6 },
+      { "40000090004", 6 },
    };
 
    public static TheoryData<String> InvalidRangeValues =>
@@ -185,36 +167,36 @@ public class GbChiNumberTests
       "999999999",
 
       // Values below CHI number block
-      "000 000 001",
-      "009 999 999",
+      "000000 001",
+      "009999 999",
 
       // Gap between CHI number block and HC number block
-      "311 300 000",
-      "319 999 999",
+      "311300 000",
+      "319999 999",
 
       // HC number block
-      "320 000 000",
-      "399 999 999",
+      "320000 000",
+      "399999 999",
 
       // First NHS number block
-      "400 000 000",
-      "499 999 999",
+      "400000 000",
+      "499999 999",
 
       // Gap in NHS numbers
-      "500 000 000",
-      "599 999 999",
+      "500000 000",
+      "599999 999",
 
       // Second NHS number block
-      "600 000 000",
-      "799 999 999",
+      "600000 000",
+      "799999 999",
 
       // Gap between NHS numbers and test numbers
-      "800 000 000",
-      "899 999 999",
+      "800000 000",
+      "899999 999",
 
       // Test numbers
-      "900 000 000",
-      "999 999 999",
+      "900000 000",
+      "999999 999",
    ];
 
    public static TheoryData<String, String> InvalidChiNumberDateOfBirthValues = new()
@@ -389,9 +371,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      var invalidDateOfBirth = value.Length == GbPatientNumberBase.UnformattedLength
-         ? value[..6]
-         : value[..7];
+      var invalidDateOfBirth = value[..6];
       GbChiNumber.ValidationError expected = new InvalidDateOfBirth(
          Messages.GbChiNumberInvalidDateOfBirth,
          invalidDateOfBirth,
@@ -649,9 +629,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      var invalidDateOfBirth = value.Length == GbPatientNumberBase.UnformattedLength
-         ? value[..6]
-         : value[..7];
+      var invalidDateOfBirth = value[..6];
       GbChiNumber.ValidationError expected = new InvalidDateOfBirth(
          Messages.GbChiNumberInvalidDateOfBirth,
          invalidDateOfBirth,
@@ -915,9 +893,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      var invalidDateOfBirth = value.Length == GbPatientNumberBase.UnformattedLength
-         ? value[..6]
-         : value[..7];
+      var invalidDateOfBirth = value[..6];
       LocalCreateResult expected = (GbChiNumber.ValidationError)new InvalidDateOfBirth(
          Messages.GbChiNumberInvalidDateOfBirth,
          invalidDateOfBirth,
@@ -1387,9 +1363,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      var invalidDateOfBirth = value.Length == GbPatientNumberBase.UnformattedLength
-         ? value[..6]
-         : value[..7];
+      var invalidDateOfBirth = value[..6];
       GbChiNumber.ValidationResult expected = new InvalidDateOfBirth(
          Messages.GbChiNumberInvalidDateOfBirth,
          invalidDateOfBirth,

@@ -15,29 +15,51 @@ public abstract record GbPatientNumberBase
 
    /// <summary>
    ///   The default format mask that will render the patient number as a
-   ///   "3 3 4" value.
+   ///   "DDMMYY NNNN" value.
    /// </summary>
-   public const String DefaultFormatMask = "___ ___ ____";
+   public const String DefaultChiFormatMask = "______ ____";
 
    /// <summary>
-   ///   The length of a valid patient number that is not formatted for readability.
+   ///   The default format mask that will render the patient number as a
+   ///   "3 3 4" value.
+   /// </summary>
+   public const String DefaultNhsFormatMask = "___ ___ ____";
+
+   /// <summary>
+   ///   The length of a valid patient number that is not formatted for
+   ///   readability.
    /// </summary>
    internal const Int32 UnformattedLength = 10;
 
    /// <summary>
-   ///   The length of a valid patient number that is formatted for readability.
+   ///   The length of a valid patient number that is formatted for readability
+   ///   using a 'DDMMYY NNNC' pattern.
    /// </summary>
-   internal const Int32 FormattedLength = 12;
+   internal const Int32 ChiFormattedLength = 11;
 
    /// <summary>
-   ///   The zero-based offset of the first separator character in a formatted patient number.
+   ///   The length of a valid patient number that is formatted for readability
+   ///   using '3 3 4' pattern.
    /// </summary>
-   internal const Int32 SeparatorPosition1 = 3;
+   internal const Int32 NhsFormattedLength = 12;
 
    /// <summary>
-   ///   The zero-based offset of the second separator character in a formatted patient number.
+   ///   The zero-based offset of the separator character in a formatted CHI
+   ///   number.
    /// </summary>
-   internal const Int32 SeparatorPosition2 = 7;
+   internal const Int32 ChiSeparatorPosition = 6;
+
+   /// <summary>
+   ///   The zero-based offset of the first separator character in a formatted
+   ///   NHS, H&amp;C or test patient number.
+   /// </summary>
+   internal const Int32 NhsSeparatorPosition1 = 3;
+
+   /// <summary>
+   ///   The zero-based offset of the second separator character in a formatted
+   ///   NHS, H&amp;C or test patient number.
+   /// </summary>
+   internal const Int32 NhsSeparatorPosition2 = 7;
 
    /// <summary>
    ///   The zero-based offset for the digit that encodes gender for CHI numbers.
@@ -50,8 +72,27 @@ public abstract record GbPatientNumberBase
    internal static readonly ValidLengthDefinition[] ValidLengthDefinitions =
    [
       new ValidLengthDefinition(UnformattedLength, Messages.GbPatientNumberUnformattedLength),
-      new ValidLengthDefinition(FormattedLength, Messages.GbPatientNumberFormattedLength)
+      new ValidLengthDefinition(NhsFormattedLength, Messages.GbPatientNumberDoubleSeparatorFormattedLength)
    ];
+
+   /// <summary>
+   ///   Details for the length of a valid formatted CHI patient number.
+   /// </summary>
+   internal static readonly ValidLengthDefinition ChiLengthDefinition =
+      new ValidLengthDefinition(ChiFormattedLength, Messages.GbPatientNumberSingleSeparatorFormattedLength);
+
+   /// <summary>
+   ///   Details for the length of a valid formatted NHS, H&amp;C or test
+   ///   patient number.
+   /// </summary>
+   internal static readonly ValidLengthDefinition NhsLengthDefinition =
+      new ValidLengthDefinition(NhsFormattedLength, Messages.GbPatientNumberDoubleSeparatorFormattedLength);
+
+   /// <summary>
+   ///   Details for the length of a valid unformatted GB patient number.
+   /// </summary>
+   internal static readonly ValidLengthDefinition UnformattedLengthDefinition =
+      new ValidLengthDefinition(UnformattedLength, Messages.GbPatientNumberUnformattedLength);
 
    /// <summary>
    ///   Specifies which block of identifiers a particular number is a member of.
@@ -86,33 +127,39 @@ public abstract record GbPatientNumberBase
    }
 
    /// <summary>
+   ///   Gets an array of details about valid lengths accepted for a GB patient
+   ///   number.
+   /// </summary>
+   /// <returns>
+   ///   An array of <see cref="ValidLengthDefinition"/>s.
+   /// </returns>
+   internal static ValidLengthDefinition[] GetGbPatientNumberValidLengthDefinitions() =>
+   [
+      UnformattedLengthDefinition,
+      ChiLengthDefinition,
+      NhsLengthDefinition
+   ];
+
+   /// <summary>
    ///   Extract the two-digit day, month and year elements from a formatted or
-   ///   unformatted patient number <paramref name="value"/>.
+   ///   unformatted CHI number <paramref name="value"/>.
    /// </summary>
    /// <param name="value">
-   ///   The patient number containing the day, month and year values.
+   ///   The CHI number containing the day, month and year values.
    /// </param>
    /// <returns>
    ///   A tuple containing the two-digit day, month and year elements contained
    ///   in the first six digits of the <paramref name="value"/>.
    /// </returns>
+   /// <remarks>
+   ///   We don't need to worry about possible formatting because the six digits
+   ///   in CHI number date of birth all preceed the separator character.
+   /// </remarks>
    protected static (Int32 Day, Int32 Month, Int32 Year) GetDayMonthYear(ReadOnlySpan<Char> value)
    {
       var day = value.ParseTwoDigits();
-      Int32 month, year;
-      if (IsFormatted(value))
-      {
-         // When formatted, the month value is split across the trailing
-         // character of the first group of three digits and the first character
-         // of the second group of three digits.
-         month = (value[2].ToSingleDigit() * 10) + value[4].ToSingleDigit();
-         year = value[5..].ParseTwoDigits();
-      }
-      else
-      {
-         month = value[2..].ParseTwoDigits();
-         year = value[4..].ParseTwoDigits();
-      }
+      var month = value[2..].ParseTwoDigits();
+      var year = value[4..].ParseTwoDigits();
 
       return (day, month, year);
    }
@@ -133,7 +180,7 @@ public abstract record GbPatientNumberBase
    /// </remarks>
    protected static IdentifierRangeCategory GetIdentifierCategory(ReadOnlySpan<Char> value)
    {
-      var fourthDigitOffset = IsFormatted(value) ? 4 : 3;
+      var fourthDigitOffset = value.Length == NhsFormattedLength ? 4 : 3;
       var num = (value.ParseThreeDigits() * 10) + value[fourthDigitOffset].ToSingleDigit();
 
       return num switch
@@ -190,7 +237,7 @@ public abstract record GbPatientNumberBase
    protected static InvalidDateOfBirth GetInvalidDateOfBirthResult(
       String value,
       String description)
-      => new(description, value[..(IsFormatted(value) ? 7 : 6)], ChiNumberDateFormat);
+      => new(description, value[..6], ChiNumberDateFormat);
 
    /// <summary>
    ///   Creates an invalid length result for a GB patient number.
@@ -233,24 +280,14 @@ public abstract record GbPatientNumberBase
    ///   The raw patient number value, stripped of any formatting.
    /// </returns>
    protected static String GetRawValue(String value)
-      => value.Length == UnformattedLength
-         ? value
-         : String.Concat(value.AsSpan(..3), value.AsSpan(4..7), value.AsSpan(8..));
-
-   /// <summary>
-   ///   Determines whether the value contains format characters (based on
-   ///   the length of the value).
-   /// </summary>
-   /// <param name="value">
-   ///   The value to check.
-   /// </param>
-   /// <returns>
-   ///   <see langword="true"/> if the value length equals the formatted length;
-   ///   otherwise, <see langword="false"/>.
-   /// </returns>
-   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   protected static Boolean IsFormatted(ReadOnlySpan<Char> value)
-      => value.Length == FormattedLength;
+#pragma warning disable CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
+      => value.Length switch
+      {
+         UnformattedLength => value,
+         ChiFormattedLength => String.Concat(value.AsSpan(..6), value.AsSpan(7..)),
+         NhsFormattedLength => String.Concat(value.AsSpan(..3), value.AsSpan(4..7), value.AsSpan(8..)),
+      };
+#pragma warning restore CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
 
    /// <summary>
    ///   Validates whether <paramref name="value"/> contains a valid Modulus 11
@@ -270,9 +307,14 @@ public abstract record GbPatientNumberBase
       String value,
       out Int32 invalidCharacterPosition)
    {
-      var validCheckDigit = IsFormatted(value)
-         ? MaskedAlgorithms.Modulus11Decimal.Validate(value, GbPatientNumberMask.Instance)
-         : Algorithms.Modulus11Decimal.Validate(value);
+#pragma warning disable CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
+      var validCheckDigit = value.Length switch
+      {
+         UnformattedLength => Algorithms.Modulus11Decimal.Validate(value),
+         ChiFormattedLength => MaskedAlgorithms.Modulus11Decimal.Validate(value, ChiNumberMask.Instance),
+         NhsFormattedLength => MaskedAlgorithms.Modulus11Decimal.Validate(value, NhsNumberMask.Instance),
+      };
+#pragma warning restore CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
 
       // Modulus11Decimal.Validate returns false for an invalid check digit OR
       // if an invalid character was encountered (because a valid check digit
@@ -319,20 +361,6 @@ public abstract record GbPatientNumberBase
    }
 
    /// <summary>
-   ///   Validates whether the span length matches the expected unformatted or
-   ///   formatted length.
-   /// </summary>
-   /// <param name="value">
-   ///   The character span to validate.
-   /// </param>
-   /// <returns>
-   ///   <see langword="true"/> if the length is valid; otherwise, <see langword="false"/>.
-   /// </returns>
-   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   protected static Boolean ValidateLength(ReadOnlySpan<Char> value)
-      => value.Length is UnformattedLength or FormattedLength;
-
-   /// <summary>
    ///   Confirm that <paramref name="value"/> does not contain invalid
    ///   separator characters.
    /// </summary>
@@ -352,20 +380,26 @@ public abstract record GbPatientNumberBase
       out Int32 invalidSeparatorPosition)
    {
       invalidSeparatorPosition = -1;
-      if (!IsFormatted(value))
+      if (value.Length == UnformattedLength)
       {
          return true;
       }
 
-      var separator1 = value[SeparatorPosition1];
+      if (value.Length == ChiFormattedLength)
+      {
+         invalidSeparatorPosition = ChiSeparatorPosition;
+         return !Char.IsAsciiDigit(value[ChiSeparatorPosition]);
+      }
+
+      var separator1 = value[NhsSeparatorPosition1];
       if (Char.IsAsciiDigit(separator1))
       {
-         invalidSeparatorPosition = SeparatorPosition1;
+         invalidSeparatorPosition = NhsSeparatorPosition1;
          return false;
       }
-      else if (value[SeparatorPosition2] != separator1)
+      else if (value[NhsSeparatorPosition2] != separator1)
       {
-         invalidSeparatorPosition = SeparatorPosition2;
+         invalidSeparatorPosition = NhsSeparatorPosition2;
          return false;
       }
 
@@ -376,11 +410,10 @@ public abstract record GbPatientNumberBase
    // separators) or -1 if no non-digit characters found.
    private static Int32 LocateInvalidCharacter(ReadOnlySpan<Char> value)
    {
-      var isFormatted = IsFormatted(value);
-
       for (var index = 0; index < value.Length; index++)
       {
-         if (isFormatted && index is SeparatorPosition1 or SeparatorPosition2)
+         if ((value.Length == ChiFormattedLength && index == ChiSeparatorPosition)
+            || (value.Length == NhsFormattedLength && index is NhsSeparatorPosition1 or NhsSeparatorPosition2))
          {
             continue;
          }
@@ -396,24 +429,47 @@ public abstract record GbPatientNumberBase
 
    /// <summary>
    ///   <see cref="ICheckDigitMask"/> used when validating the
-   ///   check digit of a formatted patient number.
+   ///   check digit of a formatted CHI number.
    /// </summary>
-   protected class GbPatientNumberMask : ICheckDigitMask
+   protected class ChiNumberMask : ICheckDigitMask
    {
-      private static readonly Lazy<GbPatientNumberMask> _instance =
-         new(() => new GbPatientNumberMask());
+      private static readonly Lazy<ChiNumberMask> _instance =
+         new(() => new ChiNumberMask());
 
       /// <summary>
-      ///   Gets the only instance of <see cref="GbPatientNumberMask"/>.
+      ///   Gets the only instance of <see cref="ChiNumberMask"/>.
       /// </summary>
-      public static GbPatientNumberMask Instance => _instance.Value;
+      public static ChiNumberMask Instance => _instance.Value;
 
       /// <inheritdoc/>
       public Boolean ExcludeCharacter(Int32 index)
-         => index is SeparatorPosition1 or SeparatorPosition2;
+         => index == ChiSeparatorPosition;
 
       /// <inheritdoc/>
       public Boolean IncludeCharacter(Int32 index)
-         => index is not SeparatorPosition1 and not SeparatorPosition2;
+         => index != ChiSeparatorPosition;
+   }
+
+   /// <summary>
+   ///   <see cref="ICheckDigitMask"/> used when validating the
+   ///   check digit of a formatted NHS, H&amp;C or test patient number.
+   /// </summary>
+   protected class NhsNumberMask : ICheckDigitMask
+   {
+      private static readonly Lazy<NhsNumberMask> _instance =
+         new(() => new NhsNumberMask());
+
+      /// <summary>
+      ///   Gets the only instance of <see cref="NhsNumberMask"/>.
+      /// </summary>
+      public static NhsNumberMask Instance => _instance.Value;
+
+      /// <inheritdoc/>
+      public Boolean ExcludeCharacter(Int32 index)
+         => index is NhsSeparatorPosition1 or NhsSeparatorPosition2;
+
+      /// <inheritdoc/>
+      public Boolean IncludeCharacter(Int32 index)
+         => index is not NhsSeparatorPosition1 and not NhsSeparatorPosition2;
    }
 }

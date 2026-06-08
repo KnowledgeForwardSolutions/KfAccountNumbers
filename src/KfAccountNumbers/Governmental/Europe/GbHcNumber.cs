@@ -309,7 +309,7 @@ public record GbHcNumber : GbPatientNumberBase
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
    ///   details on creating a mask to format the H&amp;C number.
    /// </remarks>
-   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+   public String Format(String mask = DefaultNhsFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
    ///   Get a string representation of the H&amp;C number.
@@ -359,6 +359,11 @@ public record GbHcNumber : GbPatientNumberBase
          ? new GbPatientNumberInvalidRange(Messages.GbHcNumberInvalidRange)
          : default(ValidValue);
    }
+
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean ValidateLength(ReadOnlySpan<Char> value)
+      => value.Length is UnformattedLength or NhsFormattedLength;
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

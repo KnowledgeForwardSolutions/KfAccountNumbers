@@ -302,7 +302,7 @@ public record class GbChiNumber : GbPatientNumberBase
    /// </summary>
    /// <param name="mask">
    ///   Optional. The mask that specifies the final output. If not supplied
-   ///   then the default mask "___ ___ ____" will be used instead.
+   ///   then the default mask "______ ____" will be used instead.
    /// </param>
    /// <returns>
    ///   A formatted Scottish CHI number.
@@ -318,7 +318,7 @@ public record class GbChiNumber : GbPatientNumberBase
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
    ///   details on creating a mask to format the CHI number.
    /// </remarks>
-   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+   public String Format(String mask = DefaultChiFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
    ///   Extracts the date of birth from the CHI number.
@@ -397,6 +397,11 @@ public record class GbChiNumber : GbPatientNumberBase
          ? default(ValidValue)
          : GetInvalidDateOfBirthResult(value, Messages.GbChiNumberInvalidDateOfBirth);
    }
+
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean ValidateLength(ReadOnlySpan<Char> value)
+      => value.Length is UnformattedLength or ChiFormattedLength;
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

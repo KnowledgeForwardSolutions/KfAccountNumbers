@@ -242,4 +242,111 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </remarks>
 public record GbPatientNumber : GbPatientNumberBase
 {
+   /// <summary>
+   ///   Discriminated union defining the types of identifier that
+   ///   <see cref="GbPatientNumber"/> can represent.
+   /// </summary>
+   public union IdentifierCategory(
+      GbHealthService.Chi,
+      GbHealthService.Hc,
+      GbHealthService.Nhs,
+      GbHealthService.Test)
+   {
+   }
+   
+   /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="GbPatientNumber"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      GbPatientNumberInvalidRange,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="GbPatientNumber"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      GbPatientNumberInvalidRange,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   Check the <paramref name="value"/> to determine if it contains a valid
+   ///   UK public health service patient number.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a UK public health service patient number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
+   /// </returns>
+   public static ValidationResult Validate(String? value)
+   {
+      if (String.IsNullOrWhiteSpace(value))
+      {
+         return default(EmptyValue);
+      }
+
+      if (!ValidateLength(value))
+      {
+         return GetInvalidLengthResult(value);
+      }
+
+      if (!ValidateCheckDigit(value, out var invalidCharacterPosition))
+      {
+         return invalidCharacterPosition == -1
+            ? GetInvalidChecksumResult()
+            : GetInvalidCharacterResult(value, invalidCharacterPosition);
+      }
+
+      if (!ValidateSeparators(value, out var invalidSeparatorPosition))
+      {
+         return GetInvalidSeparatorResult(value, invalidSeparatorPosition);
+      }
+
+      IdentifierRangeCategory identifierCategory = GetIdentifierCategory(value);
+      if (identifierCategory is IdentifierRangeCategory.Invalid)
+      {
+         return new GbPatientNumberInvalidRange(Messages.GbPatientNumberInvalidRange);
+      }
+
+      // Secondary length validation for formatted values. Formatted length must
+      // match the length allowed for the specific category.
+      if ((value.Length == ChiFormattedLength && identifierCategory is not IdentifierRangeCategory.Chi)
+         || (value.Length == NhsFormattedLength && identifierCategory is IdentifierRangeCategory.Chi))
+      {
+         return GetInvalidLengthResult(value);
+      }
+
+      if (identifierCategory is IdentifierRangeCategory.Chi && !ValidateChiNumberDateOfBirth(value))
+      {
+         return GetInvalidDateOfBirthResult(value, Messages.GbChiNumberInvalidDateOfBirth);
+      }
+
+      return default(ValidValue);
+   }
+
+   private static InvalidLength GetInvalidLengthResult(ReadOnlySpan<Char> value)
+      => new(Messages.GbPatientNumberInvalidLength, value.Length, GetGbPatientNumberValidLengthDefinitions());
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean ValidateLength(ReadOnlySpan<Char> value)
+      => value.Length is UnformattedLength or ChiFormattedLength or NhsFormattedLength;
 }

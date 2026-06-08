@@ -311,7 +311,7 @@ public record GbNhsNumber : GbPatientNumberBase
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
    ///   details on creating a mask to format the NHS number.
    /// </remarks>
-   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+   public String Format(String mask = DefaultNhsFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
    ///   Get a string representation of the NHS number.
@@ -361,6 +361,10 @@ public record GbNhsNumber : GbPatientNumberBase
          ? new GbPatientNumberInvalidRange(Messages.GbNhsNumberInvalidRange)
          : default(ValidValue);
    }
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean ValidateLength(ReadOnlySpan<Char> value)
+      => value.Length is UnformattedLength or NhsFormattedLength;
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
