@@ -42,7 +42,7 @@ public class EsNifTests
    [
       "2345678Z",             // DNI Length 8
       "012345678-Z",          // DNI Length 11
-      "X123567L",             // NIE Length 8 
+      "X123567L",             // NIE Length 8
       "X1234567-L",           // NIE Length 10
       "X-01234567-L",         // NIE Length 12
       new String('1', 100)    // Very long string
@@ -62,8 +62,8 @@ public class EsNifTests
       "12345678U",               // Unformatted DNI, invalid trailing character 'U'
       "12345678t",               // Unformatted DNI, invalid trailing character 't'
       "123456782",               // Unformatted DNI, invalid trailing character '2'
-      "\u21532345678Z",          // Unformatted DNI, non-digit character Unicode fraction 1/3              
-      "1\u00D6345678Z",          // Unformatted DNI, invalid character unicode O with umlaut               
+      "\u21532345678Z",          // Unformatted DNI, non-digit character Unicode fraction 1/3
+      "1\u00D6345678Z",          // Unformatted DNI, invalid character unicode O with umlaut
 
       "1 345678-Z",              // Formatted DNI, non-digit character ' '
       "1-345678-Z",              // Formatted DNI, non-digit character '-'
@@ -77,8 +77,8 @@ public class EsNifTests
       "12345678 U",              // Formatted DNI, invalid trailing character 'U'
       "12345678 t",              // Formatted DNI, invalid trailing character 't'
       "12345678 2",              // Formatted DNI, invalid trailing character '2'
-      "1\u2153345678 Z",         // Formatted DNI, non-digit character Unicode fraction 1/3              
-      "1\u00D6345678 Z",         // Formatted DNI, invalid character unicode O with umlaut               
+      "1\u2153345678 Z",         // Formatted DNI, non-digit character Unicode fraction 1/3
+      "1\u00D6345678 Z",         // Formatted DNI, invalid character unicode O with umlaut
 
       "A1234567L",               // Unformatted NIE, invalid leading character 'A'
       "W1234567L",               // Unformatted NIE, invalid leading character 'B'
@@ -96,8 +96,8 @@ public class EsNifTests
       "X1234567U",               // Unformatted NIE, invalid trailing character 'U'
       "X1234567t",               // Unformatted NIE, invalid trailing character 't'
       "X12345672",               // Unformatted NIE, invalid trailing character '2'
-      "\u21531234567L",          // Unformatted NIE, non-digit character Unicode fraction 1/3              
-      "X\u00D6234567L",          // Unformatted NIE, invalid character unicode O with umlaut               
+      "\u21531234567L",          // Unformatted NIE, non-digit character Unicode fraction 1/3
+      "X\u00D6234567L",          // Unformatted NIE, invalid character unicode O with umlaut
 
       "A-1234567 L",             // Formatted NIE, invalid leading character 'A'
       "W-1234567 L",             // Formatted NIE, invalid leading character 'B'
@@ -115,8 +115,8 @@ public class EsNifTests
       "X 1234567 U",             // Formatted NIE, invalid trailing character 'U'
       "X 1234567 t",             // Formatted NIE, invalid trailing character 't'
       "X 1234567 2",             // Formatted NIE, invalid trailing character '2'
-      "\u2153 1234567 L",        // Formatted NIE, non-digit character Unicode fraction 1/3              
-      "X \u00D6234567 L",        // Formatted NIE, invalid character unicode O with umlaut               
+      "\u2153 1234567 L",        // Formatted NIE, non-digit character Unicode fraction 1/3
+      "X \u00D6234567 L",        // Formatted NIE, invalid character unicode O with umlaut
    ];
 
    public static TheoryData<String> InvalidCheckDigitValues =>
@@ -219,7 +219,7 @@ public class EsNifTests
    [InlineData("X0000011B")]
    [InlineData("X0000012N")]
    [InlineData("X0000013J")]
-   [InlineData("X0000014Z")]      
+   [InlineData("X0000014Z")]
    [InlineData("X0000015S")]
    [InlineData("X0000016Q")]
    [InlineData("X-0000017-V")]

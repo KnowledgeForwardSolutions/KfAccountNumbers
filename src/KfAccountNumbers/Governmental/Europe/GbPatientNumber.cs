@@ -253,7 +253,7 @@ public record GbPatientNumber : GbPatientNumberBase
       GbHealthService.Test)
    {
    }
-   
+
    /// <summary>
    ///   Discriminated union defining the possible validation errors that can
    ///   occur when creating a new <see cref="GbPatientNumber"/>.

@@ -1,5 +1,3 @@
-using Microsoft.Win32.SafeHandles;
-
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -71,28 +69,28 @@ public abstract record GbPatientNumberBase
    /// </summary>
    internal static readonly ValidLengthDefinition[] ValidLengthDefinitions =
    [
-      new ValidLengthDefinition(UnformattedLength, Messages.GbPatientNumberUnformattedLength),
-      new ValidLengthDefinition(NhsFormattedLength, Messages.GbPatientNumberDoubleSeparatorFormattedLength)
+      new(UnformattedLength, Messages.GbPatientNumberUnformattedLength),
+      new(NhsFormattedLength, Messages.GbPatientNumberDoubleSeparatorFormattedLength)
    ];
 
    /// <summary>
    ///   Details for the length of a valid formatted CHI patient number.
    /// </summary>
    internal static readonly ValidLengthDefinition ChiLengthDefinition =
-      new ValidLengthDefinition(ChiFormattedLength, Messages.GbPatientNumberSingleSeparatorFormattedLength);
+      new(ChiFormattedLength, Messages.GbPatientNumberSingleSeparatorFormattedLength);
 
    /// <summary>
    ///   Details for the length of a valid formatted NHS, H&amp;C or test
    ///   patient number.
    /// </summary>
    internal static readonly ValidLengthDefinition NhsLengthDefinition =
-      new ValidLengthDefinition(NhsFormattedLength, Messages.GbPatientNumberDoubleSeparatorFormattedLength);
+      new(NhsFormattedLength, Messages.GbPatientNumberDoubleSeparatorFormattedLength);
 
    /// <summary>
    ///   Details for the length of a valid unformatted GB patient number.
    /// </summary>
    internal static readonly ValidLengthDefinition UnformattedLengthDefinition =
-      new ValidLengthDefinition(UnformattedLength, Messages.GbPatientNumberUnformattedLength);
+      new(UnformattedLength, Messages.GbPatientNumberUnformattedLength);
 
    /// <summary>
    ///   Specifies which block of identifiers a particular number is a member of.

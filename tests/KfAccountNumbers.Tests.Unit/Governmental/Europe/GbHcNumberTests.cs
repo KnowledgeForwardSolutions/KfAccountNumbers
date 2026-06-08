@@ -705,7 +705,7 @@ public class GbHcNumberTests
       LocalCreateResult expected = (GbHcNumber.ValidationError)new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbHcNumber.ValidLengthDefinitions);
+         GbPatientNumberBase.ValidLengthDefinitions);
 
       // Act.
       var result = GbHcNumber.Create(value);

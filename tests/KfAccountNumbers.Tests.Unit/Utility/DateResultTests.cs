@@ -97,7 +97,7 @@ public class DateResultTests
    [InlineData(1904,  1, 32)]       // Invalid day of month for January, any year
    [InlineData(1901,  2, 29)]       // Invalid day of for February, non-leap year
    [InlineData(1904,  2, 30)]       // Invalid day of for February, leap year
-   [InlineData(1904,  2, 30)]       // Invalid day of for February, leap year (2000 is leap-year)
+   [InlineData(2000,  2, 30)]       // Invalid day of for February, leap year (2000 is leap-year)
    [InlineData(1904,  3, 32)]       // Invalid day of for March, any year
    [InlineData(1904,  4, 31)]       // Invalid day of for April, any year
    [InlineData(1904,  5, 32)]       // Invalid day of for May, any year

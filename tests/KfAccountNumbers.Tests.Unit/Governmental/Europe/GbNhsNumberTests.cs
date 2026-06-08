@@ -583,6 +583,7 @@ public class GbNhsNumberTests
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
    }
+
    [Fact]
    public void GbNhsNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
    {
@@ -708,7 +709,7 @@ public class GbNhsNumberTests
       LocalCreateResult expected = (GbNhsNumber.ValidationError)new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbNhsNumber.ValidLengthDefinitions);
+         GbPatientNumberBase.ValidLengthDefinitions);
 
       // Act.
       var result = GbNhsNumber.Create(value);

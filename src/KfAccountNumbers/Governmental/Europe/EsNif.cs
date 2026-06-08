@@ -216,7 +216,7 @@ public record EsNif
    ///   Will contain the new <see cref="EsNif"/> if 
    ///   <paramref name="nif"/> is valid or an
    ///   <see cref="EsNifValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="nif"/> is 
+   ///   the validation rule that was failed if <paramref name="nif"/> is
    ///   invalid.
    /// </returns>
    public static CreateResult<EsNif, EsNifValidationResult> Create(String? nif)
@@ -272,7 +272,7 @@ public record EsNif
    ///   String representation of a Spanish Número de Identificación Fiscal (NIF).
    /// </param>
    /// <returns>
-   ///   A <see cref="EsNifValidationResult"/> enumeration 
+   ///   A <see cref="EsNifValidationResult"/> enumeration
    ///   value that indicates if the <paramref name="nif"/> passed
    ///   validation or what validation error was encountered.
    /// </returns>
@@ -310,7 +310,7 @@ public record EsNif
          UnformattedLength => nif,
          DniFormattedLength => String.Concat(nif.AsSpan(..8), nif.AsSpan(^1..)),
          NieFormattedLength => String.Concat(nif.AsSpan(..1), nif.AsSpan(2..^2), nif.AsSpan(^1..)),
-         _ => throw new InvalidOperationException()      // Validation ensures this is never reached
+         _ => throw new InvalidOperationException(),      // Validation ensures this is never reached
       };
 
    private static EsNifValidationResult ValidateCheckDigit(ReadOnlySpan<Char> nif)
@@ -332,7 +332,7 @@ public record EsNif
       // Handle inner digits.
       var start = nif.Length == NieFormattedLength ? 2 : 1;
       var end = nif.Length == NieFormattedLength ? 9 : 8;
-      for(var index = start; index < end; index++)
+      for (var index = start; index < end; index++)
       {
          sum *= 10;
          num = nif[index].ToSingleDigit();
@@ -376,7 +376,7 @@ public record EsNif
       }
 
       var trailingSeparator = nif[^TrailingSeparatorOffset];
-   
+
       // Separator must not be a digit
       if (trailingSeparator.IsAsciiDigit())
       {

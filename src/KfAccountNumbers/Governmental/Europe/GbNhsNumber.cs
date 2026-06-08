@@ -280,7 +280,7 @@ public record GbNhsNumber : GbPatientNumberBase
    public static UCreateResult<GbNhsNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
-         ValidValue => new GbNhsNumber(value!, ValidationMode.BypassValidation),
+         ValidValue => new GbNhsNumber(value, ValidationMode.BypassValidation),
          EmptyValue emptyValue => (ValidationError)emptyValue,
          InvalidLength invalidLength => (ValidationError)invalidLength,
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,

@@ -38,20 +38,20 @@ public class IePpsNumberTests
       for (var index = 0; index < 7; index++)
       {
          var num = ppsNumber[index] - Chars.DigitZero;
-         sum += (num * weight);
+         sum += num * weight;
          weight--;
       }
 
       if (ppsNumber.Length == 9)
       {
-         var trailingChar = Char.ToUpper(ppsNumber[8], System.Globalization.CultureInfo.InvariantCulture);
+         var trailingChar = Char.ToUpper(ppsNumber[8], CultureInfo.InvariantCulture);
          var trailingCharValue = trailingChar switch
          {
             >= Chars.UpperCaseA and <= Chars.UpperCaseI => (trailingChar - Chars.UpperCaseA) + 1,
             Chars.UpperCaseW => 0,
-            _ => throw new InvalidOperationException()
+            _ => throw new InvalidOperationException(),
          };
-         sum += (trailingCharValue * 9);
+         sum += trailingCharValue * 9;
       }
 
       var remainder = sum % 23;
@@ -78,7 +78,7 @@ public class IePpsNumberTests
 
    public static TheoryData<String> ValidTrailingCharacters =>
    [
-      "",
+      String.Empty,
       "A",
       "B",
       "C",
@@ -119,17 +119,17 @@ public class IePpsNumberTests
       "12345a7T",                // non-digit character 'a'
       "12345b7T",                // non-digit character 'b'
       "123456~T",                // non-digit character '~'
-      "123456\u2153T",           // non-digit character Unicode fraction 1/3  
+      "123456\u2153T",           // non-digit character Unicode fraction 1/3
       "123456\u00D6T",           // non-digit character unicode O with umlaut
       "1234567 ",                // non-letter check character ' '
       "1234567-",                // non-letter check character '-'
       "1234567~",                // non-letter check character '~'
-      "1234567\u2153",           // non-letter check character Unicode fraction 1/3 
+      "1234567\u2153",           // non-letter check character Unicode fraction 1/3
       "1234567\u00D6",           // non-letter check character unicode O with umlaut
       "1234567F ",               // non-letter trailing character ' '
       "1234567F-",               // non-letter trailing character '-'
       "1234567F~",               // non-letter trailing character '~'
-      "1234567F\u2153",          // non-letter trailing character Unicode fraction 1/3 
+      "1234567F\u2153",          // non-letter trailing character Unicode fraction 1/3
       "1234567F\u00D6",          // non-letter trailing character unicode O with umlaut
       "1234567FJ",               // invalid letter trailing character 'J'
       "1234567Fj",               // invalid letter trailing character 'j'
@@ -152,7 +152,6 @@ public class IePpsNumberTests
       "1122444OB",               // 1122334OB with two digit twin error, 33 -> 44
       "2222334T",                // 1122334T with two digit twin error, 11 -> 22
    ];
-
 
    #region Check Digit Algorithm Tests
    // ==========================================================================

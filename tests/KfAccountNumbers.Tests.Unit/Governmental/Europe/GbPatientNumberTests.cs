@@ -125,7 +125,7 @@ public class GbPatientNumberTests
       { "4000000~04", 7 },          // Non-digit character '~'
       { "40000000\u21534", 8 },     // Non-digit character Unicode fraction 1/3
       { "400000000\u00D6", 9 },     // Invalid character unicode O with umlaut
-
+      // same, with single separator
       { ".10100 0006", 0 },         // Non-digit character '.'
       { "0 0100 0006", 1 },         // Non-digit character ' '
       { "01A100 0006", 2 },         // Non-digit character 'A'
@@ -136,7 +136,7 @@ public class GbPatientNumberTests
       { "010100-0~06", 8 },         // Non-digit character '~'
       { "010100-00\u21536", 9 },    // Non-digit character Unicode fraction 1/3
       { "010100-000\u00D6", 10 },   // Invalid character unicode O with umlaut
-
+      // same, with double separator
       { ".00 000 0004", 0 },        // Non-digit character '.'
       { "4 0 000 0004", 1 },        // Non-digit character ' '
       { "40A 000 0004", 2 },        // Non-digit character 'A'

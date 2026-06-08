@@ -806,7 +806,7 @@ public class GbChiNumberTests
       LocalCreateResult expected = (GbChiNumber.ValidationError)new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbChiNumber.ValidLengthDefinitions);
+         GbPatientNumberBase.ValidLengthDefinitions);
 
       // Act.
       var result = GbChiNumber.Create(value);
