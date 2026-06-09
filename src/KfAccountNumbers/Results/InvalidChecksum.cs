@@ -11,12 +11,10 @@ namespace KfAccountNumbers.Results;
 /// </remarks>
 /// <param name="Description">
 ///   Description of the checksum validation error.
-///   </param>
+/// </param>
 /// <param name="AlgorithmName">
 ///   Name of the algorithm used for checksum validation.
-///   </param>
-public record struct InvalidChecksum(
+/// </param>
+public readonly record struct InvalidChecksum(
    String Description,
-   String AlgorithmName)
-{
-}
+   String AlgorithmName);

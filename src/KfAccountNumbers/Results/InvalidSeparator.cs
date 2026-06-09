@@ -18,9 +18,7 @@ namespace KfAccountNumbers.Results;
 ///   The zero-based index of the invalid separator character in the input
 ///   value.
 /// </param>
-public record struct InvalidSeparator(
+public readonly record struct InvalidSeparator(
    String Description,
    Char Separator,
-   Int32 Position)
-{
-}
+   Int32 Position);

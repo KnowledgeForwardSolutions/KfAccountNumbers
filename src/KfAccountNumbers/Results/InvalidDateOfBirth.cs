@@ -16,9 +16,7 @@ namespace KfAccountNumbers.Results;
 /// <param name="DateFormat">
 ///   The date format, i.e. DDMMYY or YYYYMMDD, etc.
 /// </param>
-public record struct InvalidDateOfBirth(
+public readonly record struct InvalidDateOfBirth(
    String Description,
    String DateOfBirth,
-   String DateFormat)
-{
-}
+   String DateFormat);

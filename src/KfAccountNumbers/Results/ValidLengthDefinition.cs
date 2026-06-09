@@ -18,6 +18,6 @@ namespace KfAccountNumbers.Results;
 ///   represent each of those valid lengths along with a description of what
 ///   they represent (e.g., "Unformatted Length" and "Formatted Length").
 /// </remarks>
-public record struct ValidLengthDefinition(Int32 Length, String Description)
-{
-}
+public readonly record struct ValidLengthDefinition(
+   Int32 Length,
+   String Description);

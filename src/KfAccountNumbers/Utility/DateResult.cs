@@ -53,7 +53,8 @@ public record DateResult
       {
          if (day > DateTime.DaysInMonth(year.Value, month.Value))
          {
-            throw new ArgumentOutOfRangeException(nameof(day),
+            throw new ArgumentOutOfRangeException(
+               nameof(day),
                day,
                String.Format(Messages.DayOutOfRangeForYearAndMonth, day, year, month));
          }
