@@ -1128,6 +1128,185 @@ public class GbPatientNumberTests
 
    #endregion
 
+   #region Format Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(ValidUnformattedChiNumber, ValidFormattedChiNumber)]
+   [InlineData(ValidUnformattedHcNumber, ValidFormattedHcNumber)]
+   [InlineData(ValidUnformattedNhsNumberBlock1, ValidFormattedNhsNumberBlock1)]
+   [InlineData(ValidUnformattedTestNumber, ValidFormattedTestNumber)]
+   public void GbPatientNumber_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed(
+      String value,
+      String expected)
+   {
+      // Arrange.
+      var sut = new GbPatientNumber(value);
+
+      // Act.
+      var str = sut.Format();
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void GbPatientNumber_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new GbPatientNumber(ValidUnformattedNhsNumberBlock1);
+      var mask = "__________";
+      var expected = ValidUnformattedNhsNumberBlock1;
+
+      // Act.
+      var str = sut.Format(mask);
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void GbPatientNumber_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
+   {
+      // Arrange.
+      var sut = new GbPatientNumber(ValidUnformattedNhsNumberBlock1);
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = sut.Format(mask))
+         .Should()
+         .ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbPatientNumber_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidUnformattedNhsNumberBlock2);
+      var sut2 = new GbPatientNumber(ValidUnformattedNhsNumberBlock2);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void GbPatientNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidUnformattedNhsNumberBlock2);
+      var sut2 = new GbPatientNumber(ValidUnformattedTestNumber);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   [Fact]
+   public void GbPatientNumber_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 12 character versions for same person should still be equal.
+      var sut1 = new GbPatientNumber(ValidUnformattedNhsNumberBlock2);
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock2);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void GbPatientNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidFormattedNhsNumberBlock2);
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock2.Replace(' ', '.'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void GbPatientNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidFormattedNhsNumberBlock2.Replace(' ', 'A'));
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock2.Replace(' ', 'a'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // GbPatientNumber does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void GbPatientNumber_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidUnformattedTestNumber);
+      var sut2 = new GbPatientNumber(ValidUnformattedTestNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbPatientNumber_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new GbPatientNumber(value);
+      var expected = GetRawValue(value);
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -1289,6 +1468,109 @@ public class GbPatientNumberTests
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbPatientNumber_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new GbPatientNumber(ValidUnformattedNhsNumberBlock2);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<GbPatientNumber>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void GbPatientNumber_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new GbPatientNumber(AltValidFormattedNhsNumberBlock1);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public GbPatientNumber PatientNumber { get; set; } = null!;
+   }
+
+   [Fact]
+   public void GbPatientNumber_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { PatientNumber = new GbPatientNumber(AltValidFormattedTestNumber) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void GbPatientNumber_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"PatientNumber\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void GbPatientNumber_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"PatientNumber\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.PatientNumber.Should().BeNull();
+   }
+
+   [Fact]
+   public void GbPatientNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenValueIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"PatientNumber\":\"123-456-78901\"}";  // Invalid length
+      GbPatientNumber.ValidationError expected = new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         13,
+         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<GbPatientNumber.ValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
    }
 
    #endregion

@@ -242,6 +242,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      objects.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(GbPatientNumberJsonConverter))]
 public record GbPatientNumber : GbPatientNumberBase
 {
    /// <summary>
@@ -429,6 +430,40 @@ public record GbPatientNumber : GbPatientNumberBase
          _ => throw new SwitchExpressionException("This branch should never be reached"),
       };
 
+   /// <summary>
+   ///   Format the patient number using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then a default mask chosen by the <see cref="IdentifierType"/> will be
+   ///   used instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted patient number.
+   /// </returns>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the NHS number.
+   /// </remarks>
+   public String Format(String? mask = null)
+   {
+      mask ??= IdentifierType is GbHealthService.Chi
+         ? DefaultChiFormatMask
+         : DefaultNhsFormatMask;
+
+      return Value.FormatWithMask(mask);
+   }
+
+   /// <summary>
+   ///   Get a string representation of the patient number.
+   /// </summary>
+   /// <returns>
+   ///   The raw patient number, without separator characters.
+   /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
@@ -497,4 +532,23 @@ public record GbPatientNumber : GbPatientNumberBase
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean ValidateLength(ReadOnlySpan<Char> value)
       => value.Length is UnformattedLength or ChiFormattedLength or NhsFormattedLength;
+}
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
+public class GbPatientNumberJsonConverter : JsonConverter<GbPatientNumber>
+{
+   public override GbPatientNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new GbPatientNumber(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, GbPatientNumber value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }
