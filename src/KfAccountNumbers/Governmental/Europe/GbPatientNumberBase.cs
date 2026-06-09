@@ -65,15 +65,6 @@ public abstract record GbPatientNumberBase
    internal const Int32 GenderOffset = 8;
 
    /// <summary>
-   ///   Predefined array used when reporting invalid length values.
-   /// </summary>
-   internal static readonly ValidLengthDefinition[] ValidLengthDefinitions =
-   [
-      new(UnformattedLength, Messages.GbPatientNumberUnformattedLength),
-      new(NhsFormattedLength, Messages.GbPatientNumberDoubleSeparatorFormattedLength)
-   ];
-
-   /// <summary>
    ///   Details for the length of a valid formatted CHI patient number.
    /// </summary>
    internal static readonly ValidLengthDefinition ChiLengthDefinition =
@@ -131,11 +122,36 @@ public abstract record GbPatientNumberBase
    /// <returns>
    ///   An array of <see cref="ValidLengthDefinition"/>s.
    /// </returns>
-   internal static ValidLengthDefinition[] GetGbPatientNumberValidLengthDefinitions() =>
+   internal static ValidLengthDefinition[] GetAllValidLengthDefinitions() =>
    [
       UnformattedLengthDefinition,
       ChiLengthDefinition,
-      NhsLengthDefinition
+      NhsLengthDefinition,
+   ];
+
+   /// <summary>
+   ///   Gets an array of details about valid lengths accepted for a CHI number.
+   /// </summary>
+   /// <returns>
+   ///   An array of <see cref="ValidLengthDefinition"/>s.
+   /// </returns>
+   internal static ValidLengthDefinition[] GetChiValidLengthDefinitions() =>
+   [
+      UnformattedLengthDefinition,
+      ChiLengthDefinition,
+   ];
+
+   /// <summary>
+   ///   Gets an array of details about valid lengths accepted for a NHS number,
+   ///   H&amp;C number or test number.
+   /// </summary>
+   /// <returns>
+   ///   An array of <see cref="ValidLengthDefinition"/>s.
+   /// </returns>
+   internal static ValidLengthDefinition[] GetNhsValidLengthDefinitions() =>
+   [
+      UnformattedLengthDefinition,
+      NhsLengthDefinition,
    ];
 
    /// <summary>
@@ -238,19 +254,6 @@ public abstract record GbPatientNumberBase
       => new(description, value[..6], ChiNumberDateFormat);
 
    /// <summary>
-   ///   Creates an invalid length result for a GB patient number.
-   /// </summary>
-   /// <param name="length">
-   ///   The invalid length value.
-   /// </param>
-   /// <returns>
-   ///   An <see cref="InvalidLength"/> result containing the error message and
-   ///   validation details.
-   /// </returns>
-   protected static InvalidLength GetInvalidLengthResult(Int32 length)
-      => new(Messages.GbPatientNumberInvalidLength, length, ValidLengthDefinitions);
-
-   /// <summary>
    ///   Create an invalid separator result for a GB patient number.
    /// </summary>
    /// <param name="value">
@@ -279,12 +282,14 @@ public abstract record GbPatientNumberBase
    /// </returns>
    protected static String GetRawValue(String value)
 #pragma warning disable CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
+#pragma warning disable IDE0072 // Add missing cases
       => value.Length switch
       {
          UnformattedLength => value,
          ChiFormattedLength => String.Concat(value.AsSpan(..6), value.AsSpan(7..)),
          NhsFormattedLength => String.Concat(value.AsSpan(..3), value.AsSpan(4..7), value.AsSpan(8..)),
       };
+#pragma warning restore IDE0072 // Add missing cases
 #pragma warning restore CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
 
    /// <summary>
@@ -306,12 +311,14 @@ public abstract record GbPatientNumberBase
       out Int32 invalidCharacterPosition)
    {
 #pragma warning disable CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
+#pragma warning disable IDE0072 // Add missing cases
       var validCheckDigit = value.Length switch
       {
          UnformattedLength => Algorithms.Modulus11Decimal.Validate(value),
          ChiFormattedLength => MaskedAlgorithms.Modulus11Decimal.Validate(value, ChiNumberMask.Instance),
          NhsFormattedLength => MaskedAlgorithms.Modulus11Decimal.Validate(value, NhsNumberMask.Instance),
       };
+#pragma warning restore IDE0072 // Add missing cases
 #pragma warning restore CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
 
       // Modulus11Decimal.Validate returns false for an invalid check digit OR

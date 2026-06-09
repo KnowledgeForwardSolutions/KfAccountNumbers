@@ -211,6 +211,12 @@ public record class GbChiNumber : GbPatientNumberBase
    ///   validation when creating a new instance from a value that has already
    ///   been validated.
    /// </summary>
+   /// <param name="value">
+   ///   String representation of a Scottish CHI number.
+   /// </param>
+   /// <param name="validationMode">
+   ///   Indicates whether the <paramref name="value"/> requires validation.
+   /// </param>
    internal GbChiNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
@@ -286,7 +292,7 @@ public record class GbChiNumber : GbPatientNumberBase
    public static UCreateResult<GbChiNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
-         ValidValue => new GbChiNumber(value!, ValidationMode.BypassValidation),
+         ValidValue => new GbChiNumber(value, ValidationMode.BypassValidation),
          EmptyValue emptyValue => (ValidationError)emptyValue,
          InvalidLength invalidLength => (ValidationError)invalidLength,
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
@@ -364,6 +370,7 @@ public record class GbChiNumber : GbPatientNumberBase
    ///   <paramref name="value"/> passed validation or what validation error was
    ///   encountered.
    /// </returns>
+#pragma warning disable IDE0046 // Convert to conditional expression
    public static ValidationResult Validate(String? value)
    {
       if (String.IsNullOrWhiteSpace(value))
@@ -397,7 +404,10 @@ public record class GbChiNumber : GbPatientNumberBase
          ? default(ValidValue)
          : GetInvalidDateOfBirthResult(value, Messages.GbChiNumberInvalidDateOfBirth);
    }
+#pragma warning restore IDE0046 // Convert to conditional expression
 
+   private static InvalidLength GetInvalidLengthResult(Int32 length)
+      => new(Messages.GbPatientNumberInvalidLength, length, GetChiValidLengthDefinitions());
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean ValidateLength(ReadOnlySpan<Char> value)

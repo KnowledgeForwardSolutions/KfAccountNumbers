@@ -383,7 +383,7 @@ public class GbPatientNumberTests
       GbPatientNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+         GbPatientNumberBase.GetAllValidLengthDefinitions());
 
       // Act/assert.
       FluentActions
@@ -473,7 +473,7 @@ public class GbPatientNumberTests
       GbPatientNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+         GbPatientNumberBase.GetAllValidLengthDefinitions());
 
       // Act/assert.
       FluentActions
@@ -658,7 +658,7 @@ public class GbPatientNumberTests
       GbPatientNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+         GbPatientNumberBase.GetAllValidLengthDefinitions());
 
       // Act/assert.
       FluentActions
@@ -748,7 +748,7 @@ public class GbPatientNumberTests
       GbPatientNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+         GbPatientNumberBase.GetAllValidLengthDefinitions());
 
       // Act/assert.
       FluentActions
@@ -945,7 +945,7 @@ public class GbPatientNumberTests
       GbPatientNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+         GbPatientNumberBase.GetAllValidLengthDefinitions());
 
       // Act.
       var result = GbPatientNumber.Create(value);
@@ -1034,7 +1034,7 @@ public class GbPatientNumberTests
       GbPatientNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+         GbPatientNumberBase.GetAllValidLengthDefinitions());
 
       // Act.
       var result = GbPatientNumber.Create(value);
@@ -1458,7 +1458,7 @@ public class GbPatientNumberTests
       GbPatientNumber.ValidationResult expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+         GbPatientNumberBase.GetAllValidLengthDefinitions());
 
       // Act.
       var result = GbPatientNumber.Validate(value);
@@ -1548,7 +1548,7 @@ public class GbPatientNumberTests
       GbPatientNumber.ValidationResult expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+         GbPatientNumberBase.GetAllValidLengthDefinitions());
 
       // Act.
       var result = GbPatientNumber.Validate(value);
@@ -1672,7 +1672,7 @@ public class GbPatientNumberTests
       GbPatientNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          13,
-         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+         GbPatientNumberBase.GetAllValidLengthDefinitions());
 
       // Act/assert.
       FluentActions

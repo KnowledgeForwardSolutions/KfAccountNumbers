@@ -70,6 +70,7 @@ public class GbChiNumberTests
 
    public static TheoryData<String, Int32> InvalidCharacterData = new()
    {
+      // Unformatted.
       { ".000000004", 0 },          // Non-digit character '.'
       { "4 00000004", 1 },          // Non-digit character ' '
       { "40A0000004", 2 },          // Non-digit character 'A'
@@ -81,6 +82,7 @@ public class GbChiNumberTests
       { "40000000\u21534", 8 },     // Non-digit character Unicode fraction 1/3
       { "400000000\u00D6", 9 },     // Invalid character unicode O with umlaut
 
+      // Formatted.
       { ".00000 0004", 0 },         // Non-digit character '.'
       { "4 0000 0004", 1 },         // Non-digit character ' '
       { "40A000 0004", 2 },         // Non-digit character 'A'
@@ -285,13 +287,16 @@ public class GbChiNumberTests
       GbChiNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.ValidLengthDefinitions);
+         GbPatientNumberBase.GetChiValidLengthDefinitions());
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbChiNumber(value))
          .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
-         .And.ValidationError.Should().BeEquivalentTo(expected);
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<GbChiNumber.ValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
    }
 
    [Theory]
@@ -543,13 +548,16 @@ public class GbChiNumberTests
       GbChiNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.ValidLengthDefinitions);
+         GbPatientNumberBase.GetChiValidLengthDefinitions());
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbChiNumber)value)
          .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
-         .And.ValidationError.Should().BeEquivalentTo(expected);
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<GbChiNumber.ValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
    }
 
    [Theory]
@@ -803,16 +811,19 @@ public class GbChiNumberTests
    public void GbChiNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbChiNumber.ValidationError)new InvalidLength(
+      GbChiNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.ValidLengthDefinitions);
+         GbPatientNumberBase.GetChiValidLengthDefinitions());
 
       // Act.
       var result = GbChiNumber.Create(value);
 
       // Assert.
-      result.Should().BeEquivalentTo(expected);
+
+      // Assert.
+      result.TryGetValue(out GbChiNumber.ValidationError error).Should().BeTrue();    // Necessary to get around some issued with FluentAssertions and nested types
+      error.Value.Should().BeEquivalentTo(expected.Value);
    }
 
    [Theory]
@@ -1277,13 +1288,16 @@ public class GbChiNumberTests
       GbChiNumber.ValidationResult expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.ValidLengthDefinitions);
+         GbPatientNumberBase.GetChiValidLengthDefinitions());
 
       // Act.
       var result = GbChiNumber.Validate(value);
 
       // Assert.
-      result.Should().BeEquivalentTo(expected);
+      result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<GbChiNumber.ValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
@@ -1467,13 +1481,16 @@ public class GbChiNumberTests
       GbChiNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          13,
-         GbPatientNumberBase.ValidLengthDefinitions);
+         GbPatientNumberBase.GetChiValidLengthDefinitions());
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
          .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
-         .And.ValidationError.Should().BeEquivalentTo(expected);
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<GbChiNumber.ValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
    }
 
    #endregion

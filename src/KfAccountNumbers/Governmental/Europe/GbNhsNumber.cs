@@ -203,6 +203,12 @@ public record GbNhsNumber : GbPatientNumberBase
    ///   validation when creating a new instance from a value that has already
    ///   been validated.
    /// </summary>
+   /// <param name="value">
+   ///   String representation of a UK National Health Service number.
+   /// </param>
+   /// <param name="validationMode">
+   ///   Indicates whether the <paramref name="value"/> requires validation.
+   /// </param>
    internal GbNhsNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
@@ -366,6 +372,9 @@ public record GbNhsNumber : GbPatientNumberBase
          ? new GbPatientNumberInvalidRange(Messages.GbNhsNumberInvalidRange)
          : default(ValidValue);
    }
+
+   private static InvalidLength GetInvalidLengthResult(Int32 length)
+      => new(Messages.GbPatientNumberInvalidLength, length, GetNhsValidLengthDefinitions());
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean ValidateLength(ReadOnlySpan<Char> value)

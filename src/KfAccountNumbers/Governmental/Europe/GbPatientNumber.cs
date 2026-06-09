@@ -567,7 +567,7 @@ public record GbPatientNumber : GbPatientNumberBase
    }
 
    private static InvalidLength GetInvalidLengthResult(ReadOnlySpan<Char> value)
-      => new(Messages.GbPatientNumberInvalidLength, value.Length, GetGbPatientNumberValidLengthDefinitions());
+      => new(Messages.GbPatientNumberInvalidLength, value.Length, GetAllValidLengthDefinitions());
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean ValidateLength(ReadOnlySpan<Char> value)
