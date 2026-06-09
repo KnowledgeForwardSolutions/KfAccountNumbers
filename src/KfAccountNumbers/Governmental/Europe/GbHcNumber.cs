@@ -233,6 +233,9 @@ public record GbHcNumber : GbPatientNumberBase
       {
          IdentifierRangeCategory.Hc => default(GbHealthService.Hc),
          IdentifierRangeCategory.Test => default(GbHealthService.Test),
+         IdentifierRangeCategory.Invalid => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
+         IdentifierRangeCategory.Chi => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
+         IdentifierRangeCategory.Nhs => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
          _ => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
       };
    }

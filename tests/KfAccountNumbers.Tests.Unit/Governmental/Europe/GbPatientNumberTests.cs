@@ -1,3 +1,7 @@
+using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+   KfAccountNumbers.Governmental.Europe.GbPatientNumber,
+   KfAccountNumbers.Governmental.Europe.GbPatientNumber.ValidationError>;
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class GbPatientNumberTests
@@ -385,7 +389,10 @@ public class GbPatientNumberTests
       FluentActions
          .Invoking(() => new GbPatientNumber(value))
          .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
-         .And.ValidationError.Value.Should().BeEquivalentTo(expected.Value);              // Issue with FluentAssertions resolving nested types, so compare Value to Value
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<GbPatientNumber.ValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
    }
 
    [Theory]
@@ -472,7 +479,10 @@ public class GbPatientNumberTests
       FluentActions
          .Invoking(() => new GbPatientNumber(value))
          .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
-         .And.ValidationError.Value.Should().BeEquivalentTo(expected.Value);              // Issue with FluentAssertions resolving nested types, so compare Value to Value
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<GbPatientNumber.ValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
    }
 
    [Theory]
@@ -494,6 +504,626 @@ public class GbPatientNumberTests
          .Invoking(() => new GbPatientNumber(value))
          .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region IdentifierType Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   public static TheoryData<String, GbPatientNumber.IdentifierCategory> IdentifierTypeTestData = new()
+   {
+      { ValidUnformattedChiNumber, default(GbHealthService.Chi) },
+      { ValidUnformattedHcNumber, default(GbHealthService.Hc) },
+      { ValidUnformattedNhsNumberBlock1, default(GbHealthService.Nhs) },
+      { ValidUnformattedNhsNumberBlock2, default(GbHealthService.Nhs) },
+      { ValidFormattedTestNumber, default(GbHealthService.Test) },
+      { ValidFormattedChiNumber, default(GbHealthService.Chi) },
+      { ValidUnformattedHcNumber, default(GbHealthService.Hc) },
+      { ValidFormattedNhsNumberBlock1, default(GbHealthService.Nhs) },
+      { ValidFormattedNhsNumberBlock2, default(GbHealthService.Nhs) },
+      { ValidFormattedTestNumber, default(GbHealthService.Test) },
+   };
+
+   [Theory]
+   [MemberData(nameof(IdentifierTypeTestData))]
+   public void GbPatientNumber_IdentifierType_ShouldReturnExpectedIdentifierType(
+      String value,
+      GbPatientNumber.IdentifierCategory expected)
+   {
+      // Arrange.
+      var sut = new GbPatientNumber(value);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbPatientNumber_Value_ShouldReturnValidIdentifier(String value)
+   {
+      // Arrange.
+      var sut = new GbPatientNumber(value);
+      var expected = GetRawValue(value);
+
+      // Act/assert.
+      sut.Value.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbPatientNumber_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = ValidFormattedNhsNumberBlock1;
+      var sut = new GbPatientNumber(value);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(sut.Value);
+   }
+
+   [Fact]
+   public void GbPatientNumber_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = ValidFormattedNhsNumberBlock1;
+      var sut = new GbPatientNumber(value);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().NotBeNullOrEmpty();
+      str.Should().Be(sut.Value);
+   }
+
+   [Fact]
+   public void GbPatientNumber_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      GbPatientNumber sut = null!;
+
+      // Act.
+      String str = sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void GbPatientNumber_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      GbPatientNumber sut = null!;
+
+      // Act.
+      var str = (String)sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbPatientNumber_ExplicitCastToBeGbPatientNumber_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = new GbPatientNumber(value);
+
+      // Act.
+      var sut = (GbPatientNumber)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void GbPatientNumber_ExplicitCastToBeGbPatientNumber_ShouldThrowValidationError_WhenValueIsEmpty(String value)
+   {
+      // Arrange.
+      GbPatientNumber.ValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbPatientNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void GbPatientNumber_ExplicitCastToBeGbPatientNumber_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      GbPatientNumber.ValidationError expected = new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         value.Length,
+         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbPatientNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<GbPatientNumber.ValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterData))]
+   public void GbPatientNumber_ExplicitCastToBeGbPatientNumber_ShouldThrowValidationError_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      GbPatientNumber.ValidationError expected = new InvalidCharacter(
+         Messages.GbPatientNumberInvalidCharacter,
+         value[position],
+         position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbPatientNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void GbPatientNumber_ExplicitCastToBeGbPatientNumber_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      GbPatientNumber.ValidationError expected = new InvalidChecksum(
+         Messages.GbPatientNumberInvalidCheckDigit,
+         Algorithms.Modulus11Decimal.AlgorithmName);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbPatientNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void GbPatientNumber_ExplicitCastToBeGbPatientNumber_ShouldThrowValidationError_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      GbPatientNumber.ValidationError expected = new InvalidSeparator(
+         Messages.GbPatientNumberInvalidSeparator,
+         value[position],
+         position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbPatientNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidRangeValues))]
+   public void GbPatientNumber_ExplicitCastToBeGbPatientNumber_ShouldThrowValidationError_WhenValueIsOutsideOfValidRanges(String nineDigits)
+   {
+      // Arrange.
+      var value = nineDigits + GetCheckDigit(nineDigits);
+      GbPatientNumber.ValidationError expected = new GbPatientNumberInvalidRange(Messages.GbPatientNumberInvalidRange);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbPatientNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthForRangeValues))]
+   public void GbPatientNumber_ExplicitCastToBeGbPatientNumber_ShouldThrowValidationError_WhenLengthIsInvalidForRange(String nineDigits)
+   {
+      // Arrange.
+      var value = nineDigits + GetCheckDigit(nineDigits);
+      GbPatientNumber.ValidationError expected = new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         value.Length,
+         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbPatientNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<GbPatientNumber.ValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidChiNumberDateOfBirthValues))]
+   public void GbPatientNumber_ExplicitCastToBeGbPatientNumber_ShouldThrowValidationError_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      String separator)
+   {
+      // Arrange.
+      var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
+      var invalidDateOfBirth = value[..6];
+      GbPatientNumber.ValidationError expected = new InvalidDateOfBirth(
+         Messages.GbChiNumberInvalidDateOfBirth,
+         invalidDateOfBirth,
+         GbPatientNumberBase.ChiNumberDateFormat);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (GbPatientNumber)value)
+         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbPatientNumber_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidFormattedNhsNumberBlock1);
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock1);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbPatientNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidFormattedNhsNumberBlock1);
+      var sut2 = new GbPatientNumber(ValidFormattedTestNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbPatientNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 12 character versions for same person should still be equal.
+      var sut1 = new GbPatientNumber(ValidUnformattedNhsNumberBlock1);
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock1);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbPatientNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidFormattedNhsNumberBlock1);
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock1.Replace(' ', '.'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbPatientNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidFormattedNhsNumberBlock1.Replace(' ', 'A'));
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock1.Replace(' ', 'a'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbPatientNumber_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidUnformattedNhsNumberBlock1);
+      var sut2 = new GbPatientNumber(ValidFormattedTestNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbPatientNumber_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 12 character versions for same person should still be equal.
+      var sut1 = new GbPatientNumber(ValidUnformattedNhsNumberBlock1);
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock1);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbPatientNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidFormattedNhsNumberBlock1);
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock1);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbPatientNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidFormattedNhsNumberBlock1);
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock1.Replace(' ', '.'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbPatientNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidFormattedNhsNumberBlock1.Replace(' ', 'A'));
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock1.Replace(' ', 'a'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void GbPatientNumber_Create_ShouldReturnNewInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = new GbPatientNumber(value);
+
+      // Act.
+      var result = GbPatientNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void GbPatientNumber_Create_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (GbPatientNumber.ValidationError)default(EmptyValue);
+
+      // Act.
+      var result = GbPatientNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void GbPatientNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      GbPatientNumber.ValidationError expected = new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         value.Length,
+         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+
+      // Act.
+      var result = GbPatientNumber.Create(value);
+
+      // Assert.
+      result.TryGetValue(out GbPatientNumber.ValidationError error).Should().BeTrue();    // Necessary to get around some issued with FluentAssertions and nested types
+      error.Value.Should().BeEquivalentTo(expected.Value);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterData))]
+   public void GbPatientNumber_Create_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalCreateResult expected = (GbPatientNumber.ValidationError)new InvalidCharacter(
+         Messages.GbPatientNumberInvalidCharacter,
+         value[position],
+         position);
+
+      // Act.
+      var result = GbPatientNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void GbPatientNumber_Create_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (GbPatientNumber.ValidationError)new InvalidChecksum(
+         Messages.GbPatientNumberInvalidCheckDigit,
+         Algorithms.Modulus11Decimal.AlgorithmName);
+
+      // Act.
+      var result = GbPatientNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void GbPatientNumber_Create_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalCreateResult expected = (GbPatientNumber.ValidationError)new InvalidSeparator(
+         Messages.GbPatientNumberInvalidSeparator,
+         value[position],
+         position);
+
+      // Act.
+      var result = GbPatientNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidRangeValues))]
+   public void GbPatientNumber_Create_ShouldReturnInvalidRange_WhenValueIsOutsideOfValidRanges(String nineDigits)
+   {
+      // Arrange.
+      var value = nineDigits + GetCheckDigit(nineDigits);
+      LocalCreateResult expected = (GbPatientNumber.ValidationError)new GbPatientNumberInvalidRange(
+         Messages.GbPatientNumberInvalidRange);
+
+      // Act.
+      var result = GbPatientNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthForRangeValues))]
+   public void GbPatientNumber_Create_ShouldReturnInvalidLength_WhenLengthIsInvalidForRange(String nineDigits)
+   {
+      // Arrange.
+      var value = nineDigits + GetCheckDigit(nineDigits);
+      GbPatientNumber.ValidationError expected = new InvalidLength(
+         Messages.GbPatientNumberInvalidLength,
+         value.Length,
+         GbPatientNumberBase.GetGbPatientNumberValidLengthDefinitions());
+
+      // Act.
+      var result = GbPatientNumber.Create(value);
+
+      // Assert.
+      result.TryGetValue(out GbPatientNumber.ValidationError error).Should().BeTrue();    // Necessary to get around some issued with FluentAssertions and nested types
+      error.Value.Should().BeEquivalentTo(expected.Value);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidChiNumberDateOfBirthValues))]
+   public void GbPatientNumber_Create_ShouldReturnInvalidRange_WhenValueHasInvalidDateOfBirth(
+      String dateOfBirth,
+      String separator)
+   {
+      // Arrange.
+      var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
+      var invalidDateOfBirth = value[..6];
+      LocalCreateResult expected = (GbPatientNumber.ValidationError)new InvalidDateOfBirth(
+         Messages.GbChiNumberInvalidDateOfBirth,
+         invalidDateOfBirth,
+         GbPatientNumberBase.ChiNumberDateFormat);
+
+      // Act.
+      var result = GbPatientNumber.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbPatientNumber_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidFormattedNhsNumberBlock2);
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock2);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbPatientNumber_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(AltValidUnformattedNhsNumberBlock1);
+      var sut2 = new GbPatientNumber(ValidUnformattedTestNumber);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbPatientNumber_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 10 and 12 character versions for same person should still be equal.
+      var sut1 = new GbPatientNumber(ValidUnformattedNhsNumberBlock2);
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock2);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbPatientNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidFormattedNhsNumberBlock2);
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock2.Replace(' ', '.'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbPatientNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new GbPatientNumber(ValidFormattedNhsNumberBlock2.Replace(' ', 'A'));
+      var sut2 = new GbPatientNumber(ValidFormattedNhsNumberBlock2.Replace(' ', 'a'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
    }
 
    #endregion
@@ -544,8 +1174,10 @@ public class GbPatientNumberTests
       var result = GbPatientNumber.Validate(value);
 
       // Assert.
-      result.Value.Should().BeEquivalentTo(expected.Value);       // Issue with FluentAssertions resolving nested types, so compare Value to Value
-      // result.Should().BeEquivalentTo(expected);
+      result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<GbPatientNumber.ValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
@@ -632,8 +1264,10 @@ public class GbPatientNumberTests
       var result = GbPatientNumber.Validate(value);
 
       // Assert.
-      result.Value.Should().BeEquivalentTo(expected.Value);       // Issue with FluentAssertions resolving nested types, so compare Value to Value
-      // result.Should().BeEquivalentTo(expected);
+      result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<GbPatientNumber.ValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]

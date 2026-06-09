@@ -89,7 +89,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      GbPatientNumber includes an <see cref="IdentifierType"/> property which
 ///      indicates the exact type of identifier, based on the ranges listed
 ///      above. GbPatientNumber also includes methods to convert to the specific
-///      identifier type (<see cref="ToGbNhsNumber"/>,
+///      identifier type (<see cref="ToGbPatientNumber"/>,
 ///      <see cref="ToGbChiNumber"/> and <see cref="ToGbHcNumber"/>).
 ///   </para>
 ///   <para>
@@ -360,9 +360,76 @@ public record GbPatientNumber : GbPatientNumberBase
    }
 
    /// <summary>
+   ///   Gets the specific type of identifier that this instance represents.
+   /// </summary>
+   public IdentifierCategory IdentifierType
+   {
+      get => GetIdentifierCategory(Value) switch
+      {
+         IdentifierRangeCategory.Chi => default(GbHealthService.Chi),
+         IdentifierRangeCategory.Hc => default(GbHealthService.Hc),
+         IdentifierRangeCategory.Nhs => default(GbHealthService.Nhs),
+         IdentifierRangeCategory.Test => default(GbHealthService.Test),
+         IdentifierRangeCategory.Invalid => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
+         _ => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
+      };
+   }
+
+   /// <summary>
    ///   Gets the patient number, without any formatting.
    /// </summary>
    public String Value { get; private init; }
+
+   /// <summary>
+   ///   Implicitly converts a <see cref="GbPatientNumber"/> to a <see cref="String"/>,
+   ///   returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="GbPatientNumber"/> to convert.
+   /// </param>
+   public static implicit operator String(GbPatientNumber source)
+      => source?.Value ?? String.Empty;         // Handle null object gracefully by returning empty string
+
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="GbPatientNumber"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a GB patient number, either a NHS number,
+   ///   H&amp;C number, CHI number or a test number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid GB patient number.
+   /// </exception>
+   public static explicit operator GbPatientNumber(String value) => new(value);
+
+   /// <summary>
+   ///   Create a new <see cref="GbPatientNumber"/> using the Result pattern.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a GB patient number, either a NHS number,
+   ///   H&amp;C number, CHI number or a test number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="UCreateResult{GbPatientNumber, ValidationError}"/>. Will
+   ///   contain the new <see cref="GbPatientNumber"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
+   /// </returns>
+   public static UCreateResult<GbPatientNumber, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new GbPatientNumber(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         GbPatientNumberInvalidRange invalidRange => (ValidationError)invalidRange,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         _ => throw new SwitchExpressionException("This branch should never be reached"),
+      };
+
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid
