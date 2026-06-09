@@ -203,7 +203,7 @@ public record GbNhsNumber : GbPatientNumberBase
    ///   validation when creating a new instance from a value that has already
    ///   been validated.
    /// </summary>
-   private GbNhsNumber(String? value, ValidationMode validationMode)
+   internal GbNhsNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {

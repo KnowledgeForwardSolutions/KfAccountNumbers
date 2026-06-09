@@ -211,7 +211,7 @@ public record class GbChiNumber : GbPatientNumberBase
    ///   validation when creating a new instance from a value that has already
    ///   been validated.
    /// </summary>
-   private GbChiNumber(String? value, ValidationMode validationMode)
+   internal GbChiNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {

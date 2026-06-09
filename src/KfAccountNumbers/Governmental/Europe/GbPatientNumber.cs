@@ -89,7 +89,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      GbPatientNumber includes an <see cref="IdentifierType"/> property which
 ///      indicates the exact type of identifier, based on the ranges listed
 ///      above. GbPatientNumber also includes methods to convert to the specific
-///      identifier type (<see cref="ToGbPatientNumber"/>,
+///      identifier type (<see cref="ToGbNhsNumber"/>,
 ///      <see cref="ToGbChiNumber"/> and <see cref="ToGbHcNumber"/>).
 ///   </para>
 ///   <para>
@@ -457,6 +457,46 @@ public record GbPatientNumber : GbPatientNumberBase
 
       return Value.FormatWithMask(mask);
    }
+
+   /// <summary>
+   ///   Convert this instance to a <see cref="GbChiNumber"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{GbChiNumber}"/> instance that will contain the
+   ///   <see cref="GbChiNumber"/> if this patient number is a CHI number;
+   ///   otherwise <see cref="None"/> to indicate that this is not a CHI number.
+   /// </returns>
+   public KfOption<GbChiNumber> ToGbChiNumber()
+      => IdentifierType is GbHealthService.Chi
+      ? new GbChiNumber(Value, ValidationMode.BypassValidation)
+      : default(None);
+
+   /// <summary>
+   ///   Convert this instance to a <see cref="GbHcNumber"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{GbHcNumber}"/> instance that will contain the
+   ///   <see cref="GbHcNumber"/> if this patient number is a H&amp;C number;
+   ///   otherwise <see cref="None"/> to indicate that this is not a H&amp;C
+   ///   number.
+   /// </returns>
+   public KfOption<GbHcNumber> ToGbHcNumber()
+      => IdentifierType is GbHealthService.Hc
+         ? new GbHcNumber(Value, ValidationMode.BypassValidation)
+         : default(None);
+
+   /// <summary>
+   ///   Convert this instance to a <see cref="GbNhsNumber"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{GbNhsNumber}"/> instance that will contain the
+   ///   <see cref="GbNhsNumber"/> if this patient number is a NHS number;
+   ///   otherwise <see cref="None"/> to indicate that this is not a NHS number.
+   /// </returns>
+   public KfOption<GbNhsNumber> ToGbNhsNumber()
+      => IdentifierType is GbHealthService.Nhs
+         ? new GbNhsNumber(Value, ValidationMode.BypassValidation)
+         : default(None);
 
    /// <summary>
    ///   Get a string representation of the patient number.

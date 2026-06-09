@@ -201,7 +201,7 @@ public record GbHcNumber : GbPatientNumberBase
    ///   validation when creating a new instance from a value that has already
    ///   been validated.
    /// </summary>
-   private GbHcNumber(String? value, ValidationMode validationMode)
+   internal GbHcNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {

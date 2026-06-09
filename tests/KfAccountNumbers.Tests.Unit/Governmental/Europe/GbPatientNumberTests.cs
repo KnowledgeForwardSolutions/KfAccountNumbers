@@ -1289,6 +1289,117 @@ public class GbPatientNumberTests
 
    #endregion
 
+   #region ToGbChiNumber Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbPatientNumber_ToGbChiNumber_ShouldReturnExpectedResult_WhenValueIsChiNumber()
+   {
+      // Arrange.
+      var sut = new GbPatientNumber(ValidUnformattedChiNumber);
+      var expected = new GbChiNumber(ValidUnformattedChiNumber);
+
+      // Act.
+      KfOption<GbChiNumber> result = sut.ToGbChiNumber();
+
+      // Assert.
+      result.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData(ValidUnformattedHcNumber)]
+   [InlineData(ValidUnformattedNhsNumberBlock1)]
+   [InlineData(ValidUnformattedTestNumber)]
+   public void GbPatientNumber_ToGbChiNumber_ShouldReturnExpectedResult_WhenValueIsNotChiNumber(String value)
+   {
+      // Arrange.
+      var sut = new GbPatientNumber(value);
+      var expected = default(None);
+
+      // Act.
+      KfOption<GbChiNumber> result = sut.ToGbChiNumber();
+
+      // Assert.
+      result.Value.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region ToGbHcNumber Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbPatientNumber_ToGbHcNumber_ShouldReturnExpectedResult_WhenValueIsHcNumber()
+   {
+      // Arrange.
+      var sut = new GbPatientNumber(ValidUnformattedHcNumber);
+      var expected = new GbHcNumber(ValidUnformattedHcNumber);
+
+      // Act.
+      KfOption<GbHcNumber> result = sut.ToGbHcNumber();
+
+      // Assert.
+      result.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData(ValidUnformattedChiNumber)]
+   [InlineData(ValidUnformattedNhsNumberBlock1)]
+   [InlineData(ValidUnformattedTestNumber)]
+   public void GbPatientNumber_ToGbHcNumber_ShouldReturnExpectedResult_WhenValueIsNotHcNumber(String value)
+   {
+      // Arrange.
+      var sut = new GbPatientNumber(value);
+      var expected = default(None);
+
+      // Act.
+      KfOption<GbHcNumber> result = sut.ToGbHcNumber();
+
+      // Assert.
+      result.Value.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region ToGbNhsNumber Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void GbPatientNumber_ToGbNhsNumber_ShouldReturnExpectedResult_WhenValueIsNhsNumber()
+   {
+      // Arrange.
+      var sut = new GbPatientNumber(ValidUnformattedNhsNumberBlock1);
+      var expected = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
+
+      // Act.
+      KfOption<GbNhsNumber> result = sut.ToGbNhsNumber();
+
+      // Assert.
+      result.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData(ValidUnformattedChiNumber)]
+   [InlineData(ValidUnformattedHcNumber)]
+   [InlineData(ValidUnformattedTestNumber)]
+   public void GbPatientNumber_ToGbNhsNumber_ShouldReturnExpectedResult_WhenValueIsNotNhsNumber(String value)
+   {
+      // Arrange.
+      var sut = new GbPatientNumber(value);
+      var expected = default(None);
+
+      // Act.
+      KfOption<GbNhsNumber> result = sut.ToGbNhsNumber();
+
+      // Assert.
+      result.Value.Should().Be(expected);
+   }
+
+   #endregion
+
    #region ToString Method Tests
    // ==========================================================================
    // ==========================================================================
