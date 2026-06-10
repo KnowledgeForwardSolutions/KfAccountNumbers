@@ -478,10 +478,14 @@ public record GbPatientNumber : GbPatientNumberBase
    ///   An <see cref="KfOption{GbHcNumber}"/> instance that will contain the
    ///   <see cref="GbHcNumber"/> if this patient number is a H&amp;C number;
    ///   otherwise <see cref="None"/> to indicate that this is not a H&amp;C
-   ///   number.
+   ///   number or test number.
    /// </returns>
+   /// <remarks>
+   ///   <see cref="GbHcNumber"/> allows numbers from the test block so test
+   ///   numbers can be converted to <see cref="GbHcNumber"/>.
+   /// </remarks>
    public KfOption<GbHcNumber> ToGbHcNumber()
-      => IdentifierType is GbHealthService.Hc
+      => IdentifierType is GbHealthService.Hc or GbHealthService.Test
          ? new GbHcNumber(Value, ValidationMode.BypassValidation)
          : default(None);
 
@@ -491,10 +495,15 @@ public record GbPatientNumber : GbPatientNumberBase
    /// <returns>
    ///   An <see cref="KfOption{GbNhsNumber}"/> instance that will contain the
    ///   <see cref="GbNhsNumber"/> if this patient number is a NHS number;
-   ///   otherwise <see cref="None"/> to indicate that this is not a NHS number.
+   ///   otherwise <see cref="None"/> to indicate that this is not a NHS number
+   ///   or test number.
    /// </returns>
+   /// <remarks>
+   ///   <see cref="GbNhsNumber"/> allows numbers from the test block so test
+   ///   numbers can be converted to <see cref="GbNhsNumber"/>.
+   /// </remarks>
    public KfOption<GbNhsNumber> ToGbNhsNumber()
-      => IdentifierType is GbHealthService.Nhs
+      => IdentifierType is GbHealthService.Nhs or GbHealthService.Test
          ? new GbNhsNumber(Value, ValidationMode.BypassValidation)
          : default(None);
 

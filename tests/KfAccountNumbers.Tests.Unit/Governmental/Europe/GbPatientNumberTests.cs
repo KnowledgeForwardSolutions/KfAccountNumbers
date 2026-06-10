@@ -1330,12 +1330,14 @@ public class GbPatientNumberTests
    // ==========================================================================
    // ==========================================================================
 
-   [Fact]
-   public void GbPatientNumber_ToGbHcNumber_ShouldReturnExpectedResult_WhenValueIsHcNumber()
+   [Theory]
+   [InlineData(ValidUnformattedHcNumber)]
+   [InlineData(ValidUnformattedTestNumber)]
+   public void GbPatientNumber_ToGbHcNumber_ShouldReturnExpectedResult_WhenValueIsHcNumberOrTestNumber(String value)
    {
       // Arrange.
-      var sut = new GbPatientNumber(ValidUnformattedHcNumber);
-      var expected = new GbHcNumber(ValidUnformattedHcNumber);
+      var sut = new GbPatientNumber(value);
+      var expected = new GbHcNumber(value);
 
       // Act.
       KfOption<GbHcNumber> result = sut.ToGbHcNumber();
@@ -1347,7 +1349,6 @@ public class GbPatientNumberTests
    [Theory]
    [InlineData(ValidUnformattedChiNumber)]
    [InlineData(ValidUnformattedNhsNumberBlock1)]
-   [InlineData(ValidUnformattedTestNumber)]
    public void GbPatientNumber_ToGbHcNumber_ShouldReturnExpectedResult_WhenValueIsNotHcNumber(String value)
    {
       // Arrange.
@@ -1367,12 +1368,14 @@ public class GbPatientNumberTests
    // ==========================================================================
    // ==========================================================================
 
-   [Fact]
-   public void GbPatientNumber_ToGbNhsNumber_ShouldReturnExpectedResult_WhenValueIsNhsNumber()
+   [Theory]
+   [InlineData(ValidUnformattedNhsNumberBlock1)]
+   [InlineData(ValidUnformattedTestNumber)]
+   public void GbPatientNumber_ToGbNhsNumber_ShouldReturnExpectedResult_WhenValueIsNhsNumberOrTestNumber(String value)
    {
       // Arrange.
-      var sut = new GbPatientNumber(ValidUnformattedNhsNumberBlock1);
-      var expected = new GbNhsNumber(ValidUnformattedNhsNumberBlock1);
+      var sut = new GbPatientNumber(value);
+      var expected = new GbNhsNumber(value);
 
       // Act.
       KfOption<GbNhsNumber> result = sut.ToGbNhsNumber();
@@ -1384,7 +1387,6 @@ public class GbPatientNumberTests
    [Theory]
    [InlineData(ValidUnformattedChiNumber)]
    [InlineData(ValidUnformattedHcNumber)]
-   [InlineData(ValidUnformattedTestNumber)]
    public void GbPatientNumber_ToGbNhsNumber_ShouldReturnExpectedResult_WhenValueIsNotNhsNumber(String value)
    {
       // Arrange.

@@ -63,8 +63,8 @@ public class GbChiNumberTests
    public static TheoryData<String> InvalidLengthValues =>
    [
       "123456789",            // Length 9, too short
-      "123 456 7890",         // Length 12, too long
-      "123-456-78901",        // Length 13, too long,
+      "123456 78901",         // Length 12, too long
+      "123456 789012",        // Length 13, too long,
       new String('1', 100),   // Very long value
    ];
 
@@ -120,16 +120,16 @@ public class GbChiNumberTests
 
    public static TheoryData<String, Int32> InvalidSeparatorValues = new()
    {
-      { "40000000004", 6 },
-      { "40000010004", 6 },
-      { "40000020004", 6 },
-      { "40000030004", 6 },
-      { "40000040004", 6 },
-      { "40000050004", 6 },
-      { "40000060004", 6 },
-      { "40000070004", 6 },
-      { "40000080004", 6 },
-      { "40000090004", 6 },
+      { "01010000006", 6 },
+      { "01010010006", 6 },
+      { "01010020006", 6 },
+      { "01010030006", 6 },
+      { "01010040006", 6 },
+      { "01010050006", 6 },
+      { "01010060006", 6 },
+      { "01010070006", 6 },
+      { "01010080006", 6 },
+      { "01010090006", 6 },
    };
 
    public static TheoryData<String> InvalidRangeValues =>
