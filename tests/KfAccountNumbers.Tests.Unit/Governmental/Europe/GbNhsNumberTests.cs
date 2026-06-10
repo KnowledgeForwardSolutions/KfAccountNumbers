@@ -70,6 +70,7 @@ public class GbNhsNumberTests
 
    public static TheoryData<String, Int32> InvalidCharacterData = new()
    {
+      // Unformatted values
       { ".000000004", 0 },          // Non-digit character '.'
       { "4 00000004", 1 },          // Non-digit character ' '
       { "40A0000004", 2 },          // Non-digit character 'A'
@@ -80,7 +81,7 @@ public class GbNhsNumberTests
       { "4000000~04", 7 },          // Non-digit character '~'
       { "40000000\u21534", 8 },     // Non-digit character Unicode fraction 1/3
       { "400000000\u00D6", 9 },     // Invalid character unicode O with umlaut
-
+      // Formatted value
       { ".00 000 0004", 0 },        // Non-digit character '.'
       { "4 0 000 0004", 1 },        // Non-digit character ' '
       { "40A 000 0004", 2 },        // Non-digit character 'A'
@@ -241,13 +242,16 @@ public class GbNhsNumberTests
       GbNhsNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.ValidLengthDefinitions);
+         GbPatientNumberBase.GetNhsValidLengthDefinitions());
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbNhsNumber(value))
          .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
-         .And.ValidationError.Should().BeEquivalentTo(expected);
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<GbNhsNumber.ValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
    }
 
    [Theory]
@@ -467,13 +471,16 @@ public class GbNhsNumberTests
       GbNhsNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.ValidLengthDefinitions);
+         GbPatientNumberBase.GetNhsValidLengthDefinitions());
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbNhsNumber)value)
          .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
-         .And.ValidationError.Should().BeEquivalentTo(expected);
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<GbNhsNumber.ValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
    }
 
    [Theory]
@@ -583,6 +590,7 @@ public class GbNhsNumberTests
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
    }
+
    [Fact]
    public void GbNhsNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
    {
@@ -705,16 +713,17 @@ public class GbNhsNumberTests
    public void GbNhsNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbNhsNumber.ValidationError)new InvalidLength(
+      GbNhsNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbNhsNumber.ValidLengthDefinitions);
+         GbPatientNumberBase.GetNhsValidLengthDefinitions());
 
       // Act.
       var result = GbNhsNumber.Create(value);
 
       // Assert.
-      result.Should().BeEquivalentTo(expected);
+      result.TryGetValue(out GbNhsNumber.ValidationError error).Should().BeTrue();    // Necessary to get around some issued with FluentAssertions and nested types
+      error.Value.Should().BeEquivalentTo(expected.Value);
    }
 
    [Theory]
@@ -1080,13 +1089,16 @@ public class GbNhsNumberTests
       GbNhsNumber.ValidationResult expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          value.Length,
-         GbPatientNumberBase.ValidLengthDefinitions);
+         GbPatientNumberBase.GetNhsValidLengthDefinitions());
 
       // Act.
       var result = GbNhsNumber.Validate(value);
 
       // Assert.
-      result.Should().BeEquivalentTo(expected);
+      result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<GbNhsNumber.ValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
@@ -1249,13 +1261,16 @@ public class GbNhsNumberTests
       GbNhsNumber.ValidationError expected = new InvalidLength(
          Messages.GbPatientNumberInvalidLength,
          13,
-         GbPatientNumberBase.ValidLengthDefinitions);
+         GbPatientNumberBase.GetNhsValidLengthDefinitions());
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
          .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
-         .And.ValidationError.Should().BeEquivalentTo(expected);
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<GbNhsNumber.ValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
    }
 
    #endregion

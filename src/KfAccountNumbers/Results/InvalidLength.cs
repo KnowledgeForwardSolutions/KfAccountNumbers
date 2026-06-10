@@ -14,9 +14,7 @@ namespace KfAccountNumbers.Results;
 /// <param name="ValidLengths">
 ///   Valid length definitions that specify the expected length constraints.
 /// </param>
-public record struct InvalidLength(
+public readonly record struct InvalidLength(
    String Description,
    Int32 Length,
-   params ValidLengthDefinition[] ValidLengths)
-{
-}
+   params ValidLengthDefinition[] ValidLengths);

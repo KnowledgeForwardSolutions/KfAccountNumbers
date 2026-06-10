@@ -329,17 +329,23 @@ The three public health services in the United Kingdom are:
 * The Scottish Community Health Index (CHI).
 * Northern Ireland Health and Care (H&C).
 
-A patient number from one of these services consists of 10 digits structured as NNNNNNNNNC, where
-* NNNNNNNNN is a unique nine-digit number
-* C is a Modulus 11 check digit calculated from the preceding nine digits
+Each of the services uses a 10-digit patient number, with the first nine digits assigned by the
+service and the trailing (right-most) digit calculated using the Modulus 11 check digit algorithm.
+The patient numbers used by NHS and H&C have no embedded patient information while CHI numbers
+embed the patient date of birth and gender (see below).
 
-Patient numbers can be displayed as a string of 10 digits or formatted for readability as three groups of digits in a '3 3 4'
-pattern (e.g. "123 456 7890"). The optional separator characters can be any character that is not an ASCII digit ('0' - '9'),
-but both separator characters must be the same. The typical separator character is a space (' ').
+The patient numbers can be displayed as a string of 10 digits or formatted with separator characters
+for readability. NHS and H&C numbers are formatted as three groups of digits in a '3 3 4' pattern
+(e.g. "123 456 7890") while CHI numbers are formatted as two groups of digits in a '6 4' pattern
+(e.g. "123456 7890"). The six-digit grouping in CHI numbers corresponds to the first six digits
+representing the patient's date of birth (see below). The optional separator characters can be any
+character that is not an ASCII digit ('0' - '9'), but for NHS and H&C numbers both separator
+characters must be the same. The typical separator character is a space (' ').
 
-Each of the services are allocated one or more non-overlapping blocks of nine-digit numbers so it is possible to determine what service
-issued the number by comparing the number to a list of valid ranges for each service. There is also a block of numbers that
-is reserved for test purposes and is not issued to the public.
+Each of the services is allocated one or more non-overlapping blocks of nine-digit numbers so it is
+possible to determine what service issued the number by comparing the number to a list of valid
+ranges for each service. There is also a block of numbers that is reserved for test purposes and is
+not issued to the public.
 
 The current assigned blocks of numbers are:
 * 010 000 000 to 311 299 999 - Scottish CHI
@@ -348,17 +354,19 @@ The current assigned blocks of numbers are:
 * 600 000 000 to 799 999 999 - NHS
 * 900 000 000 to 999 999 999 - Test
 
-The actual patient number is a nine-digit number selected from the block of numbers allocated to the issuing service,
-to which a Modulus 11 check digit is appended, resulting in a 10-digit final number. Note that the Modulus 11 algorithm
-can generate a final checksum equal to 10, which can not be represented with a single decimal digit. In this case, the
-number is not issued and another number is selected. In practice this means that approximately 9.09% of all possible
-numbers are never issued.
+The actual patient number is a nine-digit number selected from the block of numbers allocated to the
+issuing service, to which a Modulus 11 check digit is appended, resulting in a 10-digit final number.
+Note that the Modulus 11 algorithm can generate a final checksum equal to 10, which can not be
+represented with a single decimal digit. In this case, the number is not issued and another number
+is selected. In practice this means that approximately 9.09% of all possible numbers are never
+issued.
 
 A valid patient number for any of the UK public health services must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
-* The value must be either 10 characters long (without separators) or 12 characters long (with separators).
+* The value must be either 10 characters long (without separators) or 11 characters (CHI number with separator) or 12 characters long (NHS and H&C numbers with separators).
 * All characters (except the optional separator characters) must be ASCII digits ('0' - '9').
 * The trailing (right-most) digit must be a valid Modulus 11 check digit.
+* If the value is 11 characters long, character position 6 (zero-based) must not be an ASCII digit ('0' - '9').
 * If the value is 12 characters long, character positions 3 and 7 (zero-based) must not be ASCII digits ('0' - '9'). The same character must be used in each separator position.
 * The first nine digits must be in a range appropriate to the issuing service (or the test range in the case of NHS or H&C).
 
@@ -380,10 +388,11 @@ as date of birth or gender in the number.
 ### GbChiNumber
 
 `GbChiNumber` represents a patient number issued by CHI. A CHI patient number encodes both date of birth and gender in the
-patient number and the NNNNNNNNN component described above is further subdivided into DDMMYYNNG where
+patient number and is structured as DDMMYYNNGC where
 * DDMMYY is the patient date of birth encoded in DDMMYY format.
 * NNG are three digits used to differentiate between two persons born on the same day. The third digit (G) also indicates
  the person's gender, where odd numbers = male and even numbers = female.
+* C is the Modulus 11 check digit.
 
 `GbChiNumber` has an additional validation rule where the initial six digits of the number must be a valid date. `GbChiNumber`
 does not allow numbers from the test block because they would fail date of birth validation.
@@ -393,8 +402,10 @@ of birth.
 
 ### GbPatientNumber
 
-`GbPatientNumber` represents a patient number issued by any of the UK public health services. `GbPatientNumber` uses all of
-the validation rules described above, including date of birth validation if the number is in the CHI block.
+`GbPatientNumber` represents a patient number issued by any of the UK public health services. `GbPatientNumber` uses all
+of the validation rules described above, including ensuring that the length of formatted values is appropriate for the
+specific number block (length 11 for values in the CHI block and 12 for values in other blocks) and ensuring that date
+of birth is valid if the number is in the CHI block.
 
 `GbPatientNumber` has an `IdentifierType` property that allows the user to determine the service that issued the number.
 `GbPatientNumber` allows implicit conversion from `GbNhsNumber`, `GbHcNumber` and `GbChiNumber` and implements 
@@ -409,7 +420,7 @@ Example values:
 * 3200000007 - unformatted H&C number
 * 320 000 0007 - formatted H&C number
 * 3112999991 - unformatted CHI number, date of birth December 31, 1999, gender = male
-* 311 299 9991 - formatted CHI number, date of birth December 31, 1999, gender = male
+* 311299 9991 - formatted CHI number, date of birth December 31, 1999, gender = male
 * 9000000009 - unformatted test number
 * 900 000 0009 - formatted test number
 

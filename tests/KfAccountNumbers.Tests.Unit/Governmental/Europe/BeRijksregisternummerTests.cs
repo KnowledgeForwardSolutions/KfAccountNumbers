@@ -43,7 +43,7 @@ public class BeRijksregisternummerTests
    {
       var temp = $"{(year >= 2000 ? 2 : 0)}{year % 100:D2}{month:D2}{day:D2}{sequenceNumber:D3}";
       var checkSum = GetCheckSum(temp);
-      
+
       return formatted
          ? $"{year % 100:D2}.{month:D2}.{day:D2}-{sequenceNumber:D3}.{checkSum:D2}"
          : $"{year % 100:D2}{month:D2}{day:D2}{sequenceNumber:D3}{checkSum:D2}";
@@ -669,7 +669,7 @@ public class BeRijksregisternummerTests
       {
          >= 20 and <= 32 => month - BeRijksregisternummer.BisNummerUnknownGenderMonthOffset,
          >= 40 and <= 52 => month - BeRijksregisternummer.BisNummerMonthOffset,
-         _ => month
+         _ => month,
       };
       var expected = new DateResult(
          year > 0 ? year : null,

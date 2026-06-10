@@ -2,11 +2,11 @@ namespace KfAccountNumbers.Tests.Unit.Results;
 
 public class UCreateResultTests
 {
-   public record struct IntBetweenOneAndTen(Int32 Value) { }
+   public readonly record struct IntBetweenOneAndTen(Int32 Value);
 
-   public record struct TooLow(Int32 Value) { }
+   public readonly record struct TooLow(Int32 Value);
 
-   public record struct TooHigh(Int32 Value) { }
+   public readonly record struct TooHigh(Int32 Value);
 
    public union NumberValidationError(TooLow, TooHigh);
 
@@ -15,7 +15,7 @@ public class UCreateResultTests
    // ==========================================================================
 
    [Fact]
-   public void CreateResult_Constructor_ShouldCreateExpectedObject_WhenValidationSucceeds()
+   public void CreateResult_Constructor_ShouldCreateInstance_WhenValidationSucceeds()
    {
       // Arrange.
       var number = 9;
@@ -30,7 +30,7 @@ public class UCreateResultTests
    }
 
    [Fact]
-   public void CreateResult_Constructor_ShouldCreateExpectedObject_WhenValidationFails()
+   public void CreateResult_Constructor_ShouldCreateInstance_WhenValidationFails()
    {
       // Arrange.
       var number = -1;

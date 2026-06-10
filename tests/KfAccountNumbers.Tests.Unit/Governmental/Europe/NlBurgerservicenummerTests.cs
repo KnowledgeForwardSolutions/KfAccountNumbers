@@ -115,9 +115,9 @@ public class NlBurgerservicenummerTests
 
    [Theory]
    // Values designed to produce all possible check digits 0-9
-                                 // Weights: 9 8 7 6 5 4 3 2 -1 
-   [InlineData("110000006")]     //          9 8             -6 = 11, mod 11 = 0             
-   [InlineData("101000005")]     //          9   7           -5 
+                                 // Weights: 9 8 7 6 5 4 3 2 -1
+   [InlineData("110000006")]     //          9 8             -6 = 11, mod 11 = 0
+   [InlineData("101000005")]     //          9   7           -5
    [InlineData("100100004")]     //          9     6         -4
    [InlineData("100010003")]     //          9       5       -3
    [InlineData("100001002")]     //          9         4     -2

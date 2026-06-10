@@ -35,7 +35,7 @@ public class FrInseeNumberTests
       {
          "2A" => "19",
          "2B" => "18",
-         _ => department
+         _ => department,
       };
       var work = $"{gender}{year}{month}{checksumDepartment}{commune}{registrationOrder}";
       var checkSum = GetCheckSum(work);
@@ -96,9 +96,9 @@ public class FrInseeNumberTests
          var formatOptions = new Boolean[] { true, false };
          var departmentCodes = FrDepartmentCodes.GetAllDepartmentCodes();
 
-         foreach(var opt in formatOptions)
+         foreach (var opt in formatOptions)
          {
-            foreach(var code in departmentCodes)
+            foreach (var code in departmentCodes)
             {
                data.Add(code, opt);
             }
@@ -113,7 +113,7 @@ public class FrInseeNumberTests
       // Standard months
       { "01", false },
       { "12", false },
-   
+
       // Special month codes for unknown/incomplete DOB
       { "13", false },     // Unknown month (birth month not known)
       { "20", false },     // Incomplete DOB range start
@@ -124,7 +124,7 @@ public class FrInseeNumberTests
       // Standard months
       { "01", true },
       { "12", true },
-   
+
       // Special month codes for unknown/incomplete DOB
       { "13", true },      // Unknown month (birth month not known)
       { "20", true },      // Incomplete DOB range start

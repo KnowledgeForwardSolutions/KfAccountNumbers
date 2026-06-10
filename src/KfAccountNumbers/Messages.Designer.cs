@@ -565,11 +565,11 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A formatted GB patient number must be 12 characters in length.
+        ///   Looks up a localized string similar to A formatted NHS, H&amp;C or test patient number.
         /// </summary>
-        internal static string GbPatientNumberFormattedLength {
+        internal static string GbPatientNumberDoubleSeparatorFormattedLength {
             get {
-                return ResourceManager.GetString("GbPatientNumberFormattedLength", resourceCulture);
+                return ResourceManager.GetString("GbPatientNumberDoubleSeparatorFormattedLength", resourceCulture);
             }
         }
         
@@ -592,11 +592,20 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to GB patient number must have a length of 10 (without separators) or 12 (with separators).
+        ///   Looks up a localized string similar to GB patient number must have a length of 10 (without separators), 11 (CHI number with separator) or 12 (NHS, H&amp;C or test number with separators).
         /// </summary>
         internal static string GbPatientNumberInvalidLength {
             get {
                 return ResourceManager.GetString("GbPatientNumberInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB patient number must be in the range 010 000 000 to 311 299 999, 320 000 000 to 399 999 999, 400 000 000 to 499 999 999, 600 000 000 to 799 999 999, or 900 000 000 to 999 999 999, excluding trailing check digit.
+        /// </summary>
+        internal static string GbPatientNumberInvalidRange {
+            get {
+                return ResourceManager.GetString("GbPatientNumberInvalidRange", resourceCulture);
             }
         }
         
@@ -610,7 +619,16 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An unformatted GB patient number must be 10 characters in length.
+        ///   Looks up a localized string similar to A formatted CHI number.
+        /// </summary>
+        internal static string GbPatientNumberSingleSeparatorFormattedLength {
+            get {
+                return ResourceManager.GetString("GbPatientNumberSingleSeparatorFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unformatted GB patient number (NHS, CHI or H&amp;C).
         /// </summary>
         internal static string GbPatientNumberUnformattedLength {
             get {

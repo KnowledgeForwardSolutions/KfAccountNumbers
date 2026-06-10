@@ -82,7 +82,7 @@ public readonly struct UCreateResult<TS, TE> : IUnion
    /// <summary>
    ///   Gets the success result or error value.
    /// </summary>
-   public Object Value => IsSuccess ? _success! : _error!;
+   public Object Value => IsSuccess ? _success : _error;
 
    /// <summary>
    ///   Implicitly converts a <typeparamref name="TS"/> success value to a

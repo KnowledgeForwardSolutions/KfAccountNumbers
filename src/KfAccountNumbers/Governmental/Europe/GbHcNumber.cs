@@ -201,7 +201,13 @@ public record GbHcNumber : GbPatientNumberBase
    ///   validation when creating a new instance from a value that has already
    ///   been validated.
    /// </summary>
-   private GbHcNumber(String? value, ValidationMode validationMode)
+   /// <param name="value">
+   ///   String representation of a Northern Ireland H&amp;C number.
+   /// </param>
+   /// <param name="validationMode">
+   ///   Indicates whether the <paramref name="value"/> requires validation.
+   /// </param>
+   internal GbHcNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
@@ -233,6 +239,9 @@ public record GbHcNumber : GbPatientNumberBase
       {
          IdentifierRangeCategory.Hc => default(GbHealthService.Hc),
          IdentifierRangeCategory.Test => default(GbHealthService.Test),
+         IdentifierRangeCategory.Invalid => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
+         IdentifierRangeCategory.Chi => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
+         IdentifierRangeCategory.Nhs => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
          _ => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
       };
    }
@@ -278,7 +287,7 @@ public record GbHcNumber : GbPatientNumberBase
    public static UCreateResult<GbHcNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
-         ValidValue => new GbHcNumber(value!, ValidationMode.BypassValidation),
+         ValidValue => new GbHcNumber(value, ValidationMode.BypassValidation),
          EmptyValue emptyValue => (ValidationError)emptyValue,
          InvalidLength invalidLength => (ValidationError)invalidLength,
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
@@ -309,7 +318,7 @@ public record GbHcNumber : GbPatientNumberBase
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
    ///   details on creating a mask to format the H&amp;C number.
    /// </remarks>
-   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+   public String Format(String mask = DefaultNhsFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
    ///   Get a string representation of the H&amp;C number.
@@ -331,6 +340,7 @@ public record GbHcNumber : GbPatientNumberBase
    ///   <paramref name="value"/> passed validation or what validation error was
    ///   encountered.
    /// </returns>
+#pragma warning disable IDE0046 // Convert to conditional expression
    public static ValidationResult Validate(String? value)
    {
       if (String.IsNullOrWhiteSpace(value))
@@ -359,6 +369,14 @@ public record GbHcNumber : GbPatientNumberBase
          ? new GbPatientNumberInvalidRange(Messages.GbHcNumberInvalidRange)
          : default(ValidValue);
    }
+#pragma warning restore IDE0046 // Convert to conditional expression
+
+   private static InvalidLength GetInvalidLengthResult(Int32 length)
+      => new(Messages.GbPatientNumberInvalidLength, length, GetNhsValidLengthDefinitions());
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean ValidateLength(ReadOnlySpan<Char> value)
+      => value.Length is UnformattedLength or NhsFormattedLength;
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

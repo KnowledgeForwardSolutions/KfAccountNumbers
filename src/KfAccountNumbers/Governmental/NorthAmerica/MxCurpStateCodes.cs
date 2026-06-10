@@ -23,30 +23,30 @@ public static class MxCurpStateCodes
          { "CS", "Chiapas" },
          { "CH", "Chihuahua" },
          { "DF", "Ciudad de México" },
-         { "DG", "Durango" }, 
-         { "GT", "Guanajuato" }, 
-         { "GR", "Guerrero" }, 
-         { "HG", "Hidalgo" }, 
-         { "JC", "Jalisco" }, 
-         { "MC", "México" }, 
-         { "MN", "Michoacán de Ocampo" }, 
-         { "MS", "Morelos" }, 
-         { "NT", "Nayarit" }, 
-         { "NL", "Nuevo León" }, 
-         { "OC", "Oaxaca" }, 
-         { "PL", "Puebla" }, 
-         { "QT", "Querétaro" }, 
-         { "QR", "Quintana Roo" }, 
-         { "SP", "San Luis Potosí" }, 
-         { "SL", "Sinaloa" }, 
-         { "SR", "Sonora" }, 
-         { "TC", "Tabasco" }, 
-         { "TS", "Tamaulipas" }, 
-         { "TL", "Tlaxcala" }, 
-         { "VZ", "Veracruz" }, 
-         { "YN", "Yucatán" }, 
-         { "ZS", "Zacatecas" }, 
-         { "NE", "Nacido en el Extranjero" }, 
+         { "DG", "Durango" },
+         { "GT", "Guanajuato" },
+         { "GR", "Guerrero" },
+         { "HG", "Hidalgo" },
+         { "JC", "Jalisco" },
+         { "MC", "México" },
+         { "MN", "Michoacán de Ocampo" },
+         { "MS", "Morelos" },
+         { "NT", "Nayarit" },
+         { "NL", "Nuevo León" },
+         { "OC", "Oaxaca" },
+         { "PL", "Puebla" },
+         { "QT", "Querétaro" },
+         { "QR", "Quintana Roo" },
+         { "SP", "San Luis Potosí" },
+         { "SL", "Sinaloa" },
+         { "SR", "Sonora" },
+         { "TC", "Tabasco" },
+         { "TS", "Tamaulipas" },
+         { "TL", "Tlaxcala" },
+         { "VZ", "Veracruz" },
+         { "YN", "Yucatán" },
+         { "ZS", "Zacatecas" },
+         { "NE", "Nacido en el Extranjero" },
       }
       .GetAlternateLookup<ReadOnlySpan<Char>>();
 
@@ -56,7 +56,7 @@ public static class MxCurpStateCodes
    /// <returns>
    ///   An unordered array of all valid state codes.
    /// </returns>
-   public static String[] GetAllStateCodes() => _validStates.Dictionary.Keys.ToArray();
+   public static String[] GetAllStateCodes() => [.. _validStates.Dictionary.Keys];
 
    /// <summary>
    ///   Get the name of the state with the supplied <paramref name="stateCode"/>.

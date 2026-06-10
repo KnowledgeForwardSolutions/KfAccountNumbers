@@ -23,7 +23,7 @@ public class GbNationalInsuranceNumberTests
       String suffix = "",
       Boolean formatted = false)
       => formatted
-         ? $"{prefix} {digits[..2]} {digits[2..4]} {digits[4..]}{(suffix != String.Empty ? " " : "")}{suffix}"
+         ? $"{prefix} {digits[..2]} {digits[2..4]} {digits[4..]}{(suffix != String.Empty ? " " : String.Empty)}{suffix}"
          : $"{prefix}{digits}{suffix}";
 
    public static String GetNationalInsuranceNumber(
@@ -39,7 +39,7 @@ public class GbNationalInsuranceNumberTests
       {
          11 => $"{str[..2]}{str[3..5]}{str[6..8]}{str[9..]}",
          13 => $"{str[..2]}{str[3..5]}{str[6..8]}{str[9..11]}{str[12]}",
-         _ => str
+         _ => str,
       };
 
    public static TheoryData<String> ValidNationalInsuranceNumberValues =>
@@ -142,7 +142,7 @@ public class GbNationalInsuranceNumberTests
 
    public static TheoryData<String, Boolean> ValidSuffixCharacters = new()
    {
-      { "", false },
+      { String.Empty, false },
       { "A", false },
       { "B", false },
       { "C", false },
@@ -224,7 +224,7 @@ public class GbNationalInsuranceNumberTests
       { "012A45", false },
       { "0123b5", false },
       { "01234~", false },
-      { "01234\u2153", false },       // Unicode fraction 1/3  
+      { "01234\u2153", false },       // Unicode fraction 1/3
       { "01234\u00D6", false },       // unicode O with umlaut
       { " 12345", true },
       { "0-2345", true },
@@ -232,7 +232,7 @@ public class GbNationalInsuranceNumberTests
       { "012A45", true },
       { "0123b5", true },
       { "01234~", true },
-      { "01234\u2153", true },        // Unicode fraction 1/3  
+      { "01234\u2153", true },        // Unicode fraction 1/3
       { "01234\u00D6", true },        // unicode O with umlaut
    };
 
@@ -246,7 +246,7 @@ public class GbNationalInsuranceNumberTests
       { "=", false },
       { "1", false },
       { "0", false },
-      { "\u2153", false },       // Unicode fraction 1/3  
+      { "\u2153", false },       // Unicode fraction 1/3
       { "\u00D6", false },       // unicode O with umlaut
       { "a", true },
       { "b", true },
@@ -256,7 +256,7 @@ public class GbNationalInsuranceNumberTests
       { "=", true },
       { "1", true },
       { "0", true },
-      { "\u2153", true },       // Unicode fraction 1/3  
+      { "\u2153", true },       // Unicode fraction 1/3
       { "\u00D6", true },       // unicode O with umlaut
    };
 
@@ -1552,8 +1552,8 @@ public class GbNationalInsuranceNumberTests
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
    public void GbNationalInsuranceNumber_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(String value)
-      => GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidSeparator);  
-   
+      => GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidSeparator);
+
    #endregion
 
    #region Json Serialization Tests

@@ -5,7 +5,7 @@ internal static class CharacterData
    public static Char[] AsciiLowercaseAlphabeticCharacters
       => "abcdefghijklmnopqrstuvwxyz".ToCharArray();
 
-   public static Char[] NumericCharacters 
+   public static Char[] NumericCharacters
       => "0123456789".ToCharArray();
 
    public static Char[] AsciiUppercaseAlphabeticCharacters

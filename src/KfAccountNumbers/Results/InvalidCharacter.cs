@@ -14,9 +14,7 @@ namespace KfAccountNumbers.Results;
 /// <param name="Position">
 ///   The zero-based index of the invalid character in the input value.
 /// </param>
-public record struct InvalidCharacter(
+public readonly record struct InvalidCharacter(
    String Description,
    Char Character,
-   Int32 Position)
-{
-}
+   Int32 Position);

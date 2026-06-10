@@ -35,23 +35,22 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      CHI Numbers can be displayed as a string of 10 digits or formatted for
-///      readability as three groups of digits in a '3 3 4' pattern
-///      (e.g. "123 456 7890"). The optional separator characters can be any
-///      character that is not an ASCII digit ('0' - '9'), but both separator
-///      characters must be the same. The typical separator character is a space (' ').
+///      readability as two groups of digits (e.g. "DDMMYY NNNC"). The optional
+///      separator character can be any character that is not an ASCII digit
+///      ('0' - '9'). The typical separator character is a space (' ').
 ///   </para>
 ///   <para>
-///      Each of the public health services in the United Kingdom (NHS, Scottish CHI
-///      and Northern Ireland H&amp;C) are allocated separate blocks of 10-digit
-///      numbers so it is possible to determine what service issued the number by
-///      comparing the number to a list of valid ranges for each service. For CHI,
-///      the valid range is 010 000 000 to 311 299 999 (excluding the trailing check
-///      digit). The leading two digits of the valid range correspond to the
-///      valid date format (DDMMYY) where 01-31 are allowed for the day component.
-///      Unlike <see cref="GbNhsNumber"/> and <see cref="GbHcNumber"/>,
-///      <see cref="GbChiNumber"/> does not allow test numbers in the range of
-///      900 000 000 to 999 999 999 because those numbers would not contain a valid
-///      date of birth.
+///      Each of the public health services in the United Kingdom (NHS, Scottish
+///      CHI and Northern Ireland H&amp;C) are allocated separate blocks of
+///      10-digit numbers so it is possible to determine what service issued the
+///      number by comparing the number to a list of valid ranges for each
+///      service. For CHI, the valid range is 010 000 000 to 311 299 999
+///      (excluding the trailing check digit). The leading two digits of the
+///      valid range correspond to the valid date format (DDMMYY) where 01-31
+///      are allowed for the day component. Unlike <see cref="GbNhsNumber"/> and
+///      <see cref="GbHcNumber"/>, <see cref="GbChiNumber"/> does not allow test
+///      numbers in the range of 900 000 000 to 999 999 999 because those
+///      numbers would not contain a valid date of birth.
 ///   </para>
 ///   <para>
 ///      When creating a new <see cref="GbChiNumber"/>, the following validation
@@ -64,13 +63,13 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The value must be either 10 characters (without separators) or
-///               12 characters (with separators) in length.
+///               The value must be either 10 characters (without separator) or
+///               11 characters (with separator) in length.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               All characters (except the optional separator characters) must
+///               All characters (except the optional separator character) must
 ///               be ASCII digits ('0'-'9').
 ///            </description>
 ///         </item>
@@ -82,9 +81,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               If the value is 12 characters long, character positions 3 and 7
-///               (zero-based) must not be ASCII digits ('0' - '9'). The same
-///               character must be used in each separator position.
+///               If the value is 11 characters long, character position 6
+///               (zero-based) must not be an ASCII digit ('0' - '9').
 ///            </description>
 ///         </item>
 ///         <item>
@@ -95,7 +93,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The first six digits must represent a valid date in DDMMYY format.
+///               The first six digits must represent a valid date in DDMMYY
+///               format.
 ///            </description>
 ///         </item>
 ///      </list>
@@ -105,8 +104,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      check value of 10 which can not be encoded as a single decimal digit.
 ///      Community Health Index and other issuing authorities avoid this
 ///      issue by not issuing any number that would result in a check value of
-///      10. This means that approximately 9.09% of all possible values are never
-///      issued.
+///      10. This means that approximately 9.09% of all possible values are
+///      never issued.
 ///   </para>
 ///   <para>
 ///      Example values:
@@ -135,8 +134,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      Also see <see cref="GbHcNumber"/>, <see cref="GbNhsNumber"/> and
-///      <see cref="GbPatientNumber"/> for associated patient identifier business
-///      objects.
+///      <see cref="GbPatientNumber"/> for associated patient identifier
+///      business objects.
 ///   </para>
 /// </remarks>
 [JsonConverter(typeof(GbChiNumberJsonConverter))]
@@ -183,7 +182,7 @@ public record class GbChiNumber : GbPatientNumberBase
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
-   ///   <paramref name="value"/> is not length 10 (or 12 if separator
+   ///   <paramref name="value"/> is not length 10 (or 11 if separator
    ///   characters are used).
    ///   - or -
    ///   <paramref name="value"/> contains a non-digit character in any
@@ -192,9 +191,8 @@ public record class GbChiNumber : GbPatientNumberBase
    ///   <paramref name="value"/> has invalid modulus 11 check digit character
    ///   in the trailing (right-most) character position.
    ///   - or -
-   ///   <paramref name="value"/> is 12 characters in length and has an ASCII
-   ///   digit character ('0'-'9') in a separator location or uses a different
-   ///   character in each separator location.
+   ///   <paramref name="value"/> is 11 characters in length and has an ASCII
+   ///   digit character ('0'-'9') in a separator location.
    ///   - or -
    ///   The first nine digits of <paramref name="value"/> are not in the range
    ///   of 010 000 000 to 311 299 999.
@@ -211,7 +209,13 @@ public record class GbChiNumber : GbPatientNumberBase
    ///   validation when creating a new instance from a value that has already
    ///   been validated.
    /// </summary>
-   private GbChiNumber(String? value, ValidationMode validationMode)
+   /// <param name="value">
+   ///   String representation of a Scottish CHI number.
+   /// </param>
+   /// <param name="validationMode">
+   ///   Indicates whether the <paramref name="value"/> requires validation.
+   /// </param>
+   internal GbChiNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
@@ -286,7 +290,7 @@ public record class GbChiNumber : GbPatientNumberBase
    public static UCreateResult<GbChiNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
-         ValidValue => new GbChiNumber(value!, ValidationMode.BypassValidation),
+         ValidValue => new GbChiNumber(value, ValidationMode.BypassValidation),
          EmptyValue emptyValue => (ValidationError)emptyValue,
          InvalidLength invalidLength => (ValidationError)invalidLength,
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
@@ -302,7 +306,7 @@ public record class GbChiNumber : GbPatientNumberBase
    /// </summary>
    /// <param name="mask">
    ///   Optional. The mask that specifies the final output. If not supplied
-   ///   then the default mask "___ ___ ____" will be used instead.
+   ///   then the default mask "______ ____" will be used instead.
    /// </param>
    /// <returns>
    ///   A formatted Scottish CHI number.
@@ -318,7 +322,7 @@ public record class GbChiNumber : GbPatientNumberBase
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
    ///   details on creating a mask to format the CHI number.
    /// </remarks>
-   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+   public String Format(String mask = DefaultChiFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
    ///   Extracts the date of birth from the CHI number.
@@ -364,6 +368,7 @@ public record class GbChiNumber : GbPatientNumberBase
    ///   <paramref name="value"/> passed validation or what validation error was
    ///   encountered.
    /// </returns>
+#pragma warning disable IDE0046 // Convert to conditional expression
    public static ValidationResult Validate(String? value)
    {
       if (String.IsNullOrWhiteSpace(value))
@@ -397,6 +402,14 @@ public record class GbChiNumber : GbPatientNumberBase
          ? default(ValidValue)
          : GetInvalidDateOfBirthResult(value, Messages.GbChiNumberInvalidDateOfBirth);
    }
+#pragma warning restore IDE0046 // Convert to conditional expression
+
+   private static InvalidLength GetInvalidLengthResult(Int32 length)
+      => new(Messages.GbPatientNumberInvalidLength, length, GetChiValidLengthDefinitions());
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean ValidateLength(ReadOnlySpan<Char> value)
+      => value.Length is UnformattedLength or ChiFormattedLength;
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

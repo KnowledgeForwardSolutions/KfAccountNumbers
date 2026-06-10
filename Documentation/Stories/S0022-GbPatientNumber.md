@@ -24,10 +24,11 @@ I can work with patient identifiers in a region-agnostic manner while preserving
 
 ### Validation Rules
 - [ ] Value may not be null, empty, or all whitespace
+- [ ] Length must be 10 digits or 11/12 characters with appropriate formatting
 - [ ] Must be valid as at least one of: GbNhsNumber, GbChiNumber, or GbHcNumber (or a valid test number as allowed by GbNhsNumber and GbHcNumber)
 - [ ] Validates using the most permissive rules that cover all three types
+- [ ] Further validates the length of formatted values must be appropriate to the type (NHS, H&C, test = 12 characters, CHI = 11 characters)
 - [ ] Further validates date of birth if range indicates Scottish CHI number
-- [ ] Length must be 10 digits or 11/12 characters with appropriate formatting
 - [ ] All validation rules from constituent types apply as appropriate
 - [ ] Check digit validation performed according to modulus 11 algorithm
 - [ ] Date validation performed for CHI format (DDMMYY component)
@@ -37,20 +38,19 @@ I can work with patient identifiers in a region-agnostic manner while preserving
 ### Identifier Type Detection
 - [ ] `IdentifierType` property returns `GbPatientNumberIdentifierType` enum indicating the determined type
 - [ ] Type determination based on range:
-  - **CHI**: 010 000 000 to 311 299 999
+  - **CHI**: 010000 000 to 311299 999
   - **H&C**: 320 000 000 to 399 999 999
   - **NHS**: 400 000 000 to 499 999 999 or 600 000 000 to 799 999 999
   - **Test**: 900 000 000 to 999 999 999
 
 ### Format Support
 - [ ] Accept unformatted: 1234567890
-- [ ] Accept formatted with spaces: 123 456 7890
-- [ ] `Format` method returns formatted version with optional mask parameter (default: "___ ___ ____")
+- [ ] Accept formatted with separator characters: 123 456 7890 or 123456 7890
+- [ ] `Format` method returns formatted version with optional mask parameter (if not specified, will use the mask appropriate for the type of identifier: "___ ___ ____" or "______ ____")
 
 ### Properties
 - [ ] `Value` property returns raw 10-character string (digits only, no spaces)
-- [ ] `IdentifierType` property returns `GbPatientNumberIdentifierType` enum
-- [ ] `Region` property returns string: "England/Wales/Isle of Man", "Scotland", or "Northern Ireland" based on type
+- [ ] `IdentifierType` property returns `GbPatientNumber.IdentifierCategory` union
 
 ### Conversion From Specific Types
 - [ ] Implicit conversion from `GbNhsNumber` to `GbPatientNumber`
@@ -61,21 +61,20 @@ I can work with patient identifiers in a region-agnostic manner while preserving
 
 ### Conversion To Specific Types
 - [ ] `ToGbNhsNumber()` method returns `Option<GbNhsNumber>`
-  - Returns Some(GbNhsNumber) if IdentifierType is NHS
+  - Returns Some(GbNhsNumber) if IdentifierType is NHS or test
   - Returns None if IdentifierType is not NHS
 - [ ] `ToGbChiNumber()` method returns `Option<GbChiNumber>`
   - Returns Some(GbChiNumber) if IdentifierType is CHI
   - Returns None if IdentifierType is not CHI
 - [ ] `ToGbHcNumber()` method returns `Option<GbHcNumber>`
-  - Returns Some(GbHcNumber) if IdentifierType is H&C
+  - Returns Some(GbHcNumber) if IdentifierType is H&C or test
   - Returns None if IdentifierType is not H&C
 - [ ] Use Option<T> pattern
-- [ ] `ToGbNhsNumber()`, `ToGbChiNumber()` and `ToGbHcNumber()` return None if the value is a test number
 
 ### Type Determination Examples
 ```
 NHS Number:    450 557 7104 → IdentifierType.Nhs
-CHI Number:    010 190 1234 → IdentifierType.Chi
+CHI Number:    010190 1234 → IdentifierType.Chi
 H&C Number:    320 123 4560 → IdentifierType.Hc
 Test Number:   900 000 0000 → IdentifierType.Nhs (test range)
 ```
@@ -108,9 +107,9 @@ Test Number:   900 000 0000 → IdentifierType.Nhs (test range)
 - [ ] Valid CHI Numbers and conversion to GbPatientNumber
 - [ ] Valid H&C Numbers and conversion to GbPatientNumber
 - [ ] Implicit conversions from specific types to GbPatientNumber
-- [ ] ToGbNhsNumber() returning Some for NHS numbers, None for others
+- [ ] ToGbNhsNumber() returning Some for NHS/test numbers, None for others
 - [ ] ToGbChiNumber() returning Some for CHI numbers, None for others
-- [ ] ToGbHcNumber() returning Some for H&C numbers, None for others
+- [ ] ToGbHcNumber() returning Some for H&C/test numbers, None for others
 - [ ] IdentifierType property correctly identifying each type
 - [ ] Test numbers (900 million, 999 million) for NHS/H&C
 - [ ] CHI numbers with valid dates
@@ -215,7 +214,6 @@ public enum GbPatientNumberIdentifierType
 var nhs = new GbNhsNumber("450 557 7104");
 GbPatientNumber patient = nhs; // Implicit conversion
 patient.IdentifierType; // Returns GbPatientNumberIdentifierType.Nhs
-patient.Region; // Returns "England/Wales/Isle of Man"
 patient.ToGbNhsNumber(); // Returns Some(nhs)
 patient.ToGbChiNumber(); // Returns None
 patient.ToGbHcNumber(); // Returns None
@@ -226,7 +224,6 @@ patient.ToGbHcNumber(); // Returns None
 var chi = new GbChiNumber("010190-1234");
 GbPatientNumber patient = chi; // Implicit conversion
 patient.IdentifierType; // Returns GbPatientNumberIdentifierType.Chi
-patient.Region; // Returns "Scotland"
 patient.ToGbNhsNumber(); // Returns None (has date component, not NHS)
 patient.ToGbChiNumber(); // Returns Some(chi)
 patient.ToGbHcNumber(); // Returns None
@@ -237,7 +234,6 @@ patient.ToGbHcNumber(); // Returns None
 var hc = new GbHcNumber("320 123 4560");
 GbPatientNumber patient = hc; // Implicit conversion
 patient.IdentifierType; // Returns GbPatientNumberIdentifierType.Hc
-patient.Region; // Returns "Northern Ireland"
 patient.ToGbNhsNumber(); // Returns None (has H&C prefix)
 patient.ToGbChiNumber(); // Returns None (invalid date component)
 patient.ToGbHcNumber(); // Returns Some(hc)
@@ -261,7 +257,7 @@ hcTest.Region; // Returns "Northern Ireland"
 // Construct directly from string
 var patient1 = new GbPatientNumber("450 557 7104"); // NHS
 var patient2 = new GbPatientNumber("010 190 1234"); // CHI
-var patient3 = new GbPatientNumber("320 123 4560"); // H&C
+var patient3 = new GbPatientNumber("320123 4560"); // H&C
 var patient4 = new GbPatientNumber("900 000 0000"); // Test
 
 // Type is automatically determined

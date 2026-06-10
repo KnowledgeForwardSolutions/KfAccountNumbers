@@ -109,37 +109,37 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <description>
 ///               If the century indicator = 4 <b>AND</b> the two digit year of
-///               birth is &le; 36 then the century of birth = 2000.
+///               birth is &lt;= 36 then the century of birth = 2000.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
 ///               If the century indicator = 4 <b>AND</b> the two digit year of
-///               birth is &ge; 37 then the century of birth = 1900.
+///               birth is &gt;= 37 then the century of birth = 1900.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
 ///               If the century indicator = 5-8 <b>AND</b> the two digit year of
-///               birth is &le; 57 then the century of birth = 2000.
+///               birth is &lt;= 57 then the century of birth = 2000.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
 ///               If the century indicator = 5-8 <b>AND</b> the two digit year of
-///               birth is &ge; 58 then the century of birth = 1800.
+///               birth is &gt;= 58 then the century of birth = 1800.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
 ///               If the century indicator = 9 <b>AND</b> the two digit year of
-///               birth is &le; 36 then the century of birth = 2000.
+///               birth is &lt;= 36 then the century of birth = 2000.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
 ///               If the century indicator = 9 <b>AND</b> the two digit year of
-///               birth is &ge; 37 then the century of birth = 1900.
+///               birth is &gt;= 37 then the century of birth = 1900.
 ///            </description>
 ///         </item>
 ///      </list>
