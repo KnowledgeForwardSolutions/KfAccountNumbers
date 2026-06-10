@@ -9,7 +9,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A valid US Social Security Number consists of nine decimal digits. The 
+///      A valid US Social Security Number consists of nine decimal digits. The
 ///      nine digits are commonly separated into three groups, the first three
 ///      digits represent the area number, the next two digits represent the
 ///      group number and the final four digits represent the serial number.
@@ -17,34 +17,34 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///   <para>
 ///      Prior to 2011, the area number was tied to a geographic region in the
 ///      US, the group number represented a subgrouping within the area and the
-///      serial number was a consecutive sequence within the group. However in 
-///      2011, the SSN generation process was randomized and the geographic 
+///      serial number was a consecutive sequence within the group. However in
+///      2011, the SSN generation process was randomized and the geographic
 ///      association was eliminated. The changes made in 2011 also started
 ///      issuing social security numbers from previously reserved blocks of area
-///      numbers. The validation checks performed by 
+///      numbers. The validation checks performed by
 ///      <see cref="UsSocialSecurityNumber"/> use the rules in effect at the
-///      time of release (currently 2026) and therefore some SSN's that would 
+///      time of release (currently 2026) and therefore some SSN's that would
 ///      have been considered invalid prior to 2011 are considered valid by
 ///      <see cref="UsSocialSecurityNumber"/>.
 ///   </para>
 ///   <para>
 ///      Social Security Numbers are commonly formatted with dashes ('-') and
-///      sometimes spaces separating the three groups. A 
-///      <see cref="UsSocialSecurityNumber"/> can be created from strings that 
-///      include or exclude the separator character, but if used, the same 
-///      character must be used to separate both the area/group numbers and the 
-///      group/serial numbers. The separator character may not be a decimal 
+///      sometimes spaces separating the three groups. A
+///      <see cref="UsSocialSecurityNumber"/> can be created from strings that
+///      include or exclude the separator character, but if used, the same
+///      character must be used to separate both the area/group numbers and the
+///      group/serial numbers. The separator character may not be a decimal
 ///      digit (0-9).
 ///   </para>
 ///   <para>
-///      Not all 9-digit numbers are valid Social Security Numbers. When 
+///      Not all 9-digit numbers are valid Social Security Numbers. When
 ///      creating a new  <see cref="UsSocialSecurityNumber"/>, after determining
-///      that a value consists of 9 decimal digits, the following validation 
+///      that a value consists of 9 decimal digits, the following validation
 ///      rules are applied:
 ///      <list type="bullet">
 ///         <item>
 ///            <description>
-///               An area number, group number or serial number that is all 
+///               An area number, group number or serial number that is all
 ///               zeros (0) is invalid.
 ///            </description>
 ///         </item>
@@ -82,7 +82,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///      </list>
 ///   </para>
 ///   <para>
-///      <see cref="UsSocialSecurityNumber"/> does not confirm the actual 
+///      <see cref="UsSocialSecurityNumber"/> does not confirm the actual
 ///      validity of a number that meets all of the above rules. Confirmation of
 ///      the actual validity of a SSN requires use of the Social Security Number
 ///      Verification Service offered by the Social Security Administration.
@@ -110,23 +110,24 @@ public record UsSocialSecurityNumber
    private const Int32 SerialSeparatorOffset = 6;  // Offset of separator between group and serial number sections in formatted SSN
 
    /// <summary>
-   ///   Initialize a new <see cref="UsSocialSecurityNumber"/>.
+   ///   Initializes a new instance of the <see cref="UsSocialSecurityNumber"/>
+   ///   class.
    /// </summary>
    /// <param name="ssn">
    ///   String representation of a Social Security Number.
    /// </param>
    /// <exception cref="KfValidationException{UsSocialSecurityNumberValidationResult}">
-   ///   <paramref name="ssn"/> is <see langword="null"/>, empty or all 
+   ///   <paramref name="ssn"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
    ///   <paramref name="ssn"/> does not have length of 9 or 11.
    ///   - or -
    ///   <paramref name="ssn"/> contains a non-ASCII digit (not 0-9).
    ///   - or -
-   ///   <paramref name="ssn"/> is 11 characters in length and contains and 
+   ///   <paramref name="ssn"/> is 11 characters in length and contains and
    ///   separator characters that are not identical or are ASCII digits (0-9).
    ///   - or -
-   ///   <paramref name="ssn"/> contains an invalid area number (000, 666 or 
+   ///   <paramref name="ssn"/> contains an invalid area number (000, 666 or
    ///   900-999).
    ///   - or -
    ///   <paramref name="ssn"/> contains an invalid group number (00).
@@ -141,9 +142,10 @@ public record UsSocialSecurityNumber
       : this(ssn, validationMode: ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports bypassing
-   ///   validation when creating a new instance from a value that has already
-   ///   been validated.
+   ///   Initializes a new instance of the <see cref="UsSocialSecurityNumber"/>
+   ///   class. Private constructor that actually does the work. Supports
+   ///   bypassing validation when creating a new instance from a value that has
+   ///   already been validated.
    /// </summary>
    private UsSocialSecurityNumber(String? ssn, ValidationMode validationMode)
    {
@@ -160,15 +162,30 @@ public record UsSocialSecurityNumber
    }
 
    /// <summary>
-   ///   The raw SSN value.
+   ///   Gets the raw SSN value.
    /// </summary>
    public String Value { get; private init; }
 
-   public static implicit operator String(UsSocialSecurityNumber ssn)
-      => ssn?.Value ?? String.Empty;      // Handle null SSN object gracefully by returning empty string
+   /// <summary>
+   ///   Implicitly converts a <see cref="UsSocialSecurityNumber"/> to a <see cref="String"/>,
+   ///   returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="UsSocialSecurityNumber"/> to convert.
+   /// </param>
+   public static implicit operator String(UsSocialSecurityNumber source)
+      => source?.Value ?? String.Empty;      // Handle null SSN object gracefully by returning empty string
 
-   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
-   public static explicit operator UsSocialSecurityNumber(String? ssn) => new(ssn);
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="UsSocialSecurityNumber"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Social Security Number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid SSN.
+   /// </exception>
+   public static explicit operator UsSocialSecurityNumber(String? value) => new(value);
 
    /// <summary>
    ///   Create a new <see cref="UsSocialSecurityNumber"/> using the Result pattern.
@@ -178,10 +195,10 @@ public record UsSocialSecurityNumber
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{UsSocialSecurityNumber, UsSocialSecurityNumberValidationResult}"/>.
-   ///   Will contain the new <see cref="UsSocialSecurityNumber"/> if 
-   ///   <paramref name="ssn"/> is valid or 
+   ///   Will contain the new <see cref="UsSocialSecurityNumber"/> if
+   ///   <paramref name="ssn"/> is valid or
    ///   <see cref="UsSocialSecurityNumberValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="ssn"/> is 
+   ///   the validation rule that was failed if <paramref name="ssn"/> is
    ///   invalid.
    /// </returns>
    public static CreateResult<UsSocialSecurityNumber, UsSocialSecurityNumberValidationResult> Create(String? ssn)
@@ -228,7 +245,7 @@ public record UsSocialSecurityNumber
    ///   String representation of a Social Security Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="UsSocialSecurityNumberValidationResult"/> enumeration 
+   ///   A <see cref="UsSocialSecurityNumberValidationResult"/> enumeration
    ///   value that indicates if the <paramref name="ssn"/> passed validation
    ///   or what validation error was encountered.
    /// </returns>
@@ -239,14 +256,17 @@ public record UsSocialSecurityNumber
       {
          return UsSocialSecurityNumberValidationResult.Empty;
       }
+
       if (!ValidateLength(ssn))
       {
          return UsSocialSecurityNumberValidationResult.InvalidLength;
       }
+
       if (IsFormattedSsn(ssn) && !ValidateEmbeddedSeparatorCharacters(ssn))
       {
          return UsSocialSecurityNumberValidationResult.InvalidSeparatorEncountered;
       }
+
       if (!ValidateAllDigits(ssn))
       {
          return UsSocialSecurityNumberValidationResult.InvalidCharacterEncountered;
@@ -259,20 +279,24 @@ public record UsSocialSecurityNumber
       {
          return UsSocialSecurityNumberValidationResult.InvalidAreaNumber;
       }
+
       ReadOnlySpan<Char> groupNumber = GetGroupNumber(ssn);
       if (!ValidateGroupNumber(groupNumber))
       {
          return UsSocialSecurityNumberValidationResult.InvalidGroupNumber;
       }
+
       ReadOnlySpan<Char> serialNumber = GetSerialNumber(ssn);
       if (!ValidateSerialNumber(serialNumber))
       {
          return UsSocialSecurityNumberValidationResult.InvalidSerialNumber;
       }
+
       if (!ValidateNotAllIdenticalDigits(areaNumber, groupNumber, serialNumber))
       {
          return UsSocialSecurityNumberValidationResult.AllIdenticalDigits;
       }
+
       if (!ValidateNotConsecutiveRun(areaNumber, groupNumber, serialNumber))
       {
          return UsSocialSecurityNumberValidationResult.InvalidRun;
@@ -297,7 +321,7 @@ public record UsSocialSecurityNumber
    /// <summary>
    ///   Get an unformatted SSN value from a string that has passed validation.
    ///   If the source string is formatted, then create a new string by merging
-   ///   all three SSN sections together without allocating intermediate 
+   ///   all three SSN sections together without allocating intermediate
    ///   Strings.
    /// </summary>
    private static String GetValidatedSsn(String ssn)
@@ -448,6 +472,8 @@ public record UsSocialSecurityNumber
    }
 }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class UsSocialSecurityNumberJsonConverter : JsonConverter<UsSocialSecurityNumber>
 {
    public override UsSocialSecurityNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

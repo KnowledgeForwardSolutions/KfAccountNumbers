@@ -156,7 +156,7 @@ public class UsSocialSecurityNumberTests
       {
          9 => ssn,
          11 => ssn[0..3] + ssn[4..6] + ssn[7..11],
-         _ => throw new ArgumentException("Input must be 9 or 11 characters", nameof(ssn))
+         _ => throw new ArgumentException("Input must be 9 or 11 characters", nameof(ssn)),
       };
 
    #region Constructor Tests

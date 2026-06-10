@@ -1,7 +1,7 @@
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
 /// <summary>
-///   Defines the possible results returned when validating a US Social Security 
+///   Defines the possible results returned when validating a US Social Security
 ///   Number.
 /// </summary>
 public enum UsSocialSecurityNumberValidationResult
@@ -18,17 +18,17 @@ public enum UsSocialSecurityNumberValidationResult
    Empty,
 
    /// <summary>
-   ///   SSN value has incorrect length. Must be either 9 characters (digits 
+   ///   SSN value has incorrect length. Must be either 9 characters (digits
    ///   only) or 11 characters (9 digits with two separator characters).
    /// </summary>
    InvalidLength,
 
    /// <summary>
    ///   SSN value contains an unexpected character in a separator character
-   ///   location. 
+   ///   location.
    /// </summary>
    /// <remarks>
-   ///   A SSN with length 11 should have valid separator character between the 
+   ///   A SSN with length 11 should have valid separator character between the
    ///   area, group and serial number sections. The same character must be used
    ///   to separate both the area/group numbers and the group/serial numbers.
    ///   The separator character may not be a decimal digit (0-9).
@@ -84,7 +84,7 @@ public static class UsSocialSecurityNumberValidationResultExtensions
          UsSocialSecurityNumberValidationResult.AllIdenticalDigits => Messages.UsSsnAllIdenticalDigits,
          UsSocialSecurityNumberValidationResult.InvalidRun => Messages.UsSsnInvalidRun,
          UsSocialSecurityNumberValidationResult.ValidationPassed => Messages.ValidationPassed,
-         _ => throw new SwitchExpressionException()
+         _ => throw new SwitchExpressionException(),
       };
 
    public static KfValidationException<UsSocialSecurityNumberValidationResult> ToValidationException(
