@@ -238,7 +238,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      Also see <see cref="GbChiNumber"/>, <see cref="GbHcNumber"/> and
-///      <see cref="GbPatientNumber"/> for associated patient identifier business
+///      <see cref="GbNhsNumber"/> for associated patient identifier business
 ///      objects.
 ///   </para>
 /// </remarks>

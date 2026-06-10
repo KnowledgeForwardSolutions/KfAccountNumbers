@@ -167,7 +167,7 @@ public abstract record GbPatientNumberBase
    /// </returns>
    /// <remarks>
    ///   We don't need to worry about possible formatting because the six digits
-   ///   in CHI number date of birth all preceed the separator character.
+   ///   in CHI number date of birth all precede the separator character.
    /// </remarks>
    protected static (Int32 Day, Int32 Month, Int32 Year) GetDayMonthYear(ReadOnlySpan<Char> value)
    {

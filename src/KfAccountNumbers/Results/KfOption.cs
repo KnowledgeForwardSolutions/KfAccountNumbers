@@ -61,8 +61,8 @@ public readonly struct KfOption<TS> : IUnion
    ///   Gets a value indicating whether this instance has a value.
    /// </summary>
    /// <remarks>
-   ///   Supports the "non-boxing access pattern" for retrieving the success or
-   ///   error value without incurring boxing overhead.
+   ///   Supports the "non-boxing access pattern" for retrieving the "some" or
+   ///   "none" value without incurring boxing overhead.
    /// </remarks>
    public Boolean HasValue => true;
 
@@ -74,7 +74,7 @@ public readonly struct KfOption<TS> : IUnion
 
    /// <summary>
    ///   Gets a value indicating whether this instance is Some; i.e. it
-   ///   represets the presence of a value.
+   ///   represents the presence of a value.
    /// </summary>
    public Boolean IsSome { get; private init; }
 
