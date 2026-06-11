@@ -610,7 +610,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to GB patient number may not contain an ASCII digit (0-9) in a separator position and both separator positions must contain the same non-digit character.
+        ///   Looks up a localized string similar to GB patient number may not contain an ASCII digit (0-9) in a separator position and if two separators are used, both separator positions must contain the same non-digit character.
         /// </summary>
         internal static string GbPatientNumberInvalidSeparator {
             get {

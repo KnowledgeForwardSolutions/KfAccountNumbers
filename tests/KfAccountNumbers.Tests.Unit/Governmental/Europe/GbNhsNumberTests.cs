@@ -721,14 +721,17 @@ public class GbNhsNumberTests
    public void GbNhsNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = GetInvalidLengthResult(value);
+      LocalCreateResult expected = (GbNhsNumber.ValidationError)GetInvalidLengthResult(value);
 
       // Act.
       var result = GbNhsNumber.Create(value);
 
       // Assert.
-      result.TryGetValue(out GbNhsNumber.ValidationError error).Should().BeTrue();    // Necessary to get around some issued with FluentAssertions and nested types
-      error.Value.Should().BeEquivalentTo(expected.Value);
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<GbNhsNumber.ValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]

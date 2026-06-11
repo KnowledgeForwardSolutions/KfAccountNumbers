@@ -466,7 +466,7 @@
     <value>GB patient number must have a valid Modulus 11 check digit in the trailing (right-most) character position</value>
   </data>
   <data name="GbPatientNumberInvalidSeparator" xml:space="preserve">
-    <value>GB patient number may not contain an ASCII digit (0-9) in a separator position and both separator positions must contain the same non-digit character</value>
+    <value>GB patient number may not contain an ASCII digit (0-9) in a separator position and if two separators are used, both separator positions must contain the same non-digit character</value>
   </data>
   <data name="GbNhsNumberInvalidRange" xml:space="preserve">
     <value>GB NHS Number must be in the range 400 000 000 to 499 999 999, 600 000 000 to 799 999 999, or 900 000 000 to 999 999 999, excluding trailing check digit</value>
