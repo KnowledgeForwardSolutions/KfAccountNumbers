@@ -820,8 +820,6 @@ public class GbChiNumberTests
       var result = GbChiNumber.Create(value);
 
       // Assert.
-
-      // Assert.
       result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
          .ComparingByMembers<LocalCreateResult>()
          .ComparingByMembers<GbChiNumber.ValidationError>()
