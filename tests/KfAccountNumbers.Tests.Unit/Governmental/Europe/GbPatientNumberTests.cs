@@ -373,7 +373,7 @@ public class GbPatientNumberTests
       => new(Messages.GbPatientNumberInvalidRange);
 
    private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
-      => new(Messages.GbChiNumberInvalidDateOfBirth, value[..6], "DDMMYY");
+      => new(Messages.GbChiNumberInvalidDateOfBirth, value[..6], DateFormatName.DDMMYY);
 
    #region Constructor Tests
    // ==========================================================================
@@ -1565,7 +1565,7 @@ public class GbPatientNumberTests
       GbPatientNumber.ValidationResult expected = new InvalidDateOfBirth(
          Messages.GbChiNumberInvalidDateOfBirth,
          invalidDateOfBirth,
-         GbPatientNumberBase.ChiNumberDateFormat);
+         DateFormatName.DDMMYY);
 
       // Act.
       var result = GbPatientNumber.Validate(value);

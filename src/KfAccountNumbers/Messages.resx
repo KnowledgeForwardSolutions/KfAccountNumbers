@@ -445,7 +445,7 @@
     <value>GB National Insurance Number with length 11 or 13 contains an invalid separator character. Separator characters may not be ASCII digits ('0'-'9') or uppercase or lowercase letters (A-Z, a-z). All separator locations must contain the same character.</value>
   </data>
   <data name="GbPatientNumberUnformattedLength" xml:space="preserve">
-    <value>An GB patient number (NHS, CHI or H&amp;C) without any separator characters</value>
+    <value>A GB patient number (NHS, CHI or H&amp;C) without any separator characters</value>
   </data>
   <data name="GbPatientNumberDoubleSeparatorFormattedLength" xml:space="preserve">
     <value>A formatted NHS, H&amp;C or test patient number with separator characters at offsets 3 and 7 (zero-based)</value>

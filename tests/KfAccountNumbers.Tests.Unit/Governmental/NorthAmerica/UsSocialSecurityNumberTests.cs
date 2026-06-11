@@ -643,7 +643,7 @@ public class UsSocialSecurityNumberTests
    [Fact]
    public void UsSocialSecurityNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
-      // Arrange. 10 and 12 character versions for same person should still be equal.
+      // Arrange. 9 and 11 character versions for same person should still be equal.
       var sut1 = new UsSocialSecurityNumber(ValidUnformattedSsn);
       var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn);
 
@@ -656,7 +656,7 @@ public class UsSocialSecurityNumberTests
    {
       // Arrange.
       var sut1 = new UsSocialSecurityNumber(ValidFormattedSsn);
-      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace(' ', '.'));
+      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace('-', '.'));
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -666,8 +666,8 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
    {
       // Arrange.
-      var sut1 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace(' ', 'A'));
-      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace(' ', 'a'));
+      var sut1 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace('-', 'A'));
+      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace('-', 'a'));
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -933,7 +933,7 @@ public class UsSocialSecurityNumberTests
    {
       // Arrange.
       var sut1 = new UsSocialSecurityNumber(ValidFormattedSsn);
-      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace(' ', '.'));
+      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace('-', '.'));
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -943,8 +943,8 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
    {
       // Arrange.
-      var sut1 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace(' ', 'A'));
-      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace(' ', 'a'));
+      var sut1 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace('-', 'A'));
+      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace('-', 'a'));
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -1094,7 +1094,7 @@ public class UsSocialSecurityNumberTests
    {
       // Arrange.
       var sut1 = new UsSocialSecurityNumber(ValidFormattedSsn);
-      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace(' ', '.'));
+      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace('-', '.'));
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1108,8 +1108,8 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
    {
       // Arrange.
-      var sut1 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace(' ', 'A'));
-      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace(' ', 'a'));
+      var sut1 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace('-', 'A'));
+      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace('-', 'a'));
 
       // Act.
       var hash1 = sut1.GetHashCode();

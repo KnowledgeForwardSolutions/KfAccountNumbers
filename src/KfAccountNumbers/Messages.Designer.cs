@@ -628,7 +628,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An GB patient number (NHS, CHI or H&amp;C) without any separator characters.
+        ///   Looks up a localized string similar to A GB patient number (NHS, CHI or H&amp;C) without any separator characters.
         /// </summary>
         internal static string GbPatientNumberUnformattedLength {
             get {

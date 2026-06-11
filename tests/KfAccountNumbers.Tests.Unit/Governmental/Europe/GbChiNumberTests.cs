@@ -277,7 +277,7 @@ public class GbChiNumberTests
       => new(Messages.GbChiNumberInvalidRange);
 
    private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
-      => new(Messages.GbChiNumberInvalidDateOfBirth, value[..6], "DDMMYY");
+      => new(Messages.GbChiNumberInvalidDateOfBirth, value[..6], DateFormatName.DDMMYY);
 
    #region Constructor Tests
    // ==========================================================================
