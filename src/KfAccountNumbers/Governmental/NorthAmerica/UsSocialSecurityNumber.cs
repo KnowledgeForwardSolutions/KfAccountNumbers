@@ -201,7 +201,7 @@ public record UsSocialSecurityNumber
                UsSsnInvalidSerialNumber invalidSerialNumber => new UKfValidationException<ValidationError>(invalidSerialNumber),
                UsSsnAllIdenticalDigits allIdenticalDigits => new UKfValidationException<ValidationError>(allIdenticalDigits),
                UsSsnInvalidRun invalidRun => new UKfValidationException<ValidationError>(invalidRun),
-               _ => new SwitchExpressionException("This branch should never be reached"),
+               _ => new UnreachableException("This branch should never be reached"),
             };
          }
       }
@@ -242,7 +242,7 @@ public record UsSocialSecurityNumber
    ///   String representation of a Social Security Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{GbNhsNumber, ValidationError}"/>. Will
+   ///   A <see cref="UCreateResult{UsSocialSecurityNumber, ValidationError}"/>. Will
    ///   contain the new <see cref="UsSocialSecurityNumber"/> if
    ///   <paramref name="value"/> is valid or a <see cref="ValidationError"/>
    ///   that identifies the validation rule that was failed if
@@ -261,7 +261,7 @@ public record UsSocialSecurityNumber
          UsSsnInvalidSerialNumber invalidSerialNumber => (ValidationError)invalidSerialNumber,
          UsSsnAllIdenticalDigits allIdenticalDigits => (ValidationError)allIdenticalDigits,
          UsSsnInvalidRun invalidRun => (ValidationError)invalidRun,
-         _ => throw new SwitchExpressionException("This branch should never be reached"),
+         _ => throw new UnreachableException("This branch should never be reached"),
       };
 
    /// <summary>
@@ -364,7 +364,7 @@ public record UsSocialSecurityNumber
             serialNumber.ToString());
       }
 
-      if (!ValidateNotAllIdenticalDigits(areaNumber, groupNumber, serialNumber))
+      if (!ValidateNotAllIdenticalDigits(value))
       {
          return default(UsSsnAllIdenticalDigits);
       }
@@ -467,33 +467,20 @@ public record UsSocialSecurityNumber
    private static Boolean ValidateLength(ReadOnlySpan<Char> value)
       => value.Length is UnformattedLength or FormattedLength;
 
-   private static Boolean ValidateNotAllIdenticalDigits(
-      ReadOnlySpan<Char> areaNumber,
-      ReadOnlySpan<Char> groupNumber,
-      ReadOnlySpan<Char> serialNumber)
+   private static Boolean ValidateNotAllIdenticalDigits(ReadOnlySpan<Char> value)
    {
-      var initialChar = areaNumber[0];
-
-      // Early exit: if area number has different chars, we're done.
-      foreach (var ch in areaNumber)
+      var initialChar = value[0];
+      var isFormatted = IsFormattedSsn(value);
+      for (var index = 0; index < value.Length; index++)
       {
-         if (ch != initialChar)
+         if (isFormatted && index is GroupSeparatorOffset or SerialSeparatorOffset)
          {
-            return true;
+            continue;
          }
-      }
 
-      foreach (var ch in groupNumber)
-      {
-         if (ch != initialChar)
-         {
-            return true;
-         }
-      }
-
-      foreach (var ch in serialNumber)
-      {
-         if (ch != initialChar)
+         // First character that is different from the initial character means
+         // that not all digits are identical.
+         if (value[index] != initialChar)
          {
             return true;
          }

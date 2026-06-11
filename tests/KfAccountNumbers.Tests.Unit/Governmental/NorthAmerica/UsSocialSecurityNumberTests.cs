@@ -173,7 +173,7 @@ public class UsSocialSecurityNumberTests
       };
 
    /// <summary>
-   /// Extracts unformatted SSN value. If ITTN is 9 characters then value is
+   /// Extracts unformatted SSN value. If SSN is 9 characters then value is
    /// returned unchanged. If an 11-character formatted SSN then assumes
    /// separators at positions 3 and 6.
    /// </summary>
@@ -231,7 +231,7 @@ public class UsSocialSecurityNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidAreaNumberBoundaryValues))]
-   public void UsSocialSecurityNumber_Constructor_ShouldCreateObject_WhenValueContainsValidSsn(String value)
+   public void UsSocialSecurityNumber_Constructor_ShouldCreateInstance_WhenValueContainsValidSsn(String value)
    {
       // Arrange.
       var expected = GetRawSsn(value);
@@ -466,7 +466,7 @@ public class UsSocialSecurityNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidAreaNumberBoundaryValues))]
-   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldCreateObject_WhenValueContainsValidSsn(String value)
+   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldCreateInstance_WhenValueContainsValidSsn(String value)
    {
       // Arrange.
       var expected = GetRawSsn(value);
@@ -743,7 +743,7 @@ public class UsSocialSecurityNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidAreaNumberBoundaryValues))]
-   public void UsSocialSecurityNumber_Create_ShouldCreateObject_WhenValueContainsValidSsn(String value)
+   public void UsSocialSecurityNumber_Create_ShouldCreateInstance_WhenValueContainsValidSsn(String value)
    {
       // Arrange.
       LocalCreateResult expected = new UsSocialSecurityNumber(value);
@@ -757,7 +757,7 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsSocialSecurityNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String? value)
+   public void UsSocialSecurityNumber_Create_ShouldReturnEmptyValue_WhenValueIsEmpty(String? value)
    {
       // Arrange.
       LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)default(EmptyValue);
@@ -771,7 +771,7 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsSocialSecurityNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   public void UsSocialSecurityNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
       LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)GetInvalidLengthResult(value);
@@ -789,7 +789,7 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void UsSocialSecurityNumber_Create_ShouldReturnInvalidSeparatorCharacterValidationResult_WhenValueHasInvalidSeparator(
+   public void UsSocialSecurityNumber_Create_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
       String value,
       Int32 position)
    {
@@ -805,7 +805,7 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsSocialSecurityNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueContainsNonAsciiDigit(
+   public void UsSocialSecurityNumber_Create_ShouldReturnInvalidCharacter_WhenValueContainsNonAsciiDigit(
       String value,
       Int32 position)
    {
@@ -821,7 +821,7 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidAreaNumberValues))]
-   public void UsSocialSecurityNumber_Create_ShouldReturnInvalidAreaNumberValidationResult_WhenValueHasInvalidAreaNumber(String value)
+   public void UsSocialSecurityNumber_Create_ShouldReturnInvalidAreaNumber_WhenValueHasInvalidAreaNumber(String value)
    {
       // Arrange.
       LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)GetInvalidAreaNumberResult(value);
@@ -835,7 +835,7 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidGroupNumberValues))]
-   public void UsSocialSecurityNumber_Create_ShouldReturnInvalidGroupNumberValidationResult_WhenValueHasInvalidGroupNumber(String value)
+   public void UsSocialSecurityNumber_Create_ShouldReturnInvalidGroupNumber_WhenValueHasInvalidGroupNumber(String value)
    {
       // Arrange.
       LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)GetInvalidGroupNumberResult(value);
@@ -849,7 +849,7 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidSerialNumberValues))]
-   public void UsSocialSecurityNumber_Create_ShouldReturnInvalidSerialNumberValidationResult_WhenValueHasInvalidSerialNumber(String value)
+   public void UsSocialSecurityNumber_Create_ShouldReturnInvalidSerialNumber_WhenValueHasInvalidSerialNumber(String value)
    {
       // Arrange.
       LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)GetInvalidSerialNumberResult(value);
@@ -863,7 +863,7 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [MemberData(nameof(AllIdenticalDigitsValues))]
-   public void UsSocialSecurityNumber_Create_ShouldReturnAllIdenticalDigitsValidationResult_WhenValueHas9IdenticalDigits(String value)
+   public void UsSocialSecurityNumber_Create_ShouldReturnAllIdenticalDigits_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
       LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)default(UsSsnAllIdenticalDigits);
@@ -877,7 +877,7 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidRunValues))]
-   public void UsSocialSecurityNumber_Create_ShouldReturnInvalidRunValidationResult_WhenValueHasConsecutiveRun(String value)
+   public void UsSocialSecurityNumber_Create_ShouldReturnInvalidRun_WhenValueHasConsecutiveRun(String value)
    {
       // Arrange.
       LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)default(UsSsnInvalidRun);
@@ -1215,7 +1215,7 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void UsSocialSecurityNumber_Validate_ShouldReturnInvalidSeparatorEncountered_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
+   public void UsSocialSecurityNumber_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
       String value,
       Int32 position)
    {
@@ -1231,7 +1231,7 @@ public class UsSocialSecurityNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsSocialSecurityNumber_Validate_ShouldReturnInvalidCharacterEncountered_WhenValueHasNonDigitCharacter(
+   public void UsSocialSecurityNumber_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
       String value,
       Int32 position)
    {
@@ -1404,7 +1404,6 @@ public class UsSocialSecurityNumberTests
       var json = "{\"Ssn\":\"666123456\"}";  // Invalid area number
       UsSocialSecurityNumber.ValidationError expected = GetInvalidAreaNumberResult("666123456");
 
-      // Act/assert.
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
