@@ -1,4 +1,4 @@
-namespace KfAccountNumbers.Governmental.Europe;
+namespace KfAccountNumbers.Results;
 
 /// <summary>
 ///   Represents a validation error indicating that the input value contains a
@@ -8,6 +8,4 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// <param name="Description">
 ///   Description of the specific range that was violated.
 /// </param>
-public record struct GbPatientNumberInvalidRange(String Description)
-{
-}
+public readonly record struct GbPatientNumberInvalidRange(String Description);

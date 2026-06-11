@@ -68,7 +68,7 @@ public class GbNhsNumberTests
       new String('1', 100),   // Very long value
    ];
 
-   public static TheoryData<String, Int32> InvalidCharacterData = new()
+   public static TheoryData<String, Int32> InvalidCharacterValues = new()
    {
       // Unformatted values
       { ".000000004", 0 },          // Non-digit character '.'
@@ -255,7 +255,7 @@ public class GbNhsNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidCharacterData))]
+   [MemberData(nameof(InvalidCharacterValues))]
    public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueHasNonDigitCharacter(
       String value,
       Int32 position)
@@ -484,7 +484,7 @@ public class GbNhsNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidCharacterData))]
+   [MemberData(nameof(InvalidCharacterValues))]
    public void GbNhsNumber_ExplicitCastToBeGbNhsNumber_ShouldThrowValidationError_WhenValueHasNonDigitCharacter(
       String value,
       Int32 position)
@@ -727,7 +727,7 @@ public class GbNhsNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidCharacterData))]
+   [MemberData(nameof(InvalidCharacterValues))]
    public void GbNhsNumber_Create_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
       String value,
       Int32 position)
@@ -1102,7 +1102,7 @@ public class GbNhsNumberTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidCharacterData))]
+   [MemberData(nameof(InvalidCharacterValues))]
    public void GbNhsNumber_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
       String value,
       Int32 position)

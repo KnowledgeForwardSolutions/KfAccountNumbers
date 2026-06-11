@@ -2,6 +2,7 @@
 #pragma warning disable IDE0059 // Unnecessary assignment of a value
 #pragma warning disable CA1822 // Mark members as static
 
+using KfAccountNumbers.Results;
 using KfAccountNumbers.Utility;
 
 namespace KfAccountNumbers.Tests.Benchmarks.Governmental.NorthAmerica;
@@ -23,7 +24,7 @@ public class UsSocialSecurityNumberBenchmarks
    [Arguments("012-34-5678")]
    public void UsSsnCreateMethod(String ssn)
    {
-      CreateResult<UsSocialSecurityNumber, UsSocialSecurityNumberValidationResult> validatedSsn =
+      UCreateResult<UsSocialSecurityNumber, UsSocialSecurityNumber.ValidationError> validatedSsn =
          UsSocialSecurityNumber.Create(ssn);
    }
 
@@ -32,6 +33,6 @@ public class UsSocialSecurityNumberBenchmarks
    [Arguments("012-34-5678")]
    public void UsSsnValidateMethod(String ssn)
    {
-      UsSocialSecurityNumberValidationResult isValid = UsSocialSecurityNumber.Validate(ssn);
+      UsSocialSecurityNumber.ValidationResult isValid = UsSocialSecurityNumber.Validate(ssn);
    }
 }

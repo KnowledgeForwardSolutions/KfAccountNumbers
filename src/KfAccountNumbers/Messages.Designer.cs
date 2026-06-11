@@ -565,7 +565,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A formatted NHS, H&amp;C or test patient number.
+        ///   Looks up a localized string similar to A formatted NHS, H&amp;C or test patient number with separator characters at offsets 3 and 7 (zero-based).
         /// </summary>
         internal static string GbPatientNumberDoubleSeparatorFormattedLength {
             get {
@@ -619,7 +619,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A formatted CHI number.
+        ///   Looks up a localized string similar to A formatted CHI number with a single separator character at offset 6 (zero-based).
         /// </summary>
         internal static string GbPatientNumberSingleSeparatorFormattedLength {
             get {
@@ -628,7 +628,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An unformatted GB patient number (NHS, CHI or H&amp;C).
+        ///   Looks up a localized string similar to An GB patient number (NHS, CHI or H&amp;C) without any separator characters.
         /// </summary>
         internal static string GbPatientNumberUnformattedLength {
             get {
@@ -1096,6 +1096,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A US TIN (SSN or ITIN) with separator characters at offsets 3 and 6 (zero-based).
+        /// </summary>
+        internal static string UsSsnFormattedLength {
+            get {
+                return ResourceManager.GetString("UsSsnFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to US Social Security Number area number segment (AAA-xx-xxxx) must not be 000, 666 or 900-999.
         /// </summary>
         internal static string UsSsnInvalidAreaNumber {
@@ -1155,6 +1164,15 @@ namespace KfAccountNumbers {
         internal static string UsSsnInvalidSerialNumber {
             get {
                 return ResourceManager.GetString("UsSsnInvalidSerialNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A US TIN (SSN or ITIN) without separator characters.
+        /// </summary>
+        internal static string UsTinUnformattedLength {
+            get {
+                return ResourceManager.GetString("UsTinUnformattedLength", resourceCulture);
             }
         }
         

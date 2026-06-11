@@ -445,10 +445,10 @@
     <value>GB National Insurance Number with length 11 or 13 contains an invalid separator character. Separator characters may not be ASCII digits ('0'-'9') or uppercase or lowercase letters (A-Z, a-z). All separator locations must contain the same character.</value>
   </data>
   <data name="GbPatientNumberUnformattedLength" xml:space="preserve">
-    <value>An unformatted GB patient number (NHS, CHI or H&amp;C)</value>
+    <value>An GB patient number (NHS, CHI or H&amp;C) without any separator characters</value>
   </data>
   <data name="GbPatientNumberDoubleSeparatorFormattedLength" xml:space="preserve">
-    <value>A formatted NHS, H&amp;C or test patient number</value>
+    <value>A formatted NHS, H&amp;C or test patient number with separator characters at offsets 3 and 7 (zero-based)</value>
   </data>
   <data name="EmptyValueDescription" xml:space="preserve">
     <value>Value may not be null, empty ("") or all whitespace characters</value>
@@ -487,9 +487,15 @@
     <value>The value to convert from a two-digit year to a four-digit year must be in the range 0-99 or 1000-9999</value>
   </data>
   <data name="GbPatientNumberSingleSeparatorFormattedLength" xml:space="preserve">
-    <value>A formatted CHI number</value>
+    <value>A formatted CHI number with a single separator character at offset 6 (zero-based)</value>
   </data>
   <data name="GbPatientNumberInvalidRange" xml:space="preserve">
     <value>GB patient number must be in the range 010 000 000 to 311 299 999, 320 000 000 to 399 999 999, 400 000 000 to 499 999 999, 600 000 000 to 799 999 999, or 900 000 000 to 999 999 999, excluding trailing check digit</value>
+  </data>
+  <data name="UsTinUnformattedLength" xml:space="preserve">
+    <value>A US TIN (SSN or ITIN) without separator characters</value>
+  </data>
+  <data name="UsSsnFormattedLength" xml:space="preserve">
+    <value>A US TIN (SSN or ITIN) with separator characters at offsets 3 and 6 (zero-based)</value>
   </data>
 </root>
