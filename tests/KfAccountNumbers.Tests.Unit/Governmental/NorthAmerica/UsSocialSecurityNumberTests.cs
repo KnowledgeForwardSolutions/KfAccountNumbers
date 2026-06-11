@@ -224,12 +224,6 @@ public class UsSocialSecurityNumberTests
    private static UsSsnInvalidSerialNumber GetInvalidSerialNumberResult(String value)
       => new(Messages.UsSsnInvalidSerialNumber, GetSerialNumber(value));
 
-   private static UsSsnAllIdenticalDigits GetAllIdenticalDigitsResult()
-      => new(Messages.UsSsnAllIdenticalDigits);
-
-   private static UsSsnInvalidRun GetInvalidRunResult()
-      => new(Messages.UsSsnInvalidRun);
-
    #region Constructor Tests
    // ==========================================================================
    // ==========================================================================
@@ -360,7 +354,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetAllIdenticalDigitsResult();
+      UsSocialSecurityNumber.ValidationError expected = default(UsSsnAllIdenticalDigits);
 
       // Act/assert.
       FluentActions
@@ -374,7 +368,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasConsecutiveRun(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidRunResult();
+      UsSocialSecurityNumber.ValidationError expected = default(UsSsnInvalidRun);
 
       // Act/assert.
       FluentActions
@@ -595,7 +589,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetAllIdenticalDigitsResult();
+      UsSocialSecurityNumber.ValidationError expected = default(UsSsnAllIdenticalDigits);
 
       // Act/assert.
       FluentActions
@@ -609,7 +603,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHasConsecutiveRun(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidRunResult();
+      UsSocialSecurityNumber.ValidationError expected = default(UsSsnInvalidRun);
 
       // Act/assert.
       FluentActions
@@ -872,7 +866,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Create_ShouldReturnAllIdenticalDigitsValidationResult_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)GetAllIdenticalDigitsResult();
+      LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)default(UsSsnAllIdenticalDigits);
 
       // Act.
       var result = UsSocialSecurityNumber.Create(value);
@@ -886,7 +880,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Create_ShouldReturnInvalidRunValidationResult_WhenValueHasConsecutiveRun(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)GetInvalidRunResult();
+      LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)default(UsSsnInvalidRun);
 
       // Act.
       var result = UsSocialSecurityNumber.Create(value);
@@ -1298,7 +1292,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Validate_ShouldReturnAllIdenticalDigits_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationResult expected = GetAllIdenticalDigitsResult();
+      UsSocialSecurityNumber.ValidationResult expected = default(UsSsnAllIdenticalDigits);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);
@@ -1312,7 +1306,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Validate_ShouldReturnInvalidRun_WhenValueHasConsecutiveRun(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationResult expected = GetInvalidRunResult();
+      UsSocialSecurityNumber.ValidationResult expected = default(UsSsnInvalidRun);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);

@@ -366,12 +366,12 @@ public record UsSocialSecurityNumber
 
       if (!ValidateNotAllIdenticalDigits(areaNumber, groupNumber, serialNumber))
       {
-         return new UsSsnAllIdenticalDigits(Messages.UsSsnAllIdenticalDigits);
+         return default(UsSsnAllIdenticalDigits);
       }
 
       if (!ValidateNotConsecutiveRun(areaNumber, groupNumber, serialNumber))
       {
-         return new UsSsnInvalidRun(Messages.UsSsnInvalidRun);
+         return default(UsSsnInvalidRun);
       }
 
       return default(ValidValue);
