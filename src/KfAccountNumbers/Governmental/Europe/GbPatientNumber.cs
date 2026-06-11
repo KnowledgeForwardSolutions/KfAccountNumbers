@@ -352,7 +352,7 @@ public record GbPatientNumber : GbPatientNumberBase
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
                GbPatientNumberInvalidRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
                InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
-               _ => new SwitchExpressionException("This branch should never be reached"),
+               _ => new UnreachableException("This branch should never be reached"),
             };
          }
       }
@@ -371,8 +371,8 @@ public record GbPatientNumber : GbPatientNumberBase
          IdentifierRangeCategory.Hc => default(GbHealthService.Hc),
          IdentifierRangeCategory.Nhs => default(GbHealthService.Nhs),
          IdentifierRangeCategory.Test => default(GbHealthService.Test),
-         IdentifierRangeCategory.Invalid => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
-         _ => throw new SwitchExpressionException("Validation should ensure that this branch is never taken"),
+         IdentifierRangeCategory.Invalid => throw new UnreachableException("Validation should ensure that this branch is never taken"),
+         _ => throw new UnreachableException("Validation should ensure that this branch is never taken"),
       };
    }
 
@@ -427,7 +427,7 @@ public record GbPatientNumber : GbPatientNumberBase
          InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
          GbPatientNumberInvalidRange invalidRange => (ValidationError)invalidRange,
          InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
-         _ => throw new SwitchExpressionException("This branch should never be reached"),
+         _ => throw new UnreachableException("This branch should never be reached"),
       };
 
    /// <summary>
