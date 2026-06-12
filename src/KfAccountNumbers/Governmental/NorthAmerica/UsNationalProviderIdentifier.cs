@@ -47,6 +47,31 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 [JsonConverter(typeof(UsNationalProviderIdentifierJsonConverter))]
 public record UsNationalProviderIdentifier
 {
+   /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="UsNationalProviderIdentifier"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="UsNationalProviderIdentifier"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum)
+   {
+   }
+
    private const Int32 ValidLength = 10;
 
    /// <summary>
@@ -56,7 +81,7 @@ public record UsNationalProviderIdentifier
    /// <param name="value">
    ///   The string representation of a US National Provider Identifier.
    /// </param>
-   /// <exception cref="KfValidationException{UsNationalProviderIdentifierValidationResult}">
+   /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
@@ -83,10 +108,17 @@ public record UsNationalProviderIdentifier
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         UsNationalProviderIdentifierValidationResult validationResult = Validate(value);
-         if (validationResult != UsNationalProviderIdentifierValidationResult.ValidationPassed)
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            throw validationResult.ToValidationException();
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
          }
       }
 
@@ -128,22 +160,23 @@ public record UsNationalProviderIdentifier
    ///   String representation of a US National Provider Identifier.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{UsNationalProviderIdentifier, UsNationalProviderIdentifierValidationResult}"/>.
-   ///   Will contain the new <see cref="UsNationalProviderIdentifier"/> if
-   ///   <paramref name="value"/> is valid or 
-   ///   <see cref="UsNationalProviderIdentifierValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="value"/> is
-   ///   invalid.
+   ///   A <see cref="UCreateResult{UsNationalProviderIdentifier, ValidationError}"/>. Will
+   ///   contain the new <see cref="UsNationalProviderIdentifier"/> if
+   ///   <paramref name="value"/> is valid or a <see cref="ValidationError"/>
+   ///   that identifies the validation rule that was failed if
+   ///   <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<UsNationalProviderIdentifier, UsNationalProviderIdentifierValidationResult> Create(
+   public static UCreateResult<UsNationalProviderIdentifier, ValidationError> Create(
       String? value)
-   {
-      UsNationalProviderIdentifierValidationResult validationResult = Validate(value);
-
-      return validationResult is UsNationalProviderIdentifierValidationResult.ValidationPassed
-         ? new UsNationalProviderIdentifier(value, validationMode: ValidationMode.BypassValidation)
-         : validationResult;
-   }
+      => Validate(value) switch
+      {
+         ValidValue => new UsNationalProviderIdentifier(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
 
    /// <summary>
    ///   Get a string representation of the NPI.
@@ -161,47 +194,57 @@ public record UsNationalProviderIdentifier
    ///   String representation of a US National Provider Identifier.
    /// </param>
    /// <returns>
-   ///   A <see cref="UsNationalProviderIdentifierValidationResult"/> enumeration
-   ///   value that indicates if the <paramref name="value"/> passed validation
-   ///   or what validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
-   public static UsNationalProviderIdentifierValidationResult Validate(String? value)
+   public static ValidationResult Validate(String? value)
    {
       // Basic checks for empty/null and length and formatting.
       if (String.IsNullOrWhiteSpace(value))
       {
-         return UsNationalProviderIdentifierValidationResult.Empty;
+         return default(EmptyValue);
       }
       else if (value.Length != ValidLength)
       {
-         return UsNationalProviderIdentifierValidationResult.InvalidLength;
+         return new InvalidLength(
+            Messages.UsNpiInvalidLength,
+            value.Length,
+            new ValidLengthDefinition(ValidLength, Messages.UsNpiValidLength));
       }
 
-      // Validate the check digit (and by extension, that all characters are digits).
+      // Validate the check digit (and by extension, that all characters are
+      // digits).
       if (Algorithms.Npi.Validate(value))
       {
-         return UsNationalProviderIdentifierValidationResult.ValidationPassed;
+         return default(ValidValue);
       }
 
-      // Invalid check digit could be due to either an invalid character or an incorrect
-      // check digit. Check if all characters are digits to determine which validation
-      // error to return.
-      return ValidateDigits(value)
-            ? UsNationalProviderIdentifierValidationResult.InvalidCheckDigit
-            : UsNationalProviderIdentifierValidationResult.InvalidCharacterEncountered;
+      // Invalid check digit could be due to either an invalid character or
+      // an incorrect check digit. Check if all characters are digits to
+      // determine which validation error to return.
+      var invalidCharacterPosition = LocateInvalidCharacter(value);
+      return invalidCharacterPosition == -1
+         ? new InvalidChecksum(Messages.UsNpiInvalidCheckDigit, Algorithms.Luhn.AlgorithmName)
+         : new InvalidCharacter(
+            Messages.UsNpiInvalidCharacter,
+            value[invalidCharacterPosition],
+            invalidCharacterPosition);
    }
 
-   private static Boolean ValidateDigits(ReadOnlySpan<Char> value)
+   // Return the zero-based index of the first non-digit characteror -1 if no
+   // non-digit characters found.
+   private static Int32 LocateInvalidCharacter(ReadOnlySpan<Char> value)
    {
-      foreach (var ch in value)
+      for (var index = 0; index < value.Length; index++)
       {
-         if (!ch.IsAsciiDigit())
+         if (!Char.IsAsciiDigit(value[index]))
          {
-            return false;
+            return index;
          }
       }
 
-      return true;
+      return -1;
    }
 }
 

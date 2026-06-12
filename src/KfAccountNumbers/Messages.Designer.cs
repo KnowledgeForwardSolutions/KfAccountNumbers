@@ -1053,9 +1053,9 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to US National Provider Identifier must only contain digit characters (0-9).
         /// </summary>
-        internal static string UsNpiInvalidCharacterEncountered {
+        internal static string UsNpiInvalidCharacter {
             get {
-                return ResourceManager.GetString("UsNpiInvalidCharacterEncountered", resourceCulture);
+                return ResourceManager.GetString("UsNpiInvalidCharacter", resourceCulture);
             }
         }
         
@@ -1074,6 +1074,15 @@ namespace KfAccountNumbers {
         internal static string UsNpiInvalidLength {
             get {
                 return ResourceManager.GetString("UsNpiInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to US National Provider Identifier should be 10 digits without separator or format characters.
+        /// </summary>
+        internal static string UsNpiValidLength {
+            get {
+                return ResourceManager.GetString("UsNpiValidLength", resourceCulture);
             }
         }
         

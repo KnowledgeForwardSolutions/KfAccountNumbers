@@ -152,7 +152,7 @@ public record UsSocialSecurityNumber
    /// <param name="value">
    ///   String representation of a Social Security Number.
    /// </param>
-   /// <exception cref="KfValidationException{ValidationError}">
+   /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -

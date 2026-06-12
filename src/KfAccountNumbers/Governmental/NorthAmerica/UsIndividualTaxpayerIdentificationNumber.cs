@@ -107,7 +107,7 @@ public record UsIndividualTaxpayerIdentificationNumber
    /// <param name="value">
    ///   String representation of an Individual Taxpayer Identification Number.
    /// </param>
-   /// <exception cref="KfValidationException{UsIndividualTaxpayerIdentificationNumberValidationResult}">
+   /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all 
    ///   whitespace characters.
    ///   - or -

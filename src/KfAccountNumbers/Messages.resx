@@ -210,7 +210,7 @@
   <data name="UsNpiInvalidLength" xml:space="preserve">
     <value>US National Provider Identifier must have length 10</value>
   </data>
-  <data name="UsNpiInvalidCharacterEncountered" xml:space="preserve">
+  <data name="UsNpiInvalidCharacter" xml:space="preserve">
     <value>US National Provider Identifier must only contain digit characters (0-9)</value>
   </data>
   <data name="UsNpiInvalidCheckDigit" xml:space="preserve">
@@ -497,5 +497,8 @@
   </data>
   <data name="UsTinFormattedLength" xml:space="preserve">
     <value>A US TIN (SSN or ITIN) with separator characters at offsets 3 and 6 (zero-based)</value>
+  </data>
+  <data name="UsNpiValidLength" xml:space="preserve">
+    <value>US National Provider Identifier should be 10 digits without separator or format characters</value>
   </data>
 </root>
