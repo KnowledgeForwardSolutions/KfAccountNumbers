@@ -11,17 +11,17 @@ namespace KfAccountNumbers.Tests.Unit.Governmental.NorthAmerica;
 
 public class UsIndividualTaxpayerIdentificationNumberTests
 {
-   private const String ValidNineCharItin = "901501234";
-   private const String AltValidNineCharItin = "987654321";
-   private const String ValidElevenCharItin = "901-50-1234";
-   private const String AltValidElevenCharItin = "987 65 4321";
+   private const String ValidUnformattedItin = "901501234";
+   private const String AltValidUnformattedItin = "987654321";
+   private const String ValidFormattedItin = "901-50-1234";
+   private const String AltValidFormattedItin = "987 65 4321";
 
    // Values that will successfully create a UsIndividualTaxpayerIdentificationNumber object
    public static TheoryData<String> ValidValues =>
    [
-      ValidNineCharItin,
-      ValidElevenCharItin,
-      AltValidElevenCharItin
+      ValidUnformattedItin,
+      ValidFormattedItin,
+      AltValidFormattedItin
    ];
 
    public static TheoryData<String> ValidGroupNumberBoundaryValues =>
@@ -485,8 +485,8 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -496,11 +496,44 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var sut2 = new UsIndividualTaxpayerIdentificationNumber(AltValidNineCharItin);
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(AltValidUnformattedItin);
 
       // Act/assert.
       (sut1 == sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void UsIndividualTaxpayerIdentificationNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 9 and 11 character versions for same person should still be equal.
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void UsIndividualTaxpayerIdentificationNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin.Replace('-', '.'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void UsIndividualTaxpayerIdentificationNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin.Replace('-', 'A'));
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin.Replace('-', 'a'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
    }
 
    #endregion
@@ -513,19 +546,52 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var sut2 = new UsIndividualTaxpayerIdentificationNumber(AltValidNineCharItin);
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(AltValidUnformattedItin);
 
       // Act/assert.
       (sut1 != sut2).Should().BeTrue();
    }
 
    [Fact]
+   public void UsIndividualTaxpayerIdentificationNumber_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 9 and 11 character versions for same person should still be equal.
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
    public void UsIndividualTaxpayerIdentificationNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void UsIndividualTaxpayerIdentificationNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin.Replace('-', '.'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void UsIndividualTaxpayerIdentificationNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin.Replace('-', 'A'));
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin.Replace('-', 'a'));
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -538,8 +604,8 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(ValidNineCharItin)]
-   [InlineData(ValidElevenCharItin)]
+   [InlineData(ValidUnformattedItin)]
+   [InlineData(ValidFormattedItin)]
    public void UsIndividualTaxpayerIdentificationNumber_Value_ShouldReturnRawItin(String value)
    {
       // Arrange.
@@ -673,8 +739,8 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -684,28 +750,61 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var sut2 = new UsIndividualTaxpayerIdentificationNumber(AltValidNineCharItin);
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(AltValidUnformattedItin);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeFalse();
    }
 
    [Fact]
+   public void UsIndividualTaxpayerIdentificationNumber_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 9 and 11 character versions for same person should still be equal.
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void UsIndividualTaxpayerIdentificationNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin.Replace('-', '.'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void UsIndividualTaxpayerIdentificationNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin.Replace('-', 'A'));
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin.Replace('-', 'a'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
    public void UsIndividualTaxpayerIdentificationNumber_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
    {
       // Arrange.
-      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
 
       // Act/assert.
-      sut.Equals(ValidNineCharItin).Should().BeFalse();
+      sut.Equals(ValidUnformattedItin).Should().BeFalse();
    }
 
    [Fact]
    public void UsIndividualTaxpayerIdentificationNumber_Equals_ShouldReturnFalse_WhenComparedWithNull()
    {
       // Arrange.
-      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
 
       // Act/assert.
       sut.Equals(null).Should().BeFalse();
@@ -721,8 +820,8 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
    {
       // Arrange.
-      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var expected = ValidElevenCharItin;
+      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+      var expected = ValidFormattedItin;
 
       // Act.
       var str = sut.Format();
@@ -735,9 +834,9 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
    {
       // Arrange.
-      var sut = new UsIndividualTaxpayerIdentificationNumber(AltValidNineCharItin);
+      var sut = new UsIndividualTaxpayerIdentificationNumber(AltValidUnformattedItin);
       var mask = "___ __ ____";
-      var expected = AltValidElevenCharItin;
+      var expected = AltValidFormattedItin;
 
       // Act.
       var str = sut.Format(mask);
@@ -750,7 +849,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
    {
       // Arrange.
-      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
       String mask = null!;
 
       // Act/assert.
@@ -768,7 +867,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
    {
       // Arrange.
-      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
 
       // Act/assert.
       FluentActions
@@ -789,8 +888,8 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -804,8 +903,8 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var sut2 = new UsIndividualTaxpayerIdentificationNumber(AltValidNineCharItin);
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(AltValidUnformattedItin);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -813,6 +912,51 @@ public class UsIndividualTaxpayerIdentificationNumberTests
 
       // Assert.
       hash1.Should().NotBe(hash2);
+   }
+
+   [Fact]
+   public void UsIndividualTaxpayerIdentificationNumber_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 9 and 11 character versions for same person should still be equal.
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void UsIndividualTaxpayerIdentificationNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin.Replace('-', '.'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void UsIndividualTaxpayerIdentificationNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin.Replace('-', 'A'));
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin.Replace('-', 'a'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
    }
 
    #endregion
@@ -829,8 +973,8 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
-      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidElevenCharItin);    // Same internal value
+      var sut1 = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
+      var sut2 = new UsIndividualTaxpayerIdentificationNumber(ValidFormattedItin);    // Same internal value
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
@@ -844,8 +988,8 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(ValidNineCharItin, ValidNineCharItin)]
-   [InlineData(ValidElevenCharItin, ValidNineCharItin)]
+   [InlineData(ValidUnformattedItin, ValidUnformattedItin)]
+   [InlineData(ValidFormattedItin, ValidUnformattedItin)]
    public void UsIndividualTaxpayerIdentificationNumber_ToString_ShouldReturnExpectedValue(
       String value,
       String expected)
@@ -979,7 +1123,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_JsonSerialization_ShouldRoundTripSuccessfully()
    {
       // Arrange.
-      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
@@ -994,13 +1138,13 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
    {
       // Arrange.
-      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin);
+      var sut = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin);
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
 
       // Assert.
-      json.Should().Be($"\"{ValidNineCharItin}\"");  // Simple string, not object
+      json.Should().Be($"\"{ValidUnformattedItin}\"");  // Simple string, not object
    }
 
    public class Foo
@@ -1012,7 +1156,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_JsonSerialization_ShouldDeserializeComplexObject()
    {
       // Arrange.
-      var foo = new Foo { Itin = new UsIndividualTaxpayerIdentificationNumber(ValidNineCharItin) };
+      var foo = new Foo { Itin = new UsIndividualTaxpayerIdentificationNumber(ValidUnformattedItin) };
       var json = JsonSerializer.Serialize(foo);
 
       // Act.

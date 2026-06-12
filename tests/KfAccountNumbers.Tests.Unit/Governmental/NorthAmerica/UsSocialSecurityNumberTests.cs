@@ -623,7 +623,7 @@ public class UsSocialSecurityNumberTests
    {
       // Arrange.
       var sut1 = new UsSocialSecurityNumber(ValidUnformattedSsn);
-      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn);    // Same internal value
+      var sut2 = new UsSocialSecurityNumber(ValidUnformattedSsn);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
