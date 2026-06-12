@@ -625,7 +625,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldCreateInstance_WhenValuIsValid(String value)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
       LocalCreateResult expected = new UsIndividualTaxpayerIdentificationNumber(value);

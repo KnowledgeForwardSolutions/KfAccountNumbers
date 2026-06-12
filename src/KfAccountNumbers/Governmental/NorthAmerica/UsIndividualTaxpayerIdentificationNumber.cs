@@ -59,7 +59,7 @@ public record UsIndividualTaxpayerIdentificationNumber
 {
    /// <summary>
    ///   Discriminated union defining the possible validation errors that can
-   ///   occur when creating a new <see cref="UsSocialSecurityNumber"/>.
+   ///   occur when creating a new <see cref="UsIndividualTaxpayerIdentificationNumber"/>.
    /// </summary>
    public union ValidationError(
       EmptyValue,
@@ -73,7 +73,7 @@ public record UsIndividualTaxpayerIdentificationNumber
 
    /// <summary>
    ///   Discriminated union defining the possible results that can occur when
-   ///   validating a <see cref="UsSocialSecurityNumber"/>.
+   ///   validating a <see cref="UsIndividualTaxpayerIdentificationNumber"/>.
    /// </summary>
    public union ValidationResult(
       ValidValue,
@@ -298,7 +298,7 @@ public record UsIndividualTaxpayerIdentificationNumber
    }
 
    /// <summary>
-   ///   Gets an array of details about valid lengths accepted for a US SSN.
+   ///   Gets an array of details about valid lengths accepted for a US ITIN.
    /// </summary>
    /// <returns>
    ///   An array of <see cref="ValidLengthDefinition"/>s.
