@@ -128,11 +128,13 @@ public record UsIndividualTaxpayerIdentificationNumber
 
    /// <summary>
    ///   Initializes a new instance of the
-   ///   <see cref="UsIndividualTaxpayerIdentificationNumber"/> class. Private
-   ///   constructor that actually does the work. Supports bypassing validation
-   ///   when creating a new instance from a value that has already been
-   ///   validated.
+   ///   <see cref="UsIndividualTaxpayerIdentificationNumber"/> class.
    /// </summary>
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
    private UsIndividualTaxpayerIdentificationNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)

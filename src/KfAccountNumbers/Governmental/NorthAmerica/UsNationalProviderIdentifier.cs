@@ -1,5 +1,8 @@
 // Ignore Spelling: Json Kf npi
 
+#pragma warning disable IDE0250 // Make struct 'readonly'
+#pragma warning disable IDE0046 // Convert to conditional expression
+
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
 /// <summary>
@@ -47,112 +50,135 @@ public record UsNationalProviderIdentifier
    private const Int32 ValidLength = 10;
 
    /// <summary>
-   ///   Initialize a new <see cref="UsNationalProviderIdentifier"/>.
+   ///   Initializes a new instance of the
+   ///   <see cref="UsNationalProviderIdentifier"/> class.
    /// </summary>
-   /// <param name="npi">
+   /// <param name="value">
    ///   The string representation of a US National Provider Identifier.
    /// </param>
    /// <exception cref="KfValidationException{UsNationalProviderIdentifierValidationResult}">
-   ///   <paramref name="npi"/> is <see langword="null"/>, empty or all 
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
-   ///   <paramref name="npi"/> does not have length of 10.
+   ///   <paramref name="value"/> does not have length of 10.
    ///   - or -
-   ///   <paramref name="npi"/> contains a non-ASCII digit (not 0-9).
+   ///   <paramref name="value"/> contains a non-ASCII digit (not 0-9).
    ///   - or -
-   ///   <paramref name="npi"/> fails the Luhn check digit validation (after
+   ///   <paramref name="value"/> fails the Luhn check digit validation (after
    ///   prefixing with "80840").
    /// </exception>
-   public UsNationalProviderIdentifier(String? npi)
-      : this(npi, ValidationMode.ValidationRequired) { }
+   public UsNationalProviderIdentifier(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports bypassing
-   ///   validation when creating a new instance from a value that has already
-   ///   been validated.
+   ///   Initializes a new instance of the
+   ///   <see cref="UsNationalProviderIdentifier"/> class.
    /// </summary>
-   private UsNationalProviderIdentifier(String? npi, ValidationMode validationMode)
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private UsNationalProviderIdentifier(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         UsNationalProviderIdentifierValidationResult validationResult = Validate(npi);
+         UsNationalProviderIdentifierValidationResult validationResult = Validate(value);
          if (validationResult != UsNationalProviderIdentifierValidationResult.ValidationPassed)
          {
             throw validationResult.ToValidationException();
          }
       }
 
-      Value = npi!;
+      Value = value!;
    }
 
    /// <summary>
-   ///   The raw NPI value.
+   ///   Gets the raw NPI value.
    /// </summary>
    public String Value { get; private init; }
 
-   public static implicit operator String(UsNationalProviderIdentifier npi)
-      => npi?.Value ?? String.Empty;      // Handle null NPI object gracefully by returning empty string
+   /// <summary>
+   ///   Implicitly converts a <see cref="UsNationalProviderIdentifier"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="UsNationalProviderIdentifier"/> to convert.
+   /// </param>
+   public static implicit operator String(UsNationalProviderIdentifier source)
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
 
-   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
-   public static explicit operator UsNationalProviderIdentifier(String? npi) => new(npi);
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a
+   ///   <see cref="UsNationalProviderIdentifier"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   The string representation of a US National Provider Identifier.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid SSN.
+   /// </exception>
+   public static explicit operator UsNationalProviderIdentifier(String? value) => new(value);
 
    /// <summary>
    ///   Create a new <see cref="UsNationalProviderIdentifier"/> using the
    ///   Result pattern.
    /// </summary>
-   /// <param name="npi">
+   /// <param name="value">
    ///   String representation of a US National Provider Identifier.
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{UsNationalProviderIdentifier, UsNationalProviderIdentifierValidationResult}"/>.
-   ///   Will contain the new <see cref="UsNationalProviderIdentifier"/> if 
-   ///   <paramref name="npi"/> is valid or 
+   ///   Will contain the new <see cref="UsNationalProviderIdentifier"/> if
+   ///   <paramref name="value"/> is valid or 
    ///   <see cref="UsNationalProviderIdentifierValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="npi"/> is 
+   ///   the validation rule that was failed if <paramref name="value"/> is
    ///   invalid.
    /// </returns>
    public static CreateResult<UsNationalProviderIdentifier, UsNationalProviderIdentifierValidationResult> Create(
-      String? npi)
+      String? value)
    {
-      UsNationalProviderIdentifierValidationResult validationResult = Validate(npi);
+      UsNationalProviderIdentifierValidationResult validationResult = Validate(value);
 
       return validationResult is UsNationalProviderIdentifierValidationResult.ValidationPassed
-         ? new UsNationalProviderIdentifier(npi, validationMode: ValidationMode.BypassValidation)
+         ? new UsNationalProviderIdentifier(value, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
    /// <summary>
    ///   Get a string representation of the NPI.
    /// </summary>
+   /// <returns>
+   ///   A string containing the NPI value.
+   /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="npi"/> to determine if it contains a valid
+   ///   Check the <paramref name="value"/> to determine if it contains a valid
    ///   US National Provider Identifier (NPI).
    /// </summary>
-   /// <param name="npi">
+   /// <param name="value">
    ///   String representation of a US National Provider Identifier.
    /// </param>
    /// <returns>
-   ///   A <see cref="UsNationalProviderIdentifierValidationResult"/> enumeration 
-   ///   value that indicates if the <paramref name="npi"/> passed validation
+   ///   A <see cref="UsNationalProviderIdentifierValidationResult"/> enumeration
+   ///   value that indicates if the <paramref name="value"/> passed validation
    ///   or what validation error was encountered.
    /// </returns>
-   public static UsNationalProviderIdentifierValidationResult Validate(String? npi)
+   public static UsNationalProviderIdentifierValidationResult Validate(String? value)
    {
-
       // Basic checks for empty/null and length and formatting.
-      if (String.IsNullOrWhiteSpace(npi))
+      if (String.IsNullOrWhiteSpace(value))
       {
          return UsNationalProviderIdentifierValidationResult.Empty;
       }
-      else if (npi.Length != ValidLength)
+      else if (value.Length != ValidLength)
       {
          return UsNationalProviderIdentifierValidationResult.InvalidLength;
       }
 
       // Validate the check digit (and by extension, that all characters are digits).
-      if (Algorithms.Npi.Validate(npi))
+      if (Algorithms.Npi.Validate(value))
       {
          return UsNationalProviderIdentifierValidationResult.ValidationPassed;
       }
@@ -160,14 +186,14 @@ public record UsNationalProviderIdentifier
       // Invalid check digit could be due to either an invalid character or an incorrect
       // check digit. Check if all characters are digits to determine which validation
       // error to return.
-      return ValidateDigits(npi)
+      return ValidateDigits(value)
             ? UsNationalProviderIdentifierValidationResult.InvalidCheckDigit
             : UsNationalProviderIdentifierValidationResult.InvalidCharacterEncountered;
    }
 
-   private static Boolean ValidateDigits(ReadOnlySpan<Char> npi)
+   private static Boolean ValidateDigits(ReadOnlySpan<Char> value)
    {
-      foreach (var ch in npi)
+      foreach (var ch in value)
       {
          if (!ch.IsAsciiDigit())
          {
@@ -179,6 +205,8 @@ public record UsNationalProviderIdentifier
    }
 }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class UsNationalProviderIdentifierJsonConverter : JsonConverter<UsNationalProviderIdentifier>
 {
    public override UsNationalProviderIdentifier Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

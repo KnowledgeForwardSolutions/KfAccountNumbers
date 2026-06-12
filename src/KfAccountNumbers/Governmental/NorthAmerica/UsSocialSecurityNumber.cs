@@ -179,10 +179,13 @@ public record UsSocialSecurityNumber
 
    /// <summary>
    ///   Initializes a new instance of the <see cref="UsSocialSecurityNumber"/>
-   ///   class. Private constructor that actually does the work. Supports
-   ///   bypassing validation when creating a new instance from a value that has
-   ///   already been validated.
+   ///   class.
    /// </summary>
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
    private UsSocialSecurityNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
