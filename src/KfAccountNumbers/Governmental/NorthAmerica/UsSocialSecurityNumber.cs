@@ -206,7 +206,7 @@ public record UsSocialSecurityNumber
          }
       }
 
-      Value = GetValidatedSsn(value!);
+      Value = GetRawValue(value!);
    }
 
    /// <summary>
@@ -222,7 +222,7 @@ public record UsSocialSecurityNumber
    ///   The <see cref="UsSocialSecurityNumber"/> to convert.
    /// </param>
    public static implicit operator String(UsSocialSecurityNumber source)
-      => source?.Value ?? String.Empty;      // Handle null SSN object gracefully by returning empty string
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
 
    /// <summary>
    ///   Defines an explicit conversion of a string to a <see cref="UsSocialSecurityNumber"/>.
@@ -394,14 +394,9 @@ public record UsSocialSecurityNumber
       => value[..AreaRangeEnd];
 
    private static ReadOnlySpan<Char> GetGroupNumber(ReadOnlySpan<Char> value)
-      => IsFormattedSsn(value)
+      => IsFormatted(value)
          ? value[FormattedGroupRangeStart..FormattedGroupRangeEnd]
          : value[UnformattedGroupRangeStart..UnformattedGroupRangeEnd];
-
-   private static ReadOnlySpan<Char> GetSerialNumber(ReadOnlySpan<Char> value)
-      => IsFormattedSsn(value)
-         ? value[FormattedSerialNumberRangeStart..]
-         : value[UnformattedSerialNumberRangeStart..];
 
    /// <summary>
    ///   Get an unformatted SSN value from a string that has passed validation.
@@ -409,7 +404,7 @@ public record UsSocialSecurityNumber
    ///   all three SSN sections together without allocating intermediate
    ///   Strings.
    /// </summary>
-   private static String GetValidatedSsn(String value)
+   private static String GetRawValue(String value)
    {
       if (value.Length == UnformattedLength)
       {
@@ -422,14 +417,19 @@ public record UsSocialSecurityNumber
          GetSerialNumber(value));
    }
 
-   private static Boolean IsFormattedSsn(ReadOnlySpan<Char> value) => value.Length == FormattedLength;
+   private static ReadOnlySpan<Char> GetSerialNumber(ReadOnlySpan<Char> value)
+      => IsFormatted(value)
+         ? value[FormattedSerialNumberRangeStart..]
+         : value[UnformattedSerialNumberRangeStart..];
+
+   private static Boolean IsFormatted(ReadOnlySpan<Char> value) => value.Length == FormattedLength;
 
    private static Boolean ValidateAllDigits(
       ReadOnlySpan<Char> value,
       out Int32 invalidCharacterPosition)
    {
       invalidCharacterPosition = -1;
-      var isFormatted = IsFormattedSsn(value);
+      var isFormatted = IsFormatted(value);
       for (var index = 0; index < value.Length; index++)
       {
          if (isFormatted && (index is GroupSeparatorOffset or SerialSeparatorOffset))
@@ -470,7 +470,7 @@ public record UsSocialSecurityNumber
    private static Boolean ValidateNotAllIdenticalDigits(ReadOnlySpan<Char> value)
    {
       var initialChar = value[0];
-      var isFormatted = IsFormattedSsn(value);
+      var isFormatted = IsFormatted(value);
       for (var index = 0; index < value.Length; index++)
       {
          if (isFormatted && index is GroupSeparatorOffset or SerialSeparatorOffset)
