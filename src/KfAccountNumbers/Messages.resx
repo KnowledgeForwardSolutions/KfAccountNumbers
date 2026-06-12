@@ -147,7 +147,7 @@
   <data name="UsSsnInvalidAreaNumber" xml:space="preserve">
     <value>US Social Security Number area number segment (AAA-xx-xxxx) must not be 000, 666 or 900-999</value>
   </data>
-  <data name="UsSsnInvalidCharacterEncountered" xml:space="preserve">
+  <data name="UsSsnInvalidCharacter" xml:space="preserve">
     <value>US Social Security Number must only contain digit characters (0-9) in non-separator character locations</value>
   </data>
   <data name="CaSinInvalidCharacterEncountered" xml:space="preserve">
@@ -162,7 +162,7 @@
   <data name="UsSsnInvalidRun" xml:space="preserve">
     <value>US Social Security Number may not have sequence 123456789</value>
   </data>
-  <data name="UsSsnInvalidSeparatorEncountered" xml:space="preserve">
+  <data name="UsSsnInvalidSeparator" xml:space="preserve">
     <value>US Social Security Number with length 11 contains an unexpected character at a separator position</value>
   </data>
   <data name="UsSsnInvalidSerialNumber" xml:space="preserve">
@@ -222,10 +222,10 @@
   <data name="UsItinInvalidLength" xml:space="preserve">
     <value>US Individual Taxpayer Identification Number must have length 9 (digits only) or 11 (9 digits with two separator characters)</value>
   </data>
-  <data name="UsItinInvalidSeparatorEncountered" xml:space="preserve">
+  <data name="UsItinInvalidSeparator" xml:space="preserve">
     <value>US Individual Taxpayer Identification Number with length 11 contains an unexpected character at a separator position</value>
   </data>
-  <data name="UsItinInvalidCharacterEncountered" xml:space="preserve">
+  <data name="UsItinInvalidCharacter" xml:space="preserve">
     <value>US Individual Taxpayer Identification Number must only contain digit characters (0-9) in non-separator character locations</value>
   </data>
   <data name="UsItinInvalidAreaNumber" xml:space="preserve">
@@ -495,7 +495,7 @@
   <data name="UsTinUnformattedLength" xml:space="preserve">
     <value>A US TIN (SSN or ITIN) without separator characters</value>
   </data>
-  <data name="UsSsnFormattedLength" xml:space="preserve">
+  <data name="UsTinFormattedLength" xml:space="preserve">
     <value>A US TIN (SSN or ITIN) with separator characters at offsets 3 and 6 (zero-based)</value>
   </data>
 </root>
