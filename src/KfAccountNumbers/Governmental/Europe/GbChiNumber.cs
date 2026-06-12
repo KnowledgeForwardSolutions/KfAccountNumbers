@@ -231,7 +231,7 @@ public record class GbChiNumber : GbPatientNumberBase
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
                GbPatientNumberInvalidRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
                InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
-               _ => new SwitchExpressionException("This branch should never be reached"),
+               _ => new UnreachableException("This branch should never be reached"),
             };
          }
       }
@@ -298,7 +298,7 @@ public record class GbChiNumber : GbPatientNumberBase
          InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
          GbPatientNumberInvalidRange invalidRange => (ValidationError)invalidRange,
          InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
-         _ => throw new SwitchExpressionException("This branch should never be reached"),
+         _ => throw new UnreachableException("This branch should never be reached"),
       };
 
    /// <summary>

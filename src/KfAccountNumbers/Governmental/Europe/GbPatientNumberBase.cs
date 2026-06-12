@@ -7,11 +7,6 @@ namespace KfAccountNumbers.Governmental.Europe;
 public abstract record GbPatientNumberBase
 {
    /// <summary>
-   ///   The six-digit date format used by CHI numbers.
-   /// </summary>
-   public const String ChiNumberDateFormat = "DDMMYY";
-
-   /// <summary>
    ///   The default format mask that will render the patient number as a
    ///   "DDMMYY NNNN" value.
    /// </summary>
@@ -251,7 +246,7 @@ public abstract record GbPatientNumberBase
    protected static InvalidDateOfBirth GetInvalidDateOfBirthResult(
       String value,
       String description)
-      => new(description, value[..6], ChiNumberDateFormat);
+      => new(description, value[..6], DateFormatName.DDMMYY);
 
    /// <summary>
    ///   Create an invalid separator result for a GB patient number.

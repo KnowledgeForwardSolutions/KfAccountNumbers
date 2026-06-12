@@ -1,4 +1,5 @@
 #pragma warning disable CA1822 // Mark members as static
+
 namespace KfAccountNumbers.Results;
 
 /// <summary>

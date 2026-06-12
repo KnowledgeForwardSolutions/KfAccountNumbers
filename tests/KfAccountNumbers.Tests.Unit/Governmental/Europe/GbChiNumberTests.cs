@@ -246,6 +246,39 @@ public class GbChiNumberTests
       // { "321204", "-" },            // Invalid day of for December, any year, will be considered a valid H & C number instead
    };
 
+   private static InvalidLength GetInvalidLengthResult(String value)
+      => new(
+         Messages.GbPatientNumberInvalidLength,
+         value.Length,
+         GbPatientNumberBase.GetChiValidLengthDefinitions());
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.GbPatientNumberInvalidCharacter,
+         value[position],
+         position);
+
+   private static InvalidChecksum GetInvalidChecksumResult()
+      => new(
+         Messages.GbPatientNumberInvalidCheckDigit,
+         Algorithms.Modulus11Decimal.AlgorithmName);
+
+   private static InvalidSeparator GetInvalidSeparatorResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.GbPatientNumberInvalidSeparator,
+         value[position],
+         position);
+
+   private static GbPatientNumberInvalidRange GetInvalidRangeResult()
+      => new(Messages.GbChiNumberInvalidRange);
+
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
+      => new(Messages.GbChiNumberInvalidDateOfBirth, value[..6], DateFormatName.DDMMYY);
+
    #region Constructor Tests
    // ==========================================================================
    // ==========================================================================
@@ -284,10 +317,7 @@ public class GbChiNumberTests
    public void GbChiNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = new InvalidLength(
-         Messages.GbPatientNumberInvalidLength,
-         value.Length,
-         GbPatientNumberBase.GetChiValidLengthDefinitions());
+      GbChiNumber.ValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
@@ -306,10 +336,7 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = new InvalidCharacter(
-         Messages.GbPatientNumberInvalidCharacter,
-         value[position],
-         position);
+      GbChiNumber.ValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
@@ -323,9 +350,7 @@ public class GbChiNumberTests
    public void GbChiNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = new InvalidChecksum(
-         Messages.GbPatientNumberInvalidCheckDigit,
-         Algorithms.Modulus11Decimal.AlgorithmName);
+      GbChiNumber.ValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
@@ -341,10 +366,7 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = new InvalidSeparator(
-         Messages.GbPatientNumberInvalidSeparator,
-         value[position],
-         position);
+      GbChiNumber.ValidationError expected = GetInvalidSeparatorResult(value, position);
 
       // Act/assert.
       FluentActions
@@ -359,7 +381,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbChiNumber.ValidationError expected = new GbPatientNumberInvalidRange(Messages.GbChiNumberInvalidRange);
+      GbChiNumber.ValidationError expected = GetInvalidRangeResult();
 
       // Act/assert.
       FluentActions
@@ -376,11 +398,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      var invalidDateOfBirth = value[..6];
-      GbChiNumber.ValidationError expected = new InvalidDateOfBirth(
-         Messages.GbChiNumberInvalidDateOfBirth,
-         invalidDateOfBirth,
-         GbPatientNumberBase.ChiNumberDateFormat);
+      GbChiNumber.ValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
@@ -545,10 +563,7 @@ public class GbChiNumberTests
    public void GbChiNumber_ExplicitCastToBeGbChiNumber_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = new InvalidLength(
-         Messages.GbPatientNumberInvalidLength,
-         value.Length,
-         GbPatientNumberBase.GetChiValidLengthDefinitions());
+      GbChiNumber.ValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
@@ -567,10 +582,7 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = new InvalidCharacter(
-         Messages.GbPatientNumberInvalidCharacter,
-         value[position],
-         position);
+      GbChiNumber.ValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
@@ -584,9 +596,7 @@ public class GbChiNumberTests
    public void GbChiNumber_ExplicitCastToBeGbChiNumber_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = new InvalidChecksum(
-         Messages.GbPatientNumberInvalidCheckDigit,
-         Algorithms.Modulus11Decimal.AlgorithmName);
+      GbChiNumber.ValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
@@ -602,10 +612,7 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = new InvalidSeparator(
-         Messages.GbPatientNumberInvalidSeparator,
-         value[position],
-         position);
+      GbChiNumber.ValidationError expected = GetInvalidSeparatorResult(value, position);
 
       // Act/assert.
       FluentActions
@@ -620,7 +627,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbChiNumber.ValidationError expected = new GbPatientNumberInvalidRange(Messages.GbChiNumberInvalidRange);
+      GbChiNumber.ValidationError expected = GetInvalidRangeResult();
 
       // Act/assert.
       FluentActions
@@ -637,11 +644,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      var invalidDateOfBirth = value[..6];
-      GbChiNumber.ValidationError expected = new InvalidDateOfBirth(
-         Messages.GbChiNumberInvalidDateOfBirth,
-         invalidDateOfBirth,
-         GbPatientNumberBase.ChiNumberDateFormat);
+      GbChiNumber.ValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
@@ -811,19 +814,17 @@ public class GbChiNumberTests
    public void GbChiNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = new InvalidLength(
-         Messages.GbPatientNumberInvalidLength,
-         value.Length,
-         GbPatientNumberBase.GetChiValidLengthDefinitions());
+      LocalCreateResult expected = (GbChiNumber.ValidationError)GetInvalidLengthResult(value);
 
       // Act.
       var result = GbChiNumber.Create(value);
 
       // Assert.
-
-      // Assert.
-      result.TryGetValue(out GbChiNumber.ValidationError error).Should().BeTrue();    // Necessary to get around some issued with FluentAssertions and nested types
-      error.Value.Should().BeEquivalentTo(expected.Value);
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<GbChiNumber.ValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
@@ -833,10 +834,7 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      LocalCreateResult expected = (GbChiNumber.ValidationError)new InvalidCharacter(
-         Messages.GbPatientNumberInvalidCharacter,
-         value[position],
-         position);
+      LocalCreateResult expected = (GbChiNumber.ValidationError)GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = GbChiNumber.Create(value);
@@ -850,9 +848,7 @@ public class GbChiNumberTests
    public void GbChiNumber_Create_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbChiNumber.ValidationError)new InvalidChecksum(
-         Messages.GbPatientNumberInvalidCheckDigit,
-         Algorithms.Modulus11Decimal.AlgorithmName);
+      LocalCreateResult expected = (GbChiNumber.ValidationError)GetInvalidChecksumResult();
 
       // Act.
       var result = GbChiNumber.Create(value);
@@ -868,10 +864,7 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      LocalCreateResult expected = (GbChiNumber.ValidationError)new InvalidSeparator(
-         Messages.GbPatientNumberInvalidSeparator,
-         value[position],
-         position);
+      LocalCreateResult expected = (GbChiNumber.ValidationError)GetInvalidSeparatorResult(value, position);
 
       // Act.
       var result = GbChiNumber.Create(value);
@@ -886,8 +879,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      LocalCreateResult expected = (GbChiNumber.ValidationError)new GbPatientNumberInvalidRange(
-         Messages.GbChiNumberInvalidRange);
+      LocalCreateResult expected = (GbChiNumber.ValidationError)GetInvalidRangeResult();
 
       // Act.
       var result = GbChiNumber.Create(value);
@@ -904,11 +896,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      var invalidDateOfBirth = value[..6];
-      LocalCreateResult expected = (GbChiNumber.ValidationError)new InvalidDateOfBirth(
-         Messages.GbChiNumberInvalidDateOfBirth,
-         invalidDateOfBirth,
-         GbPatientNumberBase.ChiNumberDateFormat);
+      LocalCreateResult expected = (GbChiNumber.ValidationError)GetInvalidDateOfBirthResult(value);
 
       // Act.
       var result = GbChiNumber.Create(value);
@@ -976,6 +964,26 @@ public class GbChiNumberTests
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void GbChiNumber_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new GbChiNumber(ValidFormattedChiNumber);
+
+      // Act/assert.
+      sut.Equals(ValidFormattedChiNumber).Should().BeFalse();
+   }
+
+   [Fact]
+   public void GbChiNumber_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new GbChiNumber(ValidFormattedChiNumber);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
    }
 
    #endregion
@@ -1285,10 +1293,7 @@ public class GbChiNumberTests
    public void GbChiNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationResult expected = new InvalidLength(
-         Messages.GbPatientNumberInvalidLength,
-         value.Length,
-         GbPatientNumberBase.GetChiValidLengthDefinitions());
+      GbChiNumber.ValidationResult expected = GetInvalidLengthResult(value);
 
       // Act.
       var result = GbChiNumber.Validate(value);
@@ -1307,10 +1312,7 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      GbChiNumber.ValidationResult expected = new InvalidCharacter(
-         Messages.GbPatientNumberInvalidCharacter,
-         value[position],
-         position);
+      GbChiNumber.ValidationResult expected = GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = GbChiNumber.Validate(value);
@@ -1324,9 +1326,7 @@ public class GbChiNumberTests
    public void GbChiNumber_Validate_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationResult expected = new InvalidChecksum(
-         Messages.GbPatientNumberInvalidCheckDigit,
-         Algorithms.Modulus11Decimal.AlgorithmName);
+      GbChiNumber.ValidationResult expected = GetInvalidChecksumResult();
 
       // Act.
       var result = GbChiNumber.Validate(value);
@@ -1342,10 +1342,7 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      GbChiNumber.ValidationResult expected = new InvalidSeparator(
-         Messages.GbPatientNumberInvalidSeparator,
-         value[position],
-         position);
+      GbChiNumber.ValidationResult expected = GetInvalidSeparatorResult(value, position);
 
       // Act.
       var result = GbChiNumber.Validate(value);
@@ -1360,7 +1357,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbChiNumber.ValidationResult expected = new GbPatientNumberInvalidRange(Messages.GbChiNumberInvalidRange);
+      GbChiNumber.ValidationResult expected = GetInvalidRangeResult();
 
       // Act.
       var result = GbChiNumber.Validate(value);
@@ -1377,11 +1374,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      var invalidDateOfBirth = value[..6];
-      GbChiNumber.ValidationResult expected = new InvalidDateOfBirth(
-         Messages.GbChiNumberInvalidDateOfBirth,
-         invalidDateOfBirth,
-         GbPatientNumberBase.ChiNumberDateFormat);
+      GbChiNumber.ValidationResult expected = GetInvalidDateOfBirthResult(value);
 
       // Act.
       var result = GbChiNumber.Validate(value);
@@ -1477,20 +1470,14 @@ public class GbChiNumberTests
    public void GbChiNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenValueIsInvalid()
    {
       // Arrange.
-      var json = "{\"ChiNumber\":\"123-456-78901\"}";  // Invalid length
-      GbChiNumber.ValidationError expected = new InvalidLength(
-         Messages.GbPatientNumberInvalidLength,
-         13,
-         GbPatientNumberBase.GetChiValidLengthDefinitions());
+      var json = "{\"ChiNumber\":\"4000900004\"}";  // Invalid check digit
+      GbChiNumber.ValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
          .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
-         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-            .ComparingByMembers<GbChiNumber.ValidationError>()
-            .ComparingByMembers<ValidLengthDefinition>()
-            .WithoutStrictOrdering());
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
