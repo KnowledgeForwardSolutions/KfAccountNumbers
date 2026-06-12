@@ -717,7 +717,7 @@ public class UsSocialSecurityNumberTests
    {
       // Arrange.
       var sut1 = new UsSocialSecurityNumber(ValidFormattedSsn);
-      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace(' ', '.'));
+      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace('-', '.'));
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -727,8 +727,8 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
    {
       // Arrange.
-      var sut1 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace(' ', 'A'));
-      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace(' ', 'a'));
+      var sut1 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace('-', 'A'));
+      var sut2 = new UsSocialSecurityNumber(ValidFormattedSsn.Replace('-', 'a'));
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
