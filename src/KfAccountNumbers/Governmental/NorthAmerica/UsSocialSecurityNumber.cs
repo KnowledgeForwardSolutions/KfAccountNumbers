@@ -325,7 +325,7 @@ public record UsSocialSecurityNumber
       if (!ValidateSeparators(value, out var invalidSeparatorPosition))
       {
          return new InvalidSeparator(
-            Messages.UsSsnInvalidSeparatorEncountered,
+            Messages.UsSsnInvalidSeparator,
             value[invalidSeparatorPosition],
             invalidSeparatorPosition);
       }
@@ -333,7 +333,7 @@ public record UsSocialSecurityNumber
       if (!ValidateAllDigits(value, out var invalidCharacterPosition))
       {
          return new InvalidCharacter(
-            Messages.UsSsnInvalidCharacterEncountered,
+            Messages.UsSsnInvalidCharacter,
             value[invalidCharacterPosition],
             invalidCharacterPosition);
       }

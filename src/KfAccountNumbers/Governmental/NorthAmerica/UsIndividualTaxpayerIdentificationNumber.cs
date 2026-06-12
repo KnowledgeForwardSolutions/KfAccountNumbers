@@ -274,7 +274,7 @@ public record UsIndividualTaxpayerIdentificationNumber
       if (!ValidateSeparators(value, out var invalidSeparatorPosition))
       {
          return new InvalidSeparator(
-            Messages.UsItinInvalidSeparatorEncountered,
+            Messages.UsItinInvalidSeparator,
             value[invalidSeparatorPosition],
             invalidSeparatorPosition);
       }
@@ -282,7 +282,7 @@ public record UsIndividualTaxpayerIdentificationNumber
       if (!ValidateAllDigits(value, out var invalidCharacterPosition))
       {
          return new InvalidCharacter(
-            Messages.UsItinInvalidCharacterEncountered,
+            Messages.UsItinInvalidCharacter,
             value[invalidCharacterPosition],
             invalidCharacterPosition);
       }

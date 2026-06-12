@@ -172,7 +172,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       String value,
       Int32 position)
       => new(
-         Messages.UsItinInvalidSeparatorEncountered,
+         Messages.UsItinInvalidSeparator,
          value[position],
          position);
 
@@ -180,7 +180,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       String value,
       Int32 position)
       => new(
-         Messages.UsItinInvalidCharacterEncountered,
+         Messages.UsItinInvalidCharacter,
          value[position],
          position);
 

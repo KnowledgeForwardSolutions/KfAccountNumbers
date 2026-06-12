@@ -1008,9 +1008,9 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to US Individual Taxpayer Identification Number must only contain digit characters (0-9) in non-separator character locations.
         /// </summary>
-        internal static string UsItinInvalidCharacterEncountered {
+        internal static string UsItinInvalidCharacter {
             get {
-                return ResourceManager.GetString("UsItinInvalidCharacterEncountered", resourceCulture);
+                return ResourceManager.GetString("UsItinInvalidCharacter", resourceCulture);
             }
         }
         
@@ -1035,9 +1035,9 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to US Individual Taxpayer Identification Number with length 11 contains an unexpected character at a separator position.
         /// </summary>
-        internal static string UsItinInvalidSeparatorEncountered {
+        internal static string UsItinInvalidSeparator {
             get {
-                return ResourceManager.GetString("UsItinInvalidSeparatorEncountered", resourceCulture);
+                return ResourceManager.GetString("UsItinInvalidSeparator", resourceCulture);
             }
         }
         
@@ -1107,9 +1107,9 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to US Social Security Number must only contain digit characters (0-9) in non-separator character locations.
         /// </summary>
-        internal static string UsSsnInvalidCharacterEncountered {
+        internal static string UsSsnInvalidCharacter {
             get {
-                return ResourceManager.GetString("UsSsnInvalidCharacterEncountered", resourceCulture);
+                return ResourceManager.GetString("UsSsnInvalidCharacter", resourceCulture);
             }
         }
         
@@ -1143,9 +1143,9 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to US Social Security Number with length 11 contains an unexpected character at a separator position.
         /// </summary>
-        internal static string UsSsnInvalidSeparatorEncountered {
+        internal static string UsSsnInvalidSeparator {
             get {
-                return ResourceManager.GetString("UsSsnInvalidSeparatorEncountered", resourceCulture);
+                return ResourceManager.GetString("UsSsnInvalidSeparator", resourceCulture);
             }
         }
         

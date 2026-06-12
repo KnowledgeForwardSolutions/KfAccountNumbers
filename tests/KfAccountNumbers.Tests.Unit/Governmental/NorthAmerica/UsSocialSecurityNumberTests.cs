@@ -203,7 +203,7 @@ public class UsSocialSecurityNumberTests
       String value,
       Int32 position)
       => new(
-         Messages.UsSsnInvalidSeparatorEncountered,
+         Messages.UsSsnInvalidSeparator,
          value[position],
          position);
 
@@ -211,7 +211,7 @@ public class UsSocialSecurityNumberTests
       String value,
       Int32 position)
       => new(
-         Messages.UsSsnInvalidCharacterEncountered,
+         Messages.UsSsnInvalidCharacter,
          value[position],
          position);
 
