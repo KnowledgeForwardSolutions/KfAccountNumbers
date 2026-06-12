@@ -89,7 +89,7 @@ public class UsSocialSecurityNumberTests
       { "01234567\u2153", 8 },      // Non-digit character Unicode fraction 1/3
       { "01234567\u00D6", 8 },      // Invalid character unicode O with umlaut
 
-      // Formatted value
+      // Formatted values
       { ".12 34 5678", 0 },           // Non-digit character '.'
       { "0 2 34 5678", 1 },           // Non-digit character ' '
       { "01A 34 5678", 2 },           // Non-digit character 'A'
@@ -177,7 +177,7 @@ public class UsSocialSecurityNumberTests
    /// returned unchanged. If an 11-character formatted SSN then assumes
    /// separators at positions 3 and 6.
    /// </summary>
-   private static String GetRawSsn(String value)
+   private static String GetRawValue(String value)
       => value.Length switch
       {
          9 => value,
@@ -231,10 +231,10 @@ public class UsSocialSecurityNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidAreaNumberBoundaryValues))]
-   public void UsSocialSecurityNumber_Constructor_ShouldCreateInstance_WhenValueContainsValidSsn(String value)
+   public void UsSocialSecurityNumber_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expected = GetRawSsn(value);
+      var expected = GetRawValue(value);
 
       // Act.
       var sut = new UsSocialSecurityNumber(value);
@@ -389,7 +389,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Value_ShouldReturnRawSsn(String value)
    {
       // Arrange.
-      var expected = GetRawSsn(value);
+      var expected = GetRawValue(value);
       var sut = new UsSocialSecurityNumber(value);
 
       // Act/assert.
@@ -408,7 +408,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull(String value)
    {
       // Arrange.
-      var expected = GetRawSsn(value);
+      var expected = GetRawValue(value);
       var sut = new UsSocialSecurityNumber(value);
 
       // Act.
@@ -424,7 +424,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull(String value)
    {
       // Arrange.
-      var expected = GetRawSsn(value);
+      var expected = GetRawValue(value);
       var sut = new UsSocialSecurityNumber(value);
 
       // Act.
@@ -466,10 +466,10 @@ public class UsSocialSecurityNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidAreaNumberBoundaryValues))]
-   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldCreateInstance_WhenValueContainsValidSsn(String value)
+   public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expected = GetRawSsn(value);
+      var expected = GetRawValue(value);
 
       // Act.
       var sut = (UsSocialSecurityNumber)value;
@@ -743,7 +743,7 @@ public class UsSocialSecurityNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidAreaNumberBoundaryValues))]
-   public void UsSocialSecurityNumber_Create_ShouldCreateInstance_WhenValueContainsValidSsn(String value)
+   public void UsSocialSecurityNumber_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
       LocalCreateResult expected = new UsSocialSecurityNumber(value);
@@ -1170,7 +1170,7 @@ public class UsSocialSecurityNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidAreaNumberBoundaryValues))]
-   public void UsSocialSecurityNumber_Validate_ShouldReturnValidValue_WhenValueContainsValidSsn(String value)
+   public void UsSocialSecurityNumber_Validate_ShouldReturnValidValue_WhenValueIsValid(String value)
    {
       // Arrange.
       UsSocialSecurityNumber.ValidationResult expected = default(ValidValue);
@@ -1207,7 +1207,7 @@ public class UsSocialSecurityNumberTests
       var result = UsSocialSecurityNumber.Validate(value);
 
       // Assert.
-      result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
          .ComparingByMembers<UsSocialSecurityNumber.ValidationResult>()
          .ComparingByMembers<ValidLengthDefinition>()
          .WithoutStrictOrdering());

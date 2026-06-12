@@ -387,7 +387,7 @@ public record UsSocialSecurityNumber
       =>
       [
          new ValidLengthDefinition(UnformattedLength, Messages.UsTinUnformattedLength),
-         new ValidLengthDefinition(FormattedLength, Messages.UsSsnFormattedLength),
+         new ValidLengthDefinition(FormattedLength, Messages.UsTinFormattedLength),
       ];
 
    private static ReadOnlySpan<Char> GetAreaNumber(ReadOnlySpan<Char> value)
@@ -432,7 +432,7 @@ public record UsSocialSecurityNumber
       var isFormatted = IsFormatted(value);
       for (var index = 0; index < value.Length; index++)
       {
-         if (isFormatted && (index is GroupSeparatorOffset or SerialSeparatorOffset))
+         if (isFormatted && index is GroupSeparatorOffset or SerialSeparatorOffset)
          {
             continue;  // Skip separator character positions in formatted SSN
          }

@@ -495,7 +495,7 @@
   <data name="UsTinUnformattedLength" xml:space="preserve">
     <value>A US TIN (SSN or ITIN) without separator characters</value>
   </data>
-  <data name="UsSsnFormattedLength" xml:space="preserve">
+  <data name="UsTinFormattedLength" xml:space="preserve">
     <value>A US TIN (SSN or ITIN) with separator characters at offsets 3 and 6 (zero-based)</value>
   </data>
 </root>

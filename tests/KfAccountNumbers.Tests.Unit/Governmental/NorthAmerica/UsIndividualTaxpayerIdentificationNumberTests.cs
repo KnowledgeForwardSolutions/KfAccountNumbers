@@ -3,6 +3,10 @@
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
 
+using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+   KfAccountNumbers.Governmental.NorthAmerica.UsIndividualTaxpayerIdentificationNumber,
+   KfAccountNumbers.Governmental.NorthAmerica.UsIndividualTaxpayerIdentificationNumber.ValidationError>;
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.NorthAmerica;
 
 public class UsIndividualTaxpayerIdentificationNumberTests
@@ -65,53 +69,64 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    ];
 
    // Values that will report an invalid separator character
-   public static TheoryData<String> InvalidSeparatorValues =>
-   [
-      "901 50-1234",
-      "901-50 1234",
-      "901050 1234",
-      "90105001234",
-      "90115011234",
-      "90125021234",
-      "90135031234",
-      "90145041234",
-      "90155051234",
-      "90165061234",
-      "90175071234",
-      "90185081234",
-      "90195091234",
-   ];
+   public static TheoryData<String, Int32> InvalidSeparatorValues = new()
+   {
+      // First separator position
+      { "901050 1234", 3 },
+      { "901150 1234", 3 },
+      { "901250 1234", 3 },
+      { "901350 1234", 3 },
+      { "901450 1234", 3 },
+      { "901550 1234", 3 },
+      { "901650 1234", 3 },
+      { "901750 1234", 3 },
+      { "901850 1234", 3 },
+      { "901950 1234", 3 },
+
+      // Second separator position
+      { "901 5001234", 6 },
+      { "901 5011234", 6 },
+      { "901 5021234", 6 },
+      { "901 5031234", 6 },
+      { "901 5041234", 6 },
+      { "901 5051234", 6 },
+      { "901 5061234", 6 },
+      { "901 5071234", 6 },
+      { "901 5081234", 6 },
+      { "901 5091234", 6 },
+
+      // Mixed separators
+      { "901 50-1234", 6 },
+      { "901-50 1234", 6 },
+   };
 
    // Values that will report an invalid character encountered
-   public static TheoryData<String> InvalidCharacterValues =>
-   [
-      //"A01501234",    - will fail invalid area number validation before invalid character validation
-      "9A1501234",
-      "90A501234",
-      "901A01234",
-      "9015A1234",
-      "90150A234",
-      "901501A34",
-      "9015012A4",
-      "90150123A",
-      "9;1501234",
-      "9\u21531501234",       // Unicode fraction 1/3
-      "9\u21671501234",       // Unicode Roman numeral VII
-      "9\u0BEF1501234",       // Unicode Tamil number 9
-      //"A01-50-1234",  - will fail invalid area number validation before invalid character validation
-      "9A1-50-1234",
-      "90A-50-1234",
-      "901-A0-1234",
-      "901-5A-1234",
-      "901-50-A234",
-      "901-50-1A34",
-      "901-50-12A4",
-      "901-50-123A",
-      "9;1-50-1234",
-      "9\u21531 50 1234",       // Unicode fraction 1/3
-      "9\u21671 50 1234",       // Unicode Roman numeral VII
-      "9\u0BEF1 50 1234",       // Unicode Tamil number 9
-   ];
+   public static TheoryData<String, Int32> InvalidCharacterValues = new()
+   {
+      // Unformatted values
+      // { ".01501234", 0 },           // Non-digit character '.' - will fail invalid area number validation before invalid character validation
+      { "9 1501234", 1 },           // Non-digit character ' '
+      { "90A501234", 2 },           // Non-digit character 'A'
+      { "901Z01234", 3 },           // Non-digit character 'Z'
+      { "9015^1234", 4 },           // Non-digit character '^'
+      { "90150a234", 5 },           // Non-digit character 'a'
+      { "901501z34", 6 },           // Non-digit character 'z'
+      { "9015012~4", 7 },           // Non-digit character '~'
+      { "90150123\u2153", 8 },      // Non-digit character Unicode fraction 1/3
+      { "90150123\u00D6", 8 },      // Invalid character unicode O with umlaut
+
+      // Formatted values
+      // { ".01 50 1234", 0 },           // Non-digit character '.' - will fail invalid area number validation before invalid character validation
+      { "9 1 50 1234", 1 },           // Non-digit character ' '
+      { "90A 50 1234", 2 },           // Non-digit character 'A'
+      { "901 Z0 1234", 4 },           // Non-digit character 'Z'
+      { "901 5^ 1234", 5 },           // Non-digit character '^'
+      { "901-50-a234", 7 },           // Non-digit character 'a'
+      { "901-50-1z34", 8 },           // Non-digit character 'z'
+      { "901-50-12~4", 9 },           // Non-digit character '~'
+      { "901-50-123\u2153", 10 },     // Non-digit character Unicode fraction 1/3
+      { "901-50-123\u00D6", 10 },     // Invalid character unicode O with umlaut
+   };
 
    // Values that will report an invalid group number (group number must be in the range 50-65, 70-88, 90-92 or 94-99)
    public static TheoryData<String> InvalidGroupNumberBoundaryValues =>
@@ -124,18 +139,56 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       "900930123",
    ];
 
+   private static String GetAreaNumber(String value) => value[..3];
+
+   private static String GetGroupNumber(String value)
+      => value.Length switch
+      {
+         9 => value[3..5],
+         11 => value[4..6],
+         _ => throw new ArgumentException("Input must be 9 or 11 characters", nameof(value)),
+      };
+
    /// <summary>
    /// Extracts unformatted ITIN value. If ITIN is 9 characters then value is
    /// returned unchanged. If an 11-character formatted ITIN then assumes
    /// separators at positions 3 and 6.
    /// </summary>
-   private static String GetRawItin(String itin)
-      => itin.Length switch
+   private static String GetRawValue(String value)
+      => value.Length switch
       {
-         9 => itin,
-         11 => itin[0..3] + itin[4..6] + itin[7..11],
-         _ => throw new ArgumentException("Input must be 9 or 11 characters", nameof(itin))
+         9 => value,
+         11 => value[0..3] + value[4..6] + value[7..11],
+         _ => throw new ArgumentException("Input must be 9 or 11 characters", nameof(value)),
       };
+
+   private static InvalidLength GetInvalidLengthResult(String value)
+      => new(
+         Messages.UsItinInvalidLength,
+         value.Length,
+         UsIndividualTaxpayerIdentificationNumber.GetInvalidLengthDefinitions());
+
+   private static InvalidSeparator GetInvalidSeparatorResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.UsItinInvalidSeparatorEncountered,
+         value[position],
+         position);
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.UsItinInvalidCharacterEncountered,
+         value[position],
+         position);
+
+   private static UsTinInvalidAreaNumber GetInvalidAreaNumberResult(String value)
+      => new(Messages.UsItinInvalidAreaNumber, GetAreaNumber(value));
+
+   private static UsTinInvalidGroupNumber GetInvalidGroupNumberResult(String value)
+      => new(Messages.UsItinInvalidGroupNumber, GetGroupNumber(value));
 
    #region Constructor Tests
    // ==========================================================================
@@ -147,7 +200,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldCreateObject_WhenValueContainsValidItin(String value)
    {
       // Arrange.
-      var expected = GetRawItin(value);
+      var expected = GetRawValue(value);
 
       // Act.
       var sut = new UsIndividualTaxpayerIdentificationNumber(value);
@@ -160,62 +213,93 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueIsEmpty(String? value)
-      => FluentActions
-         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(value))
-         .Should()
-         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
-         .WithMessage(Messages.UsItinEmpty + "*")
-         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.Empty);
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new UsIndividualTaxpayerIdentificationNumber(value))
+         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
-         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(value))
-         .Should()
-         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
-         .WithMessage(Messages.UsItinInvalidLength + "*")
-         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidLength);
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new UsIndividualTaxpayerIdentificationNumber(value))
+         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<UsIndividualTaxpayerIdentificationNumber.ValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidAreaNumberValues))]
    public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidAreaNumber(String value)
-      => FluentActions
-         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(value))
-         .Should()
-         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
-         .WithMessage(Messages.UsItinInvalidAreaNumber + "*")
-         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidAreaNumber);
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidAreaNumberResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new UsIndividualTaxpayerIdentificationNumber(value))
+         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_When11CharacterValueContainsInvalidSeparator(String value)
-      => FluentActions
-         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(value))
-         .Should()
-         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
-         .WithMessage(Messages.UsItinInvalidSeparatorEncountered + "*")
-         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidSeparatorEncountered);
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new UsIndividualTaxpayerIdentificationNumber(value))
+         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String value)
-      => FluentActions
-         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(value))
-         .Should()
-         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
-         .WithMessage(Messages.UsItinInvalidCharacterEncountered + "*")
-         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered);
+   public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new UsIndividualTaxpayerIdentificationNumber(value))
+         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidGroupNumberBoundaryValues))]
    public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidGroupNumber(String value)
-      => FluentActions
-         .Invoking(() => _ = new UsIndividualTaxpayerIdentificationNumber(value))
-         .Should()
-         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
-         .WithMessage(Messages.UsItinInvalidGroupNumber + "*")
-         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber);
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidGroupNumberResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new UsIndividualTaxpayerIdentificationNumber(value))
+         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -229,7 +313,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull(String value)
    {
       // Arrange.
-      var expected = GetRawItin(value);
+      var expected = GetRawValue(value);
       var sut = new UsIndividualTaxpayerIdentificationNumber(value);
 
       // Act.
@@ -245,7 +329,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull(String value)
    {
       // Arrange.
-      var expected = GetRawItin(value);
+      var expected = GetRawValue(value);
       var sut = new UsIndividualTaxpayerIdentificationNumber(value);
 
       // Act.
@@ -287,10 +371,10 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldCreateObject_WhenValueContainsValidItin(String value)
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldCreateInstance_WhenValueContainsValidItin(String value)
    {
       // Arrange.
-      var expected = GetRawItin(value);
+      var expected = GetRawValue(value);
 
       // Act.
       var sut = (UsIndividualTaxpayerIdentificationNumber)value;
@@ -303,62 +387,93 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueIsEmpty(String? value)
-      => FluentActions
-         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)value)
-         .Should()
-         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
-         .WithMessage(Messages.UsItinEmpty + "*")
-         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.Empty);
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (UsIndividualTaxpayerIdentificationNumber)value)
+         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
-         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)value)
-         .Should()
-         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
-         .WithMessage(Messages.UsItinInvalidLength + "*")
-         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidLength);
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (UsIndividualTaxpayerIdentificationNumber)value)
+         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<UsIndividualTaxpayerIdentificationNumber.ValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidAreaNumberValues))]
    public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueHasInvalidAreaNumber(String value)
-      => FluentActions
-         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)value)
-         .Should()
-         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
-         .WithMessage(Messages.UsItinInvalidAreaNumber + "*")
-         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidAreaNumber);
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidAreaNumberResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (UsIndividualTaxpayerIdentificationNumber)value)
+         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_When11CharacterValueContainsInvalidSeparator(String value)
-      => FluentActions
-         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)value)
-         .Should()
-         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
-         .WithMessage(Messages.UsItinInvalidSeparatorEncountered + "*")
-         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidSeparatorEncountered);
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueContainsInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (UsIndividualTaxpayerIdentificationNumber)value)
+         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String value)
-      => FluentActions
-         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)value)
-         .Should()
-         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
-         .WithMessage(Messages.UsItinInvalidCharacterEncountered + "*")
-         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered);
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (UsIndividualTaxpayerIdentificationNumber)value)
+         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueHasInvalidGroupNumber(String str)
-      => FluentActions
-         .Invoking(() => _ = (UsIndividualTaxpayerIdentificationNumber)str)
-         .Should()
-         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
-         .WithMessage(Messages.UsItinInvalidGroupNumber + "*")
-         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber);
+   public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueHasInvalidGroupNumber(String value)
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidGroupNumberResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (UsIndividualTaxpayerIdentificationNumber)value)
+         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -428,7 +543,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Value_ShouldReturnRawItin(String value)
    {
       // Arrange.
-      var expected = GetRawItin(value);
+      var expected = GetRawValue(value);
       var sut = new UsIndividualTaxpayerIdentificationNumber(value);
 
       // Act/assert.
@@ -444,122 +559,108 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldCreateObject_WhenValueContainsValidItin(String value)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldCreateInstance_WhenValuIsValid(String value)
    {
       // Arrange.
-      var expected = GetRawItin(value);
-      var expectedValue = new UsIndividualTaxpayerIdentificationNumber(expected);
+      LocalCreateResult expected = new UsIndividualTaxpayerIdentificationNumber(value);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String? value)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnEmptyValue_WhenValueIsEmpty(String? value)
    {
       // Arrange.
-      var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.Empty;
+      LocalCreateResult expected = (UsIndividualTaxpayerIdentificationNumber.ValidationError)default(EmptyValue);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(expected);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidLength;
+      LocalCreateResult expected = (UsIndividualTaxpayerIdentificationNumber.ValidationError)GetInvalidLengthResult(value);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(expected);
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<UsIndividualTaxpayerIdentificationNumber.ValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
    [MemberData(nameof(InvalidAreaNumberValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidAreaNumberValidationResult_WhenValueHasInvalidAreaNumber(String value)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidAreaNumber_WhenValueHasInvalidAreaNumber(String value)
    {
       // Arrange.
-      var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidAreaNumber;
+      LocalCreateResult expected = (UsIndividualTaxpayerIdentificationNumber.ValidationError)GetInvalidAreaNumberResult(value);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(expected);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidSeparatorCharacterValidationResult_When11CharacterValueContainsInvalidSeparator(String value)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidSeparator_WhenValueContainsInvalidSeparator(
+      String value,
+      Int32 position)
    {
       // Arrange.
-      var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidSeparatorEncountered;
+      LocalCreateResult expected = (UsIndividualTaxpayerIdentificationNumber.ValidationError)GetInvalidSeparatorResult(value, position);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(expected);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueContainsNonAsciiDigit(String value)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidCharacter_WhenValueContainsNonAsciiDigit(
+      String value,
+      Int32 position)
    {
       // Arrange.
-      var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered;
+      LocalCreateResult expected = (UsIndividualTaxpayerIdentificationNumber.ValidationError)GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(expected);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidGroupNumberValidationResult_WhenValueHasInvalidGroupNumber(String value)
+   public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidGroupNumber_WhenValueHasInvalidGroupNumber(String value)
    {
       // Arrange.
-      var expected = UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber;
+      LocalCreateResult expected = (UsIndividualTaxpayerIdentificationNumber.ValidationError)GetInvalidGroupNumberResult(value);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(expected);
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -765,38 +866,108 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    [Theory]
    [MemberData(nameof(ValidValues))]
    [MemberData(nameof(ValidGroupNumberBoundaryValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnValidationPassed_WhenValueContainsValidItin(String value)
-      => UsIndividualTaxpayerIdentificationNumber.Validate(value).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.ValidationPassed);
+   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = UsIndividualTaxpayerIdentificationNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnEmpty_WhenValueIsEmpty(String? value)
-      => UsIndividualTaxpayerIdentificationNumber.Validate(value).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.Empty);
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationResult expected = default(EmptyValue);
+
+      // Act.
+      var result = UsIndividualTaxpayerIdentificationNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
-      => UsIndividualTaxpayerIdentificationNumber.Validate(value).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidLength);
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationResult expected = GetInvalidLengthResult(value);
+
+      // Act.
+      var result = UsIndividualTaxpayerIdentificationNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<UsIndividualTaxpayerIdentificationNumber.ValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidAreaNumberValues))]
    public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidAreaNumber_WhenValueHasInvalidAreaNumber(String value)
-      => UsIndividualTaxpayerIdentificationNumber.Validate(value).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidAreaNumber);
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationResult expected = GetInvalidAreaNumberResult(value);
+
+      // Act.
+      var result = UsIndividualTaxpayerIdentificationNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidSeparatorEncountered_When11CharacterValueContainsAnInvalidSeparator(String value)
-      => UsIndividualTaxpayerIdentificationNumber.Validate(value).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidSeparatorEncountered);
+   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidSeparator_WhenValueContainsAnInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationResult expected = GetInvalidSeparatorResult(value, position);
+
+      // Act.
+      var result = UsIndividualTaxpayerIdentificationNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidCharacterEncountered_WhenValueContainsNonAsciiDigit(String value)
-      => UsIndividualTaxpayerIdentificationNumber.Validate(value).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered);
+   public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidCharacter_WhenValueContainsNonAsciiDigit(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationResult expected = GetInvalidCharacterResult(value, position);
+
+      // Act.
+      var result = UsIndividualTaxpayerIdentificationNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidGroupNumberBoundaryValues))]
    public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidGroupNumber_WhenValueHasInvalidGroupNumber(String value)
-      => UsIndividualTaxpayerIdentificationNumber.Validate(value).Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber);
+   {
+      // Arrange.
+      UsIndividualTaxpayerIdentificationNumber.ValidationResult expected = GetInvalidGroupNumberResult(value);
+
+      // Act.
+      var result = UsIndividualTaxpayerIdentificationNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -884,15 +1055,14 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenItinIsInvalid()
    {
       // Arrange.
-      var json = "{\"Itin\":\"123456789\"}";  // Invalid area number
+      var json = "{\"Itin\":\"001501234\"}";  // Invalid area number
+      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidAreaNumberResult("001501234");
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should()
-         .ThrowExactly<KfValidationException<UsIndividualTaxpayerIdentificationNumberValidationResult>>()
-         .WithMessage(Messages.UsItinInvalidAreaNumber + "*")
-         .And.ValidationResult.Should().Be(UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidAreaNumber);
+         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion

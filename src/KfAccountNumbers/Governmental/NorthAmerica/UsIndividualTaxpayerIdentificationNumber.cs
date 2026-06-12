@@ -57,6 +57,35 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 [JsonConverter(typeof(UsIndividualTaxpayerIdentificationNumberJsonConverter))]
 public record UsIndividualTaxpayerIdentificationNumber
 {
+   /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="UsSocialSecurityNumber"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidSeparator,
+      InvalidCharacter,
+      UsTinInvalidAreaNumber,
+      UsTinInvalidGroupNumber)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="UsSocialSecurityNumber"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidSeparator,
+      InvalidCharacter,
+      UsTinInvalidAreaNumber,
+      UsTinInvalidGroupNumber)
+   {
+   }
+
    private const Int32 FormattedLength = 11;
    private const Int32 UnformattedLength = 9;
 
@@ -108,10 +137,19 @@ public record UsIndividualTaxpayerIdentificationNumber
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         UsIndividualTaxpayerIdentificationNumberValidationResult validationResult = Validate(value);
-         if (validationResult != UsIndividualTaxpayerIdentificationNumberValidationResult.ValidationPassed)
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            throw validationResult.ToValidationException();
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               UsTinInvalidAreaNumber invalidAreaNumber => new UKfValidationException<ValidationError>(invalidAreaNumber),
+               UsTinInvalidGroupNumber invalidGroupNumber => new UKfValidationException<ValidationError>(invalidGroupNumber),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
          }
       }
 
@@ -148,23 +186,27 @@ public record UsIndividualTaxpayerIdentificationNumber
    ///   Create a new <see cref="UsIndividualTaxpayerIdentificationNumber"/>
    ///   using the Result pattern.
    /// </summary>
-   /// <param name="itin">
+   /// <param name="value">
    ///   String representation of an Individual Taxpayer Identification Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{UsIndividualTaxpayerIdentificationNumber, UsIndividualTaxpayerIdentificationNumberValidationResult}"/>.
-   ///   Will contain the new <see cref="UsIndividualTaxpayerIdentificationNumber"/> if
-   ///   <paramref name="itin"/> is valid or
-   ///   <see cref="UsIndividualTaxpayerIdentificationNumberValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="itin"/> is
-   ///   invalid.
+   ///   A <see cref="UCreateResult{UsIndividualTaxpayerIdentificationNumber, ValidationError}"/>.
+   ///   Will contain the new <see cref="UsIndividualTaxpayerIdentificationNumber"/>
+   ///   if <paramref name="value"/> is valid or a <see cref="ValidationError"/>
+   ///   that identifies the validation rule that was failed if
+   ///   <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<UsIndividualTaxpayerIdentificationNumber, UsIndividualTaxpayerIdentificationNumberValidationResult> Create(String? itin)
-      => Validate(itin) switch
+   public static UCreateResult<UsIndividualTaxpayerIdentificationNumber, ValidationError> Create(String? value)
+      => Validate(value) switch
       {
-         UsIndividualTaxpayerIdentificationNumberValidationResult.ValidationPassed
-            => new UsIndividualTaxpayerIdentificationNumber(itin, validationMode: ValidationMode.BypassValidation),
-         var validationFailure => validationFailure,
+         ValidValue => new UsIndividualTaxpayerIdentificationNumber(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         UsTinInvalidAreaNumber invalidAreaNumber => (ValidationError)invalidAreaNumber,
+         UsTinInvalidGroupNumber invalidGroupNumber => (ValidationError)invalidGroupNumber,
+         _ => throw new UnreachableException("This branch should never be reached"),
       };
 
    /// <summary>
@@ -199,48 +241,74 @@ public record UsIndividualTaxpayerIdentificationNumber
    ///   US Individual Taxpayer Identification Number (ITIN).
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Social Security Number.
+   ///   String representation of an Individual Taxpayer Identification Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="UsIndividualTaxpayerIdentificationNumberValidationResult"/> enumeration
-   ///   value that indicates if the <paramref name="value"/> passed validation
-   ///   or what validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
-   public static UsIndividualTaxpayerIdentificationNumberValidationResult Validate(String? value)
+   public static ValidationResult Validate(String? value)
    {
       // Preliminary checks for obviously incorrect values.
       if (String.IsNullOrWhiteSpace(value))
       {
-         return UsIndividualTaxpayerIdentificationNumberValidationResult.Empty;
+         return default(EmptyValue);
       }
 
       if (!ValidateLength(value))
       {
-         return UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidLength;
+         return new InvalidLength(
+            Messages.UsItinInvalidLength,
+            value.Length,
+            GetInvalidLengthDefinitions());
       }
 
       if (value[0] != Chars.DigitNine)
       {
-         return UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidAreaNumber;
+         return new UsTinInvalidAreaNumber(
+            Messages.UsItinInvalidAreaNumber,
+            GetAreaNumber(value).ToString());
       }
 
-      if (IsFormatted(value) && !ValidateEmbeddedSeparatorCharacters(value))
+      if (!ValidateSeparators(value, out var invalidSeparatorPosition))
       {
-         return UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidSeparatorEncountered;
+         return new InvalidSeparator(
+            Messages.UsItinInvalidSeparatorEncountered,
+            value[invalidSeparatorPosition],
+            invalidSeparatorPosition);
       }
 
-      if (!ValidateAllDigits(value))
+      if (!ValidateAllDigits(value, out var invalidCharacterPosition))
       {
-         return UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidCharacterEncountered;
+         return new InvalidCharacter(
+            Messages.UsItinInvalidCharacterEncountered,
+            value[invalidCharacterPosition],
+            invalidCharacterPosition);
       }
 
       if (!ValidateGroupNumber(value))
       {
-         return UsIndividualTaxpayerIdentificationNumberValidationResult.InvalidGroupNumber;
+         return new UsTinInvalidGroupNumber(
+            Messages.UsItinInvalidGroupNumber,
+            GetGroupNumber(value).ToString());
       }
 
-      return UsIndividualTaxpayerIdentificationNumberValidationResult.ValidationPassed;
+      return default(ValidValue);
    }
+
+   /// <summary>
+   ///   Gets an array of details about valid lengths accepted for a US SSN.
+   /// </summary>
+   /// <returns>
+   ///   An array of <see cref="ValidLengthDefinition"/>s.
+   /// </returns>
+   internal static ValidLengthDefinition[] GetInvalidLengthDefinitions()
+      =>
+      [
+         new ValidLengthDefinition(UnformattedLength, Messages.UsTinUnformattedLength),
+         new ValidLengthDefinition(FormattedLength, Messages.UsTinFormattedLength),
+      ];
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static ReadOnlySpan<Char> GetAreaNumber(ReadOnlySpan<Char> value)
@@ -284,33 +352,27 @@ public record UsIndividualTaxpayerIdentificationNumber
    private static Int32 ParseGroupNumber(ReadOnlySpan<Char> groupSpan)
       => ((groupSpan[0] - Chars.DigitZero) * 10) + (groupSpan[1] - Chars.DigitZero);
 
-   private static Boolean ValidateAllDigits(ReadOnlySpan<Char> value)
+   private static Boolean ValidateAllDigits(
+      ReadOnlySpan<Char> value,
+      out Int32 invalidCharacterPosition)
    {
-      var length = value.Length;
+      invalidCharacterPosition = -1;
+      var isFormatted = IsFormatted(value);
       for (var index = 1; index < value.Length; index++)     // Can skip the first character since it is already validated to be '9'
       {
-         if (length == FormattedLength && (index is GroupSeparatorOffset or SerialSeparatorOffset))
+         if (isFormatted && index is GroupSeparatorOffset or SerialSeparatorOffset)
          {
             continue;  // Skip separator character positions in formatted ITIN
          }
 
          if (!value[index].IsAsciiDigit())
          {
+            invalidCharacterPosition = index;
             return false;
          }
       }
 
       return true;
-   }
-
-   // A formatted ITIN must contain the same separator character at the expected
-   // offsets. And the separator character must be a non-digit character.
-   private static Boolean ValidateEmbeddedSeparatorCharacters(ReadOnlySpan<Char> value)
-   {
-      var groupSeparator = value[GroupSeparatorOffset];
-      var serialSeparator = value[SerialSeparatorOffset];
-
-      return groupSeparator == serialSeparator && !groupSeparator.IsAsciiDigit();
    }
 
    private static Boolean ValidateGroupNumber(ReadOnlySpan<Char> value)
@@ -326,6 +388,33 @@ public record UsIndividualTaxpayerIdentificationNumber
 
    private static Boolean ValidateLength(ReadOnlySpan<Char> value)
       => value.Length is UnformattedLength or FormattedLength;
+
+   // A formatted ITIN must contain the same separator character at the expected
+   // offsets. And the separator character must be a non-digit character.
+   private static Boolean ValidateSeparators(
+      ReadOnlySpan<Char> value,
+      out Int32 invalidSeparatorPosition)
+   {
+      invalidSeparatorPosition = -1;
+      if (value.Length == UnformattedLength)
+      {
+         return true;
+      }
+
+      var groupSeparator = value[GroupSeparatorOffset];
+      if (groupSeparator.IsAsciiDigit())
+      {
+         invalidSeparatorPosition = GroupSeparatorOffset;
+         return false;
+      }
+      else if (value[SerialSeparatorOffset] != groupSeparator)
+      {
+         invalidSeparatorPosition = SerialSeparatorOffset;
+         return false;
+      }
+
+      return true;
+   }
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

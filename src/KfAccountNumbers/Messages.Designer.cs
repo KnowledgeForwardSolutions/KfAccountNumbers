@@ -1096,15 +1096,6 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A US TIN (SSN or ITIN) with separator characters at offsets 3 and 6 (zero-based).
-        /// </summary>
-        internal static string UsSsnFormattedLength {
-            get {
-                return ResourceManager.GetString("UsSsnFormattedLength", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to US Social Security Number area number segment (AAA-xx-xxxx) must not be 000, 666 or 900-999.
         /// </summary>
         internal static string UsSsnInvalidAreaNumber {
@@ -1164,6 +1155,15 @@ namespace KfAccountNumbers {
         internal static string UsSsnInvalidSerialNumber {
             get {
                 return ResourceManager.GetString("UsSsnInvalidSerialNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A US TIN (SSN or ITIN) with separator characters at offsets 3 and 6 (zero-based).
+        /// </summary>
+        internal static string UsTinFormattedLength {
+            get {
+                return ResourceManager.GetString("UsTinFormattedLength", resourceCulture);
             }
         }
         
