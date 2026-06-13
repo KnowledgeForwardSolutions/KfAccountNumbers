@@ -7,32 +7,32 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A valid Canadian Social Insurance Number (SIN) consists of nine decimal 
+///      A valid Canadian Social Insurance Number (SIN) consists of nine decimal
 ///      digits, generally grouped in threes, e.g. 123-456-789.
 ///   </para>
 ///   <para>
-///      The initial digit of the SIN generally indicates the province or 
+///      The initial digit of the SIN generally indicates the province or
 ///      territory where the SIN was registered. However, some highly populated
 ///      provinces have needed to use multiple initial digits (ex. Ontario).
 ///   </para>
 ///   <para>
 ///      Social Insurance Numbers are commonly formatted with dashes ('-') and
-///      sometimes spaces separating the three groups. A 
-///      <see cref="CaSocialInsuranceNumber"/> can be created from strings that 
-///      include or exclude the separator character, but if used, the same 
-///      character must be used to separate both the three groups of digits. The 
+///      sometimes spaces separating the three groups. A
+///      <see cref="CaSocialInsuranceNumber"/> can be created from strings that
+///      include or exclude the separator character, but if used, the same
+///      character must be used to separate both the three groups of digits. The
 ///      separator character may not be a decimal digit (0-9).
 ///   </para>
 ///   <para>
-///      Not all 9-digit numbers are valid Social Insurance Numbers. When 
-///      creating a new  <see cref="CaSocialInsuranceNumber"/>, after determining
-///      that a value consists of 9 decimal digits, the following validation 
-///      rules are applied:
+///      Not all 9-digit numbers are valid Social Insurance Numbers. When
+///      creating a new  <see cref="CaSocialInsuranceNumber"/>, after
+///      determining that a value consists of 9 decimal digits, the following
+///      validation rules are applied:
 ///      <list type="bullet">
 ///         <item>
 ///            <description>
 ///               The initial digit may not be 0 or 8. (8 is used for business
-///               numbers assigned to business owners and corporations. 0 is 
+///               numbers assigned to business owners and corporations. 0 is
 ///               used for tax numbers assigned by the Canada Revenue Agency).
 ///            </description>
 ///         </item>
@@ -59,20 +59,21 @@ public record CaSocialInsuranceNumber
    private const Int32 SecondSeparatorOffset = 7;
 
    /// <summary>
-   ///   Initialize a new <see cref="CaSocialInsuranceNumber"/>.
+   ///   Initializes a new instance of the <see cref="CaSocialInsuranceNumber"/>
+   ///   class.
    /// </summary>
    /// <param name="sin">
    ///   The string representation of a Social Insurance Number.
    /// </param>
    /// <exception cref="KfValidationException{CaSocialInsuranceNumberValidationResult}">
-   ///   <paramref name="sin"/> is <see langword="null"/>, empty or all 
+   ///   <paramref name="sin"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
    ///   <paramref name="sin"/> does not have length of 9 or 11.
    ///   - or -
    ///   <paramref name="sin"/> contains a non-ASCII digit (not 0-9).
    ///   - or -
-   ///   <paramref name="sin"/> is 11 characters in length and contains an 
+   ///   <paramref name="sin"/> is 11 characters in length and contains an
    ///   invalid separator character.
    ///   - or -
    ///   <paramref name="sin"/> fails the Luhn check digit validation.
@@ -84,10 +85,14 @@ public record CaSocialInsuranceNumber
       : this(sin, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports bypassing
-   ///   validation when creating a new instance from a value that has already
-   ///   been validated.
+   ///   Initializes a new instance of the <see cref="CaSocialInsuranceNumber"/>
+   ///   class.
    /// </summary>
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
    private CaSocialInsuranceNumber(String? sin, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
@@ -98,19 +103,36 @@ public record CaSocialInsuranceNumber
             throw validationResult.ToValidationException();
          }
       }
+
       Value = GetValidatedSin(sin!);
    }
 
    /// <summary>
-   ///   The raw SIN value.
+   ///   Gets raw SIN value.
    /// </summary>
    public String Value { get; private init; }
 
-   public static implicit operator String(CaSocialInsuranceNumber sin)
-      => sin?.Value ?? String.Empty;     // Handle null SIN object gracefully by returning empty string
+   /// <summary>
+   ///   Implicitly converts a <see cref="CaSocialInsuranceNumber"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="CaSocialInsuranceNumber"/> to convert.
+   /// </param>
+   public static implicit operator String(CaSocialInsuranceNumber source)
+      => source?.Value ?? String.Empty;     // Handle null SIN object gracefully by returning empty string
 
-   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
-   public static explicit operator CaSocialInsuranceNumber(String? sin) => new(sin);
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a
+   ///   <see cref="CaSocialInsuranceNumber"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   The string representation of a Social Insurance Number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid SSN.
+   /// </exception>
+   public static explicit operator CaSocialInsuranceNumber(String? value) => new(value);
 
    /// <summary>
    ///   Create a new <see cref="CaSocialInsuranceNumber"/> using the Result pattern.
@@ -120,10 +142,10 @@ public record CaSocialInsuranceNumber
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{CaSocialInsuranceNumber, CaSocialInsuranceNumberValidationResult}"/>.
-   ///   Will contain the new <see cref="CaSocialInsuranceNumber"/> if 
-   ///   <paramref name="sin"/> is valid or 
+   ///   Will contain the new <see cref="CaSocialInsuranceNumber"/> if
+   ///   <paramref name="sin"/> is valid or
    ///   <see cref="CaSocialInsuranceNumberValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="sin"/> is 
+   ///   the validation rule that was failed if <paramref name="sin"/> is
    ///   invalid.
    /// </returns>
    public static CreateResult<CaSocialInsuranceNumber, CaSocialInsuranceNumberValidationResult> Create(String? sin)
@@ -159,6 +181,9 @@ public record CaSocialInsuranceNumber
    /// <summary>
    ///   Get a string representation of the SIN.
    /// </summary>
+   /// <returns>
+   ///   The raw SIN, without separator characters.
+   /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
@@ -169,7 +194,7 @@ public record CaSocialInsuranceNumber
    ///   String representation of a Social Insurance Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="CaSocialInsuranceNumberValidationResult"/> enumeration 
+   ///   A <see cref="CaSocialInsuranceNumberValidationResult"/> enumeration
    ///   value that indicates if the <paramref name="sin"/> passed validation
    ///   or what validation error was encountered.
    /// </returns>
@@ -227,7 +252,7 @@ public record CaSocialInsuranceNumber
    /// <summary>
    ///   Get an unformatted SIN value from a string that has passed validation.
    ///   If the source string is formatted, then create a new string by merging
-   ///   all three SIN sections together without allocating intermediate 
+   ///   all three SIN sections together without allocating intermediate
    ///   Strings.
    /// </summary>
    private static String GetValidatedSin(String sin)
@@ -265,6 +290,7 @@ public record CaSocialInsuranceNumber
          {
             continue;
          }
+
          if (!sin[index].IsAsciiDigit())
          {
             return false;
@@ -288,6 +314,8 @@ public record CaSocialInsuranceNumber
       => sin[0] is not Chars.DigitZero and not Chars.DigitEight;
 }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class CaSocialInsuranceNumberJsonConverter : JsonConverter<CaSocialInsuranceNumber>
 {
    public override CaSocialInsuranceNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

@@ -139,7 +139,7 @@ public class CaSocialInsuranceNumberTests
       {
          9 => sin,
          11 => sin[0..3] + sin[4..7] + sin[8..11],
-         _ => throw new ArgumentException("Input must be 9 or 11 characters", nameof(sin))
+         _ => throw new ArgumentException("Input must be 9 or 11 characters", nameof(sin)),
       };
 
    #region Constructor Tests
