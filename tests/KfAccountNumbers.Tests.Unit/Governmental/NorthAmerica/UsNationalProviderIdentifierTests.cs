@@ -1,4 +1,4 @@
-// Ignore Spelling: Deserialization Deserialize Json Kf npi
+// Ignore Spelling: Deserialization Deserialize Json Kf
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -39,20 +39,23 @@ public class UsNationalProviderIdentifierTests
       { "123456789\u00D6", 9 },      // Invalid character unicode O with umlaut
    };
 
+   // Luhn algorithim is unable to detect these errors so they should pass
+   // validation (and the constructor/Create method should create an instance of
+   // UsNationalProviderIdentifier).
    public static TheoryData<String> CheckDigitUndetectableErrorValues =>
    [
-      "1234569071",           // Valid NPI 1234560971 with two digit transposition 09 -> 90
-      "1230967899",           // Valid NPI 1239067899 with two digit transposition 90 -> 09
-      "1122334497",           // Valid NPI 1122334497 with two digit twin error 22 -> 55
-      "1122337797",           // Valid NPI 1122334497 with two digit twin error 44 -> 77
-      "1122664497",           // Valid NPI 1122334497 with two digit twin error 33 -> 66
+      "1234569071",           // 1234560971 with two digit transposition 09 -> 90
+      "1230967899",           // 1239067899 with two digit transposition 90 -> 09
+      "1122334497",           // 1122334497 with two digit twin error 22 -> 55
+      "1122337797",           // 1122334497 with two digit twin error 44 -> 77
+      "1122664497",           // 1122334497 with two digit twin error 33 -> 66
    ];
 
    public static TheoryData<String> CheckDigitDetectableErrorValues =>
    [
-      "1238560971",           // Valid NPI 1234560971 with single digit transcription error 4 -> 8
-      "1243560971",           // Valid NPI 1234560971 with two digit transposition error 34 -> 43
-      "4422334497",           // Valid NPI 1122334497 with two digit twin error 11 -> 44
+      "1238560971",           // 1234560971 with single digit transcription error 4 -> 8
+      "1243560971",           // 1234560971 with two digit transposition error 34 -> 43
+      "4422334497",           // 1122334497 with two digit twin error 11 -> 44
    ];
 
    private static InvalidLength GetInvalidLengthResult(String value)

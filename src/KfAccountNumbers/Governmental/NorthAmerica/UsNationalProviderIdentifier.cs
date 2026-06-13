@@ -1,7 +1,6 @@
-// Ignore Spelling: Json Kf npi
+// Ignore Spelling: Json Kf
 
 #pragma warning disable IDE0250 // Make struct 'readonly'
-#pragma warning disable IDE0046 // Convert to conditional expression
 
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
@@ -148,7 +147,7 @@ public record UsNationalProviderIdentifier
    ///   The string representation of a US National Provider Identifier.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
-   ///   <paramref name="value"/> is not a valid SSN.
+   ///   <paramref name="value"/> is not a valid NPI.
    /// </exception>
    public static explicit operator UsNationalProviderIdentifier(String? value) => new(value);
 
@@ -232,7 +231,7 @@ public record UsNationalProviderIdentifier
             invalidCharacterPosition);
    }
 
-   // Return the zero-based index of the first non-digit characteror -1 if no
+   // Return the zero-based index of the first non-digit character or -1 if no
    // non-digit characters found.
    private static Int32 LocateInvalidCharacter(ReadOnlySpan<Char> value)
    {

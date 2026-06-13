@@ -1,6 +1,10 @@
 using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
    KfAccountNumbers.Governmental.Europe.GbPatientNumber,
    KfAccountNumbers.Governmental.Europe.GbPatientNumber.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.Europe.GbPatientNumber.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.Europe.GbPatientNumber.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.Europe.GbPatientNumber.ValidationResult;
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -399,12 +403,12 @@ public class GbPatientNumberTests
    public void GbPatientNumber_Constructor_ShouldThrowValidationError_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      GbPatientNumber.ValidationError expected = default(EmptyValue);
+      LocalValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbPatientNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -413,14 +417,14 @@ public class GbPatientNumberTests
    public void GbPatientNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbPatientNumber.ValidationError expected = GetInvalidLengthResult(value);
+      LocalValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbPatientNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-            .ComparingByMembers<GbPatientNumber.ValidationError>()
+            .ComparingByMembers<LocalValidationError>()
             .ComparingByMembers<ValidLengthDefinition>()
             .WithoutStrictOrdering());
    }
@@ -432,12 +436,12 @@ public class GbPatientNumberTests
       Int32 position)
    {
       // Arrange.
-      GbPatientNumber.ValidationError expected = GetInvalidCharacterResult(value, position);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbPatientNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -446,12 +450,12 @@ public class GbPatientNumberTests
    public void GbPatientNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbPatientNumber.ValidationError expected = GetInvalidChecksumResult();
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbPatientNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -462,12 +466,12 @@ public class GbPatientNumberTests
       Int32 position)
    {
       // Arrange.
-      GbPatientNumber.ValidationError expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbPatientNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -477,12 +481,12 @@ public class GbPatientNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbPatientNumber.ValidationError expected = GetInvalidRangeResult();
+      LocalValidationError expected = GetInvalidRangeResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbPatientNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -492,14 +496,14 @@ public class GbPatientNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbPatientNumber.ValidationError expected = GetInvalidLengthResult(value);
+      LocalValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbPatientNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-            .ComparingByMembers<GbPatientNumber.ValidationError>()
+            .ComparingByMembers<LocalValidationError>()
             .ComparingByMembers<ValidLengthDefinition>()
             .WithoutStrictOrdering());
    }
@@ -512,12 +516,12 @@ public class GbPatientNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      GbPatientNumber.ValidationError expected = GetInvalidDateOfBirthResult(value);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbPatientNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -656,12 +660,12 @@ public class GbPatientNumberTests
    public void GbPatientNumber_ExplicitCastToBeGbPatientNumber_ShouldThrowValidationError_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      GbPatientNumber.ValidationError expected = default(EmptyValue);
+      LocalValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbPatientNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -670,14 +674,14 @@ public class GbPatientNumberTests
    public void GbPatientNumber_ExplicitCastToBeGbPatientNumber_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbPatientNumber.ValidationError expected = GetInvalidLengthResult(value);
+      LocalValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbPatientNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-            .ComparingByMembers<GbPatientNumber.ValidationError>()
+            .ComparingByMembers<LocalValidationError>()
             .ComparingByMembers<ValidLengthDefinition>()
             .WithoutStrictOrdering());
    }
@@ -689,12 +693,12 @@ public class GbPatientNumberTests
       Int32 position)
    {
       // Arrange.
-      GbPatientNumber.ValidationError expected = GetInvalidCharacterResult(value, position);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbPatientNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -703,12 +707,12 @@ public class GbPatientNumberTests
    public void GbPatientNumber_ExplicitCastToBeGbPatientNumber_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbPatientNumber.ValidationError expected = GetInvalidChecksumResult();
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbPatientNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -719,12 +723,12 @@ public class GbPatientNumberTests
       Int32 position)
    {
       // Arrange.
-      GbPatientNumber.ValidationError expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbPatientNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -734,12 +738,12 @@ public class GbPatientNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbPatientNumber.ValidationError expected = new GbPatientNumberInvalidRange(Messages.GbPatientNumberInvalidRange);
+      LocalValidationError expected = new GbPatientNumberInvalidRange(Messages.GbPatientNumberInvalidRange);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbPatientNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -749,14 +753,14 @@ public class GbPatientNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbPatientNumber.ValidationError expected = GetInvalidLengthResult(value);
+      LocalValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbPatientNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-            .ComparingByMembers<GbPatientNumber.ValidationError>()
+            .ComparingByMembers<LocalValidationError>()
             .ComparingByMembers<ValidLengthDefinition>()
             .WithoutStrictOrdering());
    }
@@ -769,12 +773,12 @@ public class GbPatientNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      GbPatientNumber.ValidationError expected = GetInvalidDateOfBirthResult(value);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbPatientNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -925,7 +929,7 @@ public class GbPatientNumberTests
    public void GbPatientNumber_Create_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbPatientNumber.ValidationError)default(EmptyValue);
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
 
       // Act.
       var result = GbPatientNumber.Create(value);
@@ -939,7 +943,7 @@ public class GbPatientNumberTests
    public void GbPatientNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbPatientNumber.ValidationError)GetInvalidLengthResult(value);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
 
       // Act.
       var result = GbPatientNumber.Create(value);
@@ -947,7 +951,7 @@ public class GbPatientNumberTests
       // Assert.
       result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
          .ComparingByMembers<LocalCreateResult>()
-         .ComparingByMembers<GbPatientNumber.ValidationError>()
+         .ComparingByMembers<LocalValidationError>()
          .ComparingByMembers<ValidLengthDefinition>()
          .WithoutStrictOrdering());
    }
@@ -959,7 +963,7 @@ public class GbPatientNumberTests
       Int32 position)
    {
       // Arrange.
-      LocalCreateResult expected = (GbPatientNumber.ValidationError)GetInvalidCharacterResult(value, position);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = GbPatientNumber.Create(value);
@@ -973,7 +977,7 @@ public class GbPatientNumberTests
    public void GbPatientNumber_Create_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbPatientNumber.ValidationError)GetInvalidChecksumResult();
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
 
       // Act.
       var result = GbPatientNumber.Create(value);
@@ -989,7 +993,7 @@ public class GbPatientNumberTests
       Int32 position)
    {
       // Arrange.
-      LocalCreateResult expected = (GbPatientNumber.ValidationError)GetInvalidSeparatorResult(value, position);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value, position);
 
       // Act.
       var result = GbPatientNumber.Create(value);
@@ -1004,7 +1008,7 @@ public class GbPatientNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      LocalCreateResult expected = (GbPatientNumber.ValidationError)new GbPatientNumberInvalidRange(
+      LocalCreateResult expected = (LocalValidationError)new GbPatientNumberInvalidRange(
          Messages.GbPatientNumberInvalidRange);
 
       // Act.
@@ -1020,7 +1024,7 @@ public class GbPatientNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      LocalCreateResult expected = (GbPatientNumber.ValidationError)GetInvalidLengthResult(value);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
 
       // Act.
       var result = GbPatientNumber.Create(value);
@@ -1028,7 +1032,7 @@ public class GbPatientNumberTests
       // Assert.
       result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
          .ComparingByMembers<LocalCreateResult>()
-         .ComparingByMembers<GbPatientNumber.ValidationError>()
+         .ComparingByMembers<LocalValidationError>()
          .ComparingByMembers<ValidLengthDefinition>()
          .WithoutStrictOrdering());
    }
@@ -1041,7 +1045,7 @@ public class GbPatientNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      LocalCreateResult expected = (GbPatientNumber.ValidationError)GetInvalidDateOfBirthResult(value);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
 
       // Act.
       var result = GbPatientNumber.Create(value);
@@ -1434,7 +1438,7 @@ public class GbPatientNumberTests
    public void GbPatientNumber_Validate_ShouldReturnValidValue_WhenValueIsValid(String value)
    {
       // Arrange.
-      GbPatientNumber.ValidationResult expected = default(ValidValue);
+      LocalValidationResult expected = default(ValidValue);
 
       // Act.
       var result = GbPatientNumber.Validate(value);
@@ -1448,7 +1452,7 @@ public class GbPatientNumberTests
    public void GbPatientNumber_Validate_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      GbPatientNumber.ValidationResult expected = default(EmptyValue);
+      LocalValidationResult expected = default(EmptyValue);
 
       // Act.
       var result = GbPatientNumber.Validate(value);
@@ -1462,14 +1466,14 @@ public class GbPatientNumberTests
    public void GbPatientNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbPatientNumber.ValidationResult expected = GetInvalidLengthResult(value);
+      LocalValidationResult expected = GetInvalidLengthResult(value);
 
       // Act.
       var result = GbPatientNumber.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-         .ComparingByMembers<GbPatientNumber.ValidationResult>()
+         .ComparingByMembers<LocalValidationResult>()
          .ComparingByMembers<ValidLengthDefinition>()
          .WithoutStrictOrdering());
    }
@@ -1481,7 +1485,7 @@ public class GbPatientNumberTests
       Int32 position)
    {
       // Arrange.
-      GbPatientNumber.ValidationResult expected = GetInvalidCharacterResult(value, position);
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = GbPatientNumber.Validate(value);
@@ -1495,7 +1499,7 @@ public class GbPatientNumberTests
    public void GbPatientNumber_Validate_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbPatientNumber.ValidationResult expected = GetInvalidChecksumResult();
+      LocalValidationResult expected = GetInvalidChecksumResult();
 
       // Act.
       var result = GbPatientNumber.Validate(value);
@@ -1511,7 +1515,7 @@ public class GbPatientNumberTests
       Int32 position)
    {
       // Arrange.
-      GbPatientNumber.ValidationResult expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationResult expected = GetInvalidSeparatorResult(value, position);
 
       // Act.
       var result = GbPatientNumber.Validate(value);
@@ -1526,7 +1530,7 @@ public class GbPatientNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbPatientNumber.ValidationResult expected = GetInvalidRangeResult();
+      LocalValidationResult expected = GetInvalidRangeResult();
 
       // Act.
       var result = GbPatientNumber.Validate(value);
@@ -1541,14 +1545,14 @@ public class GbPatientNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbPatientNumber.ValidationResult expected = GetInvalidLengthResult(value);
+      LocalValidationResult expected = GetInvalidLengthResult(value);
 
       // Act.
       var result = GbPatientNumber.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-         .ComparingByMembers<GbPatientNumber.ValidationResult>()
+         .ComparingByMembers<LocalValidationResult>()
          .ComparingByMembers<ValidLengthDefinition>()
          .WithoutStrictOrdering());
    }
@@ -1562,7 +1566,7 @@ public class GbPatientNumberTests
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
       var invalidDateOfBirth = value[..6];
-      GbPatientNumber.ValidationResult expected = new InvalidDateOfBirth(
+      LocalValidationResult expected = new InvalidDateOfBirth(
          Messages.GbChiNumberInvalidDateOfBirth,
          invalidDateOfBirth,
          DateFormatName.DDMMYY);
@@ -1662,12 +1666,12 @@ public class GbPatientNumberTests
    {
       // Arrange.
       var json = "{\"PatientNumber\":\"4000900004\"}";  // Invalid check digit
-      GbPatientNumber.ValidationError expected = GetInvalidChecksumResult();
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should().ThrowExactly<UKfValidationException<GbPatientNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 

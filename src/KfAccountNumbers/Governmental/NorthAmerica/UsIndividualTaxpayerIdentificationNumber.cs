@@ -1,4 +1,4 @@
-// Ignore Spelling: itin Json Kf
+// Ignore Spelling: Json Kf
 
 #pragma warning disable IDE0250 // Make struct 'readonly'
 #pragma warning disable IDE0046 // Convert to conditional expression
@@ -24,7 +24,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///   </para>
 ///   <para>
 ///      Individual Taxpayer Identification Numbers are commonly formatted with
-///      dashes ('-') and sometimes spaces separating the three groups. A 
+///      dashes ('-') and sometimes spaces separating the three groups. A
 ///      <see cref="UsIndividualTaxpayerIdentificationNumber"/> can be created
 ///      from strings that include or exclude the separator character, but if
 ///      used, the same character must be used to separate both the area/group
@@ -108,14 +108,14 @@ public record UsIndividualTaxpayerIdentificationNumber
    ///   String representation of an Individual Taxpayer Identification Number.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
-   ///   <paramref name="value"/> is <see langword="null"/>, empty or all 
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
    ///   <paramref name="value"/> does not have length of 9 or 11.
    ///   - or -
    ///   <paramref name="value"/> contains a non-ASCII digit (not 0-9).
    ///   - or -
-   ///   <paramref name="value"/> is 11 characters in length and contains and 
+   ///   <paramref name="value"/> is 11 characters in length and contains and
    ///   separator characters that are not identical or are ASCII digits (0-9).
    ///   - or -
    ///   <paramref name="value"/> contains an invalid area number (000-899).
@@ -236,6 +236,9 @@ public record UsIndividualTaxpayerIdentificationNumber
    /// <summary>
    ///   Get a string representation of the ITIN.
    /// </summary>
+   /// <returns>
+   ///   The raw ITIN, without separator characters.
+   /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
@@ -360,7 +363,7 @@ public record UsIndividualTaxpayerIdentificationNumber
    {
       invalidCharacterPosition = -1;
       var isFormatted = IsFormatted(value);
-      for (var index = 1; index < value.Length; index++)     // Can skip the first character since it is already validated to be '9'
+      for (var index = 1; index < value.Length; index++) // Can skip the first character since it is already validated to be '9'
       {
          if (isFormatted && index is GroupSeparatorOffset or SerialSeparatorOffset)
          {

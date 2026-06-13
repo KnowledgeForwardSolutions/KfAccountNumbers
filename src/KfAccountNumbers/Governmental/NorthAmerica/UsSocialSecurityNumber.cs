@@ -1,4 +1,4 @@
-// Ignore Spelling: ssn Json Kf
+// Ignore Spelling: Json Kf
 
 #pragma warning disable IDE0250 // Make struct 'readonly'
 #pragma warning disable IDE0046 // Convert to conditional expression
