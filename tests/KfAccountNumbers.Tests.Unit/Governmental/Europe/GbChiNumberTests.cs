@@ -1,6 +1,10 @@
 using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
    KfAccountNumbers.Governmental.Europe.GbChiNumber,
    KfAccountNumbers.Governmental.Europe.GbChiNumber.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.Europe.GbChiNumber.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.Europe.GbChiNumber.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.Europe.GbChiNumber.ValidationResult;
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -303,12 +307,12 @@ public class GbChiNumberTests
    public void GbChiNumber_Constructor_ShouldThrowValidationError_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = default(EmptyValue);
+      LocalValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbChiNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -317,14 +321,14 @@ public class GbChiNumberTests
    public void GbChiNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = GetInvalidLengthResult(value);
+      LocalValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbChiNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-            .ComparingByMembers<GbChiNumber.ValidationError>()
+            .ComparingByMembers<LocalValidationError>()
             .ComparingByMembers<ValidLengthDefinition>()
             .WithoutStrictOrdering());
    }
@@ -336,12 +340,12 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = GetInvalidCharacterResult(value, position);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbChiNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -350,12 +354,12 @@ public class GbChiNumberTests
    public void GbChiNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = GetInvalidChecksumResult();
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbChiNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -366,12 +370,12 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbChiNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -381,12 +385,12 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbChiNumber.ValidationError expected = GetInvalidRangeResult();
+      LocalValidationError expected = GetInvalidRangeResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbChiNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -398,12 +402,12 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      GbChiNumber.ValidationError expected = GetInvalidDateOfBirthResult(value);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbChiNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -549,12 +553,12 @@ public class GbChiNumberTests
    public void GbChiNumber_ExplicitCastToBeGbChiNumber_ShouldThrowValidationError_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = default(EmptyValue);
+      LocalValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbChiNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -563,14 +567,14 @@ public class GbChiNumberTests
    public void GbChiNumber_ExplicitCastToBeGbChiNumber_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = GetInvalidLengthResult(value);
+      LocalValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbChiNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-            .ComparingByMembers<GbChiNumber.ValidationError>()
+            .ComparingByMembers<LocalValidationError>()
             .ComparingByMembers<ValidLengthDefinition>()
             .WithoutStrictOrdering());
    }
@@ -582,12 +586,12 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = GetInvalidCharacterResult(value, position);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbChiNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -596,12 +600,12 @@ public class GbChiNumberTests
    public void GbChiNumber_ExplicitCastToBeGbChiNumber_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = GetInvalidChecksumResult();
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbChiNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -612,12 +616,12 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      GbChiNumber.ValidationError expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbChiNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -627,12 +631,12 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbChiNumber.ValidationError expected = GetInvalidRangeResult();
+      LocalValidationError expected = GetInvalidRangeResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbChiNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -644,12 +648,12 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      GbChiNumber.ValidationError expected = GetInvalidDateOfBirthResult(value);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbChiNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -800,7 +804,7 @@ public class GbChiNumberTests
    public void GbChiNumber_Create_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbChiNumber.ValidationError)default(EmptyValue);
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
 
       // Act.
       var result = GbChiNumber.Create(value);
@@ -814,7 +818,7 @@ public class GbChiNumberTests
    public void GbChiNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbChiNumber.ValidationError)GetInvalidLengthResult(value);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
 
       // Act.
       var result = GbChiNumber.Create(value);
@@ -822,7 +826,7 @@ public class GbChiNumberTests
       // Assert.
       result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
          .ComparingByMembers<LocalCreateResult>()
-         .ComparingByMembers<GbChiNumber.ValidationError>()
+         .ComparingByMembers<LocalValidationError>()
          .ComparingByMembers<ValidLengthDefinition>()
          .WithoutStrictOrdering());
    }
@@ -834,7 +838,7 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      LocalCreateResult expected = (GbChiNumber.ValidationError)GetInvalidCharacterResult(value, position);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = GbChiNumber.Create(value);
@@ -848,7 +852,7 @@ public class GbChiNumberTests
    public void GbChiNumber_Create_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbChiNumber.ValidationError)GetInvalidChecksumResult();
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
 
       // Act.
       var result = GbChiNumber.Create(value);
@@ -864,7 +868,7 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      LocalCreateResult expected = (GbChiNumber.ValidationError)GetInvalidSeparatorResult(value, position);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value, position);
 
       // Act.
       var result = GbChiNumber.Create(value);
@@ -879,7 +883,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      LocalCreateResult expected = (GbChiNumber.ValidationError)GetInvalidRangeResult();
+      LocalCreateResult expected = (LocalValidationError)GetInvalidRangeResult();
 
       // Act.
       var result = GbChiNumber.Create(value);
@@ -896,7 +900,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      LocalCreateResult expected = (GbChiNumber.ValidationError)GetInvalidDateOfBirthResult(value);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
 
       // Act.
       var result = GbChiNumber.Create(value);
@@ -1265,7 +1269,7 @@ public class GbChiNumberTests
    public void GbChiNumber_Validate_ShouldReturnValidValue_WhenValueIsValid(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationResult expected = default(ValidValue);
+      LocalValidationResult expected = default(ValidValue);
 
       // Act.
       var result = GbChiNumber.Validate(value);
@@ -1279,7 +1283,7 @@ public class GbChiNumberTests
    public void GbChiNumber_Validate_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationResult expected = default(EmptyValue);
+      LocalValidationResult expected = default(EmptyValue);
 
       // Act.
       var result = GbChiNumber.Validate(value);
@@ -1293,14 +1297,14 @@ public class GbChiNumberTests
    public void GbChiNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationResult expected = GetInvalidLengthResult(value);
+      LocalValidationResult expected = GetInvalidLengthResult(value);
 
       // Act.
       var result = GbChiNumber.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-         .ComparingByMembers<GbChiNumber.ValidationResult>()
+         .ComparingByMembers<LocalValidationResult>()
          .ComparingByMembers<ValidLengthDefinition>()
          .WithoutStrictOrdering());
    }
@@ -1312,7 +1316,7 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      GbChiNumber.ValidationResult expected = GetInvalidCharacterResult(value, position);
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = GbChiNumber.Validate(value);
@@ -1326,7 +1330,7 @@ public class GbChiNumberTests
    public void GbChiNumber_Validate_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbChiNumber.ValidationResult expected = GetInvalidChecksumResult();
+      LocalValidationResult expected = GetInvalidChecksumResult();
 
       // Act.
       var result = GbChiNumber.Validate(value);
@@ -1342,7 +1346,7 @@ public class GbChiNumberTests
       Int32 position)
    {
       // Arrange.
-      GbChiNumber.ValidationResult expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationResult expected = GetInvalidSeparatorResult(value, position);
 
       // Act.
       var result = GbChiNumber.Validate(value);
@@ -1357,7 +1361,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbChiNumber.ValidationResult expected = GetInvalidRangeResult();
+      LocalValidationResult expected = GetInvalidRangeResult();
 
       // Act.
       var result = GbChiNumber.Validate(value);
@@ -1374,7 +1378,7 @@ public class GbChiNumberTests
    {
       // Arrange.
       var value = GetChiNumberWithValidCheckDigit(dateOfBirth, separator: separator);
-      GbChiNumber.ValidationResult expected = GetInvalidDateOfBirthResult(value);
+      LocalValidationResult expected = GetInvalidDateOfBirthResult(value);
 
       // Act.
       var result = GbChiNumber.Validate(value);
@@ -1471,12 +1475,12 @@ public class GbChiNumberTests
    {
       // Arrange.
       var json = "{\"ChiNumber\":\"4000900004\"}";  // Invalid check digit
-      GbChiNumber.ValidationError expected = GetInvalidChecksumResult();
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should().ThrowExactly<UKfValidationException<GbChiNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 

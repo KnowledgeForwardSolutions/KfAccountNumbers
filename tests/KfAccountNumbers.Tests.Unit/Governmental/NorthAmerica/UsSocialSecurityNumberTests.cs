@@ -1,4 +1,4 @@
-// Ignore Spelling: Deserialization Deserialize Json Kf ssn
+// Ignore Spelling: Deserialization Deserialize Json Kf
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -6,6 +6,10 @@
 using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
    KfAccountNumbers.Governmental.NorthAmerica.UsSocialSecurityNumber,
    KfAccountNumbers.Governmental.NorthAmerica.UsSocialSecurityNumber.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.NorthAmerica.UsSocialSecurityNumber.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.NorthAmerica.UsSocialSecurityNumber.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.NorthAmerica.UsSocialSecurityNumber.ValidationResult;
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.NorthAmerica;
 
@@ -249,12 +253,12 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueIsEmpty(String? value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = default(EmptyValue);
+      LocalValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsSocialSecurityNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -263,14 +267,14 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidLengthResult(value);
+      LocalValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsSocialSecurityNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-            .ComparingByMembers<UsSocialSecurityNumber.ValidationError>()
+            .ComparingByMembers<LocalValidationError>()
             .ComparingByMembers<ValidLengthDefinition>()
             .WithoutStrictOrdering());
    }
@@ -282,12 +286,12 @@ public class UsSocialSecurityNumberTests
       Int32 position)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsSocialSecurityNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -298,12 +302,12 @@ public class UsSocialSecurityNumberTests
       Int32 position)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidCharacterResult(value, position);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsSocialSecurityNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -312,12 +316,12 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidAreaNumber(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidAreaNumberResult(value);
+      LocalValidationError expected = GetInvalidAreaNumberResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsSocialSecurityNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -326,12 +330,12 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidGroupNumber(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidGroupNumberResult(value);
+      LocalValidationError expected = GetInvalidGroupNumberResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsSocialSecurityNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -340,12 +344,12 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSerialNumber(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidSerialNumberResult(value);
+      LocalValidationError expected = GetInvalidSerialNumberResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsSocialSecurityNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -354,12 +358,12 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = default(UsSsnAllIdenticalDigits);
+      LocalValidationError expected = default(UsSsnAllIdenticalDigits);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsSocialSecurityNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -368,12 +372,12 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasConsecutiveRun(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = default(UsSsnInvalidRun);
+      LocalValidationError expected = default(UsSsnInvalidRun);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsSocialSecurityNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -484,12 +488,12 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueIsEmpty(String? value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = default(EmptyValue);
+      LocalValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsSocialSecurityNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -498,14 +502,14 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidLengthResult(value);
+      LocalValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsSocialSecurityNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-            .ComparingByMembers<UsSocialSecurityNumber.ValidationError>()
+            .ComparingByMembers<LocalValidationError>()
             .ComparingByMembers<ValidLengthDefinition>()
             .WithoutStrictOrdering());
    }
@@ -517,12 +521,12 @@ public class UsSocialSecurityNumberTests
       Int32 position)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsSocialSecurityNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -533,12 +537,12 @@ public class UsSocialSecurityNumberTests
       Int32 position)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidCharacterResult(value, position);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsSocialSecurityNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -547,12 +551,12 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHasInvalidAreaNumber(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidAreaNumberResult(value);
+      LocalValidationError expected = GetInvalidAreaNumberResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsSocialSecurityNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -561,12 +565,12 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHasInvalidGroupNumber(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidGroupNumberResult(value);
+      LocalValidationError expected = GetInvalidGroupNumberResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsSocialSecurityNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -575,12 +579,12 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHasInvalidSerialNumber(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidSerialNumberResult(value);
+      LocalValidationError expected = GetInvalidSerialNumberResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsSocialSecurityNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -589,12 +593,12 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = default(UsSsnAllIdenticalDigits);
+      LocalValidationError expected = default(UsSsnAllIdenticalDigits);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsSocialSecurityNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -603,12 +607,12 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHasConsecutiveRun(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationError expected = default(UsSsnInvalidRun);
+      LocalValidationError expected = default(UsSsnInvalidRun);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsSocialSecurityNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -760,7 +764,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Create_ShouldReturnEmptyValue_WhenValueIsEmpty(String? value)
    {
       // Arrange.
-      LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)default(EmptyValue);
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
 
       // Act.
       var result = UsSocialSecurityNumber.Create(value);
@@ -774,7 +778,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)GetInvalidLengthResult(value);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
 
       // Act.
       var result = UsSocialSecurityNumber.Create(value);
@@ -782,7 +786,7 @@ public class UsSocialSecurityNumberTests
       // Assert.
       result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
          .ComparingByMembers<LocalCreateResult>()
-         .ComparingByMembers<UsSocialSecurityNumber.ValidationError>()
+         .ComparingByMembers<LocalValidationError>()
          .ComparingByMembers<ValidLengthDefinition>()
          .WithoutStrictOrdering());
    }
@@ -794,7 +798,7 @@ public class UsSocialSecurityNumberTests
       Int32 position)
    {
       // Arrange.
-      LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)GetInvalidSeparatorResult(value, position);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value, position);
 
       // Act.
       var result = UsSocialSecurityNumber.Create(value);
@@ -810,7 +814,7 @@ public class UsSocialSecurityNumberTests
       Int32 position)
    {
       // Arrange.
-      LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)GetInvalidCharacterResult(value, position);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = UsSocialSecurityNumber.Create(value);
@@ -824,7 +828,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Create_ShouldReturnInvalidAreaNumber_WhenValueHasInvalidAreaNumber(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)GetInvalidAreaNumberResult(value);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidAreaNumberResult(value);
 
       // Act.
       var result = UsSocialSecurityNumber.Create(value);
@@ -838,7 +842,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Create_ShouldReturnInvalidGroupNumber_WhenValueHasInvalidGroupNumber(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)GetInvalidGroupNumberResult(value);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidGroupNumberResult(value);
 
       // Act.
       var result = UsSocialSecurityNumber.Create(value);
@@ -852,7 +856,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Create_ShouldReturnInvalidSerialNumber_WhenValueHasInvalidSerialNumber(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)GetInvalidSerialNumberResult(value);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSerialNumberResult(value);
 
       // Act.
       var result = UsSocialSecurityNumber.Create(value);
@@ -866,7 +870,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Create_ShouldReturnAllIdenticalDigits_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)default(UsSsnAllIdenticalDigits);
+      LocalCreateResult expected = (LocalValidationError)default(UsSsnAllIdenticalDigits);
 
       // Act.
       var result = UsSocialSecurityNumber.Create(value);
@@ -880,7 +884,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Create_ShouldReturnInvalidRun_WhenValueHasConsecutiveRun(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (UsSocialSecurityNumber.ValidationError)default(UsSsnInvalidRun);
+      LocalCreateResult expected = (LocalValidationError)default(UsSsnInvalidRun);
 
       // Act.
       var result = UsSocialSecurityNumber.Create(value);
@@ -1173,7 +1177,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Validate_ShouldReturnValidValue_WhenValueIsValid(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationResult expected = default(ValidValue);
+      LocalValidationResult expected = default(ValidValue);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);
@@ -1187,7 +1191,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Validate_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationResult expected = default(EmptyValue);
+      LocalValidationResult expected = default(EmptyValue);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);
@@ -1201,14 +1205,14 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationResult expected = GetInvalidLengthResult(value);
+      LocalValidationResult expected = GetInvalidLengthResult(value);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-         .ComparingByMembers<UsSocialSecurityNumber.ValidationResult>()
+         .ComparingByMembers<LocalValidationResult>()
          .ComparingByMembers<ValidLengthDefinition>()
          .WithoutStrictOrdering());
    }
@@ -1220,7 +1224,7 @@ public class UsSocialSecurityNumberTests
       Int32 position)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationResult expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationResult expected = GetInvalidSeparatorResult(value, position);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);
@@ -1236,7 +1240,7 @@ public class UsSocialSecurityNumberTests
       Int32 position)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationResult expected = GetInvalidCharacterResult(value, position);
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);
@@ -1250,7 +1254,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Validate_ShouldReturnInvalidAreaNumber_WhenValueHasInvalidAreaNumber(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationResult expected = GetInvalidAreaNumberResult(value);
+      LocalValidationResult expected = GetInvalidAreaNumberResult(value);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);
@@ -1264,7 +1268,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Validate_ShouldReturnInvalidGroupNumber_WhenValueHasInvalidGroupNumber(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationResult expected = GetInvalidGroupNumberResult(value);
+      LocalValidationResult expected = GetInvalidGroupNumberResult(value);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);
@@ -1278,7 +1282,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Validate_ShouldReturnInvalidSerialNumber_WhenValueHasInvalidSerialNumber(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationResult expected = GetInvalidSerialNumberResult(value);
+      LocalValidationResult expected = GetInvalidSerialNumberResult(value);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);
@@ -1292,7 +1296,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Validate_ShouldReturnAllIdenticalDigits_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationResult expected = default(UsSsnAllIdenticalDigits);
+      LocalValidationResult expected = default(UsSsnAllIdenticalDigits);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);
@@ -1306,7 +1310,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Validate_ShouldReturnInvalidRun_WhenValueHasConsecutiveRun(String value)
    {
       // Arrange.
-      UsSocialSecurityNumber.ValidationResult expected = default(UsSsnInvalidRun);
+      LocalValidationResult expected = default(UsSsnInvalidRun);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);
@@ -1402,12 +1406,12 @@ public class UsSocialSecurityNumberTests
    {
       // Arrange.
       var json = "{\"Ssn\":\"666123456\"}";  // Invalid area number
-      UsSocialSecurityNumber.ValidationError expected = GetInvalidAreaNumberResult("666123456");
+      LocalValidationError expected = GetInvalidAreaNumberResult("666123456");
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should().ThrowExactly<UKfValidationException<UsSocialSecurityNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 

@@ -1,6 +1,10 @@
 using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
    KfAccountNumbers.Governmental.Europe.GbNhsNumber,
    KfAccountNumbers.Governmental.Europe.GbNhsNumber.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.Europe.GbNhsNumber.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.Europe.GbNhsNumber.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.Europe.GbNhsNumber.ValidationResult;
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -255,12 +259,12 @@ public class GbNhsNumberTests
    public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = default(EmptyValue);
+      LocalValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbNhsNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -269,14 +273,14 @@ public class GbNhsNumberTests
    public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = GetInvalidLengthResult(value);
+      LocalValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbNhsNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-            .ComparingByMembers<GbNhsNumber.ValidationError>()
+            .ComparingByMembers<LocalValidationError>()
             .ComparingByMembers<ValidLengthDefinition>()
             .WithoutStrictOrdering());
    }
@@ -288,12 +292,12 @@ public class GbNhsNumberTests
       Int32 position)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = GetInvalidCharacterResult(value, position);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbNhsNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -302,12 +306,12 @@ public class GbNhsNumberTests
    public void GbNhsNumber_Constructor_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = GetInvalidChecksumResult();
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbNhsNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -318,12 +322,12 @@ public class GbNhsNumberTests
       Int32 position)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbNhsNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -333,12 +337,12 @@ public class GbNhsNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbNhsNumber.ValidationError expected = GetInvalidRangeResult();
+      LocalValidationError expected = GetInvalidRangeResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbNhsNumber(value))
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -473,12 +477,12 @@ public class GbNhsNumberTests
    public void GbNhsNumber_ExplicitCastToBeGbNhsNumber_ShouldThrowValidationError_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = default(EmptyValue);
+      LocalValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbNhsNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -487,14 +491,14 @@ public class GbNhsNumberTests
    public void GbNhsNumber_ExplicitCastToBeGbNhsNumber_ShouldThrowValidationError_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = GetInvalidLengthResult(value);
+      LocalValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbNhsNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-            .ComparingByMembers<GbNhsNumber.ValidationError>()
+            .ComparingByMembers<LocalValidationError>()
             .ComparingByMembers<ValidLengthDefinition>()
             .WithoutStrictOrdering());
    }
@@ -506,12 +510,12 @@ public class GbNhsNumberTests
       Int32 position)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = GetInvalidCharacterResult(value, position);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbNhsNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -520,12 +524,12 @@ public class GbNhsNumberTests
    public void GbNhsNumber_ExplicitCastToBeGbNhsNumber_ShouldThrowValidationError_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = GetInvalidChecksumResult();
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbNhsNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -536,12 +540,12 @@ public class GbNhsNumberTests
       Int32 position)
    {
       // Arrange.
-      GbNhsNumber.ValidationError expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbNhsNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -551,12 +555,12 @@ public class GbNhsNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbNhsNumber.ValidationError expected = GetInvalidRangeResult();
+      LocalValidationError expected = GetInvalidRangeResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => (GbNhsNumber)value)
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -707,7 +711,7 @@ public class GbNhsNumberTests
    public void GbNhsNumber_Create_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbNhsNumber.ValidationError)default(EmptyValue);
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
 
       // Act.
       var result = GbNhsNumber.Create(value);
@@ -721,7 +725,7 @@ public class GbNhsNumberTests
    public void GbNhsNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbNhsNumber.ValidationError)GetInvalidLengthResult(value);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
 
       // Act.
       var result = GbNhsNumber.Create(value);
@@ -729,7 +733,7 @@ public class GbNhsNumberTests
       // Assert.
       result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
          .ComparingByMembers<LocalCreateResult>()
-         .ComparingByMembers<GbNhsNumber.ValidationError>()
+         .ComparingByMembers<LocalValidationError>()
          .ComparingByMembers<ValidLengthDefinition>()
          .WithoutStrictOrdering());
    }
@@ -741,7 +745,7 @@ public class GbNhsNumberTests
       Int32 position)
    {
       // Arrange.
-      LocalCreateResult expected = (GbNhsNumber.ValidationError)GetInvalidCharacterResult(value, position);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = GbNhsNumber.Create(value);
@@ -755,7 +759,7 @@ public class GbNhsNumberTests
    public void GbNhsNumber_Create_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (GbNhsNumber.ValidationError)GetInvalidChecksumResult();
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
 
       // Act.
       var result = GbNhsNumber.Create(value);
@@ -771,7 +775,7 @@ public class GbNhsNumberTests
       Int32 position)
    {
       // Arrange.
-      LocalCreateResult expected = (GbNhsNumber.ValidationError)GetInvalidSeparatorResult(value, position);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value, position);
 
       // Act.
       var result = GbNhsNumber.Create(value);
@@ -786,7 +790,7 @@ public class GbNhsNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      LocalCreateResult expected = (GbNhsNumber.ValidationError)GetInvalidRangeResult();
+      LocalCreateResult expected = (LocalValidationError)GetInvalidRangeResult();
 
       // Act.
       var result = GbNhsNumber.Create(value);
@@ -1077,7 +1081,7 @@ public class GbNhsNumberTests
    public void GbNhsNumber_Validate_ShouldReturnValidValue_WhenValueIsValid(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationResult expected = default(ValidValue);
+      LocalValidationResult expected = default(ValidValue);
 
       // Act.
       var result = GbNhsNumber.Validate(value);
@@ -1091,7 +1095,7 @@ public class GbNhsNumberTests
    public void GbNhsNumber_Validate_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationResult expected = default(EmptyValue);
+      LocalValidationResult expected = default(EmptyValue);
 
       // Act.
       var result = GbNhsNumber.Validate(value);
@@ -1105,14 +1109,14 @@ public class GbNhsNumberTests
    public void GbNhsNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationResult expected = GetInvalidLengthResult(value);
+      LocalValidationResult expected = GetInvalidLengthResult(value);
 
       // Act.
       var result = GbNhsNumber.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-         .ComparingByMembers<GbNhsNumber.ValidationResult>()
+         .ComparingByMembers<LocalValidationResult>()
          .ComparingByMembers<ValidLengthDefinition>()
          .WithoutStrictOrdering());
    }
@@ -1124,7 +1128,7 @@ public class GbNhsNumberTests
       Int32 position)
    {
       // Arrange.
-      GbNhsNumber.ValidationResult expected = GetInvalidCharacterResult(value, position);
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = GbNhsNumber.Validate(value);
@@ -1138,7 +1142,7 @@ public class GbNhsNumberTests
    public void GbNhsNumber_Validate_ShouldReturnInvalidChecksum_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
-      GbNhsNumber.ValidationResult expected = GetInvalidChecksumResult();
+      LocalValidationResult expected = GetInvalidChecksumResult();
 
       // Act.
       var result = GbNhsNumber.Validate(value);
@@ -1154,7 +1158,7 @@ public class GbNhsNumberTests
       Int32 position)
    {
       // Arrange.
-      GbNhsNumber.ValidationResult expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationResult expected = GetInvalidSeparatorResult(value, position);
 
       // Act.
       var result = GbNhsNumber.Validate(value);
@@ -1169,7 +1173,7 @@ public class GbNhsNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      GbNhsNumber.ValidationResult expected = GetInvalidRangeResult();
+      LocalValidationResult expected = GetInvalidRangeResult();
 
       // Act.
       var result = GbNhsNumber.Validate(value);
@@ -1266,12 +1270,12 @@ public class GbNhsNumberTests
    {
       // Arrange.
       var json = "{\"NhsNumber\":\"4000900004\"}";  // Invalid check digit
-      GbNhsNumber.ValidationError expected = GetInvalidChecksumResult();
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should().ThrowExactly<UKfValidationException<GbNhsNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 

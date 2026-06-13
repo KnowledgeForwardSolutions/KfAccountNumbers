@@ -1,4 +1,4 @@
-// Ignore Spelling: Deserialization Deserialize itin Itin Json Kf Unformatted
+// Ignore Spelling: Deserialization Deserialize Itin Json Kf Unformatted
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
@@ -6,6 +6,10 @@
 using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
    KfAccountNumbers.Governmental.NorthAmerica.UsIndividualTaxpayerIdentificationNumber,
    KfAccountNumbers.Governmental.NorthAmerica.UsIndividualTaxpayerIdentificationNumber.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.NorthAmerica.UsIndividualTaxpayerIdentificationNumber.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.NorthAmerica.UsIndividualTaxpayerIdentificationNumber.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.NorthAmerica.UsIndividualTaxpayerIdentificationNumber.ValidationResult;
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.NorthAmerica;
 
@@ -215,12 +219,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueIsEmpty(String? value)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = default(EmptyValue);
+      LocalValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsIndividualTaxpayerIdentificationNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -229,14 +233,14 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidLengthResult(value);
+      LocalValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsIndividualTaxpayerIdentificationNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-            .ComparingByMembers<UsIndividualTaxpayerIdentificationNumber.ValidationError>()
+            .ComparingByMembers<LocalValidationError>()
             .ComparingByMembers<ValidLengthDefinition>()
             .WithoutStrictOrdering());
    }
@@ -246,12 +250,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidAreaNumber(String value)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidAreaNumberResult(value);
+      LocalValidationError expected = GetInvalidAreaNumberResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsIndividualTaxpayerIdentificationNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -262,12 +266,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       Int32 position)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsIndividualTaxpayerIdentificationNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -278,12 +282,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       Int32 position)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidCharacterResult(value, position);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsIndividualTaxpayerIdentificationNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -292,12 +296,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidGroupNumber(String value)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidGroupNumberResult(value);
+      LocalValidationError expected = GetInvalidGroupNumberResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new UsIndividualTaxpayerIdentificationNumber(value))
-         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -389,12 +393,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueIsEmpty(String? value)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = default(EmptyValue);
+      LocalValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsIndividualTaxpayerIdentificationNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -403,14 +407,14 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidLengthResult(value);
+      LocalValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsIndividualTaxpayerIdentificationNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-            .ComparingByMembers<UsIndividualTaxpayerIdentificationNumber.ValidationError>()
+            .ComparingByMembers<LocalValidationError>()
             .ComparingByMembers<ValidLengthDefinition>()
             .WithoutStrictOrdering());
    }
@@ -420,12 +424,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueHasInvalidAreaNumber(String value)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidAreaNumberResult(value);
+      LocalValidationError expected = GetInvalidAreaNumberResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsIndividualTaxpayerIdentificationNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -436,12 +440,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       Int32 position)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsIndividualTaxpayerIdentificationNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -452,12 +456,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       Int32 position)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidCharacterResult(value, position);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsIndividualTaxpayerIdentificationNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -466,12 +470,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldThrowKfValidationException_WhenValueHasInvalidGroupNumber(String value)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidGroupNumberResult(value);
+      LocalValidationError expected = GetInvalidGroupNumberResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => (UsIndividualTaxpayerIdentificationNumber)value)
-         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
@@ -642,7 +646,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnEmptyValue_WhenValueIsEmpty(String? value)
    {
       // Arrange.
-      LocalCreateResult expected = (UsIndividualTaxpayerIdentificationNumber.ValidationError)default(EmptyValue);
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
@@ -656,7 +660,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (UsIndividualTaxpayerIdentificationNumber.ValidationError)GetInvalidLengthResult(value);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
@@ -664,7 +668,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       // Assert.
       result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
          .ComparingByMembers<LocalCreateResult>()
-         .ComparingByMembers<UsIndividualTaxpayerIdentificationNumber.ValidationError>()
+         .ComparingByMembers<LocalValidationError>()
          .ComparingByMembers<ValidLengthDefinition>()
          .WithoutStrictOrdering());
    }
@@ -674,7 +678,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidAreaNumber_WhenValueHasInvalidAreaNumber(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (UsIndividualTaxpayerIdentificationNumber.ValidationError)GetInvalidAreaNumberResult(value);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidAreaNumberResult(value);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
@@ -690,7 +694,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       Int32 position)
    {
       // Arrange.
-      LocalCreateResult expected = (UsIndividualTaxpayerIdentificationNumber.ValidationError)GetInvalidSeparatorResult(value, position);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value, position);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
@@ -706,7 +710,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       Int32 position)
    {
       // Arrange.
-      LocalCreateResult expected = (UsIndividualTaxpayerIdentificationNumber.ValidationError)GetInvalidCharacterResult(value, position);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
@@ -720,7 +724,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Create_ShouldReturnInvalidGroupNumber_WhenValueHasInvalidGroupNumber(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (UsIndividualTaxpayerIdentificationNumber.ValidationError)GetInvalidGroupNumberResult(value);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidGroupNumberResult(value);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Create(value);
@@ -1013,7 +1017,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationResult expected = default(ValidValue);
+      LocalValidationResult expected = default(ValidValue);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Validate(value);
@@ -1027,7 +1031,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnEmpty_WhenValueIsEmpty(String? value)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationResult expected = default(EmptyValue);
+      LocalValidationResult expected = default(EmptyValue);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Validate(value);
@@ -1041,14 +1045,14 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationResult expected = GetInvalidLengthResult(value);
+      LocalValidationResult expected = GetInvalidLengthResult(value);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-         .ComparingByMembers<UsIndividualTaxpayerIdentificationNumber.ValidationResult>()
+         .ComparingByMembers<LocalValidationResult>()
          .ComparingByMembers<ValidLengthDefinition>()
          .WithoutStrictOrdering());
    }
@@ -1058,7 +1062,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidAreaNumber_WhenValueHasInvalidAreaNumber(String value)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationResult expected = GetInvalidAreaNumberResult(value);
+      LocalValidationResult expected = GetInvalidAreaNumberResult(value);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Validate(value);
@@ -1074,7 +1078,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       Int32 position)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationResult expected = GetInvalidSeparatorResult(value, position);
+      LocalValidationResult expected = GetInvalidSeparatorResult(value, position);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Validate(value);
@@ -1090,7 +1094,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       Int32 position)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationResult expected = GetInvalidCharacterResult(value, position);
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Validate(value);
@@ -1104,7 +1108,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_Validate_ShouldReturnInvalidGroupNumber_WhenValueHasInvalidGroupNumber(String value)
    {
       // Arrange.
-      UsIndividualTaxpayerIdentificationNumber.ValidationResult expected = GetInvalidGroupNumberResult(value);
+      LocalValidationResult expected = GetInvalidGroupNumberResult(value);
 
       // Act.
       var result = UsIndividualTaxpayerIdentificationNumber.Validate(value);
@@ -1200,12 +1204,12 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    {
       // Arrange.
       var json = "{\"Itin\":\"001501234\"}";  // Invalid area number
-      UsIndividualTaxpayerIdentificationNumber.ValidationError expected = GetInvalidAreaNumberResult("001501234");
+      LocalValidationError expected = GetInvalidAreaNumberResult("001501234");
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should().ThrowExactly<UKfValidationException<UsIndividualTaxpayerIdentificationNumber.ValidationError>>()
+         .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 

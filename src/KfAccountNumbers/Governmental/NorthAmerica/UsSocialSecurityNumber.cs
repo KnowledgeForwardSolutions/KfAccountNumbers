@@ -1,4 +1,4 @@
-// Ignore Spelling: ssn Json Kf
+// Ignore Spelling: Json Kf
 
 #pragma warning disable IDE0250 // Make struct 'readonly'
 #pragma warning disable IDE0046 // Convert to conditional expression
@@ -152,7 +152,7 @@ public record UsSocialSecurityNumber
    /// <param name="value">
    ///   String representation of a Social Security Number.
    /// </param>
-   /// <exception cref="KfValidationException{ValidationError}">
+   /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
@@ -179,10 +179,13 @@ public record UsSocialSecurityNumber
 
    /// <summary>
    ///   Initializes a new instance of the <see cref="UsSocialSecurityNumber"/>
-   ///   class. Private constructor that actually does the work. Supports
-   ///   bypassing validation when creating a new instance from a value that has
-   ///   already been validated.
+   ///   class.
    /// </summary>
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
    private UsSocialSecurityNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)

@@ -197,9 +197,6 @@ public record GbHcNumber : GbPatientNumberBase
 
    /// <summary>
    ///   Initializes a new instance of the <see cref="GbHcNumber"/> class.
-   ///   Private constructor that actually does the work. Supports bypassing
-   ///   validation when creating a new instance from a value that has already
-   ///   been validated.
    /// </summary>
    /// <param name="value">
    ///   String representation of a Northern Ireland H&amp;C number.
@@ -207,6 +204,12 @@ public record GbHcNumber : GbPatientNumberBase
    /// <param name="validationMode">
    ///   Indicates whether the <paramref name="value"/> requires validation.
    /// </param>
+   /// <remarks>
+   ///   Internal constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated. Internal access to support
+   ///   <see cref="GbPatientNumber.ToGbHcNumber"/> method.
+   /// </remarks>
    internal GbHcNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
