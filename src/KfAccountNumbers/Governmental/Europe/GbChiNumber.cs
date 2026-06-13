@@ -213,9 +213,10 @@ public record class GbChiNumber : GbPatientNumberBase
    ///   Indicates whether the <paramref name="value"/> requires validation.
    /// </param>
    /// <remarks>
-   ///   Protected constructor that actually does the work. Supports bypassing
+   ///   Internal constructor that actually does the work. Supports bypassing
    ///   validation when creating a new instance from a value that has
-   ///   already been validated.
+   ///   already been validated. Internal access to support
+   ///   <see cref="GbPatientNumber.ToGbChiNumber"/> method.
    /// </remarks>
    internal GbChiNumber(String? value, ValidationMode validationMode)
    {

@@ -115,7 +115,7 @@ public record UsIndividualTaxpayerIdentificationNumber
    ///   - or -
    ///   <paramref name="value"/> contains a non-ASCII digit (not 0-9).
    ///   - or -
-   ///   <paramref name="value"/> is 11 characters in length and contains and
+   ///   <paramref name="value"/> is 11 characters in length and contains
    ///   separator characters that are not identical or are ASCII digits (0-9).
    ///   - or -
    ///   <paramref name="value"/> contains an invalid area number (000-899).

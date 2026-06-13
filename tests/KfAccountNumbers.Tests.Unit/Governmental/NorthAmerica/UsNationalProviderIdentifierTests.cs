@@ -39,7 +39,7 @@ public class UsNationalProviderIdentifierTests
       { "123456789\u00D6", 9 },      // Invalid character unicode O with umlaut
    };
 
-   // Luhn algorithim is unable to detect these errors so they should pass
+   // Luhn algorithm is unable to detect these errors so they should pass
    // validation (and the constructor/Create method should create an instance of
    // UsNationalProviderIdentifier).
    public static TheoryData<String> CheckDigitUndetectableErrorValues =>
