@@ -89,13 +89,11 @@ public record UsIndividualTaxpayerIdentificationNumber
    private const Int32 FormattedLength = 11;
    private const Int32 UnformattedLength = 9;
 
-   private const Int32 AreaRangeEnd = 3;                          // End indices are exclusive for use in range operator
-   private const Int32 UnformattedGroupRangeStart = 3;
-   private const Int32 UnformattedGroupRangeEnd = 5;
-   private const Int32 UnformattedSerialNumberRangeStart = 5;
-   private const Int32 FormattedGroupRangeStart = 4;
-   private const Int32 FormattedGroupRangeEnd = 6;
-   private const Int32 FormattedSerialNumberRangeStart = 7;
+   private static readonly SegmentRange _area = new(0, 3);
+   private static readonly SegmentRange _formattedGroup = new(4, 6);
+   private static readonly SegmentRange _unformattedGroup = new(3, 5);
+   private static readonly SegmentRange _formattedSerial = new(7, 11);
+   private static readonly SegmentRange _unformattedSerial = new(5, 9);
 
    private const Int32 GroupSeparatorOffset = 3;   // Offset of separator between area and group sections in formatted ITIN
    private const Int32 SerialSeparatorOffset = 6;  // Offset of separator between group and serial number sections in formatted ITIN
@@ -317,13 +315,13 @@ public record UsIndividualTaxpayerIdentificationNumber
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static ReadOnlySpan<Char> GetAreaNumber(ReadOnlySpan<Char> value)
-      => value[..AreaRangeEnd];
+      => _area.Extract(value);
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static ReadOnlySpan<Char> GetGroupNumber(ReadOnlySpan<Char> value)
       => IsFormatted(value)
-         ? value[FormattedGroupRangeStart..FormattedGroupRangeEnd]
-         : value[UnformattedGroupRangeStart..UnformattedGroupRangeEnd];
+         ? _formattedGroup.Extract(value)
+         : _unformattedGroup.Extract(value);
 
    /// <summary>
    ///   Get an unformatted ITIN value from a string that has passed validation.
@@ -332,23 +330,18 @@ public record UsIndividualTaxpayerIdentificationNumber
    ///   Strings.
    /// </summary>
    private static String GetRawValue(String value)
-   {
-      if (value.Length == UnformattedLength)
-      {
-         return value;
-      }
-
-      return String.Concat(
-         GetAreaNumber(value),
-         GetGroupNumber(value),
-         GetSerialNumber(value));
-   }
+      => value.Length == UnformattedLength
+         ? value
+         : String.Concat(
+            GetAreaNumber(value),
+            GetGroupNumber(value),
+            GetSerialNumber(value));
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static ReadOnlySpan<Char> GetSerialNumber(ReadOnlySpan<Char> value)
       => IsFormatted(value)
-         ? value[FormattedSerialNumberRangeStart..]
-         : value[UnformattedSerialNumberRangeStart..];
+         ? _formattedSerial.Extract(value)
+         : _unformattedSerial.Extract(value);
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean IsFormatted(ReadOnlySpan<Char> value) => value.Length == FormattedLength;
@@ -391,6 +384,7 @@ public record UsIndividualTaxpayerIdentificationNumber
             (>= 94 and <= 99);
    }
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean ValidateLength(ReadOnlySpan<Char> value)
       => value.Length is UnformattedLength or FormattedLength;
 
