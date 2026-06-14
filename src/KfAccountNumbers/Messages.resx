@@ -150,7 +150,7 @@
   <data name="UsSsnInvalidCharacter" xml:space="preserve">
     <value>US Social Security Number must only contain digit characters (0-9) in non-separator character locations</value>
   </data>
-  <data name="CaSinInvalidCharacterEncountered" xml:space="preserve">
+  <data name="CaSinInvalidCharacter" xml:space="preserve">
     <value>CA Social Insurance Number must only contain digit characters (0-9) in non-separator character locations</value>
   </data>
   <data name="UsSsnInvalidGroupNumber" xml:space="preserve">
@@ -171,7 +171,7 @@
   <data name="ValidationPassed" xml:space="preserve">
     <value>Value does not contain any validation errors</value>
   </data>
-  <data name="CaSinInvalidSeparatorEncountered" xml:space="preserve">
+  <data name="CaSinInvalidSeparator" xml:space="preserve">
     <value>CA Social Insurance Number with length 11 contains an unexpected character at a separator position</value>
   </data>
   <data name="CaSinInvalidCheckDigit" xml:space="preserve">
