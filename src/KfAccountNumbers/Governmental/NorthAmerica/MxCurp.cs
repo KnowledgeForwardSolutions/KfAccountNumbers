@@ -8,10 +8,10 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A valid CURP is an 18-character alphanumeric identifier assigned to 
-///      Mexican citizens by the Registro Nacional de Población (RENAPO). 
-///      Portions of the string are generated from a person's personal 
-///      information and the two trailing characters are assigned by RENAPO. 
+///      A valid CURP is an 18-character alphanumeric identifier assigned to
+///      Mexican citizens by the Registro Nacional de Población (RENAPO).
+///      Portions of the string are generated from a person's personal
+///      information and the two trailing characters are assigned by RENAPO.
 ///   </para>
 ///   <para>
 ///      A valid CURP meets the following criteria:
@@ -35,8 +35,8 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         </item>
 ///         <item>
 ///            <description>
-///               Has a valid date of birth (formatted as YYMMDD) in positions 
-///               4-9 (zero-based). 
+///               Has a valid date of birth (formatted as YYMMDD) in positions
+///               4-9 (zero-based).
 ///            </description>
 ///         </item>
 ///         <item>
@@ -52,9 +52,9 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         </item>
 ///         <item>
 ///            <description>
-///               Has an alphanumeric homoclave character in position 16 
-///               (zero-based). The homoclave is assigned by RENAPO to avoid 
-///               duplicate CURP values. A digit homoclave character indicates a 
+///               Has an alphanumeric homoclave character in position 16
+///               (zero-based). The homoclave is assigned by RENAPO to avoid
+///               duplicate CURP values. A digit homoclave character indicatesa
 ///               birth in the 1900-1999 century, while an alphabetic homoclave
 ///               indicates a birth in the 2000-2099 century.
 ///            </description>
@@ -74,7 +74,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///      century of birth. This has several impacts:
 ///      <list type="bullet">
 ///         <item>
-///            The <see cref="DateOfBirth"/> property uses the homoclave 
+///            The <see cref="DateOfBirth"/> property uses the homoclave
 ///            character to infer the century of birth. In cases where the
 ///            person was born before 1900 and assigned a CURP when first issued
 ///            in 1996, the century will be incorrectly reported as 1900's. This
@@ -84,15 +84,15 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         <item>
 ///            The validation for leap year dates is impacted. Specifically, the
 ///            value "000229" will be considered invalid if the homoclave is a
-///            digit (since 1900 was not a leap year) but valid if the homoclave 
+///            digit (since 1900 was not a leap year) but valid if the homoclave
 ///            is a letter (since 2000 was a leap year).
 ///         </item>
 ///         <item>
-///            While not specifically connected to the YYMMDD date of birth 
+///            While not specifically connected to the YYMMDD date of birth
 ///            format, it should be noted that the date of birth validation does
 ///            not attempt to check for future dates. So a CURP with a date of
-///            "991231" and an alphabetic homoclave character would be 
-///            considered valid, even though it would indicate a birthdate of 
+///            "991231" and an alphabetic homoclave character would be
+///            considered valid, even though it would indicate a birthdate of
 ///            December 31, 2099.
 ///         </item>
 ///      </list>
@@ -120,7 +120,7 @@ public record MxCurp
       StateCode,
       InternalConsonants,
       Homoclave,
-      CheckDigit
+      CheckDigit,
    }
 
    /// <summary>
@@ -135,7 +135,7 @@ public record MxCurp
    ///   CURP to upper-case.
    /// </remarks>
    /// <exception cref="KfValidationException{MxCurpValidationResult}">
-   ///   <paramref name="curp"/> is <see langword="null"/>, empty or all 
+   ///   <paramref name="curp"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
    ///   <paramref name="curp"/> does not have length of 18.
@@ -147,7 +147,7 @@ public record MxCurp
    ///   4-9 (zero-based).
    ///   - or -
    ///   <paramref name="curp"/> contains an invalid gender character in position
-   ///   10 (zero-based). Valid gender characters are H (Hombre/male), 
+   ///   10 (zero-based). Valid gender characters are H (Hombre/male),
    ///   M (Mujer/female) or X (non-binary).
    ///   - or -
    ///   <paramref name="curp"/> contains an invalid state code in positions
@@ -181,11 +181,11 @@ public record MxCurp
    }
 
    /// <summary>
-   ///   The person's date of birth, derived from the YYMMDD date of birth and 
+   ///   The person's date of birth, derived from the YYMMDD date of birth and
    ///   homoclave elements of the CURP.
    /// </summary>
    /// <remarks>
-   ///   Homoclave values 0-9 indicate birth in the 1900-1999 century, homoclave 
+   ///   Homoclave values 0-9 indicate birth in the 1900-1999 century, homoclave
    ///   values A-Z indicate birth in the 2000-2099 century.
    /// </remarks>
    public DateOnly DateOfBirth
@@ -242,10 +242,10 @@ public record MxCurp
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{MxCurp, MxCurpValidationResult}"/>.
-   ///   Will contain the new <see cref="MxCurpValidationResult"/> if 
-   ///   <paramref name="curp"/> is valid or 
+   ///   Will contain the new <see cref="MxCurpValidationResult"/> if
+   ///   <paramref name="curp"/> is valid or
    ///   <see cref="MxCurpValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="curp"/> is 
+   ///   the validation rule that was failed if <paramref name="curp"/> is
    ///   invalid.
    /// </returns>
    public static CreateResult<MxCurp, MxCurpValidationResult> Create(String? curp)
@@ -264,7 +264,7 @@ public record MxCurp
    ///   String representation of a CURP.
    /// </param>
    /// <returns>
-   ///   A <see cref="MxCurpValidationResult"/> enumeration 
+   ///   A <see cref="MxCurpValidationResult"/> enumeration
    ///   value that indicates if the <paramref name="curp"/> passed validation
    ///   or what validation error was encountered.
    /// </returns>
@@ -322,7 +322,7 @@ public record MxCurp
          CurpSection.InternalConsonants => curp[13..16],
          CurpSection.Homoclave => curp[16..17],
          CurpSection.CheckDigit => curp[17..],
-         _ => throw new SwitchExpressionException(section)
+         _ => throw new SwitchExpressionException(section),
       };
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -340,7 +340,6 @@ public record MxCurp
 
       // Switching from DateTime.TryParseExact to manual validation resulted in
       // a performance improvement from > 60ns to < 20ns per call in benchmark tests.
-
       foreach (var ch in dateOfBirthSpan)
       {
          if (!Char.IsAsciiDigit(ch))
@@ -397,6 +396,7 @@ public record MxCurp
             return false;
          }
       }
+
       return true;
    }
 
@@ -408,6 +408,8 @@ public record MxCurp
    }
 }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class MxCurpJsonConverter : JsonConverter<MxCurp>
 {
    public override MxCurp Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
