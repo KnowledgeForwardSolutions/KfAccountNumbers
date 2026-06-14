@@ -133,11 +133,20 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A CA Social Insurnce Number with separator characters at offsets 3 and 7 (zero-based).
+        /// </summary>
+        internal static string CaSinFormattedLength {
+            get {
+                return ResourceManager.GetString("CaSinFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CA Social Insurance Number must only contain digit characters (0-9) in non-separator character locations.
         /// </summary>
-        internal static string CaSinInvalidCharacterEncountered {
+        internal static string CaSinInvalidCharacter {
             get {
-                return ResourceManager.GetString("CaSinInvalidCharacterEncountered", resourceCulture);
+                return ResourceManager.GetString("CaSinInvalidCharacter", resourceCulture);
             }
         }
         
@@ -171,9 +180,18 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to CA Social Insurance Number with length 11 contains an unexpected character at a separator position.
         /// </summary>
-        internal static string CaSinInvalidSeparatorEncountered {
+        internal static string CaSinInvalidSeparator {
             get {
-                return ResourceManager.GetString("CaSinInvalidSeparatorEncountered", resourceCulture);
+                return ResourceManager.GetString("CaSinInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A CA Social Insurance Number without separator characters.
+        /// </summary>
+        internal static string CaSinUnformattedLength {
+            get {
+                return ResourceManager.GetString("CaSinUnformattedLength", resourceCulture);
             }
         }
         
