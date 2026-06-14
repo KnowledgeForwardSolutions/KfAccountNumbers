@@ -501,4 +501,10 @@
   <data name="UsNpiValidLength" xml:space="preserve">
     <value>US National Provider Identifier should be 10 digits without separator or format characters</value>
   </data>
+  <data name="CaSinFormattedLength" xml:space="preserve">
+    <value>A CA Social Insurance Number with separator characters at offsets 3 and 7 (zero-based)</value>
+  </data>
+  <data name="CaSinUnformattedLength" xml:space="preserve">
+    <value>A CA Social Insurance Number without separator characters</value>
+  </data>
 </root>

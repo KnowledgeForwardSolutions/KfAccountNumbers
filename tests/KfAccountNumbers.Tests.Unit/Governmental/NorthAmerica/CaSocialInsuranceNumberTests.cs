@@ -371,6 +371,16 @@ public class CaSocialInsuranceNumberTests
          .WithMessage(Messages.CaSinInvalidLength + "*")
          .And.ValidationResult.Should().Be(CaSocialInsuranceNumberValidationResult.InvalidLength);
 
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (CaSocialInsuranceNumber)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
    public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldThrowKfValidationException_When11CharacterValueContainsAnInvalidSeparator(String value)

@@ -133,6 +133,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A CA Social Insurance Number with separator characters at offsets 3 and 7 (zero-based).
+        /// </summary>
+        internal static string CaSinFormattedLength {
+            get {
+                return ResourceManager.GetString("CaSinFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CA Social Insurance Number must only contain digit characters (0-9) in non-separator character locations.
         /// </summary>
         internal static string CaSinInvalidCharacterEncountered {
