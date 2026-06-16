@@ -65,7 +65,7 @@ public record CaSocialInsuranceNumber
       InvalidSeparator,
       InvalidCharacter,
       InvalidChecksum,
-      CaSinInvalidProvince)
+      InvalidStateProvince)
    {
    }
 
@@ -80,7 +80,7 @@ public record CaSocialInsuranceNumber
       InvalidSeparator,
       InvalidCharacter,
       InvalidChecksum,
-      CaSinInvalidProvince)
+      InvalidStateProvince)
    {
    }
 
@@ -144,7 +144,7 @@ public record CaSocialInsuranceNumber
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
                InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
                InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
-               CaSinInvalidProvince invalidProvince => new UKfValidationException<ValidationError>(invalidProvince),
+               InvalidStateProvince invalidProvince => new UKfValidationException<ValidationError>(invalidProvince),
                _ => new UnreachableException("This branch should never be reached"),
             };
          }
@@ -202,7 +202,7 @@ public record CaSocialInsuranceNumber
          InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
          InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
-         CaSinInvalidProvince invalidProvince => (ValidationError)invalidProvince,
+         InvalidStateProvince invalidProvince => (ValidationError)invalidProvince,
          _ => throw new UnreachableException("This branch should never be reached"),
       };
 
@@ -290,9 +290,9 @@ public record CaSocialInsuranceNumber
 
       if (!ValidateProvince(value))
       {
-         return new CaSinInvalidProvince(
+         return new InvalidStateProvince(
             Messages.CaSinInvalidProvince,
-            value[ProvinceOffset]);
+            value[ProvinceOffset].ToString());
       }
 
       return default(ValidValue);

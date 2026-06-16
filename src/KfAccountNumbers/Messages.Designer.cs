@@ -792,9 +792,9 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to MX CURP requires alphabetic characters in positions 0-3 and 13-15 (zero-based).
         /// </summary>
-        internal static string MxCurpInvalidAlphabeticCharacterEncountered {
+        internal static string MxCurpInvalidAlphabeticCharacter {
             get {
-                return ResourceManager.GetString("MxCurpInvalidAlphabeticCharacterEncountered", resourceCulture);
+                return ResourceManager.GetString("MxCurpInvalidAlphabeticCharacter", resourceCulture);
             }
         }
         
@@ -849,6 +849,15 @@ namespace KfAccountNumbers {
         internal static string MxCurpInvalidState {
             get {
                 return ResourceManager.GetString("MxCurpInvalidState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MX CURP should be 18 characters without separator or format characters.
+        /// </summary>
+        internal static string MxCurpValidLength {
+            get {
+                return ResourceManager.GetString("MxCurpValidLength", resourceCulture);
             }
         }
         

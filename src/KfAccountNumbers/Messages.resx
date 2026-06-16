@@ -186,7 +186,7 @@
   <data name="MxCurpInvalidLength" xml:space="preserve">
     <value>MX CURP must have length 18</value>
   </data>
-  <data name="MxCurpInvalidAlphabeticCharacterEncountered" xml:space="preserve">
+  <data name="MxCurpInvalidAlphabeticCharacter" xml:space="preserve">
     <value>MX CURP requires alphabetic characters in positions 0-3 and 13-15 (zero-based)</value>
   </data>
   <data name="MxCurpInvalidDateOfBirth" xml:space="preserve">
@@ -506,5 +506,8 @@
   </data>
   <data name="CaSinUnformattedLength" xml:space="preserve">
     <value>A CA Social Insurance Number without separator characters</value>
+  </data>
+  <data name="MxCurpValidLength" xml:space="preserve">
+    <value>MX CURP should be 18 characters without separator or format characters</value>
   </data>
 </root>

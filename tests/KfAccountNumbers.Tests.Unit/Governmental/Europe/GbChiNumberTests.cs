@@ -544,7 +544,6 @@ public class GbChiNumberTests
       var sut = (GbChiNumber)value;
 
       // Assert.
-      sut.Should().NotBeNull();
       sut.Should().BeEquivalentTo(expected);
    }
 
