@@ -378,14 +378,13 @@ public class UsIndividualTaxpayerIdentificationNumberTests
    public void UsIndividualTaxpayerIdentificationNumber_ExplicitCastToUsItin_ShouldCreateInstance_WhenValueContainsValidItin(String value)
    {
       // Arrange.
-      var expected = GetRawValue(value);
+      var expected = new UsIndividualTaxpayerIdentificationNumber(value);
 
       // Act.
       var sut = (UsIndividualTaxpayerIdentificationNumber)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]

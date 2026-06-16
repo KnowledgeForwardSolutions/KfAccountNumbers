@@ -465,7 +465,6 @@ public class GbHcNumberTests
       var sut = (GbHcNumber)value;
 
       // Assert.
-      sut.Should().NotBeNull();
       sut.Should().BeEquivalentTo(expected);
    }
 

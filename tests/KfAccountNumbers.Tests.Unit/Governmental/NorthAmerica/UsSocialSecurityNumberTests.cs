@@ -473,14 +473,13 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expected = GetRawValue(value);
+      var expected = new UsSocialSecurityNumber(value);
 
       // Act.
       var sut = (UsSocialSecurityNumber)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]

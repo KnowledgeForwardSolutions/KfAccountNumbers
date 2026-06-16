@@ -3,6 +3,14 @@
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
 
+using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+   KfAccountNumbers.Governmental.NorthAmerica.MxCurp,
+   KfAccountNumbers.Governmental.NorthAmerica.MxCurp.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.NorthAmerica.MxCurp.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.NorthAmerica.MxCurp.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.NorthAmerica.MxCurp.ValidationResult;
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.NorthAmerica;
 
 public class MxCurpTests
@@ -12,7 +20,7 @@ public class MxCurpTests
    private const String AltLowerCaseValidCurp = "maar790213hmnrlf03";   // From https://sayari.com/resources/breaking-down-mexican-national-id/
 
    /// <summary>
-   ///   Generate a test CURP value. Full defaults will result in the example CURP described in https://en.wikipedia.org/wiki/Unique_Population_Registry_Code
+   ///   Generate a test CURP value. Full defaults will result in the example CURP described in https://en.wikipedia.org/wiki/Unique_Population_Registry_Code.
    /// </summary>
    private static String GetCurp(
       String initials = "HEGG",
@@ -38,29 +46,31 @@ public class MxCurpTests
 
    public static TheoryData<String, Char> ValidBirthDates => new()
    {
-       { "560427", '0' },
-       { "000101", '0' },         // Jan 1, 1900 (digit homoclave)
-       { "991231", '0' },         // Dec 31, 1999
-       { "000101", 'A' },         // Jan 1, 2000 (letter homoclave)
-       { "991231", 'A' },         // Dec 31, 2099
-       { "040229", 'A' },         // Feb 29, 2004 (leap year)
+      // Min/max dates.
+      { "560427", '0' },
+      { "000101", '0' },         // Jan 1, 1900 (digit homoclave indicates 1900s)
+      { "991231", '0' },         // Dec 31, 1999
+      { "000101", 'A' },         // Jan 1, 2000 (letter homoclave indicates 2000s)
+      { "991231", 'A' },         // Dec 31, 2099
+      { "040229", 'A' },         // Feb 29, 2004 (leap year)
 
-       { "010131", '0' },         // Max day of month January
-       { "010228", '0' },         // Max day of month February (non leap year, 1900's)
-       { "010228", 'A' },         // Max day of month February (non leap year, 2000's)
-       { "040229", '0' },         // Max day of month February (leap year, 1900's)
-       { "040229", 'B' },         // Max day of month February (leap year, 2000's)
-       { "000229", 'b' },         // Max day of month February (leap year because homoclave indicates 2000, a century divisible by 400)
-       { "010331", '0' },         // Max day of month March
-       { "010430", 'A' },         // Max day of month April
-       { "010531", 'b' },         // Max day of month May
-       { "010630", '0' },         // Max day of month June
-       { "010731", 'A' },         // Max day of month July
-       { "010831", 'b' },         // Max day of month August
-       { "010930", '0' },         // Max day of month September
-       { "011031", 'A' },         // Max day of month October
-       { "011130", 'b' },         // Max day of month November
-       { "011231", '0' }          // Max day of month December
+      // Max valid date for each month
+      { "010131", '0' },         // Max day of month January
+      { "010228", '0' },         // Max day of month February (non leap year, 1900's)
+      { "010228", 'A' },         // Max day of month February (non leap year, 2000's)
+      { "040229", '0' },         // Max day of month February (leap year, 1900's)
+      { "040229", 'B' },         // Max day of month February (leap year, 2000's)
+      { "000229", 'b' },         // Max day of month February (leap year because homoclave indicates 2000, a century divisible by 400)
+      { "010331", '0' },         // Max day of month March
+      { "010430", 'A' },         // Max day of month April
+      { "010531", 'b' },         // Max day of month May
+      { "010630", '0' },         // Max day of month June
+      { "010731", 'A' },         // Max day of month July
+      { "010831", 'b' },         // Max day of month August
+      { "010930", '0' },         // Max day of month September
+      { "011031", 'A' },         // Max day of month October
+      { "011130", 'b' },         // Max day of month November
+      { "011231", '0' },         // Max day of month December
    };
 
    public static TheoryData<Char> ValidCheckDigits
@@ -101,6 +111,8 @@ public class MxCurpTests
    {
       get
       {
+         // Generates all valid 2-letter state codes from MxCurpStateCodes.
+         // Includes both uppercase and lowercase variants.
          var data = new TheoryData<String>();
          var stateCodes = MxCurpStateCodes.GetAllStateCodes();
          data.AddRange(stateCodes.AsEnumerable());
@@ -121,16 +133,16 @@ public class MxCurpTests
       "HEGG560427MVZRRL045",     // Length 19
    ];
 
-   public static TheoryData<String> InvalidNameInitials =>
-   [
-      " AAR",                    // Space in position 0
-      "\u00E1AAR",               // á in position 0
-      "\u00C1AAR",               // Á in position 0
-      "M1AR",                    // Numeric character in position 1
-      "MA!R",                    // ! in position 2
-      "MAA\u00F1",               // ñ in position 3
-      "MAA\u00D1",               // Ñ in position 3
-   ];
+   public static TheoryData<String, Int32> InvalidNameInitials = new()
+   {
+      { " AAR",      0 },        // Space in position 0
+      { "\u00E1AAR", 0 },        // á in position 0
+      { "\u00C1AAR", 0 },        // Á in position 0
+      { "M1AR",      1 },        // Numeric character in position 1
+      { "MA!R",      2 },        // ! in position 2
+      { "MAA\u00F1", 3 },        // ñ in position 3
+      { "MAA\u00D1", 3 },        // Ñ in position 3
+   };
 
    public static TheoryData<String, Char> InvalidBirthDates => new()
    {
@@ -141,6 +153,7 @@ public class MxCurpTests
       { "0101 1", '0' },         // Non-digit character ' '
       { "01010\u2153", '0' },    // Non-digit character Unicode fraction 1/3
 
+      // Six digits, but invalid date
       { "010001", '0' },         // Invalid month (too low)
       { "011301", 'A' },         // Invalid month (too high)
       { "010100", 'b' },         // Invalid day of month (too low)
@@ -179,16 +192,16 @@ public class MxCurpTests
       "1C",
    ];
 
-   public static TheoryData<String> InvalidNameConsonants =>
-   [
-      " LF",         // Space in position 0
-      "\u00E1LF",    // á in position 0
-      "\u00C1LF",    // Á in position 0
-      "R1F",         // Numeric character in position 1
-      "RL!",         // ! in position 2
-      "RL\u00F1",    // ñ in position 2
-      "RL\u00D1",    // Ñ in position 2
-   ];
+   public static TheoryData<String, Int32> InvalidNameConsonants = new()
+   {
+      { " LF",      13 },  // Space in position 0
+      { "\u00E1LF", 13 },  // á in position 0
+      { "\u00C1LF", 13 },  // Á in position 0
+      { "R1F",      14 },  // Numeric character in position 1
+      { "RL!",      15 },  // ! in position 2
+      { "RL\u00F1", 15 },  // ñ in position 2
+      { "RL\u00D1", 15 },  // Ñ in position 2
+   };
 
    public static TheoryData<Char> InvalidHomoclaves =>
    [
@@ -205,6 +218,35 @@ public class MxCurpTests
       '\u00F1',      // Invalid check digit Unicode ñ
       '\u2153',      // Invalid check digit Unicode fraction 1
    ];
+
+   private static InvalidLength GetInvalidLengthResult(String value)
+      => new(
+         Messages.MxCurpInvalidLength,
+         value.Length,
+         new ValidLengthDefinition(18, Messages.MxCurpValidLength));
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.MxCurpInvalidAlphabeticCharacter,
+         value[position],
+         position);
+
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
+      => new(Messages.MxCurpInvalidDateOfBirth, value[4..10], DateFormatName.YYMMDD);
+
+   private static InvalidGender GetInvalidGenderResult(String value)
+      => new(Messages.MxCurpInvalidGender, value[10].ToString());
+
+   private static InvalidStateProvince GetInvalidStateResult(String value)
+      => new(Messages.MxCurpInvalidState, value[11..13].ToString());
+
+   private static MxCurpInvalidHomoclave GetInvalidHomoclaveResult(String value)
+      => new(Messages.MxCurpInvalidHomoclave, value[16]);
+
+   private static InvalidChecksum GetInvalidChecksumResult()
+      => new(Messages.MxCurpInvalidCheckDigit, "N/A");
 
    #region Constructor Tests
    // ==========================================================================
@@ -296,11 +338,11 @@ public class MxCurpTests
    public void MxCurp_Constructor_ShouldCreateInstance_WhenNameConsonantsAreValid(String consonants)
    {
       // Arrange.
-      var cvalueurp = GetCurp(consonants: consonants);
-      var expected = cvalueurp.ToUpperInvariant();
+      var value = GetCurp(consonants: consonants);
+      var expected = value.ToUpperInvariant();
 
       // Act.
-      var sut = new MxCurp(cvalueurp);
+      var sut = new MxCurp(value);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -357,34 +399,49 @@ public class MxCurpTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
-         .Invoking(() => new MxCurp(value))
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpEmpty + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.Empty);
-
-   [Theory]
-   [MemberData(nameof(InvalidLengthValues))]
-   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
-         .Invoking(() => new MxCurp(value))
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidLength + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidLength);
-
-   [Theory]
-   [MemberData(nameof(InvalidNameInitials))]
-   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenNameInitialsAreInvalid(String initials)
    {
       // Arrange.
-      var value = GetCurp(initials);
+      LocalValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(value))
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidAlphabeticCharacterEncountered + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidAlphabeticCharacterEncountered);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new MxCurp(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidNameInitials))]
+   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenNameInitialsAreInvalid(
+      String initials,
+      Int32 position)
+   {
+      // Arrange.
+      var value = GetCurp(initials);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new MxCurp(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -395,13 +452,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(dateOfBirth: dateOfBirth, homoclave: homoclave);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(value))
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidDateOfBirth + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidDateOfBirth);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -410,13 +467,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(gender: gender);
+      LocalValidationError expected = GetInvalidGenderResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(value))
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidGender + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidGender);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -425,28 +482,30 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(stateCode: stateCode);
+      LocalValidationError expected = GetInvalidStateResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(value))
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidState + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidState);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidNameConsonants))]
-   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenNameConsonantsAreInvalid(String consonants)
+   public void MxCurp_Constructor_ShouldThrowKfValidationException_WhenNameConsonantsAreInvalid(
+      String consonants,
+      Int32 position)
    {
       // Arrange.
       var value = GetCurp(consonants: consonants);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(value))
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidAlphabeticCharacterEncountered + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidAlphabeticCharacterEncountered);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -455,13 +514,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(homoclave: homoclave);
+      LocalValidationError expected = GetInvalidHomoclaveResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(value))
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidHomoclave + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidHomoclave);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Fact]
@@ -469,13 +528,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(dateOfBirth: "010132", homoclave: '!'); // Invalid day of month and invalid homoclave
+      LocalValidationError expected = GetInvalidHomoclaveResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(value))
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidHomoclave + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidHomoclave);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -484,13 +543,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(checkDigit: checkDigit);
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => new MxCurp(value))
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidCheckDigit);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -518,7 +577,7 @@ public class MxCurpTests
       var expected = DateOnly.ParseExact(
          (Char.IsAsciiDigit(homoclave) ? "19" : "20") + dateOfBirth,
          "yyyyMMdd",
-         System.Globalization.CultureInfo.InvariantCulture);
+         CultureInfo.InvariantCulture);
       var sut = new MxCurp(value);
 
       // Act/assert.
@@ -625,7 +684,7 @@ public class MxCurpTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -639,7 +698,7 @@ public class MxCurpTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -649,14 +708,13 @@ public class MxCurpTests
    public void MxCurp_ExplicitCastToMxCurp_ShouldCreateInstance_WhenFullCurpValueIsValid(String value)
    {
       // Arrange.
-      var expected = value.ToUpperInvariant();
+      var expected = new MxCurp(value);
 
       // Act.
       var sut = (MxCurp)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -665,14 +723,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(initials);
-      var expected = value.ToUpperInvariant();
+      var expected = new MxCurp(value);
 
       // Act.
       var sut = (MxCurp)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -683,14 +740,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(dateOfBirth: dateOfBirth, homoclave: homoclave);
-      var expected = value.ToUpperInvariant();
+      var expected = new MxCurp(value);
 
       // Act.
       var sut = (MxCurp)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -699,14 +755,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(gender: gender);
-      var expected = value.ToUpperInvariant();
+      var expected = new MxCurp(value);
 
       // Act.
       var sut = (MxCurp)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -715,14 +770,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(stateCode: stateCode);
-      var expected = value.ToUpperInvariant();
+      var expected = new MxCurp(value);
 
       // Act.
       var sut = (MxCurp)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -731,14 +785,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(consonants: consonants);
-      var expected = value.ToUpperInvariant();
+      var expected = new MxCurp(value);
 
       // Act.
       var sut = (MxCurp)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -747,14 +800,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(homoclave: homoclave);
-      var expected = value.ToUpperInvariant();
+      var expected = new MxCurp(value);
 
       // Act.
-      var sut = new MxCurp(value);
+      var sut = (MxCurp)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -763,14 +815,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(checkDigit: checkDigit);
-      var expected = value.ToUpperInvariant();
+      var expected = new MxCurp(value);
 
       // Act.
       var sut = (MxCurp)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Fact]
@@ -778,47 +829,61 @@ public class MxCurpTests
    {
       // Arrange.
       var value = ValidCurp.ToLowerInvariant();
-      var expected = value.ToUpperInvariant();
+      var expected = new MxCurp(value);
 
       // Act.
       var sut = (MxCurp)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
-         .Invoking(() => _ = (MxCurp)value)
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpEmpty + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.Empty);
-
-   [Theory]
-   [MemberData(nameof(InvalidLengthValues))]
-   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-   => FluentActions
-         .Invoking(() => _ = (MxCurp)value)
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidLength + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidLength);
-
-   [Theory]
-   [MemberData(nameof(InvalidNameInitials))]
-   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenNameInitialsAreInvalid(String initials)
    {
       // Arrange.
-      var value = GetCurp(initials);
+      LocalValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)value)
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidAlphabeticCharacterEncountered + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidAlphabeticCharacterEncountered);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (MxCurp)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidNameInitials))]
+   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenNameInitialsAreInvalid(
+      String initials,
+      Int32 position)
+   {
+      // Arrange.
+      var value = GetCurp(initials);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (MxCurp)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -829,13 +894,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(dateOfBirth: dateOfBirth, homoclave: homoclave);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)value)
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidDateOfBirth + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidDateOfBirth);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -844,13 +909,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(gender: gender);
+      LocalValidationError expected = GetInvalidGenderResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)value)
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidGender + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidGender);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -859,28 +924,30 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(stateCode: stateCode);
+      LocalValidationError expected = GetInvalidStateResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)value)
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidState + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidState);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidNameConsonants))]
-   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenNameConsonantsAreInvalid(String consonants)
+   public void MxCurp_ExplicitCastToMxCurp_ShouldThrowKfValidationException_WhenNameConsonantsAreInvalid(
+      String consonants,
+      Int32 position)
    {
       // Arrange.
       var value = GetCurp(consonants: consonants);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)value)
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidAlphabeticCharacterEncountered + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidAlphabeticCharacterEncountered);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -889,13 +956,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(homoclave: homoclave);
+      LocalValidationError expected = GetInvalidHomoclaveResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)value)
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidHomoclave + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidHomoclave);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Fact]
@@ -903,13 +970,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(dateOfBirth: "010132", homoclave: '!'); // Invalid day of month and invalid homoclave
+      LocalValidationError expected = GetInvalidHomoclaveResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)value)
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidHomoclave + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidHomoclave);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -918,13 +985,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(checkDigit: checkDigit);
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (MxCurp)value)
-         .Should().Throw<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidCheckDigit);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -991,19 +1058,16 @@ public class MxCurpTests
 
    [Theory]
    [MemberData(nameof(ValidFullCurpValues))]
-   public void MxCurp_Create_ShouldCreateInstance_WhenFullCurpIsValueIsValid(String value)
+   public void MxCurp_Create_ShouldCreateInstance_WhenFullCurpValueIsValid(String value)
    {
       // Arrange.
-      var expectedValue = new MxCurp(value);
+      LocalCreateResult expected = new MxCurp(value);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1012,16 +1076,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(initials);
-      var expectedValue = new MxCurp(value);
+      LocalCreateResult expected = new MxCurp(value);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1032,16 +1093,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(dateOfBirth: dateOfBirth, homoclave: homoclave);
-      var expectedValue = new MxCurp(value);
+      LocalCreateResult expected = new MxCurp(value);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1050,16 +1108,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(gender: gender);
-      var expectedValue = new MxCurp(value);
+      LocalCreateResult expected = new MxCurp(value);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1068,16 +1123,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(stateCode: stateCode);
-      var expectedValue = new MxCurp(value);
+      LocalCreateResult expected = new MxCurp(value);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1086,16 +1138,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(consonants: consonants);
-      var expectedValue = new MxCurp(value);
+      LocalCreateResult expected = new MxCurp(value);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1104,16 +1153,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(homoclave: homoclave);
-      var expectedValue = new MxCurp(value);
+      LocalCreateResult expected = new MxCurp(value);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1122,16 +1168,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(checkDigit: checkDigit);
-      var expectedValue = new MxCurp(value);
+      LocalCreateResult expected = new MxCurp(value);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Fact]
@@ -1139,61 +1182,64 @@ public class MxCurpTests
    {
       // Arrange.
       var value = ValidCurp.ToLowerInvariant();
-      var expectedValue = new MxCurp(value.ToUpperInvariant());
+      LocalCreateResult expected = new MxCurp(value);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
+      var resultCurp = (MxCurp)result.Value;
+      resultCurp.Value.Should().Be(ValidCurp);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void MxCurp_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
+
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(MxCurpValidationResult.Empty);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void MxCurp_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
+
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(MxCurpValidationResult.InvalidLength);
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<LocalValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
    [MemberData(nameof(InvalidNameInitials))]
-   public void MxCurp_Create_ShouldReturnInvalidAlphabeticCharacterEncounteredResult_WhenNameInitialsAreInvalid(String initials)
+   public void MxCurp_Create_ShouldReturnInvalidAlphabeticCharacterEncounteredResult_WhenNameInitialsAreInvalid(
+      String initials,
+      Int32 position)
    {
       // Arrange.
       var value = GetCurp(initials: initials);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(MxCurpValidationResult.InvalidAlphabeticCharacterEncountered);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1204,15 +1250,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(dateOfBirth: dateOfBirth, homoclave: homoclave);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(MxCurpValidationResult.InvalidDateOfBirth);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1221,15 +1265,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(gender: gender);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidGenderResult(value);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(MxCurpValidationResult.InvalidGender);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1238,32 +1280,30 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(stateCode: stateCode);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidStateResult(value);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(MxCurpValidationResult.InvalidState);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidNameConsonants))]
-   public void MxCurp_Create_ShouldReturnInvalidAlphabeticCharacterEncounteredResult_WhenNameConsonantsAreInvalid(String consonants)
+   public void MxCurp_Create_ShouldReturnInvalidAlphabeticCharacterEncounteredResult_WhenNameConsonantsAreInvalid(
+      String consonants,
+      Int32 position)
    {
       // Arrange.
       var value = GetCurp(consonants: consonants);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(MxCurpValidationResult.InvalidAlphabeticCharacterEncountered);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1271,16 +1311,14 @@ public class MxCurpTests
    public void MxCurp_Create_ShouldReturnInvalidHomoclaveResult_WhenHomoclaveIsInvalidCharacter(Char homoclave)
    {
       // Arrange.
-      var curp = GetCurp(homoclave: homoclave);
+      var value = GetCurp(homoclave: homoclave);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidHomoclaveResult(value);
 
       // Act.
-      var result = MxCurp.Create(curp);
+      var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(MxCurpValidationResult.InvalidHomoclave);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Fact]
@@ -1288,15 +1326,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(dateOfBirth: "010132", homoclave: '!'); // Invalid day of month and invalid homoclave
+      LocalCreateResult expected = (LocalValidationError)GetInvalidHomoclaveResult(value);
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(MxCurpValidationResult.InvalidHomoclave);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1305,15 +1341,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(checkDigit: checkDigit);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
 
       // Act.
       var result = MxCurp.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(MxCurpValidationResult.InvalidCheckDigit);
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -1451,7 +1485,16 @@ public class MxCurpTests
    [Theory]
    [MemberData(nameof(ValidFullCurpValues))]
    public void MxCurp_Validate_ShouldReturnValidationPassed_WhenFullCurpValueIsValid(String value)
-      => MxCurp.Validate(value).Should().Be(MxCurpValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(ValidNameInitials))]
@@ -1459,9 +1502,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(initials);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      MxCurp.Validate(value).Should().Be(MxCurpValidationResult.ValidationPassed);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1472,9 +1519,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(dateOfBirth: dateOfBirth, homoclave: homoclave);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      MxCurp.Validate(value).Should().Be(MxCurpValidationResult.ValidationPassed);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1483,9 +1534,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(gender: gender);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      MxCurp.Validate(value).Should().Be(MxCurpValidationResult.ValidationPassed);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1494,9 +1549,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(stateCode: stateCode);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      MxCurp.Validate(value).Should().Be(MxCurpValidationResult.ValidationPassed);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1505,10 +1564,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(consonants: consonants);
-      var expected = MxCurpValidationResult.ValidationPassed;
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      MxCurp.Validate(value).Should().Be(expected);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1516,10 +1578,14 @@ public class MxCurpTests
    public void MxCurp_Validate_ShouldReturnValidationPassed_WhenHomoclaveIsValid(Char homoclave)
    {
       // Arrange.
-      var curp = GetCurp(homoclave: homoclave);
+      var value = GetCurp(homoclave: homoclave);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      MxCurp.Validate(curp).Should().Be(MxCurpValidationResult.ValidationPassed);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1528,9 +1594,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(checkDigit: checkDigit);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      MxCurp.Validate(value).Should().Be(MxCurpValidationResult.ValidationPassed);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Fact]
@@ -1538,30 +1608,61 @@ public class MxCurpTests
    {
       // Arrange.
       var value = ValidCurp.ToLowerInvariant();
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      MxCurp.Validate(value).Should().Be(MxCurpValidationResult.ValidationPassed);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void MxCurp_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String value)
-      => MxCurp.Validate(value).Should().Be(MxCurpValidationResult.Empty);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(EmptyValue);
+
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void MxCurp_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
-      => MxCurp.Validate(value).Should().Be(MxCurpValidationResult.InvalidLength);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidLengthResult(value);
+
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidNameInitials))]
-   public void MxCurp_Validate_ShouldReturnInvalidAlphabeticCharacterEncountered_WhenNameInitialsAreInvalid(String initials)
+   public void MxCurp_Validate_ShouldReturnInvalidAlphabeticCharacterEncountered_WhenNameInitialsAreInvalid(
+      String initials,
+      Int32 position)
    {
       // Arrange.
       var value = GetCurp(initials);
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
 
-      // Act/assert.
-      MxCurp.Validate(value).Should().Be(MxCurpValidationResult.InvalidAlphabeticCharacterEncountered);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1571,10 +1672,14 @@ public class MxCurpTests
       Char homoclave)
    {
       // Arrange.
-      var curp = GetCurp(dateOfBirth: dateOfBirth, homoclave: homoclave);
+      var value = GetCurp(dateOfBirth: dateOfBirth, homoclave: homoclave);
+      LocalValidationResult expected = GetInvalidDateOfBirthResult(value);
 
-      // Act/assert.
-      MxCurp.Validate(curp).Should().Be(MxCurpValidationResult.InvalidDateOfBirth);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1583,9 +1688,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(gender: gender);
+      LocalValidationResult expected = GetInvalidGenderResult(value);
 
-      // Act/assert.
-      MxCurp.Validate(value).Should().Be(MxCurpValidationResult.InvalidGender);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1594,20 +1703,30 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(stateCode: stateCode);
+      LocalValidationResult expected = GetInvalidStateResult(value);
 
-      // Act/assert.
-      MxCurp.Validate(value).Should().Be(MxCurpValidationResult.InvalidState);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidNameConsonants))]
-   public void MxCurp_Validate_ShouldReturnInvalidAlphabeticCharacterEncountered_WhenNameConsonantsAreInvalid(String consonants)
+   public void MxCurp_Validate_ShouldReturnInvalidAlphabeticCharacterEncountered_WhenNameConsonantsAreInvalid(
+      String consonants,
+      Int32 position)
    {
       // Arrange.
       var value = GetCurp(consonants: consonants);
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
 
-      // Act/assert.
-      MxCurp.Validate(value).Should().Be(MxCurpValidationResult.InvalidAlphabeticCharacterEncountered);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1616,9 +1735,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(homoclave: homoclave);
+      LocalValidationResult expected = GetInvalidHomoclaveResult(value);
 
-      // Act/assert.
-      MxCurp.Validate(value).Should().Be(MxCurpValidationResult.InvalidHomoclave);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Fact]
@@ -1626,9 +1749,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(dateOfBirth: "010132", homoclave: '!'); // Invalid day of month and invalid homoclave
+      LocalValidationResult expected = GetInvalidHomoclaveResult(value);
 
-      // Act/assert.
-      MxCurp.Validate(value).Should().Be(MxCurpValidationResult.InvalidHomoclave);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1637,9 +1764,13 @@ public class MxCurpTests
    {
       // Arrange.
       var value = GetCurp(checkDigit: checkDigit);
+      LocalValidationResult expected = GetInvalidChecksumResult();
 
-      // Act/assert.
-      MxCurp.Validate(value).Should().Be(MxCurpValidationResult.InvalidCheckDigit);
+      // Act.
+      var result = MxCurp.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -1729,15 +1860,15 @@ public class MxCurpTests
    public void MxCurp_JsonDeserialization_ShouldThrowKfValidationException_WhenCurpIsInvalid()
    {
       // Arrange.
-      var json = "{\"Curp\":\"MAAR790213HMNRLF0\"}";  // Invalid length
+      var value = GetCurp(homoclave: '!');
+      var json = "{\"Curp\":\"" + value + "\"}";  // Invalid homoclave
+      LocalValidationError expected = GetInvalidHomoclaveResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should()
-         .ThrowExactly<KfValidationException<MxCurpValidationResult>>()
-         .WithMessage(Messages.MxCurpInvalidLength + "*")
-         .And.ValidationResult.Should().Be(MxCurpValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion

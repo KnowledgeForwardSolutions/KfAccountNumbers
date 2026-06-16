@@ -188,8 +188,8 @@ public class CaSocialInsuranceNumberTests
    private static InvalidChecksum GetInvalidChecksumResult()
       => new(Messages.CaSinInvalidCheckDigit, Algorithms.Luhn.AlgorithmName);
 
-   private static CaSinInvalidProvince GetInvalidProvinceResult(String value)
-      => new(Messages.CaSinInvalidProvince, value[0]);
+   private static InvalidStateProvince GetInvalidProvinceResult(String value)
+      => new(Messages.CaSinInvalidProvince, value[0].ToString());
 
    #region Constructor Tests
    // ==========================================================================
@@ -421,14 +421,13 @@ public class CaSocialInsuranceNumberTests
    public void CaSocialInsuranceNumber_ExplicitCastToCaSin_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expected = GetRawValue(value);
+      var expected = new CaSocialInsuranceNumber(value);
 
       // Act.
       var sut = (CaSocialInsuranceNumber)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -451,16 +450,6 @@ public class CaSocialInsuranceNumberTests
    {
       // Arrange.
       LocalValidationError expected = GetInvalidLengthResult(value);
-
-      // Act/assert.
-      FluentActions
-         .Invoking(() => new CaSocialInsuranceNumber(value))
-         .Should().ThrowExactly<LocalValidationException>()
-         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
-            .ComparingByMembers<LocalValidationError>()
-            .ComparingByMembers<ValidLengthDefinition>()
-            .WithoutStrictOrdering());
-   }
 
       // Act/assert.
       FluentActions

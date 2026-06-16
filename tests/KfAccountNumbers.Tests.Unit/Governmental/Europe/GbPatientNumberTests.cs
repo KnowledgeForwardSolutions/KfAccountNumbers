@@ -651,7 +651,6 @@ public class GbPatientNumberTests
       var sut = (GbPatientNumber)value;
 
       // Assert.
-      sut.Should().NotBeNull();
       sut.Should().BeEquivalentTo(expected);
    }
 

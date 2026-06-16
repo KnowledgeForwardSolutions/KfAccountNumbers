@@ -468,7 +468,6 @@ public class GbNhsNumberTests
       var sut = (GbNhsNumber)value;
 
       // Assert.
-      sut.Should().NotBeNull();
       sut.Should().BeEquivalentTo(expected);
    }
 

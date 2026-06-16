@@ -28,5 +28,6 @@ internal sealed record SegmentRange(Int32 Start, Int32 End)
    ///   The portion of <paramref name="value"/> that is defined by this
    ///   <see cref="SegmentRange"/>.
    /// </returns>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    public ReadOnlySpan<Char> Extract(ReadOnlySpan<Char> value) => value[Start..End];
 }

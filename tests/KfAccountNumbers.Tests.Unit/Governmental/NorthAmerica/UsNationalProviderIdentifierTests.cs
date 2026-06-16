@@ -255,13 +255,13 @@ public class UsNationalProviderIdentifierTests
    {
       // Arrange.
       var value = ValidNpi;
+      var expected = new UsNationalProviderIdentifier(value);
 
       // Act.
       var sut = (UsNationalProviderIdentifier)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(value);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]

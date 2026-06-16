@@ -9,4 +9,9 @@ public static class DateFormatName
    ///   Six digit date format, day, month, year.
    /// </summary>
    public const String DDMMYY = "DDMMYY";
+
+   /// <summary>
+   ///   Six digit date format, year, month, day.
+   /// </summary>
+   public const String YYMMDD = "YYMMDD";
 }
