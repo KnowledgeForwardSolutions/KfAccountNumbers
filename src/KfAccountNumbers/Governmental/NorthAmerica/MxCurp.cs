@@ -32,8 +32,8 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         </item>
 ///         <item>
 ///            <description>
-///               Has alphabetic characters derived the persons surname(s) and
-///               given name in positions 0-3 and 13-15 (zero-based).
+///               Has alphabetic characters derived from the person's surname(s)
+///               and given name in positions 0-3 and 13-15 (zero-based).
 ///            </description>
 ///         </item>
 ///         <item>
@@ -57,7 +57,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///            <description>
 ///               Has an alphanumeric homoclave character in position 16
 ///               (zero-based). The homoclave is assigned by RENAPO to avoid
-///               duplicate CURP values. A digit homoclave character indicatesa
+///               duplicate CURP values. A digit homoclave character indicates a
 ///               birth in the 1900-1999 century, while an alphabetic homoclave
 ///               indicates a birth in the 2000-2099 century.
 ///            </description>
@@ -150,7 +150,7 @@ public record MxCurp
 
    private static readonly SegmentRange _initialsRange = new(0, 4);
    private static readonly SegmentRange _dateOfBirthRange = new(4, 10);
-   private static readonly SegmentRange _staeRange = new(11, 13);
+   private static readonly SegmentRange _stateRange = new(11, 13);
    private static readonly SegmentRange _consonantsRange = new(13, 16);
 
    /// <summary>
@@ -164,7 +164,7 @@ public record MxCurp
    ///   manner. However, the <see cref="Value"/> property will normalize the
    ///   CURP to upper-case.
    /// </remarks>
-   /// <exception cref="KfValidationException{MxCurpValidationResult}">
+   /// <exception cref="KfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
@@ -215,7 +215,7 @@ public record MxCurp
                InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
                InvalidGender invalidGender => new UKfValidationException<ValidationError>(invalidGender),
                InvalidStateProvince invalidState => new UKfValidationException<ValidationError>(invalidState),
-               MxCurpInvalidHomoclave invalidHomoclavae => new UKfValidationException<ValidationError>(invalidHomoclavae),
+               MxCurpInvalidHomoclave invalidHomoclave => new UKfValidationException<ValidationError>(invalidHomoclave),
                InvalidChecksum invalidCheckDigit => new UKfValidationException<ValidationError>(invalidCheckDigit),
                _ => new UnreachableException("This branch should never be reached"),
             };
@@ -258,7 +258,7 @@ public record MxCurp
    /// <summary>
    ///   Gets the person's state of birth as coded in the CURP.
    /// </summary>
-   public String StateCode => _staeRange.Extract(Value).ToString();
+   public String StateCode => _stateRange.Extract(Value).ToString();
 
    /// <summary>
    ///   Gets the CURP value.
@@ -304,8 +304,8 @@ public record MxCurp
    ///   String representation of a CURP.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{UsSocialSecurityNumber, ValidationError}"/>. Will
-   ///   contain the new <see cref="UsSocialSecurityNumber"/> if
+   ///   A <see cref="UCreateResult{MxCurp, ValidationError}"/>. Will
+   ///   contain the new <see cref="MxCurp"/> if
    ///   <paramref name="value"/> is valid or a <see cref="ValidationError"/>
    ///   that identifies the validation rule that was failed if
    ///   <paramref name="value"/> is invalid.
@@ -365,8 +365,9 @@ public record MxCurp
 
       if (!Char.IsAsciiLetterOrDigit(value[HomoclaveOffset]))
       {
-         // Check moved prior to date of birth validation since homoclave is used to determine
-         // the century for leap year date of birth validation.
+         // Required to check prior to date of birth validation since homoclave
+         // is used to determine the century for leap year date of birth
+         // validation.
          return new MxCurpInvalidHomoclave(
             Messages.MxCurpInvalidHomoclave,
             value[HomoclaveOffset]);
@@ -391,11 +392,12 @@ public record MxCurp
       {
          return new InvalidStateProvince(
             Messages.MxCurpInvalidState,
-            _staeRange.Extract(value).ToString());
+            _stateRange.Extract(value).ToString());
       }
 
       if (!Char.IsAsciiDigit(value[CheckDigitOffset]))
       {
+         // No algorithm published for CURP check digit, so algorithm name is N/A.
          return new InvalidChecksum(Messages.MxCurpInvalidCheckDigit, "N/A");
       }
 
@@ -482,7 +484,7 @@ public record MxCurp
 
    private static Boolean ValidateStateCode(ReadOnlySpan<Char> value)
    {
-      ReadOnlySpan<Char> stateCode = _staeRange.Extract(value);
+      ReadOnlySpan<Char> stateCode = _stateRange.Extract(value);
 
       return MxCurpStateCodes.ValidateStateCode(stateCode);
    }

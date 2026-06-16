@@ -48,9 +48,9 @@ public class MxCurpTests
    {
       // Min/max dates.
       { "560427", '0' },
-      { "000101", '0' },         // Jan 1, 1900 (digit homoclave)
+      { "000101", '0' },         // Jan 1, 1900 (digit homoclave indicates 1900s)
       { "991231", '0' },         // Dec 31, 1999
-      { "000101", 'A' },         // Jan 1, 2000 (letter homoclave)
+      { "000101", 'A' },         // Jan 1, 2000 (letter homoclave indicates 2000s)
       { "991231", 'A' },         // Dec 31, 2099
       { "040229", 'A' },         // Feb 29, 2004 (leap year)
 
@@ -111,6 +111,8 @@ public class MxCurpTests
    {
       get
       {
+         // Generates all valid 2-letter state codes from MxCurpStateCodes.
+         // Includes both uppercase and lowercase variants.
          var data = new TheoryData<String>();
          var stateCodes = MxCurpStateCodes.GetAllStateCodes();
          data.AddRange(stateCodes.AsEnumerable());
@@ -336,11 +338,11 @@ public class MxCurpTests
    public void MxCurp_Constructor_ShouldCreateInstance_WhenNameConsonantsAreValid(String consonants)
    {
       // Arrange.
-      var cvalueurp = GetCurp(consonants: consonants);
-      var expected = cvalueurp.ToUpperInvariant();
+      var value = GetCurp(consonants: consonants);
+      var expected = value.ToUpperInvariant();
 
       // Act.
-      var sut = new MxCurp(cvalueurp);
+      var sut = new MxCurp(value);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -682,7 +684,7 @@ public class MxCurpTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -696,7 +698,7 @@ public class MxCurpTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -1056,7 +1058,7 @@ public class MxCurpTests
 
    [Theory]
    [MemberData(nameof(ValidFullCurpValues))]
-   public void MxCurp_Create_ShouldCreateInstance_WhenFullCurpIsValueIsValid(String value)
+   public void MxCurp_Create_ShouldCreateInstance_WhenFullCurpValueIsValid(String value)
    {
       // Arrange.
       LocalCreateResult expected = new MxCurp(value);
