@@ -21,6 +21,6 @@ public class MxCurpBenchmarks
    [Arguments("hegg560427mvzrll04")]
    public void MxCurpValidateMethod(String curp)
    {
-      MxCurpValidationResult result = MxCurp.Validate(curp);
+      MxCurp.ValidationResult result = MxCurp.Validate(curp);
    }
 }

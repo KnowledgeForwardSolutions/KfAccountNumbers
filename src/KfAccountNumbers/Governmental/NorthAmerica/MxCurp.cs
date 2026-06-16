@@ -164,7 +164,7 @@ public record MxCurp
    ///   manner. However, the <see cref="Value"/> property will normalize the
    ///   CURP to upper-case.
    /// </remarks>
-   /// <exception cref="KfValidationException{ValidationError}">
+   /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -

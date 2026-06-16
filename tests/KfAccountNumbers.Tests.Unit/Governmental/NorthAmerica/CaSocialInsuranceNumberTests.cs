@@ -453,7 +453,7 @@ public class CaSocialInsuranceNumberTests
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new CaSocialInsuranceNumber(value))
+         .Invoking(() => (CaSocialInsuranceNumber)value)
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
             .ComparingByMembers<LocalValidationError>()
