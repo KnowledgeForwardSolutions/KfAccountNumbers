@@ -1024,7 +1024,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SE Personnummer with six-digit date of birth (YYMMDD) format.
+        ///   Looks up a localized string similar to SE Personnummer with eight-digit date of birth (YYYYMMDD) format.
         /// </summary>
         internal static string SePersonnummerLongFormatLength {
             get {
@@ -1033,7 +1033,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SE Personnummer with eight-digit date of birth (YYYYMMDD) format.
+        ///   Looks up a localized string similar to SE Personnummer with six-digit date of birth (YYMMDD) format.
         /// </summary>
         internal static string SePersonnummerShortFormatLength {
             get {

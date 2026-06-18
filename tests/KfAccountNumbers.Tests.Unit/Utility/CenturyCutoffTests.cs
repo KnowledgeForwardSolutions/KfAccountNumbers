@@ -144,7 +144,7 @@ public class CenturyCutoffTests
 
    #endregion
 
-   #region CurrentCentury Property Tests
+   #region PreviousCentury Property Tests
    // ==========================================================================
    // ==========================================================================
 
@@ -204,7 +204,7 @@ public class CenturyCutoffTests
    [InlineData( 0,   1)]
    [InlineData(49,  50)]
    [InlineData(99, 100)]
-   public void CenturyCutoff_ToFourDigitYear_ShouldReturnCurrentCentury_WhenYearIsLessThanCutoff(
+   public void CenturyCutoff_ToFourDigitYear_ShouldReturnDefaultCurrentCentury_WhenYearIsLessThanCutoff(
       Int32 year,
       Int32 cutoff)
    {
@@ -217,10 +217,27 @@ public class CenturyCutoffTests
    }
 
    [Theory]
+   [InlineData(1800,  0,   1)]
+   [InlineData(1800, 49,  50)]
+   [InlineData(1800, 99, 100)]
+   public void CenturyCutoff_ToFourDigitYear_ShouldReturnSuppliedCurrentCentury_WhenYearIsLessThanCutoff(
+      Int32 currentCentury,
+      Int32 year,
+      Int32 cutoff)
+   {
+      // Arrange.
+      var sut = new CenturyCutoff(cutoff, currentCentury);
+      var expected = currentCentury + year;
+
+      // Act/assert.
+      sut.ToFourDigitYear(year).Should().Be(expected);
+   }
+
+   [Theory]
    [InlineData( 1,  1)]
    [InlineData(50, 50)]
    [InlineData(99, 99)]
-   public void CenturyCutoff_ToFourDigitYear_ShouldReturnPreviousCentury_WhenYearIsEqualToCutoff(
+   public void CenturyCutoff_ToFourDigitYear_ShouldReturnDefaultPreviousCentury_WhenYearIsEqualToCutoff(
       Int32 year,
       Int32 cutoff)
    {
@@ -233,16 +250,50 @@ public class CenturyCutoffTests
    }
 
    [Theory]
+   [InlineData(1800,  1,  1)]
+   [InlineData(1800, 50, 50)]
+   [InlineData(1800, 99, 99)]
+   public void CenturyCutoff_ToFourDigitYear_ShouldReturnSuppliedPreviousCentury_WhenYearIsEqualToCutoff(
+      Int32 currentCentury,
+      Int32 year,
+      Int32 cutoff)
+   {
+      // Arrange.
+      var sut = new CenturyCutoff(cutoff, currentCentury);
+      var expected = sut.PreviousCentury + year;
+
+      // Act/assert.
+      sut.ToFourDigitYear(year).Should().Be(expected);
+   }
+
+   [Theory]
    [InlineData( 2,  1)]
    [InlineData(51, 50)]
    [InlineData(99, 98)]
-   public void CenturyCutoff_ToFourDigitYear_ShouldReturnPreviousCentury_WhenYearIsGreaterThanCutoff(
+   public void CenturyCutoff_ToFourDigitYear_ShouldReturnDefaultPreviousCentury_WhenYearIsGreaterThanCutoff(
       Int32 year,
       Int32 cutoff)
    {
       // Arrange.
       var sut = new CenturyCutoff(cutoff);
       var expected = 1900 + year;
+
+      // Act/assert.
+      sut.ToFourDigitYear(year).Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData(1800,  2,  1)]
+   [InlineData(1800, 51, 50)]
+   [InlineData(1800, 99, 98)]
+   public void CenturyCutoff_ToFourDigitYear_ShouldReturnSuppliedPreviousCentury_WhenYearIsGreaterThanCutoff(
+      Int32 currentCentury,
+      Int32 year,
+      Int32 cutoff)
+   {
+      // Arrange.
+      var sut = new CenturyCutoff(cutoff, currentCentury);
+      var expected = sut.PreviousCentury + year;
 
       // Act/assert.
       sut.ToFourDigitYear(year).Should().Be(expected);

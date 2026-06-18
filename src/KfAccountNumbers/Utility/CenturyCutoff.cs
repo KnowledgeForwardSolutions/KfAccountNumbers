@@ -189,7 +189,7 @@ public record CenturyCutoff
    public Int32 ToFourDigitYear(Int32 year)
       => year switch
       {
-         >= 0 and <= 99 => year + (year < Cutoff ? 2000 : 1900),
+         >= 0 and <= 99 => year + (year < Cutoff ? CurrentCentury : PreviousCentury),
          >= 1000 and <= 9999 => year,
          _ => throw new ArgumentOutOfRangeException(nameof(year), year, Messages.InvalidYearForYyToYyyyConversion),
       };

@@ -514,9 +514,9 @@
     <value>CurrentCentury must be a multiple of 100; i.e. 1900, 2000, etc.</value>
   </data>
   <data name="SePersonnummerShortFormatLength" xml:space="preserve">
-    <value>SE Personnummer with eight-digit date of birth (YYYYMMDD) format</value>
+    <value>SE Personnummer with six-digit date of birth (YYMMDD) format</value>
   </data>
   <data name="SePersonnummerLongFormatLength" xml:space="preserve">
-    <value>SE Personnummer with six-digit date of birth (YYMMDD) format</value>
+    <value>SE Personnummer with eight-digit date of birth (YYYYMMDD) format</value>
   </data>
 </root>

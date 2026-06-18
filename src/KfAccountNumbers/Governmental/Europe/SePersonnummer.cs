@@ -458,7 +458,7 @@ public record SePersonnummer
    ///   the separator character will default to a dash ('-').
    /// </param>
    /// <returns>
-   ///   The personummer formatted as a 13 character string.
+   ///   The personnummer formatted as a 13 character string.
    /// </returns>
    public String ToLongFormatValue(TimeProvider? timeProvider = null)
    {
@@ -482,7 +482,7 @@ public record SePersonnummer
    ///   the separator character will default to a dash ('-').
    /// </param>
    /// <returns>
-   ///   The personummer formatted as an 11 character string.
+   ///   The personnummer formatted as an 11 character string.
    /// </returns>
    public String ToShortFormatValue(TimeProvider? timeProvider = null)
    {
