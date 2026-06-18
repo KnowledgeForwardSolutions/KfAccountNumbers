@@ -1145,7 +1145,7 @@ public class SePersonnummerTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void SePersonnummer_Create_ShouldReturnInvalidCheckDigitValidationResult_WhenValueHasInvalidSeparator(
+   public void SePersonnummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(
       String value,
       Int32 position)
    {
@@ -1169,7 +1169,6 @@ public class SePersonnummerTests
       var value = GetPersonnummerWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
-      // Arrange.
       LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
 
       // Act.

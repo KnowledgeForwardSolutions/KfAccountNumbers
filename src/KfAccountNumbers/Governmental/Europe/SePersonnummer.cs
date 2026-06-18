@@ -274,7 +274,7 @@ public record SePersonnummer
    /// <param name="value">
    ///   String representation of a personnummer.
    /// </param>
-   /// <exception cref="KfValidationException{SePersonnummerValidationResult}">
+   /// <exception cref="UKfValidationException{ValidationResult}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
@@ -416,7 +416,7 @@ public record SePersonnummer
    ///   String representation of a Swedish Personal Identity Number (Personnummer).
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
-   ///   <paramref name="value"/> is not a valid NHS number.
+   ///   <paramref name="value"/> is not a valid personnummer number.
    /// </exception>
    public static explicit operator SePersonnummer(String? value) => new(value);
 
