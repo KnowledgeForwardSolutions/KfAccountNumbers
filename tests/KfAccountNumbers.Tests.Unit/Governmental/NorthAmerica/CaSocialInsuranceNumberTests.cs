@@ -167,7 +167,7 @@ public class CaSocialInsuranceNumberTests
       => new(
          Messages.CaSinInvalidLength,
          value.Length,
-         CaSocialInsuranceNumber.GetInvalidLengthDefinitions());
+         CaSocialInsuranceNumber.GetValidLengthDefinitions());
 
    private static InvalidSeparator GetInvalidSeparatorResult(
       String value,

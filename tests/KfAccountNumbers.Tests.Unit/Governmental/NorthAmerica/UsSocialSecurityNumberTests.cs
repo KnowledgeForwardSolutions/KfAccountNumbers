@@ -201,7 +201,7 @@ public class UsSocialSecurityNumberTests
       => new(
          Messages.UsSsnInvalidLength,
          value.Length,
-         UsSocialSecurityNumber.GetInvalidLengthDefinitions());
+         UsSocialSecurityNumber.GetValidLengthDefinitions());
 
    private static InvalidSeparator GetInvalidSeparatorResult(
       String value,

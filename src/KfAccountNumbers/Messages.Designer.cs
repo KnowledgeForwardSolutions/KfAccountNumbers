@@ -214,6 +214,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CurrentCentury must be a multiple of 100; i.e. 1900, 2000, etc..
+        /// </summary>
+        internal static string CurrentCenturyInvalidModulus {
+            get {
+                return ResourceManager.GetString("CurrentCenturyInvalidModulus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot convert a partial or unknown date to a DateOnly type..
         /// </summary>
         internal static string DateResultPartialDateToDateOnly {
@@ -1011,6 +1020,24 @@ namespace KfAccountNumbers {
         internal static string SePersonnummerInvalidSeparator {
             get {
                 return ResourceManager.GetString("SePersonnummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SE Personnummer with six-digit date of birth (YYMMDD) format.
+        /// </summary>
+        internal static string SePersonnummerLongFormatLength {
+            get {
+                return ResourceManager.GetString("SePersonnummerLongFormatLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SE Personnummer with eight-digit date of birth (YYYYMMDD) format.
+        /// </summary>
+        internal static string SePersonnummerShortFormatLength {
+            get {
+                return ResourceManager.GetString("SePersonnummerShortFormatLength", resourceCulture);
             }
         }
         

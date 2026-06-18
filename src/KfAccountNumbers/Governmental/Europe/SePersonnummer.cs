@@ -1,5 +1,8 @@
 // Ignore Spelling: Json Personnummer Samordningsnummer
 
+#pragma warning disable IDE0250 // Make struct 'readonly'
+#pragma warning disable IDE0046 // Convert to conditional expression
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -202,41 +205,33 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record SePersonnummer
 {
    /// <summary>
-   ///   The assumed century for two digit years greater than the
-   ///   <see cref="CenturyCutoff"/>.
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="SePersonnummer"/>.
    /// </summary>
-   /// <remarks>
-   ///   <para>
-   ///   Two digit years between 50 and 99 (inclusive) are assumed to represent
-   ///   the years 1950 - 1999.
-   ///   </para>
-   ///   <para>
-   ///   In 2050, this constant and <see cref="BelowCutoffCentury"/> will need
-   ///   to be adjusted to support two digit dates of birth beyond 2049.
-   ///   </para>
-   /// </remarks>
-   public const Int32 AboveCutoffCentury = 1900;
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
 
    /// <summary>
-   ///   The assumed century for two digit years below the <see cref="CenturyCutoff"/>.
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="SePersonnummer"/>.
    /// </summary>
-   /// <remarks>
-   ///   <para>
-   ///   Two digit years between 00 and 49 (inclusive) are assumed to represent
-   ///   the years 2000 - 2049.
-   ///   </para>
-   ///   <para>
-   ///   In 2050, this constant and <see cref="AboveCutoffCentury"/> will need
-   ///   to be adjusted to support two digit dates of birth beyond 2049.
-   ///   </para>
-   /// </remarks>
-   public const Int32 BelowCutoffCentury = 2000;
-
-   /// <summary>
-   ///   When interpreting two digit years, a value less than or equal to this
-   ///   constant are assumed to have a century of <see cref="BelowCutoffCentury"/>.
-   /// </summary>
-   public const Int32 CenturyCutoff = 49;
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
 
    /// <summary>
    ///   The latest year of birth supported by <see cref="SePersonnummer"/>.
@@ -264,7 +259,6 @@ public record SePersonnummer
 
    // These offsets are measured from the end of the string instead of the start
    // because the date of birth has variable length.
-   private const Int32 DateOfBirthOffset = 5;                  // Range end index is exclusive so -1 from expected offset from end
    private const Int32 SeparatorOffset = 5;
    private const Int32 GenderOffset = 2;
 
@@ -316,10 +310,19 @@ public record SePersonnummer
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         SePersonnummerValidationResult validationResult = Validate(value);
-         if (validationResult != SePersonnummerValidationResult.ValidationPassed)
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            throw validationResult.ToValidationException();
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
          }
       }
 
@@ -418,20 +421,23 @@ public record SePersonnummer
    ///   String representation of a Swedish Personal Identity Number (Personnummer).
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{SePersonnummer, SePersonnummerValidationResult}"/>.
-   ///   Will contain the new <see cref="SePersonnummerValidationResult"/> if
-   ///   <paramref name="value"/> is valid or
-   ///   <see cref="SePersonnummerValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="value"/> is
-   ///   invalid.
+   ///   A <see cref="UCreateResult{SePersonnummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="SePersonnummer"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<SePersonnummer, SePersonnummerValidationResult> Create(String? value)
-   {
-      SePersonnummerValidationResult validationResult = Validate(value);
-      return validationResult == SePersonnummerValidationResult.ValidationPassed
-         ? new SePersonnummer(value, validationMode: ValidationMode.BypassValidation)
-         : validationResult;
-   }
+   public static UCreateResult<SePersonnummer, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new SePersonnummer(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
 
    /// <summary>
    ///   Returns a string representation of the value in a long 13 character
@@ -500,48 +506,88 @@ public record SePersonnummer
    ///   String representation of a Swedish Personal Identity Number (Personnummer).
    /// </param>
    /// <returns>
-   ///   A <see cref="SePersonnummerValidationResult"/> enumeration
-   ///   value that indicates if the <paramref name="value"/> passed
-   ///   validation or what validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
-   public static SePersonnummerValidationResult Validate(String? value)
+   public static ValidationResult Validate(String? value)
    {
       if (String.IsNullOrWhiteSpace(value))
       {
-         return SePersonnummerValidationResult.Empty;
+         return default(EmptyValue);
       }
-      else if (value.Length is not ShortFormatLength and not LongFormatLength)
+
+      if (value.Length is not ShortFormatLength and not LongFormatLength)
       {
-         return SePersonnummerValidationResult.InvalidLength;
+         return new InvalidLength(
+            Messages.SePersonnummerInvalidLength,
+            value.Length,
+            GetValidLengthDefinitions());
       }
 
       // After performing basic checks, validate the check digit because the
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
+      Int32 invalidCharacterPosition;
       if (!ValidateCheckDigit(value))
       {
-         return ValidateAllDigits(value)
-            ? SePersonnummerValidationResult.InvalidCheckDigit
-            : SePersonnummerValidationResult.InvalidCharacter;
-      }
-      else if (value.Length == LongFormatLength
-               && (!value[0].IsAsciiDigit() || !value[1].IsAsciiDigit()))
-      {
-         // Check digit does not consider leading two digits for 13 character strings.
-         // So validate here.
-         return SePersonnummerValidationResult.InvalidCharacter;
-      }
-      else if (GetSeparator(value) is not Chars.Dash and not Chars.Plus)
-      {
-         return SePersonnummerValidationResult.InvalidSeparator;
-      }
-      else if (!ValidateDateOfBirth(value))
-      {
-         return SePersonnummerValidationResult.InvalidDateOfBirth;
+         invalidCharacterPosition = LocateInvalidCharacter(value);
+         return invalidCharacterPosition == -1
+            ? new InvalidChecksum(Messages.SePersonnummerInvalidCheckDigit, Algorithms.Luhn.AlgorithmName)
+            : new InvalidCharacter(
+               Messages.SePersonnummerInvalidCharacter,
+               value[invalidCharacterPosition],
+               invalidCharacterPosition);
       }
 
-      return SePersonnummerValidationResult.ValidationPassed;
+      if (value.Length == LongFormatLength)
+      {
+         // Check digit does not consider leading two digits for 13 character
+         // strings. So validate here.
+         invalidCharacterPosition = !value[0].IsAsciiDigit()
+            ? 0
+            : !value[1].IsAsciiDigit() ? 1 : -1;
+         if (invalidCharacterPosition != -1)
+         {
+            return new InvalidCharacter(
+               Messages.SePersonnummerInvalidCharacter,
+               value[invalidCharacterPosition],
+               invalidCharacterPosition);
+         }
+      }
+
+      if (GetSeparator(value) is not Chars.Dash and not Chars.Plus)
+      {
+         return new InvalidSeparator(
+            Messages.SePersonnummerInvalidSeparator,
+            value[^SeparatorOffset],
+            value.Length - SeparatorOffset);
+      }
+
+      if (!ValidateDateOfBirth(value))
+      {
+         return new InvalidDateOfBirth(
+            Messages.SePersonnummerInvalidDateOfBirth,
+            value[..^SeparatorOffset],
+            value.Length == ShortFormatLength ? DateFormatName.YYMMDD : DateFormatName.YYYYMMDD);
+      }
+
+      return default(ValidValue);
    }
+
+   /// <summary>
+   ///   Gets an array of details about valid lengths accepted for a
+   ///   personnummer.
+   /// </summary>
+   /// <returns>
+   ///   An array of <see cref="ValidLengthDefinition"/>s.
+   /// </returns>
+   internal static ValidLengthDefinition[] GetValidLengthDefinitions()
+      =>
+      [
+         new ValidLengthDefinition(ShortFormatLength, Messages.SePersonnummerShortFormatLength),
+         new ValidLengthDefinition(LongFormatLength, Messages.SePersonnummerLongFormatLength),
+      ];
 
    private Char GetCorrectSeparatorForAgeOfPerson(TimeProvider timeProvider)
    {
@@ -556,10 +602,6 @@ public record SePersonnummer
 
       return age >= 100 ? Chars.Plus : Chars.Dash;
    }
-
-   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static ReadOnlySpan<Char> GetDateOfBirth(ReadOnlySpan<Char> value)
-      => value[..^DateOfBirthOffset];
 
    /// <summary>
    ///   Given a validated personnummer, get the internal representation which
@@ -601,33 +643,34 @@ public record SePersonnummer
       => value[^SeparatorOffset];
 
    private static (Int32 Year, Int32 Month, Int32 Day) GetYearMonthDay(
-      ReadOnlySpan<Char> personnummer,
+      ReadOnlySpan<Char> value,
       Boolean applySamordningsnummerOffset = true)
    {
       Int32 year;
       Int32 month;
       Int32 day;
-      if (personnummer.Length == ShortFormatLength)
+      if (value.Length == ShortFormatLength)
       {
          // Refer to class XML comments for details of 2 digit year calculations.
-         year = personnummer.ParseTwoDigits();
-         year += year > CenturyCutoff ? 1900 : 2000;
-         if (GetSeparator(personnummer) == Chars.Plus)
+         CenturyCutoff centuryCutoff = CenturyCutoff.DefaultInstance;
+         year = value.ParseTwoDigits();
+         year = centuryCutoff.ToFourDigitYear(year);
+         if (GetSeparator(value) == Chars.Plus)
          {
             year -= 100;
          }
 
-         month = personnummer[2..].ParseTwoDigits();
-         day = personnummer[4..].ParseTwoDigits();
+         month = value[2..].ParseTwoDigits();
+         day = value[4..].ParseTwoDigits();
       }
       else
       {
          // This works for both 13 character values with separator and 12 character
          // all digit internal representation.
-         var century = personnummer.ParseTwoDigits() * 100;
-         year = century + personnummer[2..].ParseTwoDigits();
-         month = personnummer[4..].ParseTwoDigits();
-         day = personnummer[6..].ParseTwoDigits();
+         var century = value.ParseTwoDigits() * 100;
+         year = century + value[2..].ParseTwoDigits();
+         month = value[4..].ParseTwoDigits();
+         day = value[6..].ParseTwoDigits();
       }
 
       // Handle samordningsnummer, which adds 60 to the date of birth.
@@ -643,10 +686,14 @@ public record SePersonnummer
    ///   If <see cref="ValidateCheckDigit(String)"/> returns false, determine
    ///   if the reason was an invalid character or an invalid check digit.
    /// </summary>
-   private static Boolean ValidateAllDigits(ReadOnlySpan<Char> value)
+   /// <returns>
+   ///   The zero-based index of the first non-digit character or -1 if no
+   ///   non-digit characters found.
+   /// </returns>
+   private static Int32 LocateInvalidCharacter(ReadOnlySpan<Char> value)
    {
       var processLength = value.Length;
-      var separatorIndex = processLength - SeparatorOffset;          // SeparatorOffset measures from end of value
+      var separatorIndex = processLength - SeparatorOffset;          // SeparatorOffset measures from end of value because date of birth has variable length
 
       for (var index = 0; index < processLength; index++)
       {
@@ -657,11 +704,11 @@ public record SePersonnummer
 
          if (!value[index].IsAsciiDigit())
          {
-            return false;
+            return index;
          }
       }
 
-      return true;
+      return -1;
    }
 
    private static Boolean ValidateCheckDigit(String value)
@@ -674,15 +721,6 @@ public record SePersonnummer
 
    private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> value)
    {
-      ReadOnlySpan<Char> dateOfBirthSpan = GetDateOfBirth(value);
-      foreach (var ch in dateOfBirthSpan)
-      {
-         if (!Char.IsAsciiDigit(ch))
-         {
-            return false;
-         }
-      }
-
       // Manual validation is faster than using DateTime.TryParseExact.
 #pragma warning disable IDE0008 // Use explicit type
       var (year, month, day) = GetYearMonthDay(value);
@@ -718,4 +756,30 @@ public class SePersonnummerJsonConverter : JsonConverter<SePersonnummer>
 
    public override void Write(Utf8JsonWriter writer, SePersonnummer value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.ToLongFormatValue());
+}
+
+internal class SePersonNumberShortFormatCheckDigitMask : ICheckDigitMask
+{
+   private static readonly Lazy<SePersonNumberShortFormatCheckDigitMask> _instance =
+      new(() => new SePersonNumberShortFormatCheckDigitMask());
+
+   public static SePersonNumberShortFormatCheckDigitMask Instance => _instance.Value;
+
+   public Boolean ExcludeCharacter(Int32 index) => index == 6;
+
+   public Boolean IncludeCharacter(Int32 index) => index != 6;
+}
+
+internal class SePersonNumberLongFormatCheckDigitMask : ICheckDigitMask
+{
+   private static readonly Lazy<SePersonNumberLongFormatCheckDigitMask> _instance =
+      new(() => new SePersonNumberLongFormatCheckDigitMask());
+
+   public static SePersonNumberLongFormatCheckDigitMask Instance => _instance.Value;
+
+   public Boolean ExcludeCharacter(Int32 index)
+      => index is 0 or 1 or 8;
+
+   public Boolean IncludeCharacter(Int32 index)
+      => index is not 0 and not 1 and not 8;
 }

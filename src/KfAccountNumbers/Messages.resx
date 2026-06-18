@@ -510,4 +510,13 @@
   <data name="MxCurpValidLength" xml:space="preserve">
     <value>MX CURP should be 18 characters without separator or format characters</value>
   </data>
+  <data name="CurrentCenturyInvalidModulus" xml:space="preserve">
+    <value>CurrentCentury must be a multiple of 100; i.e. 1900, 2000, etc.</value>
+  </data>
+  <data name="SePersonnummerShortFormatLength" xml:space="preserve">
+    <value>SE Personnummer with eight-digit date of birth (YYYYMMDD) format</value>
+  </data>
+  <data name="SePersonnummerLongFormatLength" xml:space="preserve">
+    <value>SE Personnummer with six-digit date of birth (YYMMDD) format</value>
+  </data>
 </root>

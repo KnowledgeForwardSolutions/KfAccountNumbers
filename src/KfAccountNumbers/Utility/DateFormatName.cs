@@ -14,4 +14,9 @@ public static class DateFormatName
    ///   Six digit date format, year, month, day.
    /// </summary>
    public const String YYMMDD = "YYMMDD";
+
+   /// <summary>
+   ///   Eight digit date format, year, month, day.
+   /// </summary>
+   public const String YYYYMMDD = "YYYYMMDD";
 }

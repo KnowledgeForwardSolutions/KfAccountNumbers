@@ -7,10 +7,28 @@ public class CenturyCutoffTests
    // ==========================================================================
 
    [Theory]
+   [InlineData(CenturyCutoff.CutoffMinValue, 1900)]
+   [InlineData(50, 1800)]
+   [InlineData(CenturyCutoff.CutoffMaxValue, 2100)]
+   public void CenturyCutoff_Constructor_ShouldCreateInstance_WhenAllParametersAre(
+      Int32 cutoff,
+      Int32 currentCentury)
+   {
+      // Act.
+      var sut = new CenturyCutoff(cutoff, currentCentury);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Cutoff.Should().Be(cutoff);
+      sut.CurrentCentury.Should().Be(currentCentury);
+      sut.PreviousCentury.Should().Be(currentCentury - 100);
+   }
+
+   [Theory]
    [InlineData(CenturyCutoff.CutoffMinValue)]
-   [InlineData(CenturyCutoff.DefaultCutoff)]
+   [InlineData(50)]
    [InlineData(CenturyCutoff.CutoffMaxValue)]
-   public void CenturyCutoff_Constructor_ShouldCreateInstance_WhenValueIsValid(Int32 cutoff)
+   public void CenturyCutoff_Constructor_ShouldCreateInstance_WhenCutoffIsValid(Int32 cutoff)
    {
       // Act.
       var sut = new CenturyCutoff(cutoff);
@@ -18,23 +36,27 @@ public class CenturyCutoffTests
       // Assert.
       sut.Should().NotBeNull();
       sut.Cutoff.Should().Be(cutoff);
+      sut.CurrentCentury.Should().Be(2000);
+      sut.PreviousCentury.Should().Be(1900);
    }
 
    [Fact]
-   public void CenturyCutoff_Constructor_ShouldCreateInstanceWithDefaultCutoff_WhenCutoffIsNotSupplied()
+   public void CenturyCutoff_Constructor_ShouldCreateInstanceWithDefaultCutoff_WhenAllDefaultsUsed()
    {
       // Act.
       var sut = new CenturyCutoff();
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Cutoff.Should().Be(CenturyCutoff.DefaultCutoff);
+      sut.Cutoff.Should().Be(50);
+      sut.CurrentCentury.Should().Be(2000);
+      sut.PreviousCentury.Should().Be(1900);
    }
 
    [Theory]
    [InlineData(CenturyCutoff.CutoffMinValue - 1)]
    [InlineData(CenturyCutoff.CutoffMaxValue + 1)]
-   public void CenturyCutoff_Constructor_ShouldThrowArgumentOutOfRangeException_WhenValueIsInvalid(Int32 cutoff)
+   public void CenturyCutoff_Constructor_ShouldThrowArgumentOutOfRangeException_WhenCutoffIsInvalid(Int32 cutoff)
       => FluentActions
       .Invoking(() => new CenturyCutoff(cutoff))
       .Should()
@@ -42,6 +64,36 @@ public class CenturyCutoffTests
       .WithParameterName(nameof(cutoff))
       .WithMessage(Messages.InvalidCenturyCutoff + "*")
       .And.ActualValue.Should().Be(cutoff);
+
+   [Theory]
+   [InlineData(1901)]
+   [InlineData(1999)]
+   public void CenturyCutoff_Constructor_ShouldThrowArgumentOutOfRangeException_WhenCurrentCenturyIsInvalid(Int32 currentCentury)
+      => FluentActions
+         .Invoking(() => new CenturyCutoff(currentCentury: currentCentury))
+         .Should()
+         .ThrowExactly<ArgumentOutOfRangeException>()
+         .WithParameterName(nameof(currentCentury))
+         .WithMessage(Messages.CurrentCenturyInvalidModulus + "*")
+         .And.ActualValue.Should().Be(currentCentury);
+
+   #endregion
+
+   #region CurrentCentury Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(1900)]
+   [InlineData(2100)]
+   public void CenturyCutoff_CurrentCentury_ShouldReturnExpectedValue(Int32 currentCentury)
+   {
+      // Arrange.
+      var sut = new CenturyCutoff(currentCentury: currentCentury);
+
+      // Act/assert.
+      sut.CurrentCentury.Should().Be(currentCentury);
+   }
 
    #endregion
 
@@ -51,7 +103,7 @@ public class CenturyCutoffTests
 
    [Theory]
    [InlineData(CenturyCutoff.CutoffMinValue)]
-   [InlineData(CenturyCutoff.DefaultCutoff)]
+   [InlineData(50)]
    [InlineData(CenturyCutoff.CutoffMaxValue)]
    public void CenturyCutoff_Cutoff_ShouldReturnExpectedValue(Int32 cutoff)
    {
@@ -76,7 +128,7 @@ public class CenturyCutoffTests
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Cutoff.Should().Be(CenturyCutoff.DefaultCutoff);
+      sut.Cutoff.Should().Be(50);
    }
 
    [Fact]
@@ -92,13 +144,32 @@ public class CenturyCutoffTests
 
    #endregion
 
+   #region CurrentCentury Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(1900)]
+   [InlineData(2100)]
+   public void CenturyCutoff_PreviousCentury_ShouldReturnExpectedValue(Int32 currentCentury)
+   {
+      // Arrange.
+      var sut = new CenturyCutoff(currentCentury: currentCentury);
+      var expected = currentCentury - 100;
+
+      // Act/assert.
+      sut.PreviousCentury.Should().Be(expected);
+   }
+
+   #endregion
+
    #region Conversion Operator Tests
    // ==========================================================================
    // ==========================================================================
 
    [Theory]
    [InlineData(CenturyCutoff.CutoffMinValue)]
-   [InlineData(CenturyCutoff.DefaultCutoff)]
+   [InlineData(50)]
    [InlineData(CenturyCutoff.CutoffMaxValue)]
    public void CenturyCutoff_ExplicitConversionToCenturyCutoff_ShouldCreateInstance_WhenValueIsValid(Int32 cutoff)
    {

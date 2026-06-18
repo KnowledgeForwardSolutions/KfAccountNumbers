@@ -170,7 +170,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       => new(
          Messages.UsItinInvalidLength,
          value.Length,
-         UsIndividualTaxpayerIdentificationNumber.GetInvalidLengthDefinitions());
+         UsIndividualTaxpayerIdentificationNumber.GetValidLengthDefinitions());
 
    private static InvalidSeparator GetInvalidSeparatorResult(
       String value,
