@@ -320,7 +320,7 @@ public record UsSocialSecurityNumber
          return new InvalidLength(
             Messages.UsSsnInvalidLength,
             value.Length,
-            GetInvalidLengthDefinitions());
+            GetValidLengthDefinitions());
       }
 
       if (!ValidateSeparators(value, out var invalidSeparatorPosition))
@@ -384,7 +384,7 @@ public record UsSocialSecurityNumber
    /// <returns>
    ///   An array of <see cref="ValidLengthDefinition"/>s.
    /// </returns>
-   internal static ValidLengthDefinition[] GetInvalidLengthDefinitions()
+   internal static ValidLengthDefinition[] GetValidLengthDefinitions()
       =>
       [
          new ValidLengthDefinition(UnformattedLength, Messages.UsTinUnformattedLength),

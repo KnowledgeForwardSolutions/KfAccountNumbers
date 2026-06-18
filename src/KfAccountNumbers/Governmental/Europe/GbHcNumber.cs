@@ -8,7 +8,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A H&amp;C Number consists of 10 digits, structured as NNNNNNNNNC, where:
+///      A H&amp;C Number consists of 10 digits, structured as NNNNNNNNNC,
+///      where:
 ///      <list type="bullet">
 ///         <item>
 ///            <term>NNNNNNNNN</term>
@@ -26,21 +27,22 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      </list>
 ///   </para>
 ///   <para>
-///      H&amp;C Numbers can be displayed as a string of 10 digits or formatted for
-///      readability as three groups of digits in a '3 3 4' pattern
+///      H&amp;C Numbers can be displayed as a string of 10 digits or formatted
+///      for readability as three groups of digits in a '3 3 4' pattern
 ///      (e.g. "123 456 7890"). The optional separator characters can be any
 ///      character that is not an ASCII digit ('0' - '9'), but both separator
-///      characters must be the same. The typical separator character is a space (' ').
+///      characters must be the same. The typical separator character is a space
+///      (' ').
 ///   </para>
 ///   <para>
-///      Each of the public health services in the United Kingdom (NHS, Scottish CHI
-///      and Northern Ireland H&amp;C) are allocated separate blocks of 10-digit
-///      numbers so it is possible to determine what service issued the number by
-///      comparing the number to a list of valid ranges for each service. For
-///      H&amp;C, the valid ranges are 320 000 000 to 399 999 999 (excluding the
-///      trailing check digit). <see cref="GbHcNumber"/> also allows a range of
-///      numbers from 900 000 000 to 999 999 999 which are reserved for test
-///      purposes and not issued to the public.
+///      Each of the public health services in the United Kingdom (NHS, Scottish
+///      CHI and Northern Ireland H&amp;C) are allocated separate blocks of
+///      10-digit numbers so it is possible to determine what service issued the
+///      number by comparing the number to a list of valid ranges for each
+///      service. For H&amp;C, the valid ranges are 320 000 000 to 399 999 999
+///      (excluding the trailing check digit). <see cref="GbHcNumber"/> also
+///      allows a range of numbers from 900 000 000 to 999 999 999 which are
+///      reserved for test purposes and not issued to the public.
 ///   </para>
 ///   <para>
 ///      When creating a new <see cref="GbHcNumber"/>, the following validation
@@ -71,8 +73,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               If the value is 12 characters long, character positions 3 and 7
-///               (zero-based) must not be ASCII digits ('0' - '9'). The same
+///               If the value is 12 characters long, character positions 3 and
+///               7 (zero-based) must not be ASCII digits ('0' - '9'). The same
 ///               character must be used in each separator position.
 ///            </description>
 ///         </item>
@@ -85,11 +87,12 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      </list>
 ///   </para>
 ///   <para>
-///      The Modulus 11 check digit algorithm used by H&amp;C numbers can generate
-///      a check value of 10 which can not be encoded as a single decimal digit.
-///      Health and Care and other issuing authorities avoid this issue by not
-///      issuing any number that would result in a check value of 10. This means
-///      that approximately 9.09% of all possible values are never issued.
+///      The Modulus 11 check digit algorithm used by H&amp;C numbers can
+///      generate a check value of 10 which can not be encoded as a single
+///      decimal digit. Health and Care and other issuing authorities avoid this
+///      issue by not issuing any number that would result in a check value of
+///      10. This means that approximately 9.09% of all possible values are
+///      never issued.
 ///   </para>
 ///   <para>
 ///      Example values:
@@ -122,8 +125,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      Also see <see cref="GbChiNumber"/>, <see cref="GbNhsNumber"/> and
-///      <see cref="GbPatientNumber"/> for associated patient identifier business
-///      objects.
+///      <see cref="GbPatientNumber"/> for associated patient identifier
+///      business objects.
 ///   </para>
 /// </remarks>
 [JsonConverter(typeof(GbHcNumberJsonConverter))]
@@ -131,8 +134,8 @@ public record GbHcNumber : GbPatientNumberBase
 {
    /// <summary>
    ///   Discriminated union defining the types of identifier that
-   ///   <see cref="GbHcNumber"/> can represent. Either a H&amp;C number or a test
-   ///   number.
+   ///   <see cref="GbHcNumber"/> can represent. Either a H&amp;C number or a
+   ///   test number.
    /// </summary>
    public union IdentifierCategory(GbHealthService.Hc, GbHealthService.Test) { }
 

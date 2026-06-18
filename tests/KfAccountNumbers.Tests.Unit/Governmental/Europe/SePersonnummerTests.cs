@@ -6,6 +6,14 @@
 
 using Microsoft.Extensions.Time.Testing;
 
+using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+   KfAccountNumbers.Governmental.Europe.SePersonnummer,
+   KfAccountNumbers.Governmental.Europe.SePersonnummer.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.Europe.SePersonnummer.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.Europe.SePersonnummer.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.Europe.SePersonnummer.ValidationResult;
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class SePersonnummerTests
@@ -26,7 +34,7 @@ public class SePersonnummerTests
       String birthSerialNumber = "987")
    {
       var partialPersonnummer = $"{dateOfBirth[^6..]}{birthSerialNumber}";
-      _ = CheckDigits.Net.Algorithms.Luhn.TryCalculateCheckDigit(partialPersonnummer, out var checkDigit);
+      _ = Algorithms.Luhn.TryCalculateCheckDigit(partialPersonnummer, out var checkDigit);
 
       return $"{dateOfBirth}{separator}{birthSerialNumber}{checkDigit}";
    }
@@ -40,9 +48,7 @@ public class SePersonnummerTests
 
       var year = ((personnummer[0] - Chars.DigitZero) * 10)
          + (personnummer[1] - Chars.DigitZero);
-      year += year <= SePersonnummer.CenturyCutoff
-         ? SePersonnummer.BelowCutoffCentury
-         : SePersonnummer.AboveCutoffCentury;
+      year = CenturyCutoff.DefaultInstance.ToFourDigitYear(year);
       if (personnummer[6] == Chars.Plus)
       {
          year -= 100;
@@ -82,6 +88,8 @@ public class SePersonnummerTests
 
    public static TheoryData<String, Char> ValidDateOfBirthValues = new()
    {
+      // Personnummer values
+      // Min/max/boundary values
       { "500101", '+' },         // Minimum valid six digit date, January 1, 1850
       { "991231", '+' },         // December 31, 1899
       { "000101", '+' },         // January 1, 1900
@@ -89,6 +97,7 @@ public class SePersonnummerTests
       { "000101", '-' },         // January 1, 2000
       { "491231", '-' },         // Maximum valid six digit date, December 31, 2049
 
+      // Month max days
       { "010131", '-' },         // Max day of month January 2001
       { "910228", '+' },         // Max day of month February 1891 (non-leap year)
       { "960229", '+' },         // Max day of month February 1896 (leap year)
@@ -107,6 +116,7 @@ public class SePersonnummerTests
       { "111130", '+' },         // Max day of month November 1911
       { "121231", '-' },         // Max day of month December 2012
 
+      // Min/max/boundary values
       { "18500101", '+' },       // Minimum valid six digit date, January 1, 1850
       { "18991231", '+' },       // December 31, 1899
       { "19000101", '+' },       // January 1, 1900
@@ -114,6 +124,7 @@ public class SePersonnummerTests
       { "20000101", '-' },       // January 1, 2000
       { "20491231", '-' },       // Maximum valid six digit date, December 31, 2049
 
+      // Month max days
       { "20010131", '-' },       // Max day of month January 2001
       { "18910228", '+' },       // Max day of month February 1891 (non-leap year)
       { "18960229", '+' },       // Max day of month February 1896 (leap year)
@@ -132,7 +143,8 @@ public class SePersonnummerTests
       { "19111130", '+' },       // Max day of month November 1911
       { "20121231", '-' },       // Max day of month December 2012
 
-      // Repeat for samordningsnummers
+      // Samordningsnummer values
+      // Min/max/boundary values
       { "500161", '+' },         // Minimum valid six digit date, January 1, 1850
       { "991291", '+' },         // December 31, 1899
       { "000161", '+' },         // January 1, 1900
@@ -140,6 +152,7 @@ public class SePersonnummerTests
       { "000161", '-' },         // January 1, 2000
       { "491291", '-' },         // Maximum valid six digit date, December 31, 2049
 
+      // Month max days
       { "010191", '-' },         // Max day of month January 2001
       { "910288", '+' },         // Max day of month February 1891 (non-leap year)
       { "960289", '+' },         // Max day of month February 1896 (leap year)
@@ -158,6 +171,7 @@ public class SePersonnummerTests
       { "111190", '+' },         // Max day of month November 1911
       { "121291", '-' },         // Max day of month December 2012
 
+      // Min/max/boundary values
       { "18500161", '+' },       // Minimum valid six digit date, January 1, 1850
       { "18991291", '+' },       // December 31, 1899
       { "19000161", '+' },       // January 1, 1900
@@ -165,6 +179,7 @@ public class SePersonnummerTests
       { "20000161", '-' },       // January 1, 2000
       { "20491291", '-' },       // Maximum valid six digit date, December 31, 2049
 
+      // Month max days
       { "20010191", '-' },       // Max day of month January 2001
       { "18910288", '+' },       // Max day of month February 1891 (non-leap year)
       { "18960289", '+' },       // Max day of month February 1896 (leap year)
@@ -192,32 +207,34 @@ public class SePersonnummerTests
       new String('1', 100) // Very long string
    ];
 
-   public static TheoryData<String> InvalidCharacterValues =>
-   [
-      "A11228-9874",          // Non-digit character 'A'
-      "8B1228-9874",          // Non-digit character 'B'
-      "81!228-9874",          // Non-digit character '!'
-      "811 28-9874",          // Non-digit character ' '
-      "8112a8-9874",          // Non-digit character 'a'
-      "8112a\u2153-9874",     // Non-digit character Unicode fraction 1/3
-      "811228-+874",          // Non-digit character '+'
-      "811228-9.74",          // Non-digit character '.'
-      "811228-98:4",          // Non-digit character ':'
-      "811228-987~",          // Non-digit character '~'
+   public static TheoryData<String, Int32> InvalidCharacterValues = new()
+   {
+      // Short format values
+      { "A11228-9874", 0 },         // Non-digit character 'A'
+      { "8B1228-9874", 1 },         // Non-digit character 'B'
+      { "81!228-9874", 2 },         // Non-digit character '!'
+      { "811 28-9874", 3 },         // Non-digit character ' '
+      { "8112a8-9874", 4 },         // Non-digit character 'a'
+      { "81122\u2153-9874", 5 },    // Non-digit character Unicode fraction 1/3
+      { "811228-+874", 7 },         // Non-digit character '+'
+      { "811228-9.74", 8 },         // Non-digit character '.'
+      { "811228-98:4", 9 },         // Non-digit character ':'
+      { "811228-987~", 10 },        // Non-digit character '~'
 
-      "z9811228-9874",        // Non-digit character 'z'
-      "1^811228-9874",        // Non-digit character '^'
-      "19A11228-9874",        // Non-digit character 'A'
-      "198B1228-9874",        // Non-digit character 'B'
-      "1981!228-9874",        // Non-digit character '!'
-      "19811 28-9874",        // Non-digit character ' '
-      "198112a8-9874",        // Non-digit character 'a'
-      "198112a\u2153-9874",   // Non-digit character Unicode fraction 1/3
-      "19811228-+874",        // Non-digit character '+'
-      "19811228-9.74",        // Non-digit character '.'
-      "19811228-98:4",        // Non-digit character ':'
-      "19811228-987~",        // Non-digit character '~'
-   ];
+      // Long format values
+      { "z9811228-9874", 0 },       // Non-digit character 'z'
+      { "1^811228-9874", 1 },       // Non-digit character '^'
+      { "19A11228-9874", 2 },       // Non-digit character 'A'
+      { "198B1228-9874", 3 },       // Non-digit character 'B'
+      { "1981!228-9874", 4 },       // Non-digit character '!'
+      { "19811 28-9874", 5 },       // Non-digit character ' '
+      { "198112a8-9874", 6 },       // Non-digit character 'a'
+      { "1981122\u2153-9874", 7 },  // Non-digit character Unicode fraction 1/3
+      { "19811228-+874", 9 },       // Non-digit character '+'
+      { "19811228-9.74", 10 },      // Non-digit character '.'
+      { "19811228-98:4", 11 },      // Non-digit character ':'
+      { "19811228-987~", 12 },      // Non-digit character '~'
+   };
 
    public static TheoryData<String> InvalidCheckDigitValues =>
    [
@@ -237,16 +254,20 @@ public class SePersonnummerTests
       "19880411+3328",     // 19880411+2228 with two digit twin error 22 -> 33
    ];
 
-   public static TheoryData<String> InvalidSeparatorValues =>
-   [
-      "811228*9874",
-      "19811228*9874"
-   ];
+   public static TheoryData<String, Int32> InvalidSeparatorValues = new()
+   {
+      { "811228*9874", 6 },
+      { "19811228*9874", 8 },
+   };
 
    public static TheoryData<String, Char> InvalidDateOfBirthValues = new()
    {
+      // Personnummer values
+      // Invalid month
       { "010001", '+' },      // Invalid month (too low)
       { "011301", '-' },      // Invalid month (too high)
+
+      // Invalid day
       { "010100", '+' },      // Invalid day of month (too low)
       { "010132", '-' },      // Invalid day of month January
       { "010229", '+' },      // Invalid day of month February (non leap year)
@@ -263,11 +284,15 @@ public class SePersonnummerTests
       { "011131", '-' },      // Invalid day of month November
       { "011232", '+' },      // Invalid day of month December
 
+      // Invalid year
       { "17991232", '+' },    // Invalid year (too low)
       { "21010101", '-' },    // Invalid year (too high)
 
+      // Invalid month
       { "19010001", '+' },    // Invalid month (too low)
       { "20011301", '-' },    // Invalid month (too high)
+
+      // Invalid day
       { "19010100", '+' },    // Invalid day of month (too low)
       { "20010132", '-' },    // Invalid day of month January
       { "19010229", '+' },    // Invalid day of month February (non leap year)
@@ -284,9 +309,12 @@ public class SePersonnummerTests
       { "20011131", '-' },    // Invalid day of month November
       { "19011232", '+' },    // Invalid day of month December
 
-      // Repeat for samordningsnummer.
+      // Samordningsnummer values
+      // Invalid month
       { "010061", '+' },      // Invalid month (too low)
       { "011361", '-' },      // Invalid month (too high)
+
+      // Invalid day
       { "010160", '+' },      // Invalid day of month (too low)
       { "010192", '-' },      // Invalid day of month January
       { "010289", '+' },      // Invalid day of month February (non leap year)
@@ -303,11 +331,15 @@ public class SePersonnummerTests
       { "011191", '-' },      // Invalid day of month November
       { "011292", '+' },      // Invalid day of month December
 
+      // Invalid year
       { "17991292", '+' },    // Invalid year (too low)
       { "21010161", '-' },    // Invalid year (too high)
 
+      // Invalid month
       { "19010061", '+' },    // Invalid month (too low)
       { "20011361", '-' },    // Invalid month (too high)
+
+      // Invalid day
       { "19010160", '+' },    // Invalid day of month (too low)
       { "20010192", '-' },    // Invalid day of month January
       { "19010289", '+' },    // Invalid day of month February (non leap year)
@@ -325,21 +357,41 @@ public class SePersonnummerTests
       { "19011292", '+' },    // Invalid day of month December
    };
 
+   private static InvalidLength GetInvalidLengthResult(String value)
+      => new(
+         Messages.SePersonnummerInvalidLength,
+         value.Length,
+         SePersonnummer.GetValidLengthDefinitions());
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.SePersonnummerInvalidCharacter,
+         value[position],
+         position);
+
+   private static InvalidChecksum GetInvalidChecksumResult()
+      => new(
+         Messages.SePersonnummerInvalidCheckDigit,
+         Algorithms.Luhn.AlgorithmName);
+
+   private static InvalidSeparator GetInvalidSeparatorResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.SePersonnummerInvalidSeparator,
+         value[position],
+         position);
+
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
+      => value.Length == 11
+         ? new InvalidDateOfBirth(Messages.SePersonnummerInvalidDateOfBirth, value[..6], DateFormatName.YYMMDD)
+         : new InvalidDateOfBirth(Messages.SePersonnummerInvalidDateOfBirth, value[..8], DateFormatName.YYYYMMDD);
+
    #region Constants Tests
    // ==========================================================================
    // ==========================================================================
-
-   [Fact]
-   public void SePersonnummer_AboveCutoffCentury_ShouldHaveExpectedValue()
-      => SePersonnummer.AboveCutoffCentury.Should().Be(1900);
-
-   [Fact]
-   public void SePersonnummer_BelowCutoffCentury_ShouldHaveExpectedValue()
-      => SePersonnummer.BelowCutoffCentury.Should().Be(2000);
-
-   [Fact]
-   public void SePersonnummer_CenturyCutoff_ShouldHaveExpectedValue()
-      => SePersonnummer.CenturyCutoff.Should().Be(49);
 
    [Fact]
    public void SePersonnummer_MinimumValidYearOfBirth_ShouldHaveExpectedValue()
@@ -413,47 +465,79 @@ public class SePersonnummerTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new SePersonnummer(value))
-         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
-         .WithMessage(Messages.SePersonnummerEmpty + "*")
-         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new SePersonnummer(value))
-         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
-         .WithMessage(Messages.SePersonnummerInvalidLength + "*")
-         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(String value)
-      => FluentActions
+   public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new SePersonnummer(value))
-         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
-         .WithMessage(Messages.SePersonnummerInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new SePersonnummer(value))
-         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
-         .WithMessage(Messages.SePersonnummerInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidCheckDigit);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
-      => FluentActions
+   public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new SePersonnummer(value))
-         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
-         .WithMessage(Messages.SePersonnummerInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]
@@ -465,13 +549,13 @@ public class SePersonnummerTests
       var value = GetPersonnummerWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new SePersonnummer(value))
-         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
-         .WithMessage(Messages.SePersonnummerInvalidDateOfBirth + "*")
-         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidDateOfBirth);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -554,7 +638,7 @@ public class SePersonnummerTests
       var expected = DateOnly.ParseExact(
          expectedDateOfBirth,
          "yyyyMMdd",
-         System.Globalization.CultureInfo.InvariantCulture);
+         CultureInfo.InvariantCulture);
 
       // Act/assert.
       sut.DateOfBirth.Should().Be(expected);
@@ -610,9 +694,10 @@ public class SePersonnummerTests
       // Arrange.
       var personnummer = GetPersonnummerWithValidCheckDigit(dateOfBirth: dateOfBirth);
       var sut = new SePersonnummer(personnummer);
+      SePersonnummer.IdentifierCategory expected = default(SeIdentifierType.Personnummer);
 
       // Act/assert.
-      sut.IdentifierType.Should().Be(SeIdentifierType.Personnummer);
+      sut.IdentifierType.Should().Be(expected);
    }
 
    [Theory]
@@ -629,9 +714,10 @@ public class SePersonnummerTests
       // Arrange.
       var personnummer = GetPersonnummerWithValidCheckDigit(dateOfBirth: dateOfBirth);
       var sut = new SePersonnummer(personnummer);
+      SePersonnummer.IdentifierCategory expected = default(SeIdentifierType.Samordningsnummer);
 
       // Act/assert.
-      sut.IdentifierType.Should().Be(SeIdentifierType.Samordningsnummer);
+      sut.IdentifierType.Should().Be(expected);
    }
 
    #endregion
@@ -725,14 +811,13 @@ public class SePersonnummerTests
    public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expected = GetInternalRepresentation(value);
+      var expected = new SePersonnummer(value);
 
       // Act.
       var sut = (SePersonnummer)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -740,14 +825,13 @@ public class SePersonnummerTests
    public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldCreateInstance_WhenCheckDigitHasUndetectableError(String value)
    {
       // Arrange.
-      var expected = GetInternalRepresentation(value);
+      var expected = new SePersonnummer(value);
 
       // Act.
       var sut = (SePersonnummer)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -761,58 +845,88 @@ public class SePersonnummerTests
          dateOfBirth: dateOfBirth,
          separator: separator);
       var sut = (SePersonnummer)value;
-      var expected = GetInternalRepresentation(value);
-
+      var expected = new SePersonnummer(value);
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (SePersonnummer)value)
-         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
-         .WithMessage(Messages.SePersonnummerEmpty + "*")
-         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (SePersonnummer)value)
-         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
-         .WithMessage(Messages.SePersonnummerInvalidLength + "*")
-         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(String value)
-      => FluentActions
+   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (SePersonnummer)value)
-         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
-         .WithMessage(Messages.SePersonnummerInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (SePersonnummer)value)
-         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
-         .WithMessage(Messages.SePersonnummerInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidCheckDigit);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
-      => FluentActions
+   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (SePersonnummer)value)
-         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
-         .WithMessage(Messages.SePersonnummerInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]
@@ -824,13 +938,13 @@ public class SePersonnummerTests
       var value = GetPersonnummerWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (SePersonnummer)value)
-         .Should().Throw<KfValidationException<SePersonnummerValidationResult>>()
-         .WithMessage(Messages.SePersonnummerInvalidDateOfBirth + "*")
-         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidDateOfBirth);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -923,16 +1037,13 @@ public class SePersonnummerTests
    public void SePersonnummer_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expectedValue = new SePersonnummer(value);
+      LocalCreateResult expected = new SePersonnummer(value);
 
       // Act.
       var result = SePersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -940,16 +1051,13 @@ public class SePersonnummerTests
    public void SePersonnummer_Create_ShouldCreateInstance_WhenValueHasUndetectableCheckDigitError(String value)
    {
       // Arrange.
-      var expectedValue = new SePersonnummer(value);
+      LocalCreateResult expected = new SePersonnummer(value);
 
       // Act.
       var result = SePersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -962,86 +1070,93 @@ public class SePersonnummerTests
       var value = GetPersonnummerWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
-      var expectedValue = new SePersonnummer(value);
+      LocalCreateResult expected = new SePersonnummer(value);
 
       // Act.
       var result = SePersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void SePersonnummer_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
+
       // Act.
       var result = SePersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(SePersonnummerValidationResult.Empty);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void SePersonnummer_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
+
       // Act.
       var result = SePersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(SePersonnummerValidationResult.InvalidLength);
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<LocalValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void SePersonnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacter(String value)
+   public void SePersonnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
+
       // Act.
       var result = SePersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(SePersonnummerValidationResult.InvalidCharacter);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void SePersonnummer_Create_ShouldReturnInvalidCheckDigitValidationResult_WhenValueHasInvalidCheckDigit(String value)
    {
-      // Act.
-      var result = SePersonnummer.Create(value);
+      {
+         // Arrange.
+         LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
 
-      // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(SePersonnummerValidationResult.InvalidCheckDigit);
+         // Act.
+         var result = SePersonnummer.Create(value);
+
+         // Assert.
+         result.Should().BeEquivalentTo(expected);
+      }
    }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void SePersonnummer_Create_ShouldReturnInvalidCheckDigitValidationResult_WhenValueHasInvalidSeparator(String value)
+   public void SePersonnummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value, position);
+
       // Act.
       var result = SePersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(SePersonnummerValidationResult.InvalidSeparator);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1054,15 +1169,13 @@ public class SePersonnummerTests
       var value = GetPersonnummerWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
 
       // Act.
       var result = SePersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(SePersonnummerValidationResult.InvalidDateOfBirth);
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -1334,12 +1447,30 @@ public class SePersonnummerTests
    [MemberData(nameof(ValidPersonnummerValues))]
    [MemberData(nameof(ValidSamordningsnummerValues))]
    public void SePersonnummer_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
-      => SePersonnummer.Validate(value).Should().Be(SePersonnummerValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = SePersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(UndetectableCheckDigitErrors))]
    public void SePersonnummer_Validate_ShouldReturnValidationPassed_WhenValueHasUndetectableCheckDigitError(String value)
-      => SePersonnummer.Validate(value).Should().Be(SePersonnummerValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = SePersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(ValidDateOfBirthValues))]
@@ -1351,25 +1482,91 @@ public class SePersonnummerTests
       var value = GetPersonnummerWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      SePersonnummer.Validate(value).Should().Be(SePersonnummerValidationResult.ValidationPassed);
+      // Act.
+      var result = SePersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void SePersonnummer_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String value)
-      => SePersonnummer.Validate(value).Should().Be(SePersonnummerValidationResult.Empty);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(EmptyValue);
+
+      // Act.
+      var result = SePersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void SePersonnummer_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
-      => SePersonnummer.Validate(value).Should().Be(SePersonnummerValidationResult.InvalidLength);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidLengthResult(value);
+
+      // Act.
+      var result = SePersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void SePersonnummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(String value)
-      => SePersonnummer.Validate(value).Should().Be(SePersonnummerValidationResult.InvalidCharacter);
+   public void SePersonnummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
+
+      // Act.
+      var result = SePersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void SePersonnummer_Validate_ShouldReturnInvalidCheckDigit_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidChecksumResult();
+
+      // Act.
+      var result = SePersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void SePersonnummer_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidSeparatorResult(value, position);
+
+      // Act.
+      var result = SePersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]
@@ -1381,20 +1578,14 @@ public class SePersonnummerTests
       var value = GetPersonnummerWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
+      LocalValidationResult expected = GetInvalidDateOfBirthResult(value);
 
-      // Act/assert.
-      SePersonnummer.Validate(value).Should().Be(SePersonnummerValidationResult.InvalidDateOfBirth);
+      // Act.
+      var result = SePersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
-
-   [Theory]
-   [MemberData(nameof(InvalidSeparatorValues))]
-   public void SePersonnummer_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(String value)
-      => SePersonnummer.Validate(value).Should().Be(SePersonnummerValidationResult.InvalidSeparator);
-
-   [Theory]
-   [MemberData(nameof(InvalidCheckDigitValues))]
-   public void SePersonnummer_Validate_ShouldReturnInvalidCheckDigit_WhenValueHasInvalidCheckDigit(String value)
-      => SePersonnummer.Validate(value).Should().Be(SePersonnummerValidationResult.InvalidCheckDigit);
 
    #endregion
 
@@ -1483,15 +1674,14 @@ public class SePersonnummerTests
    public void SePersonnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenPersonnummerIsInvalid()
    {
       // Arrange.
-      var json = "{\"Personnummer\":\"811228-987\"}";  // Invalid length
+      var json = "{\"Personnummer\":\"811228-9875\"}";  // Invalid check digit
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should()
-         .ThrowExactly<KfValidationException<SePersonnummerValidationResult>>()
-         .WithMessage(Messages.SePersonnummerInvalidLength + "*")
-         .And.ValidationResult.Should().Be(SePersonnummerValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion

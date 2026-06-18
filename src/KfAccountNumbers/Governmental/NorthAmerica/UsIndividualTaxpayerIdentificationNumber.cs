@@ -264,7 +264,7 @@ public record UsIndividualTaxpayerIdentificationNumber
          return new InvalidLength(
             Messages.UsItinInvalidLength,
             value.Length,
-            GetInvalidLengthDefinitions());
+            GetValidLengthDefinitions());
       }
 
       if (value[0] != Chars.DigitNine)
@@ -306,7 +306,7 @@ public record UsIndividualTaxpayerIdentificationNumber
    /// <returns>
    ///   An array of <see cref="ValidLengthDefinition"/>s.
    /// </returns>
-   internal static ValidLengthDefinition[] GetInvalidLengthDefinitions()
+   internal static ValidLengthDefinition[] GetValidLengthDefinitions()
       =>
       [
          new ValidLengthDefinition(UnformattedLength, Messages.UsTinUnformattedLength),

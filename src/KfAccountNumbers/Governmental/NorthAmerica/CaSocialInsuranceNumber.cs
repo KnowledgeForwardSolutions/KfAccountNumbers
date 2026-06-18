@@ -261,7 +261,7 @@ public record CaSocialInsuranceNumber
          return new InvalidLength(
             Messages.CaSinInvalidLength,
             value.Length,
-            GetInvalidLengthDefinitions());
+            GetValidLengthDefinitions());
       }
 
       if (!ValidateSeparators(value, out var invalidSeparatorPosition))
@@ -304,7 +304,7 @@ public record CaSocialInsuranceNumber
    /// <returns>
    ///   An array of <see cref="ValidLengthDefinition"/>s.
    /// </returns>
-   internal static ValidLengthDefinition[] GetInvalidLengthDefinitions()
+   internal static ValidLengthDefinition[] GetValidLengthDefinitions()
       =>
       [
          new ValidLengthDefinition(UnformattedLength, Messages.CaSinUnformattedLength),
