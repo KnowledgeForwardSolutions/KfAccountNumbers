@@ -1,5 +1,8 @@
 // Ignore Spelling: Foedselsnummer Json Nummer
 
+#pragma warning disable IDE0250 // Make struct 'readonly'
+#pragma warning disable IDE0046 // Convert to conditional expression
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -139,8 +142,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <term>Rule 1</term>
 ///            <description>
-///               If the individual number is &ge; 500 and &le; 749 AND the
-///               two digit year is &ge; 54 then the century = 1800.
+///               If the individual number is &gt;= 500 and &lt;= 749 AND the
+///               two digit year is &gt;= 54 then the century = 1800.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -152,15 +155,15 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <term>Rule 3</term>
 ///            <description>
-///               If the individual number is &ge; 900 AND the two digit year
-///               is &ge; 40 then the century = 1900.
+///               If the individual number is &gt;= 900 AND the two digit year
+///               is &gt;= 40 then the century = 1900.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>Rule 4</term>
 ///            <description>
-///               If the individual number is &ge; 500 AND the two digit year
-///               is &le; 39 then the century =2000.
+///               If the individual number is &gt;= 500 AND the two digit year
+///               is &lt;= 39 then the century =2000.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -218,57 +221,60 @@ public record NoFoedselsnummer
    private static readonly Int32[] _c2Weights = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2, 1];
 
    /// <summary>
-   ///   Initialize a new instance of the <see cref="NoFoedselsnummer"/> class.
+   ///   Initializes a new instance of the <see cref="NoFoedselsnummer"/> class.
    /// </summary>
-   /// <param name="foedselsnummer">
+   /// <param name="value">
    ///   String representation of a fødselsnummer.
    /// </param>
-   /// <exception cref="KfValidationException{NoFoedselsnummerValidationResult}">
-   ///   <paramref name="foedselsnummer"/> is <see langword="null"/>, empty or all 
+   /// <exception cref="UKfValidationException{ValidationException}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
-   ///   <paramref name="foedselsnummer"/> is not length 11 (or 12 if a separator
+   ///   <paramref name="value"/> is not length 11 (or 12 if a separator
    ///   character is used).
    ///   - or -
-   ///   <paramref name="foedselsnummer"/> contains a non-digit character in
+   ///   <paramref name="value"/> contains a non-digit character in
    ///   any position other than the separator location.
    ///   - or -
-   ///   <paramref name="foedselsnummer"/> contains an invalid weighted modulus
+   ///   <paramref name="value"/> contains an invalid weighted modulus
    ///   11 check digit in one or both trailing positions.
    ///   - or -
-   ///   <paramref name="foedselsnummer"/> contains a digit character in position
+   ///   <paramref name="value"/> contains a digit character in position
    ///   6 (zero-based). Valid separator characters are any non-digit character,
    ///   though space (' ') and dash ('-') are the most common values.
    ///   - or -
-   ///   <paramref name="foedselsnummer"/> contains an invalid date of birth in
+   ///   <paramref name="value"/> contains an invalid date of birth in
    ///   positions 0-5 (zero-based).
    /// </exception>
-   public NoFoedselsnummer(String? foedselsnummer)
-      : this(foedselsnummer, ValidationMode.ValidationRequired) { }
+   public NoFoedselsnummer(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports bypassing
-   ///   validation when creating a new instance from a value that has already
-   ///   been validated.
+   ///   Initializes a new instance of the <see cref="NoFoedselsnummer"/> class.
    /// </summary>
-   private NoFoedselsnummer(String? foedselsnummer, ValidationMode validationMode)
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private NoFoedselsnummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         NoFoedselsnummerValidationResult validationResult = Validate(foedselsnummer);
+         NoFoedselsnummerValidationResult validationResult = Validate(value);
          if (validationResult != NoFoedselsnummerValidationResult.ValidationPassed)
          {
             throw validationResult.ToValidationException();
          }
       }
 
-      Value = GetRawFoedselsnummer(foedselsnummer!);
+      Value = GetRawFoedselsnummer(value!);
    }
 
    /// <summary>
-   ///   The person's date of birth, derived from the first six digits in DDMMYY
-   ///   format and the exact century of birth derived from the individual
-   ///   number.
+   ///   Gets the person's date of birth, derived from the first six digits in
+   ///   DDMMYY format and the exact century of birth derived from the
+   ///   individual number.
    /// </summary>
    /// <remarks>
    ///   Note that D-nummer values add 40 to the leading two digits (the DD
@@ -281,22 +287,22 @@ public record NoFoedselsnummer
       {
 #pragma warning disable IDE0008 // Use explicit type
          var (day, month, year) = GetDayMonthYear(Value);
-         #pragma warning restore IDE0008 // Use explicit type
+#pragma warning restore IDE0008 // Use explicit type
 
          return new DateOnly(year, month, day);
       }
    }
 
    /// <summary>
-   ///   The person's gender, as indicated by the individual number. Odd
+   ///   Gets the person's gender, as indicated by the individual number. Odd
    ///   numbers = Male; even numbers = Female.
    /// </summary>
-   public BinaryGender Gender => Value[^GenderOffset] % 2 == 0       // This works because the ASCII character values for digits have the same odd/even pattern
+   public BinaryGender Gender => Value[^GenderOffset] % 2 == 0 // This works because the ASCII character values for digits have the same odd/even pattern
       ? BinaryGender.Female
       : BinaryGender.Male;
 
    /// <summary>
-   ///   The type of Norwegian identifier represented by this instance,
+   ///   Gets the type of Norwegian identifier represented by this instance,
    ///   indicating if this is a fødselsnummer or a D-nummer.
    /// </summary>
    /// <remarks>
@@ -310,35 +316,50 @@ public record NoFoedselsnummer
          : NoIdentifierType.Foedselsnummer;
 
    /// <summary>
-   ///   The raw fødselsnummer value.
+   ///   Gets a string representation of the fødselsnummer.
    /// </summary>
    public String Value { get; private init; }
 
-   public static implicit operator String(NoFoedselsnummer foedselsnummer)
-      => foedselsnummer?.Value ?? String.Empty;     // Handle null foedselsnummer object gracefully by returning empty string
+   /// <summary>
+   ///   Implicitly converts a <see cref="NoFoedselsnummer"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="NoFoedselsnummer"/> to convert.
+   /// </param>
+   public static implicit operator String(NoFoedselsnummer source)
+      => source?.Value ?? String.Empty;     // Handle null object gracefully by returning empty string
 
-   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
-   public static explicit operator NoFoedselsnummer(String? foedselsnummer) => new(foedselsnummer);
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="NoFoedselsnummer"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Norwegian National Identity Number (fødselsnummer).
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid fødselsnummer.
+   /// </exception>
+   public static explicit operator NoFoedselsnummer(String? value) => new(value);
 
    /// <summary>
    ///   Create a new <see cref="NoFoedselsnummer"/> using the Result pattern.
    /// </summary>
-   /// <param name="foedselsnummer">
+   /// <param name="value">
    ///   String representation of a Norwegian National Identity Number (fødselsnummer).
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{NoFoedselsnummer, NoFoedselsnummerValidationResult}"/>.
-   ///   Will contain the new <see cref="NoFoedselsnummerValidationResult"/> if 
-   ///   <paramref name="foedselsnummer"/> is valid or 
+   ///   Will contain the new <see cref="NoFoedselsnummerValidationResult"/> if
+   ///   <paramref name="value"/> is valid or
    ///   <see cref="NoFoedselsnummerValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="foedselsnummer"/> is 
+   ///   the validation rule that was failed if <paramref name="value"/> is
    ///   invalid.
    /// </returns>
-   public static CreateResult<NoFoedselsnummer, NoFoedselsnummerValidationResult> Create(String? foedselsnummer)
+   public static CreateResult<NoFoedselsnummer, NoFoedselsnummerValidationResult> Create(String? value)
    {
-      NoFoedselsnummerValidationResult validationResult = Validate(foedselsnummer);
+      NoFoedselsnummerValidationResult validationResult = Validate(value);
       return validationResult == NoFoedselsnummerValidationResult.ValidationPassed
-         ? new NoFoedselsnummer(foedselsnummer, validationMode: ValidationMode.BypassValidation)
+         ? new NoFoedselsnummer(value, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
@@ -368,30 +389,30 @@ public record NoFoedselsnummer
    /// <summary>
    ///   Get a string representation of the fødselsnummer.
    /// </summary>
-   /// <remarks>
-   ///   Will return the raw fødselsnummer, without a separator character.
-   /// </remarks>
+   /// <returns>
+   ///   The raw fødselsnummer, without separator characters.
+   /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="foedselsnummer"/> to determine if it contains a
+   ///   Check the <paramref name="value"/> to determine if it contains a
    ///   valid Norwegian national identity number (fødselsnummer) value.
    /// </summary>
-   /// <param name="foedselsnummer">
+   /// <param name="value">
    ///   String representation of a Norwegian national identity number (fødselsnummer).
    /// </param>
    /// <returns>
-   ///   A <see cref="NoFoedselsnummerValidationResult"/> enumeration 
-   ///   value that indicates if the <paramref name="foedselsnummer"/> passed
+   ///   A <see cref="NoFoedselsnummerValidationResult"/> enumeration
+   ///   value that indicates if the <paramref name="value"/> passed
    ///   validation or what validation error was encountered.
    /// </returns>
-   public static NoFoedselsnummerValidationResult Validate(String? foedselsnummer)
+   public static NoFoedselsnummerValidationResult Validate(String? value)
    {
-      if (String.IsNullOrWhiteSpace(foedselsnummer))
+      if (String.IsNullOrWhiteSpace(value))
       {
          return NoFoedselsnummerValidationResult.Empty;
       }
-      else if (foedselsnummer.Length is not UnformattedLength and not FormattedLength)
+      else if (value.Length is not UnformattedLength and not FormattedLength)
       {
          return NoFoedselsnummerValidationResult.InvalidLength;
       }
@@ -399,17 +420,17 @@ public record NoFoedselsnummer
       // After performing basic checks, validate the check digits because the
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
-      NoFoedselsnummerValidationResult validationResult = ValidateCheckDigits(foedselsnummer);
+      NoFoedselsnummerValidationResult validationResult = ValidateCheckDigits(value);
       if (validationResult != NoFoedselsnummerValidationResult.ValidationPassed)
       {
          // Could be either InvalidCharacter or InvalidCheckDigits.
          return validationResult;
       }
-      else if (!ValidateSeparator(foedselsnummer))
+      else if (!ValidateSeparator(value))
       {
          return NoFoedselsnummerValidationResult.InvalidSeparator;
       }
-      else if (!ValidateDateOfBirth(foedselsnummer))
+      else if (!ValidateDateOfBirth(value))
       {
          return NoFoedselsnummerValidationResult.InvalidDateOfBirth;
       }
@@ -417,14 +438,14 @@ public record NoFoedselsnummer
       return NoFoedselsnummerValidationResult.ValidationPassed;
    }
 
-   private static (Int32 day, Int32 month, Int32 year) GetDayMonthYear(ReadOnlySpan<Char> foedselsnummer)
+   private static (Int32 Day, Int32 Month, Int32 Year) GetDayMonthYear(ReadOnlySpan<Char> value)
    {
-      var day = foedselsnummer.ParseTwoDigits();
-      var month = foedselsnummer[2..].ParseTwoDigits();
-      var year = foedselsnummer[4..].ParseTwoDigits();
+      var day = value.ParseTwoDigits();
+      var month = value[2..].ParseTwoDigits();
+      var year = value[4..].ParseTwoDigits();
 
       // Adjust day for possible D-nummer.
-      if (day >= DNummerMinimumDay && day <= DNummerMaximumDay)
+      if (day is >= DNummerMinimumDay and <= DNummerMaximumDay)
       {
          day -= DNummerDayOffset;
       }
@@ -432,44 +453,50 @@ public record NoFoedselsnummer
       // Adjust the year according to the value of the individual number.
       // See https://blog.variant.no/ssns-and-pattern-matching-in-c-9-498f96aa71d4
       // for description of the rules used.
-      var individualNumber = foedselsnummer[^IndividualNumberOffset..].ParseThreeDigits();
+      var individualNumber = value[^IndividualNumberOffset..].ParseThreeDigits();
+#pragma warning disable format
       year += (individualNumber, year) switch
       {
          // Rule 1. 500–749: 1854–1899
-         ( >= 500 and <= 749, >= 54) => 1800,
+         (>= 500 and <= 749, >= 54) => 1800,
+
          // Rule 2. 000–499: 1900–1999
-         ( < 500, _) => 1900,
+         (< 500, _) => 1900,
+
          // Rule 3. 900–999: 1940–1999
-         ( >= 900, >= 40) => 1900,
+         (>= 900, >= 40) => 1900,
+
          // Rule 4. 500–999: 2000–2039
-         ( >= 500, <= 39) => 2000,
+         (>= 500, <= 39) => 2000,
+
          // No rule
-         (_, _) => 0
+         (_, _) => 0,
       };
+#pragma warning restore format
 
       return (day, month, year);
    }
 
-   private static String GetRawFoedselsnummer(String foedselsnummer)
-      => foedselsnummer.Length == UnformattedLength
-         ? foedselsnummer
+   private static String GetRawFoedselsnummer(String value)
+      => value.Length == UnformattedLength
+         ? value
          : String.Concat(
-            foedselsnummer.AsSpan(0, SeparatorOffset),
-            foedselsnummer.AsSpan(SeparatorOffset + 1));
+            value.AsSpan(0, SeparatorOffset),
+            value.AsSpan(SeparatorOffset + 1));
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static Boolean IsFormatted(ReadOnlySpan<Char> foedselsnummer)
-      => foedselsnummer.Length == FormattedLength;
+   private static Boolean IsFormatted(ReadOnlySpan<Char> value)
+      => value.Length == FormattedLength;
 
-   private static NoFoedselsnummerValidationResult ValidateCheckDigits(ReadOnlySpan<Char> foedselsnummer)
+   private static NoFoedselsnummerValidationResult ValidateCheckDigits(ReadOnlySpan<Char> value)
    {
       // Calcuate weighted sums for both check digits in a single pass. Final
       // c1 weight is zero so that it the final digit is excluded from c1 sum.
-      var isFormatted = IsFormatted(foedselsnummer);
+      var isFormatted = IsFormatted(value);
       var c1Sum = 0;
       var c2Sum = 0;
       var weightIndex = 0;
-      var processLength = foedselsnummer.Length;
+      var processLength = value.Length;
       for (var charIndex = 0; charIndex < processLength; charIndex++)
       {
          if (isFormatted && charIndex == SeparatorOffset)
@@ -477,8 +504,8 @@ public record NoFoedselsnummer
             continue;
          }
 
-         var num = foedselsnummer[charIndex] - Chars.DigitZero;
-         if (num < 0 || num > 9)
+         var num = value[charIndex] - Chars.DigitZero;
+         if (num is < 0 or > 9)
          {
             return NoFoedselsnummerValidationResult.InvalidCharacter;
          }
@@ -494,17 +521,18 @@ public record NoFoedselsnummer
          : NoFoedselsnummerValidationResult.InvalidCheckDigits;
    }
 
-   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> foedselsnummer)
+   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> value)
    {
 #pragma warning disable IDE0008 // Use explicit type
-      var (day, month, year) = GetDayMonthYear(foedselsnummer);
+      var (day, month, year) = GetDayMonthYear(value);
 #pragma warning restore IDE0008 // Use explicit type
 
-      if (year < MinimumValidYearOfBirth || year > MaximumValidYearOfBirth)
+      if (year is < MinimumValidYearOfBirth or > MaximumValidYearOfBirth)
       {
          return false;
       }
-      if (month < 1 || month > 12)
+
+      if (month is < 1 or > 12)
       {
          return false;
       }
@@ -512,10 +540,12 @@ public record NoFoedselsnummer
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);
    }
 
-   private static Boolean ValidateSeparator(ReadOnlySpan<Char> foedselsnummer)
-      => !IsFormatted(foedselsnummer) || !foedselsnummer[SeparatorOffset].IsAsciiDigit();
+   private static Boolean ValidateSeparator(ReadOnlySpan<Char> foedsvalueelsnummer)
+      => !IsFormatted(foedsvalueelsnummer) || !foedsvalueelsnummer[SeparatorOffset].IsAsciiDigit();
 }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class NoFoedselsnummerJsonConverter : JsonConverter<NoFoedselsnummer>
 {
    public override NoFoedselsnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
