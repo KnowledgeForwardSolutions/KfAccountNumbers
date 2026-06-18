@@ -205,6 +205,12 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record SePersonnummer
 {
    /// <summary>
+   ///   Discriminated union defining the types of identifier that
+   ///   <see cref="SePersonnummer"/> can represent.
+   /// </summary>
+   public union IdentifierCategory(SeIdentifierType.Personnummer, SeIdentifierType.Samordningsnummer) { }
+
+   /// <summary>
    ///   Discriminated union defining the possible validation errors that can
    ///   occur when creating a new <see cref="SePersonnummer"/>.
    /// </summary>
@@ -383,10 +389,10 @@ public record SePersonnummer
    ///   normal range (1-31) while a samordningsnummer will add 60 to the day
    ///   component of the day of birth resulting in values from 61-91.
    /// </remarks>
-   public SeIdentifierType IdentifierType
+   public IdentifierCategory IdentifierType
       => Value.AsSpan(6..8).ParseTwoDigits() > SamordningsnummerDayOffset
-         ? SeIdentifierType.Samordningsnummer
-         : SeIdentifierType.Personnummer;
+         ? default(SeIdentifierType.Samordningsnummer)
+         : default(SeIdentifierType.Personnummer);
 
    /// <summary>
    ///   Gets the raw personnummer value.

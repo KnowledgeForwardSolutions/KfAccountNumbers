@@ -694,9 +694,10 @@ public class SePersonnummerTests
       // Arrange.
       var personnummer = GetPersonnummerWithValidCheckDigit(dateOfBirth: dateOfBirth);
       var sut = new SePersonnummer(personnummer);
+      SePersonnummer.IdentifierCategory expected = default(SeIdentifierType.Personnummer);
 
       // Act/assert.
-      sut.IdentifierType.Should().Be(SeIdentifierType.Personnummer);
+      sut.IdentifierType.Should().Be(expected);
    }
 
    [Theory]
@@ -713,9 +714,10 @@ public class SePersonnummerTests
       // Arrange.
       var personnummer = GetPersonnummerWithValidCheckDigit(dateOfBirth: dateOfBirth);
       var sut = new SePersonnummer(personnummer);
+      SePersonnummer.IdentifierCategory expected = default(SeIdentifierType.Samordningsnummer);
 
       // Act/assert.
-      sut.IdentifierType.Should().Be(SeIdentifierType.Samordningsnummer);
+      sut.IdentifierType.Should().Be(expected);
    }
 
    #endregion
