@@ -4,6 +4,14 @@
 #pragma warning disable IDE0058 // Expression value is never used
 #pragma warning disable CA2211 // Non-constant fields should not be visible
 
+using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+   KfAccountNumbers.Governmental.Europe.NoFoedselsnummer,
+   KfAccountNumbers.Governmental.Europe.NoFoedselsnummer.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.Europe.NoFoedselsnummer.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.Europe.NoFoedselsnummer.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.Europe.NoFoedselsnummer.ValidationResult;
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class NoFoedselsnummerTests
@@ -47,12 +55,7 @@ public class NoFoedselsnummerTests
 
       var sum2 = (5 * d1) + (4 * d2) + (3 * d3) + (2 * d4) + (7 * d5) + (6 * d6) + (5 * i1) + (4 * i2) + (3 * i3) + (2 * c1);
       var c2 = (11 - (sum2 % 11)) % 11;
-      if (c2 == 10)
-      {
-         return String.Empty;
-      }
-
-      return $"{dateOfBirth}{separator}{individualNumber}{c1}{c2}";
+      return c2 == 10 ? String.Empty : $"{dateOfBirth}{separator}{individualNumber}{c1}{c2}";
    }
 
    public static TheoryData<String> ValidFoedselsnummerValues =>
@@ -101,14 +104,14 @@ public class NoFoedselsnummerTests
       // Rule 2 - individual number < 500, year not considered - century = 1900's
       { "020100", "000" },       // minimum 6 digit date and minimum individual number (010100 000 adjusted because of check digits)
       { "010100", "001" },       // minimum 6 digit date and minimum individual number  "
-      { "010100", "499" },       // minimum 6 digit date and maximum individual number  
+      { "010100", "499" },       // minimum 6 digit date and maximum individual number
       { "301299", "000" },       // maximum 6 digit date and minimum individual number (311299 000 adjusted because of check digits)
       { "311299", "001" },       // maximum 6 digit date and minimum individual number  "
-      { "311299", "499" },       // maximum 6 digit date and maximum individual number  
+      { "311299", "499" },       // maximum 6 digit date and maximum individual number
 
       // Rule 3 - individual number >= 900 and year >= 40 - century = 1900's
       { "010140", "900" },       // minimum 6 digit date and minimum individual number
-      { "010140", "999" },       // minimum 6 digit date and maximum individual number  
+      { "010140", "999" },       // minimum 6 digit date and maximum individual number
       { "311299", "900" },       // maximum 6 digit date and minimum individual number
       { "301299", "999" },       // maximum 6 digit date and maximum individual number (311299 999 adjusted because of check digits)
       { "311299", "998" },       // maximum 6 digit date and maximum individual number  "
@@ -119,6 +122,7 @@ public class NoFoedselsnummerTests
       { "311239", "500" },       // maximum 6 digit date and minimum individual number
       { "311239", "999" },       // maximum 6 digit date and maximum individual number
 
+      // Month maximum days
       { "310104", "501" },       // maximum days for January, any year
       { "280201", "234" },       // maximum days for February, non-leap year
       { "290204", "234" },       // maximum days for February, leap year
@@ -140,17 +144,17 @@ public class NoFoedselsnummerTests
       { "410154", "749" },       // minimum 6 digit date and maximum individual number
       { "701299", "500" },       // maximum 6 digit date and minimum individual number (711299 500 adjusted because of check digits)
       { "711299", "501" },       // maximum 6 digit date and minimum individual number  "
-      { "711299", "749" },       // maximum 6 digit date and maximum individual number 
+      { "711299", "749" },       // maximum 6 digit date and maximum individual number
 
       // Rule 2 - individual number < 500, year not considered - century = 1900's
       { "410100", "000" },       // minimum 6 digit date and minimum individual number
-      { "410100", "499" },       // minimum 6 digit date and maximum individual number  
+      { "410100", "499" },       // minimum 6 digit date and maximum individual number
       { "711299", "000" },       // maximum 6 digit date and minimum individual number
-      { "711299", "499" },       // maximum 6 digit date and maximum individual number  
+      { "711299", "499" },       // maximum 6 digit date and maximum individual number
 
       // Rule 3 - individual number >= 900 and year >= 40 - century = 1900's
       { "410140", "900" },       // minimum 6 digit date and minimum individual number
-      { "410140", "999" },       // minimum 6 digit date and maximum individual number  
+      { "410140", "999" },       // minimum 6 digit date and maximum individual number
       { "711299", "900" },       // maximum 6 digit date and minimum individual number
       { "711299", "999" },       // maximum 6 digit date and maximum individual number
 
@@ -160,6 +164,7 @@ public class NoFoedselsnummerTests
       { "711239", "500" },       // maximum 6 digit date and minimum individual number
       { "711239", "999" },       // maximum 6 digit date and maximum individual number
 
+      // Month maximum days
       { "710104", "501" },       // maximum days for January, any year
       { "680201", "234" },       // maximum days for February, non-leap year
       { "690204", "234" },       // maximum days for February, leap year
@@ -183,34 +188,39 @@ public class NoFoedselsnummerTests
       new String('1', 100) // Very long string
    ];
 
-   public static TheoryData<String> InvalidCharacterValues =>
-   [
-      "A0061270707",
-      "1 061270707",
-      "10#61270707",
-      "100=1270707",
-      "1006B270707",
-      "10061C70707",
-      "100612D0707",
-      "1006127a707",
-      "10061270b07",
-      "100612707c7",
-      "1006127070~",
-      "A00612 70707",
-      "1 0612 70707",
-      "10#612 70707",
-      "100=12 70707",
-      "1006B2 70707",
-      "10061C 70707",
-      "100612-D0707",
-      "100612-7a707",
-      "100612-70b07",
-      "100612-707c7",
-      "100612-7070~",
-   ];
+   // Values that will report an invalid character encountered
+   public static TheoryData<String, Int32> InvalidCharacterValues = new()
+   {
+      // Unformatted values
+      { ".0061270707", 0 },         // Non-digit character '.'
+      { "1 061270707", 1 },         // Non-digit character ' '
+      { "10A61270707", 2 },         // Non-digit character 'A'
+      { "100Z1270707", 3 },         // Non-digit character 'Z'
+      { "1006^270707", 4 },         // Non-digit character '^'
+      { "10061a70707", 5 },         // Non-digit character 'a'
+      { "100612z0707", 6 },         // Non-digit character 'z'
+      { "1006127~707", 7 },         // Non-digit character '~'
+      { "10061270\u215307", 8 },    // Non-digit character Unicode fraction 1/3
+      { "100612707\u00D67", 9 },    // Invalid character unicode O with umlaut
+      { "1006127070\u0BE6", 10 },   // Invalid character unicode Tamil digit 0
+
+      // Formatted values
+      { ".00612 70707", 0 },        // Non-digit character '.'
+      { "1 0612 70707", 1 },        // Non-digit character ' '
+      { "10A612 70707", 2 },        // Non-digit character 'A'
+      { "100Z12 70707", 3 },        // Non-digit character 'Z'
+      { "1006^2 70707", 4 },        // Non-digit character '^'
+      { "10061a 70707", 5 },        // Non-digit character 'a'
+      { "100612 z0707", 7 },        // Non-digit character 'z'
+      { "100612-7~707", 8 },        // Non-digit character '~'
+      { "100612-70\u215307", 9 },   // Non-digit character Unicode fraction 1/3
+      { "100612-707\u00D67", 10 },  // Invalid character unicode O with umlaut
+      { "100612-7070\u0BE6", 11 },  // Invalid character unicode Tamil digit 0
+   };
 
    public static TheoryData<String> InvalidCheckDigitValues =>
    [
+      // Unformatted values
       "13039597140",          // 13029597140 with single digit transcription error 2 -> 3
       "20055025972",          // 20055029572 with two digit transposition error 95 -> 59
       "21072551149",          // 21072441149 with two digit twin error 44 -> 55
@@ -218,6 +228,7 @@ public class NoFoedselsnummerTests
       "13072101223",          // 13072101213 with invalid first check digit 1 -> 2
       "11085149989",          // 11085149980 with invalid second check digit 0 -> 9
 
+      // Formatted values
       "130395 97140",         // 130295 97140 with single digit transcription error 2 -> 3
       "200550 25972",         // 200550 29572 with two digit transposition error 95 -> 59
       "210725 51149",         // 210724 41149 with two digit twin error 44 -> 55
@@ -317,9 +328,38 @@ public class NoFoedselsnummerTests
       { "910100", "501" },
    };
 
+   private static InvalidLength GetInvalidLengthResult(String value)
+      => new(
+         Messages.NoFoedselsnummerInvalidLength,
+         value.Length,
+         NoFoedselsnummer.GetValidLengthDefinitions());
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.NoFoedselsnummerInvalidCharacter,
+         value[position],
+         position);
+
+   private static InvalidChecksum GetInvalidChecksumResult()
+      => new(
+         Messages.NoFoedselsnummerInvalidCheckDigits,
+        NoFoedselsnummer.CheckDigitAlgorithmName);
+
+   private static InvalidSeparator GetInvalidSeparatorResult(String value)
+      => new(Messages.NoFoedselsnummerInvalidSeparator, value[6], 6);
+
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
+      => new(Messages.NoFoedselsnummerInvalidDateOfBirth, value[..6], DateFormatName.DDMMYY);
+
    #region Constants Tests
    // ==========================================================================
    // ==========================================================================
+
+   [Fact]
+   public void NoFoedselsnummer_CheckDigitAlgorithmName_ShouldHaveExpectedValue()
+      => NoFoedselsnummer.CheckDigitAlgorithmName.Should().Be("Weighted Modulus 11");
 
    [Fact]
    public void NoFoedselsnummer_MinimumValidYearOfBirth_ShouldHaveExpectedValue()
@@ -394,38 +434,63 @@ public class NoFoedselsnummerTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new NoFoedselsnummer(value))
-         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
-         .WithMessage(Messages.NoFoedselsnummerEmpty + "*")
-         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new NoFoedselsnummer(value))
-         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
-         .WithMessage(Messages.NoFoedselsnummerInvalidLength + "*")
-         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(String value)
-      => FluentActions
+   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new NoFoedselsnummer(value))
-         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
-         .WithMessage(Messages.NoFoedselsnummerInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new NoFoedselsnummer(value))
-         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
-         .WithMessage(Messages.NoFoedselsnummerInvalidCheckDigits + "*")
-         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidCheckDigits);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparators))]
@@ -433,13 +498,13 @@ public class NoFoedselsnummerTests
    {
       // Arrange.
       var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
+      LocalValidationError expected = GetInvalidSeparatorResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new NoFoedselsnummer(value))
-         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
-         .WithMessage(Messages.NoFoedselsnummerInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -452,13 +517,13 @@ public class NoFoedselsnummerTests
       var value = GetFoedselsnummerWithValidCheckDigits(
          dateOfBirth: dateOfBirth,
          individualNumber: individualNumber);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new NoFoedselsnummer(value))
-         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
-         .WithMessage(Messages.NoFoedselsnummerInvalidDateOfBirth + "*")
-         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidDateOfBirth);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -676,7 +741,7 @@ public class NoFoedselsnummerTests
    public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expected = GetRawFoedselsnummer(value);
+      var expected = new NoFoedselsnummer(value);
 
       // Act.
       var sut = (NoFoedselsnummer)value;
@@ -692,7 +757,7 @@ public class NoFoedselsnummerTests
    {
       // Arrange.
       var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
-      var expected = GetRawFoedselsnummer(value);
+      var expected = new NoFoedselsnummer(value);
 
       // Act.
       var sut = (NoFoedselsnummer)value;
@@ -712,7 +777,7 @@ public class NoFoedselsnummerTests
       var value = GetFoedselsnummerWithValidCheckDigits(
          dateOfBirth: dateOfBirth,
          individualNumber: individualNumber);
-      var expected = GetRawFoedselsnummer(value);
+      var expected = new NoFoedselsnummer(value);
 
       // Act.
       var sut = (NoFoedselsnummer)value;
@@ -725,38 +790,63 @@ public class NoFoedselsnummerTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (NoFoedselsnummer)value)
-         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
-         .WithMessage(Messages.NoFoedselsnummerEmpty + "*")
-         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (NoFoedselsnummer)value)
-         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
-         .WithMessage(Messages.NoFoedselsnummerInvalidLength + "*")
-         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidNonDigitCharacter(String value)
-      => FluentActions
+   public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (NoFoedselsnummer)value)
-         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
-         .WithMessage(Messages.NoFoedselsnummerInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (NoFoedselsnummer)value)
-         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
-         .WithMessage(Messages.NoFoedselsnummerInvalidCheckDigits + "*")
-         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidCheckDigits);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparators))]
@@ -764,13 +854,13 @@ public class NoFoedselsnummerTests
    {
       // Arrange.
       var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
+      LocalValidationError expected = GetInvalidSeparatorResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (NoFoedselsnummer)value)
-         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
-         .WithMessage(Messages.NoFoedselsnummerInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -783,13 +873,13 @@ public class NoFoedselsnummerTests
       var value = GetFoedselsnummerWithValidCheckDigits(
          dateOfBirth: dateOfBirth,
          individualNumber: individualNumber);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (NoFoedselsnummer)value)
-         .Should().Throw<KfValidationException<NoFoedselsnummerValidationResult>>()
-         .WithMessage(Messages.NoFoedselsnummerInvalidDateOfBirth + "*")
-         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidDateOfBirth);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -882,16 +972,13 @@ public class NoFoedselsnummerTests
    public void NoFoedselsnummer_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expectedValue = new NoFoedselsnummer(value);
+      LocalCreateResult expected = new NoFoedselsnummer(value);
 
       // Act.
       var result = NoFoedselsnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -900,16 +987,13 @@ public class NoFoedselsnummerTests
    {
       // Arrange.
       var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
-      var expectedValue = new NoFoedselsnummer(value);
+      LocalCreateResult expected = new NoFoedselsnummer(value);
 
       // Act.
       var result = NoFoedselsnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -922,72 +1006,75 @@ public class NoFoedselsnummerTests
       var value = GetFoedselsnummerWithValidCheckDigits(
          dateOfBirth: dateOfBirth,
          individualNumber: individualNumber);
-      var expectedValue = new NoFoedselsnummer(value);
+      LocalCreateResult expected = new NoFoedselsnummer(value);
 
       // Act.
       var result = NoFoedselsnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void NoFoedselsnummer_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
+
       // Act.
       var result = NoFoedselsnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(NoFoedselsnummerValidationResult.Empty);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void NoFoedselsnummer_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
+
       // Act.
       var result = NoFoedselsnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(NoFoedselsnummerValidationResult.InvalidLength);
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<LocalValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void NoFoedselsnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacter(String value)
+   public void NoFoedselsnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
+
       // Act.
       var result = NoFoedselsnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(NoFoedselsnummerValidationResult.InvalidCharacter);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void NoFoedselsnummer_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigits(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
+
       // Act.
       var result = NoFoedselsnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(NoFoedselsnummerValidationResult.InvalidCheckDigits);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -996,15 +1083,13 @@ public class NoFoedselsnummerTests
    {
       // Arrange.
       var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value);
 
       // Act.
       var result = NoFoedselsnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(NoFoedselsnummerValidationResult.InvalidSeparator);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1017,15 +1102,13 @@ public class NoFoedselsnummerTests
       var value = GetFoedselsnummerWithValidCheckDigits(
          dateOfBirth: dateOfBirth,
          individualNumber: individualNumber);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
 
       // Act.
       var result = NoFoedselsnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(NoFoedselsnummerValidationResult.InvalidDateOfBirth);
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -1236,7 +1319,16 @@ public class NoFoedselsnummerTests
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDNummerValues))]
    public void NoFoedselsnummer_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
-      => NoFoedselsnummer.Validate(value).Should().Be(NoFoedselsnummerValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = NoFoedselsnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(ValidSeparators))]
@@ -1244,9 +1336,13 @@ public class NoFoedselsnummerTests
    {
       // Arrange.
       var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      NoFoedselsnummer.Validate(value).Should().Be(NoFoedselsnummerValidationResult.ValidationPassed);
+      // Act.
+      var result = NoFoedselsnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1259,30 +1355,75 @@ public class NoFoedselsnummerTests
       var value = GetFoedselsnummerWithValidCheckDigits(
          dateOfBirth: dateOfBirth,
          individualNumber: individualNumber);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      NoFoedselsnummer.Validate(value).Should().Be(NoFoedselsnummerValidationResult.ValidationPassed);
+      // Act.
+      var result = NoFoedselsnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void NoFoedselsnummer_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String value)
-      => NoFoedselsnummer.Validate(value).Should().Be(NoFoedselsnummerValidationResult.Empty);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(EmptyValue);
+
+      // Act.
+      var result = NoFoedselsnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void NoFoedselsnummer_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
-      => NoFoedselsnummer.Validate(value).Should().Be(NoFoedselsnummerValidationResult.InvalidLength);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidLengthResult(value);
+
+      // Act.
+      var result = NoFoedselsnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void NoFoedselsnummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(String value)
-      => NoFoedselsnummer.Validate(value).Should().Be(NoFoedselsnummerValidationResult.InvalidCharacter);
+   public void NoFoedselsnummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
+
+      // Act.
+      var result = NoFoedselsnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void NoFoedselsnummer_Validate_ShouldReturnInvalidCheckDigits_WhenValueHasInvalidCheckDigits(String value)
-      => NoFoedselsnummer.Validate(value).Should().Be(NoFoedselsnummerValidationResult.InvalidCheckDigits);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidChecksumResult();
+
+      // Act.
+      var result = NoFoedselsnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparators))]
@@ -1290,9 +1431,13 @@ public class NoFoedselsnummerTests
    {
       // Arrange.
       var value = GetFoedselsnummerWithValidCheckDigits(separator: separator);
+      LocalValidationResult expected = GetInvalidSeparatorResult(value);
 
-      // Act/assert.
-      NoFoedselsnummer.Validate(value).Should().Be(NoFoedselsnummerValidationResult.InvalidSeparator);
+      // Act.
+      var result = NoFoedselsnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1305,9 +1450,13 @@ public class NoFoedselsnummerTests
       var value = GetFoedselsnummerWithValidCheckDigits(
          dateOfBirth: dateOfBirth,
          individualNumber: individualNumber);
+      LocalValidationResult expected = GetInvalidDateOfBirthResult(value);
 
-      // Act/assert.
-      NoFoedselsnummer.Validate(value).Should().Be(NoFoedselsnummerValidationResult.InvalidDateOfBirth);
+      // Act.
+      var result = NoFoedselsnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -1397,15 +1546,14 @@ public class NoFoedselsnummerTests
    public void NoFoedselsnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenFoedselsnummerIsInvalid()
    {
       // Arrange.
-      var json = "{\"Foedselsnummer\":\"100612-707079\"}";  // Invalid length
+      var json = "{\"Foedselsnummer\":\"13039597140\"}";  // Invalid check digits
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should()
-         .ThrowExactly<KfValidationException<NoFoedselsnummerValidationResult>>()
-         .WithMessage(Messages.NoFoedselsnummerInvalidLength + "*")
-         .And.ValidationResult.Should().Be(NoFoedselsnummerValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion

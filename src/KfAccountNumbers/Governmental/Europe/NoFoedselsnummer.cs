@@ -185,6 +185,40 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record NoFoedselsnummer
 {
    /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="NoFoedselsnummer"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="NoFoedselsnummer"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   The name of the check digit algorithm used by fødselsnummers.
+   /// </summary>
+   public const String CheckDigitAlgorithmName = "Weighted Modulus 11";
+
+   /// <summary>
    ///   Represents the day offset used to distinguish D-nummers from fødselsnummers.
    /// </summary>
    /// <remarks>
@@ -261,10 +295,19 @@ public record NoFoedselsnummer
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         NoFoedselsnummerValidationResult validationResult = Validate(value);
-         if (validationResult != NoFoedselsnummerValidationResult.ValidationPassed)
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            throw validationResult.ToValidationException();
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
          }
       }
 
@@ -348,20 +391,23 @@ public record NoFoedselsnummer
    ///   String representation of a Norwegian National Identity Number (fødselsnummer).
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{NoFoedselsnummer, NoFoedselsnummerValidationResult}"/>.
-   ///   Will contain the new <see cref="NoFoedselsnummerValidationResult"/> if
-   ///   <paramref name="value"/> is valid or
-   ///   <see cref="NoFoedselsnummerValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="value"/> is
-   ///   invalid.
+   ///   A <see cref="UCreateResult{NoFoedselsnummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="NoFoedselsnummer"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<NoFoedselsnummer, NoFoedselsnummerValidationResult> Create(String? value)
-   {
-      NoFoedselsnummerValidationResult validationResult = Validate(value);
-      return validationResult == NoFoedselsnummerValidationResult.ValidationPassed
-         ? new NoFoedselsnummer(value, validationMode: ValidationMode.BypassValidation)
-         : validationResult;
-   }
+   public static UCreateResult<NoFoedselsnummer, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new NoFoedselsnummer(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
 
    /// <summary>
    ///   Format the fødselsnummer using the supplied <paramref name="mask"/>.
@@ -402,41 +448,67 @@ public record NoFoedselsnummer
    ///   String representation of a Norwegian national identity number (fødselsnummer).
    /// </param>
    /// <returns>
-   ///   A <see cref="NoFoedselsnummerValidationResult"/> enumeration
-   ///   value that indicates if the <paramref name="value"/> passed
-   ///   validation or what validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
-   public static NoFoedselsnummerValidationResult Validate(String? value)
+   public static ValidationResult Validate(String? value)
    {
       if (String.IsNullOrWhiteSpace(value))
       {
-         return NoFoedselsnummerValidationResult.Empty;
+         return default(EmptyValue);
       }
-      else if (value.Length is not UnformattedLength and not FormattedLength)
+
+      if (value.Length is not UnformattedLength and not FormattedLength)
       {
-         return NoFoedselsnummerValidationResult.InvalidLength;
+         return new InvalidLength(
+            Messages.NoFoedselsnummerInvalidLength,
+            value.Length,
+            GetValidLengthDefinitions());
       }
 
       // After performing basic checks, validate the check digits because the
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
-      NoFoedselsnummerValidationResult validationResult = ValidateCheckDigits(value);
-      if (validationResult != NoFoedselsnummerValidationResult.ValidationPassed)
+      ValidationResult validationResult = ValidateCheckDigits(value);
+      if (validationResult is not ValidValue)
       {
          // Could be either InvalidCharacter or InvalidCheckDigits.
          return validationResult;
       }
-      else if (!ValidateSeparator(value))
+
+      if (!ValidateSeparator(value))
       {
-         return NoFoedselsnummerValidationResult.InvalidSeparator;
-      }
-      else if (!ValidateDateOfBirth(value))
-      {
-         return NoFoedselsnummerValidationResult.InvalidDateOfBirth;
+         return new InvalidSeparator(
+            Messages.NoFoedselsnummerInvalidSeparator,
+            value[SeparatorOffset],
+            SeparatorOffset);
       }
 
-      return NoFoedselsnummerValidationResult.ValidationPassed;
+      if (!ValidateDateOfBirth(value))
+      {
+         return new InvalidDateOfBirth(
+            Messages.NoFoedselsnummerInvalidDateOfBirth,
+            value[..SeparatorOffset],
+            DateFormatName.DDMMYY);
+      }
+
+      return default(ValidValue);
    }
+
+   /// <summary>
+   ///   Gets an array of details about valid lengths accepted for a
+   ///   fødselsnummer.
+   /// </summary>
+   /// <returns>
+   ///   An array of <see cref="ValidLengthDefinition"/>s.
+   /// </returns>
+   internal static ValidLengthDefinition[] GetValidLengthDefinitions()
+      =>
+      [
+         new ValidLengthDefinition(UnformattedLength, Messages.NoFoedselsnummerUnformattedLength),
+         new ValidLengthDefinition(FormattedLength, Messages.NoFoedselsnummerFormattedLength),
+      ];
 
    private static (Int32 Day, Int32 Month, Int32 Year) GetDayMonthYear(ReadOnlySpan<Char> value)
    {
@@ -488,7 +560,7 @@ public record NoFoedselsnummer
    private static Boolean IsFormatted(ReadOnlySpan<Char> value)
       => value.Length == FormattedLength;
 
-   private static NoFoedselsnummerValidationResult ValidateCheckDigits(ReadOnlySpan<Char> value)
+   private static ValidationResult ValidateCheckDigits(ReadOnlySpan<Char> value)
    {
       // Calcuate weighted sums for both check digits in a single pass. Final
       // c1 weight is zero so that it the final digit is excluded from c1 sum.
@@ -507,7 +579,10 @@ public record NoFoedselsnummer
          var num = value[charIndex] - Chars.DigitZero;
          if (num is < 0 or > 9)
          {
-            return NoFoedselsnummerValidationResult.InvalidCharacter;
+            return new InvalidCharacter(
+               Messages.NoFoedselsnummerInvalidCharacter,
+               value[charIndex],
+               charIndex);
          }
 
          c1Sum += num * _c1Weights[weightIndex];
@@ -517,8 +592,10 @@ public record NoFoedselsnummer
 
       // Both weighted sums must be multiples of 11 for the check digits to be valid.
       return (c1Sum % 11) == 0 && (c2Sum % 11) == 0
-         ? NoFoedselsnummerValidationResult.ValidationPassed
-         : NoFoedselsnummerValidationResult.InvalidCheckDigits;
+         ? default(ValidValue)
+         : new InvalidChecksum(
+            Messages.NoFoedselsnummerInvalidCheckDigits,
+            CheckDigitAlgorithmName);
    }
 
    private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> value)

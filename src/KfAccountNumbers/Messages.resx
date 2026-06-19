@@ -519,4 +519,10 @@
   <data name="SePersonnummerLongFormatLength" xml:space="preserve">
     <value>SE Personnummer with eight-digit date of birth (YYYYMMDD) format</value>
   </data>
+  <data name="NoFoedselsnummerUnformattedLength" xml:space="preserve">
+    <value>NO Foedselsnummer without a separator character</value>
+  </data>
+  <data name="NoFoedselsnummerFormattedLength" xml:space="preserve">
+    <value>NO Foedselsnummer formatted for readability with a separator character at character position 6 (zero-based)</value>
+  </data>
 </root>
