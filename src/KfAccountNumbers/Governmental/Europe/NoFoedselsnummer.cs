@@ -185,6 +185,12 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record NoFoedselsnummer
 {
    /// <summary>
+   ///   Discriminated union defining the types of identifier that
+   ///   <see cref="NoFoedselsnummer"/> can represent.
+   /// </summary>
+   public union IdentifierCategory(NoIdentifierType.Foedselsnummer, NoIdentifierType.DNummer) { }
+
+   /// <summary>
    ///   Discriminated union defining the possible validation errors that can
    ///   occur when creating a new <see cref="NoFoedselsnummer"/>.
    /// </summary>
@@ -353,10 +359,10 @@ public record NoFoedselsnummer
    ///   D-nummers add 40 to the first two digits of the date of birth (DDMMYY
    ///   format) so any day of birth between 41 and 71 is considered a D-nummer.
    /// </remarks>
-   public NoIdentifierType IdentifierType
+   public IdentifierCategory IdentifierType
       => Value.AsSpan().ParseTwoDigits() is >= DNummerMinimumDay and <= DNummerMaximumDay
-         ? NoIdentifierType.DNummer
-         : NoIdentifierType.Foedselsnummer;
+         ? default(NoIdentifierType.DNummer)
+         : default(NoIdentifierType.Foedselsnummer);
 
    /// <summary>
    ///   Gets a string representation of the fødselsnummer.
