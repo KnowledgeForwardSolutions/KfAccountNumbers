@@ -1,5 +1,8 @@
 // Ignore Spelling: Fyrirtaeki Json Kennitala
 
+#pragma warning disable IDE0250 // Make struct 'readonly'
+#pragma warning disable IDE0046 // Convert to conditional expression
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -174,65 +177,69 @@ public record IsKennitala
    private static readonly Int32[] _weights = [3, 2, 7, 6, 5, 4, 3, 2, 1];
 
    /// <summary>
-   ///   Initialize a new instance of the <see cref="IsKennitala"/> class.
+   ///   Initializes a new instance of the <see cref="IsKennitala"/> class.
    /// </summary>
-   /// <param name="kennitala">
+   /// <param name="value">
    ///   String representation of a kennitala.
    /// </param>
    /// <exception cref="KfValidationException{IsKennitalaValidationResult}">
-   ///   <paramref name="kennitala"/> is <see langword="null"/>, empty or all 
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
-   ///   <paramref name="kennitala"/> is not length 10 (or 11 if a separator
+   ///   <paramref name="value"/> is not length 10 (or 11 if a separator
    ///   character is used).
    ///   - or -
-   ///   <paramref name="kennitala"/> contains a non-digit character in
+   ///   <paramref name="value"/> contains a non-digit character in
    ///   any position other than the separator location.
    ///   - or -
-   ///   <paramref name="kennitala"/> contains an invalid weighted modulus
+   ///   <paramref name="value"/> contains an invalid weighted modulus
    ///   11 check digit in the trailing (right-most) character position.
    ///   - or -
-   ///   <paramref name="kennitala"/> contains a digit character in position
+   ///   <paramref name="value"/> contains a digit character in position
    ///   6 (zero-based). Valid separator characters are any non-digit character,
    ///   though space (' ') and dash ('-') are the most common values.
    ///   - or -
-   ///   <paramref name="kennitala"/> contains an invalid century indicator
+   ///   <paramref name="value"/> contains an invalid century indicator
    ///   in the trailing (right-most) position. Valid century indicators are
    ///   '9' (1900's) and '0' (2000's).
    ///   - or -
-   ///   <paramref name="kennitala"/> contains an invalid date of birth in
+   ///   <paramref name="value"/> contains an invalid date of birth in
    ///   positions 0-5 (zero-based).
    /// </exception>
-   public IsKennitala(String? kennitala)
-      : this(kennitala, ValidationMode.ValidationRequired) { }
+   public IsKennitala(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports bypassing
-   ///   validation when creating a new instance from a value that has already
-   ///   been validated.
+   ///   Initializes a new instance of the <see cref="IsKennitala"/> class.
    /// </summary>
-   private IsKennitala(String? kennitala, ValidationMode validationMode)
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private IsKennitala(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         IsKennitalaValidationResult validationResult = Validate(kennitala);
+         IsKennitalaValidationResult validationResult = Validate(value);
          if (validationResult != IsKennitalaValidationResult.ValidationPassed)
          {
             throw validationResult.ToValidationException();
          }
       }
 
-      Value = GetRawValue(kennitala!);
+      Value = GetRawValue(value!);
    }
 
    /// <summary>
-   ///   The person's date of birth, derived from the first six digits in DDMMYY
-   ///   format and the exact century of birth derived from the century indicator.
+   ///   Gets the person's date of birth, derived from the first six digits in
+   ///   DDMMYY format and the exact century of birth derived from the century
+   ///   indicator.
    /// </summary>
    /// <remarks>
    ///   Note that fyrirtaeki kennitala values add 40 to the leading two digits
-   ///   (the DD portion of the DDMMYY date of birth). The date of birth property
-   ///   automatically adjusts for this offset.
+   ///   (the DD portion of the DDMMYY date of birth). The date of birth
+   ///   property automatically adjusts for this offset.
    /// </remarks>
    public DateOnly DateOfBirth
    {
@@ -247,7 +254,7 @@ public record IsKennitala
    }
 
    /// <summary>
-   ///   The type of kennitala identifier represented by this instance,
+   ///   Gets the type of kennitala identifier represented by this instance,
    ///   indicating if this is an Einstaklingur or a Fyrirtaeki.
    /// </summary>
    /// <remarks>
@@ -261,35 +268,50 @@ public record IsKennitala
          : IsIdentifierType.Einstaklingur;
 
    /// <summary>
-   ///   The raw kennitala value.
+   ///   Gets the raw kennitala value.
    /// </summary>
    public String Value { get; private init; }
 
-   public static implicit operator String(IsKennitala kennitala)
-      => kennitala?.Value ?? String.Empty;      // Handle null kennitala object gracefully by returning empty string
+   /// <summary>
+   ///   Implicitly converts a <see cref="IsKennitala"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="IsKennitala"/> to convert.
+   /// </param>
+   public static implicit operator String(IsKennitala source)
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
 
-   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
-   public static explicit operator IsKennitala(String? kennitala) => new(kennitala);
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="IsKennitala"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a kennitala.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid kennitala.
+   /// </exception>
+   public static explicit operator IsKennitala(String? value) => new(value);
 
    /// <summary>
    ///   Create a new <see cref="IsKennitala"/> using the Result pattern.
    /// </summary>
-   /// <param name="kennitala">
+   /// <param name="value">
    ///   String representation of an Icelandic kennitala.
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{IsKennitala, IsKennitalaValidationResult}"/>.
-   ///   Will contain the new <see cref="IsKennitala"/> if 
-   ///   <paramref name="kennitala"/> is valid or an
+   ///   Will contain the new <see cref="IsKennitala"/> if
+   ///   <paramref name="value"/> is valid or an
    ///   <see cref="IsKennitalaValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="kennitala"/> is 
+   ///   the validation rule that was failed if <paramref name="value"/> is
    ///   invalid.
    /// </returns>
-   public static CreateResult<IsKennitala, IsKennitalaValidationResult> Create(String? kennitala)
+   public static CreateResult<IsKennitala, IsKennitalaValidationResult> Create(String? value)
    {
-      IsKennitalaValidationResult validationResult = Validate(kennitala);
+      IsKennitalaValidationResult validationResult = Validate(value);
       return validationResult == IsKennitalaValidationResult.ValidationPassed
-         ? new IsKennitala(kennitala, validationMode: ValidationMode.BypassValidation)
+         ? new IsKennitala(value, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
@@ -319,30 +341,30 @@ public record IsKennitala
    /// <summary>
    ///   Get a string representation of the kennitala.
    /// </summary>
-   /// <remarks>
-   ///   Will return the raw kennitala, without a separator character.
-   /// </remarks>
+   /// <returns>
+   ///   The raw kennitala, without separator characters.
+   /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="kennitala"/> to determine if it contains a
+   ///   Check the <paramref name="value"/> to determine if it contains a
    ///   valid Icelandic kennitala number.
    /// </summary>
-   /// <param name="kennitala">
+   /// <param name="value">
    ///   String representation of an Icelandic kennitala number.
    /// </param>
    /// <returns>
-   ///   A <see cref="IsKennitalaValidationResult"/> enumeration 
-   ///   value that indicates if the <paramref name="kennitala"/> passed
+   ///   A <see cref="IsKennitalaValidationResult"/> enumeration
+   ///   value that indicates if the <paramref name="value"/> passed
    ///   validation or what validation error was encountered.
    /// </returns>
-   public static IsKennitalaValidationResult Validate(String? kennitala)
+   public static IsKennitalaValidationResult Validate(String? value)
    {
-      if (String.IsNullOrWhiteSpace(kennitala))
+      if (String.IsNullOrWhiteSpace(value))
       {
          return IsKennitalaValidationResult.Empty;
       }
-      else if (kennitala.Length is not UnformattedLength and not FormattedLength)
+      else if (value.Length is not UnformattedLength and not FormattedLength)
       {
          return IsKennitalaValidationResult.InvalidLength;
       }
@@ -350,23 +372,24 @@ public record IsKennitala
       // After performing basic checks, validate the check digits because the
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
-      IsKennitalaValidationResult validationResult = ValidateCheckDigit(kennitala);
+      IsKennitalaValidationResult validationResult = ValidateCheckDigit(value);
       if (validationResult != IsKennitalaValidationResult.ValidationPassed)
       {
          // Could be either InvalidCharacter or InvalidCheckDigit.
          return validationResult;
       }
-      validationResult = ValidateCenturyIndicator(kennitala);
+
+      validationResult = ValidateCenturyIndicator(value);
       if (validationResult != IsKennitalaValidationResult.ValidationPassed)
       {
          // Could be either InvalidCharacter or InvalidCentury.
          return validationResult;
       }
-      else if (!ValidateSeparator(kennitala))
+      else if (!ValidateSeparator(value))
       {
          return IsKennitalaValidationResult.InvalidSeparator;
       }
-      else if (!ValidateDateOfBirth(kennitala))
+      else if (!ValidateDateOfBirth(value))
       {
          return IsKennitalaValidationResult.InvalidDateOfBirth;
       }
@@ -374,12 +397,12 @@ public record IsKennitala
       return IsKennitalaValidationResult.ValidationPassed;
    }
 
-   private static (Int32 day, Int32 month, Int32 year) GetDayMonthYear(ReadOnlySpan<Char> kennitala)
+   private static (Int32 Day, Int32 Month, Int32 Year) GetDayMonthYear(ReadOnlySpan<Char> value)
    {
-      var day = kennitala.ParseTwoDigits();
-      var month = kennitala[2..].ParseTwoDigits();
-      var year = kennitala[4..].ParseTwoDigits();
-      year += kennitala[^CenturyIndicatorOffset] == Chars.DigitNine ? 1900 : 2000;
+      var day = value.ParseTwoDigits();
+      var month = value[2..].ParseTwoDigits();
+      var year = value[4..].ParseTwoDigits();
+      year += value[^CenturyIndicatorOffset] == Chars.DigitNine ? 1900 : 2000;
 
       // Adjust day for possible Fyrirtaeki.
       if (day > FyrirtaekiDayOffset)
@@ -390,21 +413,21 @@ public record IsKennitala
       return (day, month, year);
    }
 
-   private static String GetRawValue(String kennitala)
-      => kennitala.Length == UnformattedLength
-         ? kennitala
+   private static String GetRawValue(String value)
+      => value.Length == UnformattedLength
+         ? value
          : String.Concat(
-            kennitala.AsSpan(0, SeparatorOffset),
-            kennitala.AsSpan(SeparatorOffset + 1));
+            value.AsSpan(0, SeparatorOffset),
+            value.AsSpan(SeparatorOffset + 1));
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static Boolean IsFormatted(ReadOnlySpan<Char> kennitala)
-      => kennitala.Length == FormattedLength;
+   private static Boolean IsFormatted(ReadOnlySpan<Char> value)
+      => value.Length == FormattedLength;
 
-   private static IsKennitalaValidationResult ValidateCenturyIndicator(ReadOnlySpan<Char> kennitala)
+   private static IsKennitalaValidationResult ValidateCenturyIndicator(ReadOnlySpan<Char> value)
    {
-      var ch = kennitala[^CenturyIndicatorOffset];
-      if (!ch.IsAsciiDigit())                         // Check for ASCII digit because check digit validation doesn't evaluate century indicator
+      var ch = value[^CenturyIndicatorOffset];
+      if (!ch.IsAsciiDigit()) // Check for ASCII digit because check digit validation doesn't evaluate century indicator
       {
          return IsKennitalaValidationResult.InvalidCharacter;
       }
@@ -414,16 +437,15 @@ public record IsKennitala
          : IsKennitalaValidationResult.InvalidCentury;
    }
 
-   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> kennitala)
+   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> value)
    {
 #pragma warning disable IDE0008 // Use explicit type
-      var (day, month, year) = GetDayMonthYear(kennitala);
+      var (day, month, year) = GetDayMonthYear(value);
 #pragma warning restore IDE0008 // Use explicit type
 
       // No need to validate year because validation has already confirmed that
       // the kennitala is all digits and that the century indicator is valid.
-
-      if (month < 1 || month > 12)
+      if (month is < 1 or > 12)
       {
          return false;
       }
@@ -431,20 +453,19 @@ public record IsKennitala
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);
    }
 
-   private static Boolean ValidateSeparator(ReadOnlySpan<Char> kennitala)
-      => !IsFormatted(kennitala) || !kennitala[SeparatorOffset].IsAsciiDigit();
+   private static Boolean ValidateSeparator(ReadOnlySpan<Char> value)
+      => !IsFormatted(value) || !value[SeparatorOffset].IsAsciiDigit();
 
-   private static IsKennitalaValidationResult ValidateCheckDigit(ReadOnlySpan<Char> kennitala)
+   private static IsKennitalaValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
    {
       // Note that while the documentation in the linked articles does not
       // explicitly state it, it appears that values that would result in a
       // check digit of 10 are not issued. This is consistent with other
       // modulus 11 check digit examples such as Norwegian fødselsnummer.
-
       var sum = 0;
       var weightIndex = 0;
-      var isFormatted = IsFormatted(kennitala);
-      var processLength = kennitala.Length - 1;
+      var isFormatted = IsFormatted(value);
+      var processLength = value.Length - 1;
       for (var index = 0; index < processLength; index++)
       {
          if (isFormatted && index == SeparatorOffset)
@@ -452,8 +473,8 @@ public record IsKennitala
             continue;
          }
 
-         var num = kennitala[index] - Chars.DigitZero;
-         if (num < 0 || num > 9)
+         var num = value[index] - Chars.DigitZero;
+         if (num is < 0 or > 9)
          {
             return IsKennitalaValidationResult.InvalidCharacter;
          }
@@ -468,6 +489,8 @@ public record IsKennitala
    }
 }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class IsKennitalaJsonConverter : JsonConverter<IsKennitala>
 {
    public override IsKennitala Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
