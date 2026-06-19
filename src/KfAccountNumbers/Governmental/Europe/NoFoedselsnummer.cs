@@ -220,12 +220,13 @@ public record NoFoedselsnummer
    }
 
    /// <summary>
-   ///   The name of the check digit algorithm used by fødselsnummers.
+   ///   The name of the check digit algorithm used by fødselsnummer values.
    /// </summary>
    public const String CheckDigitAlgorithmName = "Weighted Modulus 11";
 
    /// <summary>
-   ///   Represents the day offset used to distinguish D-nummers from fødselsnummers.
+   ///   Represents the day offset used to distinguish a D-nummer from a
+   ///   fødselsnummer.
    /// </summary>
    /// <remarks>
    ///   In Norwegian identity numbers, a D-nummer is indicated by
@@ -568,7 +569,7 @@ public record NoFoedselsnummer
 
    private static ValidationResult ValidateCheckDigits(ReadOnlySpan<Char> value)
    {
-      // Calcuate weighted sums for both check digits in a single pass. Final
+      // Calculate weighted sums for both check digits in a single pass. Final
       // c1 weight is zero so that it the final digit is excluded from c1 sum.
       var isFormatted = IsFormatted(value);
       var c1Sum = 0;
