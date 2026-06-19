@@ -17,6 +17,8 @@ Following the successful union-pattern migration of `SePersonnummer` in S0028, r
 
 All three types will share a common base class `SeIdentityNumberBase` following the pattern established by `GbPatientNumberBase`, `GbNhsNumber`, `GbChiNumber`, and `GbHcNumber`. This approach provides compile-time type safety, enables more specific business logic targeting, and improves API clarity.
 
+NOTE: Look at creating a unit test base class that contains shared test data
+
 ---
 
 ## Business Value
