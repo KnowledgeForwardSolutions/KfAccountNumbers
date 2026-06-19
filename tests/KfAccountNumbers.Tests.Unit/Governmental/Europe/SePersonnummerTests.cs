@@ -1131,16 +1131,14 @@ public class SePersonnummerTests
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void SePersonnummer_Create_ShouldReturnInvalidCheckDigitValidationResult_WhenValueHasInvalidCheckDigit(String value)
    {
-      {
-         // Arrange.
-         LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
 
-         // Act.
-         var result = SePersonnummer.Create(value);
+      // Act.
+      var result = SePersonnummer.Create(value);
 
-         // Assert.
-         result.Should().BeEquivalentTo(expected);
-      }
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]

@@ -925,6 +925,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NO Foedselsnummer formatted for readability with a separator character at character position 6 (zero-based).
+        /// </summary>
+        internal static string NoFoedselsnummerFormattedLength {
+            get {
+                return ResourceManager.GetString("NoFoedselsnummerFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to NO Foedselsnummer contains a non-digit character where a digit was expected.
         /// </summary>
         internal static string NoFoedselsnummerInvalidCharacter {
@@ -966,6 +975,15 @@ namespace KfAccountNumbers {
         internal static string NoFoedselsnummerInvalidSeparator {
             get {
                 return ResourceManager.GetString("NoFoedselsnummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Foedselsnummer without a separator character.
+        /// </summary>
+        internal static string NoFoedselsnummerUnformattedLength {
+            get {
+                return ResourceManager.GetString("NoFoedselsnummerUnformattedLength", resourceCulture);
             }
         }
         

@@ -274,7 +274,7 @@ public record SePersonnummer
    /// <param name="value">
    ///   String representation of a personnummer.
    /// </param>
-   /// <exception cref="UKfValidationException{ValidationResult}">
+   /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
