@@ -755,8 +755,7 @@ public class NoFoedselsnummerTests
       var sut = (NoFoedselsnummer)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -771,8 +770,7 @@ public class NoFoedselsnummerTests
       var sut = (NoFoedselsnummer)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -791,8 +789,7 @@ public class NoFoedselsnummerTests
       var sut = (NoFoedselsnummer)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1269,7 +1266,7 @@ public class NoFoedselsnummerTests
    {
       // Arrange.
       var sut = new NoFoedselsnummer(AltValidUnformattedFoedselsnummer);
-      var mask = "______-______";
+      var mask = "______-_____";
       var expected = AltValidFormattedFoedselsnummer;
 
       // Act.

@@ -266,7 +266,7 @@ public record NoFoedselsnummer
    /// <param name="value">
    ///   String representation of a fødselsnummer.
    /// </param>
-   /// <exception cref="UKfValidationException{ValidationException}">
+   /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
@@ -623,8 +623,8 @@ public record NoFoedselsnummer
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);
    }
 
-   private static Boolean ValidateSeparator(ReadOnlySpan<Char> foedsvalueelsnummer)
-      => !IsFormatted(foedsvalueelsnummer) || !foedsvalueelsnummer[SeparatorOffset].IsAsciiDigit();
+   private static Boolean ValidateSeparator(ReadOnlySpan<Char> value)
+      => !IsFormatted(value) || !value[SeparatorOffset].IsAsciiDigit();
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
