@@ -16,14 +16,14 @@ namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class IsKennitalaTests
 {
-   private const String Valid10CharacterEinstaklingurKennitala = "1205854369";
-   private const String Valid11CharacterEinstaklingurKennitala = "120585-4369";
-   private const String AltValid10CharacterEinstaklingurKennitala = "1302058360";
-   private const String AltValid11CharacterEinstaklingurKennitala = "130205-8360";
-   private const String Valid10CharacterFyrirtaekiKennitala = "5311073810";
-   private const String Valid11CharacterFyrirtaekiKennitala = "531107 3810";
-   private const String AltValid10CharacterFyrirtaekiKennitala = "6005203690";
-   private const String AltValid11CharacterFyrirtaekiKennitala = "600520 3690";
+   private const String ValidUnformattedEinstaklingurKennitala = "1205854369";
+   private const String ValidFormattedEinstaklingurKennitala = "120585-4369";
+   private const String AltValidUnformattedEinstaklingurKennitala = "1302058360";
+   private const String AltValidFormattedEinstaklingurKennitala = "130205-8360";
+   private const String ValidUnformattedFyrirtaekiKennitala = "5311073810";
+   private const String ValidFormattedFyrirtaekiKennitala = "531107 3810";
+   private const String AltValidUnformattedFyrirtaekiKennitala = "6005203690";
+   private const String AltValidFormattedFyrirtaekiKennitala = "600520 3690";
 
    private static String GetRawKennitala(String kennitala)
       => kennitala.Length == 10
@@ -60,14 +60,14 @@ public class IsKennitalaTests
 
    public static TheoryData<String> ValidKennitalaValues =>
    [
-      Valid10CharacterEinstaklingurKennitala,
-      Valid11CharacterEinstaklingurKennitala,
-      AltValid10CharacterEinstaklingurKennitala,
-      AltValid11CharacterEinstaklingurKennitala,
-      Valid10CharacterFyrirtaekiKennitala,
-      Valid11CharacterFyrirtaekiKennitala,
-      AltValid10CharacterFyrirtaekiKennitala,
-      AltValid11CharacterFyrirtaekiKennitala,
+      ValidUnformattedEinstaklingurKennitala,
+      ValidFormattedEinstaklingurKennitala,
+      AltValidUnformattedEinstaklingurKennitala,
+      AltValidFormattedEinstaklingurKennitala,
+      ValidUnformattedFyrirtaekiKennitala,
+      ValidFormattedFyrirtaekiKennitala,
+      AltValidUnformattedFyrirtaekiKennitala,
+      AltValidFormattedFyrirtaekiKennitala,
    ];
 
    public static TheoryData<String> ValidSeparators =>
@@ -274,7 +274,7 @@ public class IsKennitalaTests
    private static InvalidChecksum GetInvalidChecksumResult()
       => new(
          Messages.IsKennitalaInvalidCheckDigit,
-         NoFoedselsnummer.CheckDigitAlgorithmName);
+         IsKennitala.CheckDigitAlgorithmName);
 
    private static InvalidSeparator GetInvalidSeparatorResult(String value)
       => new(Messages.IsKennitalaInvalidSeparator, value[6], 6);
@@ -570,10 +570,10 @@ public class IsKennitalaTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(Valid10CharacterEinstaklingurKennitala, Valid10CharacterEinstaklingurKennitala)]
-   [InlineData(Valid11CharacterEinstaklingurKennitala, Valid10CharacterEinstaklingurKennitala)]
-   [InlineData(Valid10CharacterFyrirtaekiKennitala, Valid10CharacterFyrirtaekiKennitala)]
-   [InlineData(Valid11CharacterFyrirtaekiKennitala, Valid10CharacterFyrirtaekiKennitala)]
+   [InlineData(ValidUnformattedEinstaklingurKennitala, ValidUnformattedEinstaklingurKennitala)]
+   [InlineData(ValidFormattedEinstaklingurKennitala, ValidUnformattedEinstaklingurKennitala)]
+   [InlineData(ValidUnformattedFyrirtaekiKennitala, ValidUnformattedFyrirtaekiKennitala)]
+   [InlineData(ValidFormattedFyrirtaekiKennitala, ValidUnformattedFyrirtaekiKennitala)]
    public void IsKennitala_Value_ShouldReturnValidatedKennitala(
       String value,
       String expected)
@@ -595,7 +595,7 @@ public class IsKennitalaTests
    public void IsKennitala_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid10CharacterEinstaklingurKennitala;
+      var value = ValidUnformattedEinstaklingurKennitala;
       var sut = new IsKennitala(value);
 
       // Act.
@@ -610,7 +610,7 @@ public class IsKennitalaTests
    public void IsKennitala_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid11CharacterEinstaklingurKennitala;
+      var value = ValidFormattedEinstaklingurKennitala;
       var sut = new IsKennitala(value);
       var expected = GetRawKennitala(value);
 
@@ -821,8 +821,8 @@ public class IsKennitalaTests
    public void IsKennitala_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -832,8 +832,8 @@ public class IsKennitalaTests
    public void IsKennitala_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(AltValid11CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(AltValidFormattedEinstaklingurKennitala);
 
       // Act/assert.
       (sut1 == sut2).Should().BeFalse();
@@ -843,8 +843,30 @@ public class IsKennitalaTests
    public void IsKennitala_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 11 character versions for same person should still be equal.
-      var sut1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
-      var sut2 = new IsKennitala(Valid11CharacterFyrirtaekiKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedFyrirtaekiKennitala);
+      var sut2 = new IsKennitala(ValidFormattedFyrirtaekiKennitala);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IsKennitala_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', '.'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IsKennitala_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', 'A'));
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', 'a'));
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -860,8 +882,8 @@ public class IsKennitalaTests
    public void IsKennitala_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
-      var sut2 = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedFyrirtaekiKennitala);
+      var sut2 = new IsKennitala(AltValidUnformattedFyrirtaekiKennitala);
 
       // Act/assert.
       (sut1 != sut2).Should().BeTrue();
@@ -871,8 +893,8 @@ public class IsKennitalaTests
    public void IsKennitala_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 11 character versions for same person should still be equal.
-      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -882,8 +904,30 @@ public class IsKennitalaTests
    public void IsKennitala_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void IsKennitala_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', '.'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void IsKennitala_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', 'A'));
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', 'a'));
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -1067,8 +1111,8 @@ public class IsKennitalaTests
    public void IsKennitala_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -1078,8 +1122,8 @@ public class IsKennitalaTests
    public void IsKennitala_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
-      var sut2 = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedFyrirtaekiKennitala);
+      var sut2 = new IsKennitala(AltValidUnformattedFyrirtaekiKennitala);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeFalse();
@@ -1089,11 +1133,53 @@ public class IsKennitalaTests
    public void IsKennitala_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 11 character versions for same person should still be equal.
-      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IsKennitala_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', '.'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IsKennitala_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', 'A'));
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', 'a'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IsKennitala_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+
+      // Act/assert.
+      sut.Equals(ValidFormattedEinstaklingurKennitala).Should().BeFalse();
+   }
+
+   [Fact]
+   public void IsKennitala_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
    }
 
    #endregion
@@ -1106,8 +1192,8 @@ public class IsKennitalaTests
    public void IsKennitala_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
    {
       // Arrange.
-      var sut = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var expected = Valid11CharacterEinstaklingurKennitala;
+      var sut = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+      var expected = ValidFormattedEinstaklingurKennitala;
 
       // Act.
       var str = sut.Format();
@@ -1120,9 +1206,9 @@ public class IsKennitalaTests
    public void IsKennitala_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
    {
       // Arrange.
-      var sut = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
+      var sut = new IsKennitala(AltValidUnformattedFyrirtaekiKennitala);
       var mask = "______ ____";
-      var expected = AltValid11CharacterFyrirtaekiKennitala;
+      var expected = AltValidFormattedFyrirtaekiKennitala;
 
       // Act.
       var str = sut.Format(mask);
@@ -1135,7 +1221,7 @@ public class IsKennitalaTests
    public void IsKennitala_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
    {
       // Arrange.
-      var sut = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
       String mask = null!;
 
       // Act/assert.
@@ -1153,7 +1239,7 @@ public class IsKennitalaTests
    public void IsKennitala_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
    {
       // Arrange.
-      var sut = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
+      var sut = new IsKennitala(AltValidUnformattedFyrirtaekiKennitala);
       var expectedMessage = Messages.FormatMaskEmpty + "*";
       var act = () => _ = sut.Format(mask);
 
@@ -1173,8 +1259,8 @@ public class IsKennitalaTests
    public void IsKennitala_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1188,8 +1274,8 @@ public class IsKennitalaTests
    public void IsKennitala_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(AltValid11CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(AltValidFormattedEinstaklingurKennitala);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1203,8 +1289,38 @@ public class IsKennitalaTests
    public void IsKennitala_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 11 character versions for same person should still be equal.
-      var sut1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
-      var sut2 = new IsKennitala(Valid11CharacterFyrirtaekiKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedFyrirtaekiKennitala);
+      var sut2 = new IsKennitala(ValidFormattedFyrirtaekiKennitala);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void IsKennitala_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedFyrirtaekiKennitala);
+      var sut2 = new IsKennitala(ValidFormattedFyrirtaekiKennitala.Replace('-', '.'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void IsKennitala_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedFyrirtaekiKennitala.Replace('-', 'A'));
+      var sut2 = new IsKennitala(ValidFormattedFyrirtaekiKennitala.Replace('-', 'a'));
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1228,8 +1344,8 @@ public class IsKennitalaTests
    public void IsKennitala_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
@@ -1431,7 +1547,7 @@ public class IsKennitalaTests
    public void IsKennitala_JsonSerialization_ShouldRoundTripSuccessfully()
    {
       // Arrange.
-      var sut = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
@@ -1446,7 +1562,7 @@ public class IsKennitalaTests
    public void IsKennitala_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
    {
       // Arrange.
-      var sut = new IsKennitala(Valid11CharacterFyrirtaekiKennitala);
+      var sut = new IsKennitala(ValidFormattedFyrirtaekiKennitala);
       var expected = sut.Value;
 
       // Act.
@@ -1465,7 +1581,7 @@ public class IsKennitalaTests
    public void IsKennitala_JsonSerialization_ShouldDeserializeComplexObject()
    {
       // Arrange.
-      var foo = new Foo { Kennitala = new IsKennitala(Valid11CharacterEinstaklingurKennitala) };
+      var foo = new Foo { Kennitala = new IsKennitala(ValidFormattedEinstaklingurKennitala) };
       var json = JsonSerializer.Serialize(foo);
 
       // Act.
