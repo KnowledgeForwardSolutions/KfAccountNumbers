@@ -146,6 +146,12 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record IsKennitala
 {
    /// <summary>
+   ///   Discriminated union defining the types of identifier that
+   ///   <see cref="IsKennitala"/> can represent.
+   /// </summary>
+   public union IdentifierCategory(IsIdentifierType.Einstaklingur, IsIdentifierType.Fyrirtaeki) { }
+
+   /// <summary>
    ///   Discriminated union defining the possible validation errors that can
    ///   occur when creating a new <see cref="IsKennitala"/>.
    /// </summary>
@@ -311,10 +317,10 @@ public record IsKennitala
    ///   Fyrirtaekis add 40 to the first two digits of the date of birth (DDMMYY
    ///   format) so any day of birth between 41 and 71 is considered a Fyrirtaeki.
    /// </remarks>
-   public IsIdentifierType IdentifierType
+   public IdentifierCategory IdentifierType
       => Value.AsSpan().ParseTwoDigits() is >= FyrirtaekiMinimumDay and <= FyrirtaekiMaximumDay
-         ? IsIdentifierType.Fyrirtaeki
-         : IsIdentifierType.Einstaklingur;
+         ? default(IsIdentifierType.Fyrirtaeki)
+         : default(IsIdentifierType.Einstaklingur);
 
    /// <summary>
    ///   Gets the raw kennitala value.

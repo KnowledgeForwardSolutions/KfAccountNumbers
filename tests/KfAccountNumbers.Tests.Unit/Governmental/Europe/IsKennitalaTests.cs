@@ -539,9 +539,10 @@ public class IsKennitalaTests
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
       var sut = new IsKennitala(value);
+      IsKennitala.IdentifierCategory expected = default(IsIdentifierType.Einstaklingur);
 
       // Act/assert.
-      sut.IdentifierType.Should().Be(IsIdentifierType.Einstaklingur);
+      sut.IdentifierType.Should().Be(expected);
    }
 
    [Theory]
@@ -558,9 +559,10 @@ public class IsKennitalaTests
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
       var sut = new IsKennitala(value);
+      IsKennitala.IdentifierCategory expected = default(IsIdentifierType.Fyrirtaeki);
 
       // Act/assert.
-      sut.IdentifierType.Should().Be(IsIdentifierType.Fyrirtaeki);
+      sut.IdentifierType.Should().Be(expected);
    }
 
    #endregion
