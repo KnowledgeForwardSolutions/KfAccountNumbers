@@ -628,7 +628,7 @@ public class NoFoedselsnummerTests
    [InlineData("544", " ")]
    [InlineData("546", " ")]
    [InlineData("648", " ")]    // 5 changed to 6 because of modulus 11 check digits
-   public void NoFoedselsnummer_Gender_ShouldReturnMale_ForValuesWithEvenGenderIndicator(
+   public void NoFoedselsnummer_Gender_ShouldReturnFemale_ForValuesWithEvenGenderIndicator(
       String individualNumber,
       String separator)
    {

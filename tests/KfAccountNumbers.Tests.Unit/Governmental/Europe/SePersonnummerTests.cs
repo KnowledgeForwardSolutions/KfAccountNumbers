@@ -688,7 +688,7 @@ public class SePersonnummerTests
    [InlineData("19811228", '4')]
    [InlineData("19811228", '6')]
    [InlineData("19811228", '8')]
-   public void SePersonnummer_Gender_ShouldReturnFemale_ForValuesWithOddGenderIndicator(
+   public void SePersonnummer_Gender_ShouldReturnFemale_ForValuesWithEvenGenderIndicator(
       String dateOfBirth,
       Char digit)
    {

@@ -319,12 +319,10 @@ public record DkPersonnummer
    ///   String representation of a Danish personnummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{DkPersonnummer, DkPersonnummerValidationResult}"/>.
-   ///   Will contain the new <see cref="DkPersonnummer"/> if
-   ///   <paramref name="value"/> is valid or an
-   ///   <see cref="DkPersonnummerValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="value"/> is
-   ///   invalid.
+   ///   A <see cref="UCreateResult{DkPersonnummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="DkPersonnummer"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
    public static UCreateResult<DkPersonnummer, ValidationError> Create(String? value)
       => Validate(value) switch
