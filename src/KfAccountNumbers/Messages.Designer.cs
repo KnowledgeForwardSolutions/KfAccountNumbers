@@ -727,6 +727,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to IS Kennitala formatted for readability with a separator character at character position 6 (zero-based).
+        /// </summary>
+        internal static string IsKennitalaFormattedLength {
+            get {
+                return ResourceManager.GetString("IsKennitalaFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to IS Kennitala century indicator must be either &apos;9&apos; or &apos;0&apos;.
         /// </summary>
         internal static string IsKennitalaInvalidCentury {
@@ -777,6 +786,15 @@ namespace KfAccountNumbers {
         internal static string IsKennitalaInvalidSeparator {
             get {
                 return ResourceManager.GetString("IsKennitalaInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IS Kennitala without a separator character.
+        /// </summary>
+        internal static string IsKennitalaUnformattedLength {
+            get {
+                return ResourceManager.GetString("IsKennitalaUnformattedLength", resourceCulture);
             }
         }
         

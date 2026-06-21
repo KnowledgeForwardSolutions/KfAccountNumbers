@@ -525,4 +525,10 @@
   <data name="NoFoedselsnummerFormattedLength" xml:space="preserve">
     <value>NO Foedselsnummer formatted for readability with a separator character at character position 6 (zero-based)</value>
   </data>
+  <data name="IsKennitalaFormattedLength" xml:space="preserve">
+    <value>IS Kennitala formatted for readability with a separator character at character position 6 (zero-based)</value>
+  </data>
+  <data name="IsKennitalaUnformattedLength" xml:space="preserve">
+    <value>IS Kennitala without a separator character</value>
+  </data>
 </root>
