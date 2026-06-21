@@ -177,7 +177,7 @@ public record IsKennitala
    }
 
    /// <summary>
-   ///   The name of the check digit algorithm used by kennatala values.
+   ///   The name of the check digit algorithm used by kennitala values.
    /// </summary>
    public const String CheckDigitAlgorithmName = "Weighted Modulus 11";
 
@@ -432,7 +432,7 @@ public record IsKennitala
       ValidationResult validationResult = ValidateCheckDigit(value);
       if (validationResult is not ValidValue)
       {
-         // Could be either InvalidCharacter or InvalidCheckDigit.
+         // Could be either InvalidCharacter or InvalidChecksum.
          return validationResult;
       }
 
