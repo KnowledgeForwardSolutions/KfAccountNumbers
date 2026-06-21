@@ -55,11 +55,6 @@ public abstract record GbPatientNumberBase
    internal const Int32 NhsSeparatorPosition2 = 7;
 
    /// <summary>
-   ///   The zero-based offset for the digit that encodes gender for CHI numbers.
-   /// </summary>
-   internal const Int32 GenderOffset = 8;
-
-   /// <summary>
    ///   Details for the length of a valid formatted CHI patient number.
    /// </summary>
    internal static readonly ValidLengthDefinition ChiLengthDefinition =

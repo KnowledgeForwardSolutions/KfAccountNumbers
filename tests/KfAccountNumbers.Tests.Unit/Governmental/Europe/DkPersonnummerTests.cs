@@ -851,6 +851,26 @@ public class DkPersonnummerTests
       sut1.Equals(sut2).Should().BeTrue();
    }
 
+   [Fact]
+   public void DkPersonnummer_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new DkPersonnummer(ValidFormattedPersonnummer);
+
+      // Act/assert.
+      sut.Equals(ValidFormattedPersonnummer).Should().BeFalse();
+   }
+
+   [Fact]
+   public void DkPersonnummer_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new DkPersonnummer(ValidFormattedPersonnummer);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
+   }
+
    #endregion
 
    #region Format Method Tests

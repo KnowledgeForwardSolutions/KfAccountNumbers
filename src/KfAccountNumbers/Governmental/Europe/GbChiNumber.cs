@@ -172,6 +172,8 @@ public record class GbChiNumber : GbPatientNumberBase
    {
    }
 
+   private const Int32 GenderOffset = 2;           // Measured from end of string, regardless of separator presence
+
    /// <summary>
    ///   Initializes a new instance of the <see cref="GbChiNumber"/> class.
    /// </summary>
@@ -246,11 +248,11 @@ public record class GbChiNumber : GbPatientNumberBase
    ///   Gets the binary gender extracted from the CHI number.
    /// </summary>
    /// <remarks>
-   ///   The eighth digit (zero-based) is used to indicate the person's gender.
+   ///   The second right-most digit is used to indicate the person's gender.
    ///   Odd digits indicate male and even digits indicate female.
    /// </remarks>
    public Gender.BinaryGender Gender
-      => Value[GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);    // This works because the ASCII character values for digits have the same odd/even pattern
+      => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);    // This works because the ASCII character values for digits have the same odd/even pattern
 
    /// <summary>
    ///   Gets the CHI number, without any formatting.
