@@ -1039,9 +1039,9 @@ public class IsKennitalaTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void IsKennitala_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigit(String value)
+   public void IsKennitala_Create_ShouldReturnInvalidCheckDigitValidationResult_WhenValueHasInvalidCheckDigit(String value)
    {
-      // Act.
+      // Arrange.
       LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
 
       // Act.
@@ -1053,9 +1053,9 @@ public class IsKennitalaTests
 
    [Theory]
    [MemberData(nameof(InvalidCenturyIndicatorValues))]
-   public void IsKennitala_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCenturyIndicator(String value)
+   public void IsKennitala_Create_ShouldReturnInvalidCenturyValidationResult_WhenValueHasInvalidCenturyIndicator(String value)
    {
-      // Act.
+      // Arrange.
       LocalCreateResult expected = (LocalValidationError)GetInvalidCenturyResult(value);
 
       // Act.

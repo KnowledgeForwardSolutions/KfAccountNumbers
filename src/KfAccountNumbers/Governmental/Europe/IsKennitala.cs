@@ -492,6 +492,7 @@ public record IsKennitala
       return (day, month, year);
    }
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static String GetRawValue(String value)
       => value.Length == UnformattedLength
          ? value
@@ -520,25 +521,6 @@ public record IsKennitala
             Messages.IsKennitalaInvalidCentury,
             value[^CenturyIndicatorOffset]);
    }
-
-   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> value)
-   {
-#pragma warning disable IDE0008 // Use explicit type
-      var (day, month, year) = GetDayMonthYear(value);
-#pragma warning restore IDE0008 // Use explicit type
-
-      // No need to validate year because validation has already confirmed that
-      // the kennitala is all digits and that the century indicator is valid.
-      if (month is < 1 or > 12)
-      {
-         return false;
-      }
-
-      return day >= 1 && day <= DateTime.DaysInMonth(year, month);
-   }
-
-   private static Boolean ValidateSeparator(ReadOnlySpan<Char> value)
-      => !IsFormatted(value) || !value[SeparatorOffset].IsAsciiDigit();
 
    private static ValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
    {
@@ -576,6 +558,26 @@ public record IsKennitala
             Messages.IsKennitalaInvalidCheckDigit,
             CheckDigitAlgorithmName);
    }
+
+   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> value)
+   {
+#pragma warning disable IDE0008 // Use explicit type
+      var (day, month, year) = GetDayMonthYear(value);
+#pragma warning restore IDE0008 // Use explicit type
+
+      // No need to validate year because validation has already confirmed that
+      // the kennitala is all digits and that the century indicator is valid.
+      if (month is < 1 or > 12)
+      {
+         return false;
+      }
+
+      return day >= 1 && day <= DateTime.DaysInMonth(year, month);
+   }
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean ValidateSeparator(ReadOnlySpan<Char> value)
+      => !IsFormatted(value) || !value[SeparatorOffset].IsAsciiDigit();
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
