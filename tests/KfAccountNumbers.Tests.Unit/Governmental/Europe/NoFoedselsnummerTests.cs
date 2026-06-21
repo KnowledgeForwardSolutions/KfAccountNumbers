@@ -592,26 +592,55 @@ public class NoFoedselsnummerTests
    // ==========================================================================
 
    [Theory]
-   [InlineData("540", BinaryGender.Female)]
-   [InlineData("541", BinaryGender.Male)]
-   [InlineData("542", BinaryGender.Female)]
-   [InlineData("543", BinaryGender.Male)]
-   [InlineData("544", BinaryGender.Female)]
-   [InlineData("545", BinaryGender.Male)]
-   [InlineData("546", BinaryGender.Female)]
-   [InlineData("547", BinaryGender.Male)]
-   [InlineData("648", BinaryGender.Female)]     // 5 changed to 6 because of modulus 11 check digits
-   [InlineData("549", BinaryGender.Male)]
-   public void NoFoedselsnummer_Gender_ShouldReturnExpectedValue(
+   [InlineData("541", "")]
+   [InlineData("543", "")]
+   [InlineData("545", "")]
+   [InlineData("547", "")]
+   [InlineData("549", "")]
+   [InlineData("541", " ")]
+   [InlineData("543", " ")]
+   [InlineData("545", " ")]
+   [InlineData("547", " ")]
+   [InlineData("549", " ")]
+   public void NoFoedselsnummer_Gender_ShouldReturnMale_ForValuesWithOddGenderIndicator(
       String individualNumber,
-      BinaryGender expectedGender)
+      String separator)
    {
       // Arrange.
-      var value = GetFoedselsnummerWithValidCheckDigits(individualNumber: individualNumber);
+      var value = GetFoedselsnummerWithValidCheckDigits(
+         individualNumber: individualNumber,
+         separator: separator);
       var sut = new NoFoedselsnummer(value);
+      Gender.BinaryGender expected = default(Gender.Male);
 
       // Act/assert.
-      sut.Gender.Should().Be(expectedGender);
+      sut.Gender.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData("540", "")]
+   [InlineData("542", "")]
+   [InlineData("544", "")]
+   [InlineData("546", "")]
+   [InlineData("648", "")]     // 5 changed to 6 because of modulus 11 check digits
+   [InlineData("540", " ")]
+   [InlineData("542", " ")]
+   [InlineData("544", " ")]
+   [InlineData("546", " ")]
+   [InlineData("648", " ")]    // 5 changed to 6 because of modulus 11 check digits
+   public void NoFoedselsnummer_Gender_ShouldReturnFemale_ForValuesWithEvenGenderIndicator(
+      String individualNumber,
+      String separator)
+   {
+      // Arrange.
+      var value = GetFoedselsnummerWithValidCheckDigits(
+         individualNumber: individualNumber,
+         separator: separator);
+      var sut = new NoFoedselsnummer(value);
+      Gender.BinaryGender expected = default(Gender.Female);
+
+      // Act/assert.
+      sut.Gender.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -695,8 +724,7 @@ public class NoFoedselsnummerTests
       String str = sut;
 
       // Assert.
-      str.Should().NotBeNullOrEmpty();
-      str.Should().Be(value);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
@@ -705,14 +733,13 @@ public class NoFoedselsnummerTests
       // Arrange.
       var value = ValidFormattedDNummer;
       var sut = new NoFoedselsnummer(value);
-      var expected = GetRawFoedselsnummer(value);
 
       // Act.
       var str = (String)sut;
 
       // Assert.
       str.Should().NotBeNullOrEmpty();
-      str.Should().Be(expected);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]

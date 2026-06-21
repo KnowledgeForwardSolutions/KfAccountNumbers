@@ -268,6 +268,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to DK Personnummer formatted for readability with a separator character at character position 6 (zero-based).
+        /// </summary>
+        internal static string DkPersonnummerFormattedLength {
+            get {
+                return ResourceManager.GetString("DkPersonnummerFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DK Personnummer contains a non-digit character where a digit was expected.
         /// </summary>
         internal static string DkPersonnummerInvalidCharacter {
@@ -300,6 +309,15 @@ namespace KfAccountNumbers {
         internal static string DkPersonnummerInvalidSeparator {
             get {
                 return ResourceManager.GetString("DkPersonnummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DK Personnummer without a separator character.
+        /// </summary>
+        internal static string DkPersonnummerUnformattedLength {
+            get {
+                return ResourceManager.GetString("DkPersonnummerUnformattedLength", resourceCulture);
             }
         }
         

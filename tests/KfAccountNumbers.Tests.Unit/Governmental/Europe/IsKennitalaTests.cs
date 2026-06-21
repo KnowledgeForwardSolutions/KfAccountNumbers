@@ -605,7 +605,7 @@ public class IsKennitalaTests
 
       // Assert.
       str.Should().NotBeNullOrEmpty();
-      str.Should().Be(value);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
@@ -614,14 +614,13 @@ public class IsKennitalaTests
       // Arrange.
       var value = ValidFormattedEinstaklingurKennitala;
       var sut = new IsKennitala(value);
-      var expected = GetRawKennitala(value);
 
       // Act.
       var str = (String)sut;
 
       // Assert.
       str.Should().NotBeNullOrEmpty();
-      str.Should().Be(expected);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]

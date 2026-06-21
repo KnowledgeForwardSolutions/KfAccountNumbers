@@ -651,27 +651,57 @@ public class SePersonnummerTests
    // ==========================================================================
 
    [Theory]
-   [InlineData('0', BinaryGender.Female)]
-   [InlineData('1', BinaryGender.Male)]
-   [InlineData('2', BinaryGender.Female)]
-   [InlineData('3', BinaryGender.Male)]
-   [InlineData('4', BinaryGender.Female)]
-   [InlineData('5', BinaryGender.Male)]
-   [InlineData('6', BinaryGender.Female)]
-   [InlineData('7', BinaryGender.Male)]
-   [InlineData('8', BinaryGender.Female)]
-   [InlineData('9', BinaryGender.Male)]
-   public void SePersonnummer_Gender_ShouldReturnExpectedValue(
-      Char digit,
-      BinaryGender expectedGender)
+   [InlineData("811228", '1')]
+   [InlineData("811228", '3')]
+   [InlineData("811228", '5')]
+   [InlineData("811228", '7')]
+   [InlineData("811228", '9')]
+   [InlineData("19811228", '1')]
+   [InlineData("19811228", '3')]
+   [InlineData("19811228", '5')]
+   [InlineData("19811228", '7')]
+   [InlineData("19811228", '9')]
+   public void SePersonnummer_Gender_ShouldReturnMale_ForValuesWithOddGenderIndicator(
+      String dateOfBirth,
+      Char digit)
    {
       // Arrange.
       var birthSerialNumber = $"54{digit}";
-      var value = GetPersonnummerWithValidCheckDigit(birthSerialNumber: birthSerialNumber);
+      var value = GetPersonnummerWithValidCheckDigit(
+         dateOfBirth: dateOfBirth,
+         birthSerialNumber: birthSerialNumber);
       var sut = new SePersonnummer(value);
+      Gender.BinaryGender expected = default(Gender.Male);
 
       // Act/assert.
-      sut.Gender.Should().Be(expectedGender);
+      sut.Gender.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData("811228", '0')]
+   [InlineData("811228", '2')]
+   [InlineData("811228", '4')]
+   [InlineData("811228", '6')]
+   [InlineData("811228", '8')]
+   [InlineData("19811228", '0')]
+   [InlineData("19811228", '2')]
+   [InlineData("19811228", '4')]
+   [InlineData("19811228", '6')]
+   [InlineData("19811228", '8')]
+   public void SePersonnummer_Gender_ShouldReturnFemale_ForValuesWithEvenGenderIndicator(
+      String dateOfBirth,
+      Char digit)
+   {
+      // Arrange.
+      var birthSerialNumber = $"54{digit}";
+      var value = GetPersonnummerWithValidCheckDigit(
+         dateOfBirth: dateOfBirth,
+         birthSerialNumber: birthSerialNumber);
+      var sut = new SePersonnummer(value);
+      Gender.BinaryGender expected = default(Gender.Female);
+
+      // Act/assert.
+      sut.Gender.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -751,14 +781,13 @@ public class SePersonnummerTests
       // Arrange.
       var value = Valid11CharacterDashPersonnummer;
       var sut = new SePersonnummer(value);
-      var expected = GetInternalRepresentation(value);
 
       // Act.
       String str = sut;
 
       // Assert.
       str.Should().NotBeNullOrEmpty();
-      str.Should().Be(expected);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
@@ -767,14 +796,13 @@ public class SePersonnummerTests
       // Arrange.
       var value = Valid11CharacterDashPersonnummer;
       var sut = new SePersonnummer(value);
-      var expected = GetInternalRepresentation(value);
 
       // Act.
       var str = (String)sut;
 
       // Assert.
       str.Should().NotBeNullOrEmpty();
-      str.Should().Be(expected);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]

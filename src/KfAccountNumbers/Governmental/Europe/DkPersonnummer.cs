@@ -1,5 +1,8 @@
 // Ignore Spelling: Json Personnummer
 
+#pragma warning disable IDE0250 // Make struct 'readonly'
+#pragma warning disable IDE0046 // Convert to conditional expression
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -21,19 +24,20 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            <term>SSSS</term>
 ///            <description>
 ///               A four digit sequence number used to differentiate between two
-///               persons born on the same date. The sequence number also encodes
-///               additional information. The first digit is used to indicate the
-///               century of birth (see below) and the final digit indicates the
-///               person's gender, with even numbers for females and odd numbers
-///               for males.
+///               persons born on the same date. The sequence number also
+///               encodes additional information. The first digit is used to
+///               indicate the century of birth (see below) and the final digit
+///               indicates the person's gender, with even numbers for females
+///               and odd numbers for males.
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
-///      A Danish personnummer may be formatted as a string of 10 consecutive digits
-///      (DDMMYYSSSS) or as 11 characters with a dash ('-') as a separator character
-///      separating the date of birth and the remaining four digits (DDMMYY-SSSS).
+///      A Danish personnummer may be formatted as a string of 10 consecutive
+///      digits (DDMMYYSSSS) or as 11 characters with a dash ('-') as a
+///      separator character separating the date of birth and the remaining four
+///      digits (DDMMYY-SSSS).
 ///   </para>
 ///   <para>
 ///      Example values:
@@ -63,19 +67,20 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The value must be either 10 characters (without separator) or 11
-///               characters (with separator) in length.
+///               The value must be either 10 characters (without separator) or
+///               11 characters (with separator) in length.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               All characters (except the optional separator character) must be
-///               ASCII digits ('0'-'9').
+///               All characters (except the optional separator character) must
+///               be ASCII digits ('0'-'9').
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               The optional separator character, if included, must be a dash ('-').
+///               The optional separator character, if included, must be a dash
+///               ('-').
 ///            </description>
 ///         </item>
 ///         <item>
@@ -103,7 +108,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      <list type="bullet">
 ///         <item>
 ///            <description>
-///               If the century indicator = 0-3, then the century of birth = 1900
+///               If the century indicator = 0-3, then the century of birth =
+///               1900
 ///            </description>
 ///         </item>
 ///         <item>
@@ -120,14 +126,14 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               If the century indicator = 5-8 <b>AND</b> the two digit year of
-///               birth is &lt;= 57 then the century of birth = 2000.
+///               If the century indicator = 5-8 <b>AND</b> the two digit year
+///               of birth is &lt;= 57 then the century of birth = 2000.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               If the century indicator = 5-8 <b>AND</b> the two digit year of
-///               birth is &gt;= 58 then the century of birth = 1800.
+///               If the century indicator = 5-8 <b>AND</b> the two digit year
+///               of birth is &gt;= 58 then the century of birth = 1800.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -144,7 +150,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///      </list>
 ///      According to these rules, the valid range for a date of birth is
-///      January 1, 1858 to December 31 2057.
+///      January 1, 1858 to December 31, 2057.
 ///   </para>
 ///   <para>
 ///      See https://en.wikipedia.org/wiki/Personal_identification_number_(Denmark)
@@ -154,6 +160,33 @@ namespace KfAccountNumbers.Governmental.Europe;
 [JsonConverter(typeof(DkPersonnummerJsonConverter))]
 public record DkPersonnummer
 {
+   /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="DkPersonnummer"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="DkPersonnummer"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
    /// <summary>
    ///   The latest year of birth supported by <see cref="DkPersonnummer"/>.
    /// </summary>
@@ -174,52 +207,64 @@ public record DkPersonnummer
    private const Int32 GenderOffset = 1;
 
    /// <summary>
-   ///   Initialize a new instance of the <see cref="DkPersonnummer"/> class.
+   ///   Initializes a new instance of the <see cref="DkPersonnummer"/> class.
    /// </summary>
-   /// <param name="personnummer">
+   /// <param name="value">
    ///   String representation of a Danish personnummer.
    /// </param>
-   /// <exception cref="KfValidationException{DkPersonnummerValidationResult}">
-   ///   <paramref name="personnummer"/> is <see langword="null"/>, empty or all 
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
-   ///   <paramref name="personnummer"/> is not length 10 (or 11 if a separator
+   ///   <paramref name="value"/> is not length 10 (or 11 if a separator
    ///   character is used).
    ///   - or -
-   ///   <paramref name="personnummer"/> contains a non-digit character in
+   ///   <paramref name="value"/> contains a non-digit character in
    ///   any position other than the separator location.
    ///   - or -
-   ///   <paramref name="personnummer"/> is 11 characters in length and has a
+   ///   <paramref name="value"/> is 11 characters in length and has a
    ///   character other than dash ('-') as a separator.
    ///   - or -
-   ///   <paramref name="personnummer"/> contains an invalid date of birth in
+   ///   <paramref name="value"/> contains an invalid date of birth in
    ///   positions 0-5 (zero-based).
    /// </exception>
-   public DkPersonnummer(String? personnummer)
-      : this(personnummer, ValidationMode.ValidationRequired) { }
+   public DkPersonnummer(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports bypassing
-   ///   validation when creating a new instance from a value that has already
-   ///   been validated.
+   ///   Initializes a new instance of the <see cref="DkPersonnummer"/> class.
    /// </summary>
-   private DkPersonnummer(String? personnummer, ValidationMode validationMode)
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private DkPersonnummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         DkPersonnummerValidationResult validationResult = Validate(personnummer);
-         if (validationResult != DkPersonnummerValidationResult.ValidationPassed)
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            throw validationResult.ToValidationException();
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
          }
       }
 
-      Value = GetRawValue(personnummer!);
+      Value = GetRawValue(value!);
    }
 
    /// <summary>
-   ///   The person's date of birth, derived from the first six digits in DDMMYY
-   ///   format and the exact century of birth derived from the century indicator.
+   ///   Gets the person's date of birth, derived from the first six digits in
+   ///   DDMMYY format and the exact century of birth derived from the century
+   ///   indicator.
    /// </summary>
    public DateOnly DateOfBirth
    {
@@ -234,45 +279,62 @@ public record DkPersonnummer
    }
 
    /// <summary>
-   ///   The person's gender, as indicated by the trailing (right-most) digit.
-   ///   Odd numbers = Male; even numbers = Female.
+   ///   Gets the person's gender, as indicated by the trailing (right-most)
+   ///   digit. Odd numbers = Male; even numbers = Female.
    /// </summary>
-   public BinaryGender Gender => Value[^GenderOffset] % 2 == 0       // This works because the ASCII character values for digits have the same odd/even pattern
-      ? BinaryGender.Female
-      : BinaryGender.Male;
+   public Gender.BinaryGender Gender
+      => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
 
    /// <summary>
-   ///   The raw personnummer value.
+   ///   Gets the raw personnummer value.
    /// </summary>
    public String Value { get; private init; }
 
-   public static implicit operator String(DkPersonnummer personnummer)
-      => personnummer?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+   /// <summary>
+   ///   Implicitly converts a <see cref="DkPersonnummer"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="DkPersonnummer"/> to convert.
+   /// </param>
+   public static implicit operator String(DkPersonnummer source)
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
 
-   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
-   public static explicit operator DkPersonnummer(String? personnummer) => new(personnummer);
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a
+   ///   <see cref="DkPersonnummer"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a personnummer.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid personnummer.
+   /// </exception>
+   public static explicit operator DkPersonnummer(String? value) => new(value);
 
    /// <summary>
    ///   Create a new <see cref="DkPersonnummer"/> using the Result pattern.
    /// </summary>
-   /// <param name="personnummer">
+   /// <param name="value">
    ///   String representation of a Danish personnummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{DkPersonnummer, DkPersonnummerValidationResult}"/>.
-   ///   Will contain the new <see cref="DkPersonnummer"/> if 
-   ///   <paramref name="personnummer"/> is valid or an
-   ///   <see cref="DkPersonnummerValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="personnummer"/> is 
-   ///   invalid.
+   ///   A <see cref="UCreateResult{DkPersonnummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="DkPersonnummer"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<DkPersonnummer, DkPersonnummerValidationResult> Create(String? personnummer)
-   {
-      DkPersonnummerValidationResult validationResult = Validate(personnummer);
-      return validationResult == DkPersonnummerValidationResult.ValidationPassed
-         ? new DkPersonnummer(personnummer, validationMode: ValidationMode.BypassValidation)
-         : validationResult;
-   }
+   public static UCreateResult<DkPersonnummer, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new DkPersonnummer(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
 
    /// <summary>
    ///   Format the personnummer using the supplied <paramref name="mask"/>.
@@ -300,95 +362,137 @@ public record DkPersonnummer
    /// <summary>
    ///   Get a string representation of the personnummer.
    /// </summary>
-   /// <remarks>
-   ///   Will return the raw personnummer, without a separator character.
-   /// </remarks>
+   /// <returns>
+   ///   The raw personnummer, without separator characters.
+   /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="personnummer"/> to determine if it contains a
+   ///   Check the <paramref name="value"/> to determine if it contains a
    ///   valid Danish personnummer.
    /// </summary>
-   /// <param name="personnummer">
+   /// <param name="value">
    ///   String representation of a Danish personnummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="DkPersonnummerValidationResult"/> enumeration 
-   ///   value that indicates if the <paramref name="personnummer"/> passed
-   ///   validation or what validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
-   public static DkPersonnummerValidationResult Validate(String? personnummer)
+   public static ValidationResult Validate(String? value)
    {
-      if (String.IsNullOrWhiteSpace(personnummer))
+      if (String.IsNullOrWhiteSpace(value))
       {
-         return DkPersonnummerValidationResult.Empty;
-      }
-      else if (personnummer.Length is not UnformattedLength and not FormattedLength)
-      {
-         return DkPersonnummerValidationResult.InvalidLength;
-      }
-      else if (!ValidateAllDigits(personnummer))
-      {
-         return DkPersonnummerValidationResult.InvalidCharacter;
-      }
-      else if (!ValidateSeparator(personnummer))
-      {
-         return DkPersonnummerValidationResult.InvalidSeparator;
-      }
-      else if (!ValidateDateOfBirth(personnummer))
-      {
-         return DkPersonnummerValidationResult.InvalidDateOfBirth;
+         return default(EmptyValue);
       }
 
-      return DkPersonnummerValidationResult.ValidationPassed;
+      if (value.Length is not UnformattedLength and not FormattedLength)
+      {
+         return new InvalidLength(
+            Messages.DkPersonnummerInvalidLength,
+            value.Length,
+            GetValidLengthDefinitions());
+      }
+
+      if (!ValidateAllDigits(value, out var invalidCharacterPosition))
+      {
+         return new InvalidCharacter(
+            Messages.DkPersonnummerInvalidCharacter,
+            value[invalidCharacterPosition],
+            invalidCharacterPosition);
+      }
+
+      if (!ValidateSeparator(value))
+      {
+         return new InvalidSeparator(
+            Messages.DkPersonnummerInvalidSeparator,
+            value[SeparatorOffset],
+            SeparatorOffset);
+      }
+
+      if (!ValidateDateOfBirth(value))
+      {
+         return new InvalidDateOfBirth(
+            Messages.DkPersonnummerInvalidDateOfBirth,
+            value[..SeparatorOffset],
+            DateFormatName.DDMMYY);
+      }
+
+      return default(ValidValue);
    }
 
-   private static (Int32 day, Int32 month, Int32 year) GetDayMonthYear(ReadOnlySpan<Char> personnummer)
+   /// <summary>
+   ///   Gets an array of details about valid lengths accepted for a
+   ///   personnummer.
+   /// </summary>
+   /// <returns>
+   ///   An array of <see cref="ValidLengthDefinition"/>s.
+   /// </returns>
+   internal static ValidLengthDefinition[] GetValidLengthDefinitions()
+      =>
+      [
+         new ValidLengthDefinition(UnformattedLength, Messages.DkPersonnummerUnformattedLength),
+         new ValidLengthDefinition(FormattedLength, Messages.DkPersonnummerFormattedLength),
+      ];
+
+   private static (Int32 Day, Int32 Month, Int32 Year) GetDayMonthYear(ReadOnlySpan<Char> value)
    {
-      var day = personnummer.ParseTwoDigits();
-      var month = personnummer[2..].ParseTwoDigits();
-      var year = personnummer[4..].ParseTwoDigits();
+      var day = value.ParseTwoDigits();
+      var month = value[2..].ParseTwoDigits();
+      var year = value[4..].ParseTwoDigits();
 
       // Adjust the year according to the value of the century indicator.
-      var centuryIndicator = personnummer[^CenturyIndicatorOffset] - Chars.DigitZero;
+      var centuryIndicator = value[^CenturyIndicatorOffset] - Chars.DigitZero;
 
+#pragma warning disable format
       year += (centuryIndicator, year) switch
       {
          // Rule 1. Century indicator = 0-3 => 1900
-         ( >= 0 and <= 3, _) => 1900,
+         (>= 0 and <= 3, _) => 1900,
+
          // Rule 2. Century indicator = 4, year <= 36 => 2000
          (4, <= 36) => 2000,
+
          // Rule 3. Century indicator = 4, year >= 37 => 1900
          (4, >= 37) => 1900,
+
          // Rule 4. Century indicator = 5-8, year <= 57 => 2000
-         ( >= 5 and <= 8, <= 57) => 2000,
+         (>= 5 and <= 8, <= 57) => 2000,
+
          // Rule 5. Century indicator = 5-8, year >= 58 => 1800
-         ( >= 5 and <= 8, >= 58) => 1800,
+         (>= 5 and <= 8, >= 58) => 1800,
+
          // Rule 6. Century indicator = 9, year <= 36 => 2000
          (9, <= 36) => 2000,
+
          // Rule 7. Century indicator = 9, year >= 37 => 1900
          (9, >= 37) => 1900,
-         _ => 0
+
+         _ => 0,
       };
+#pragma warning restore format
 
       return (day, month, year);
    }
 
-   private static String GetRawValue(String personnummer)
-      => personnummer.Length == UnformattedLength
-         ? personnummer
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static String GetRawValue(String value)
+      => value.Length == UnformattedLength
+         ? value
          : String.Concat(
-            personnummer.AsSpan(0, SeparatorOffset),
-            personnummer.AsSpan(SeparatorOffset + 1));
+            value.AsSpan(0, SeparatorOffset),
+            value.AsSpan(SeparatorOffset + 1));
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static Boolean IsFormatted(ReadOnlySpan<Char> personnummer)
-      => personnummer.Length == FormattedLength;
+   private static Boolean IsFormatted(ReadOnlySpan<Char> value)
+      => value.Length == FormattedLength;
 
-   private static Boolean ValidateAllDigits(ReadOnlySpan<Char> personnummer)
+   private static Boolean ValidateAllDigits(
+      ReadOnlySpan<Char> value,
+      out Int32 invalidCharacterPosition)
    {
-      var isFormatted = IsFormatted(personnummer);
-      var processLength = personnummer.Length;
+      var isFormatted = IsFormatted(value);
+      var processLength = value.Length;
       for (var index = 0; index < processLength; index++)
       {
          if (isFormatted && index == SeparatorOffset)
@@ -396,29 +500,31 @@ public record DkPersonnummer
             continue;
          }
 
-         if (!personnummer[index].IsAsciiDigit())
+         if (!value[index].IsAsciiDigit())
          {
+            invalidCharacterPosition = index;
             return false;
          }
       }
 
+      invalidCharacterPosition = -1;
       return true;
    }
 
-   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> personnummer)
+   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> value)
    {
 #pragma warning disable IDE0008 // Use explicit type
-      var (day, month, year) = GetDayMonthYear(personnummer);
+      var (day, month, year) = GetDayMonthYear(value);
 #pragma warning restore IDE0008 // Use explicit type
 
-      if (year < MinimumValidYearOfBirth || year > MaximumValidYearOfBirth)
+      if (year is < MinimumValidYearOfBirth or > MaximumValidYearOfBirth)
       {
          // Should be impossible to ever reach this point, but return false
          // out of abundance of caution and to avoid throwing an exception.
          return false;
       }
 
-      if (month < 1 || month > 12)
+      if (month is < 1 or > 12)
       {
          return false;
       }
@@ -426,10 +532,13 @@ public record DkPersonnummer
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);
    }
 
-   private static Boolean ValidateSeparator(ReadOnlySpan<Char> personnummer)
-      => personnummer.Length == UnformattedLength || personnummer[SeparatorOffset] == Chars.Dash;
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean ValidateSeparator(ReadOnlySpan<Char> value)
+      => value.Length == UnformattedLength || value[SeparatorOffset] == Chars.Dash;
 }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class DkPersonnummerJsonConverter : JsonConverter<DkPersonnummer>
 {
    public override DkPersonnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

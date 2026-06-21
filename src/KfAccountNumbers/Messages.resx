@@ -531,4 +531,10 @@
   <data name="IsKennitalaUnformattedLength" xml:space="preserve">
     <value>IS Kennitala without a separator character</value>
   </data>
+  <data name="DkPersonnummerFormattedLength" xml:space="preserve">
+    <value>DK Personnummer formatted for readability with a separator character at character position 6 (zero-based)</value>
+  </data>
+  <data name="DkPersonnummerUnformattedLength" xml:space="preserve">
+    <value>DK Personnummer without a separator character</value>
+  </data>
 </root>

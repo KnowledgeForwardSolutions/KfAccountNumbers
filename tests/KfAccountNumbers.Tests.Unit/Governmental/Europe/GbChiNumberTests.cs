@@ -418,15 +418,22 @@ public class GbChiNumberTests
    // ==========================================================================
 
    [Theory]
-   [InlineData('1')]
-   [InlineData('3')]
-   [InlineData('5')]
-   [InlineData('7')]
-   [InlineData('9')]
-   public void GbChiNumber_Gender_ShouldReturnMale_ForValuesWithOddGenderIndicator(Char gender)
+   [InlineData('1', "")]
+   [InlineData('3', "")]
+   [InlineData('5', "")]
+   [InlineData('7', "")]
+   [InlineData('9', "")]
+   [InlineData('1', " ")]
+   [InlineData('3', " ")]
+   [InlineData('5', " ")]
+   [InlineData('7', " ")]
+   [InlineData('9', " ")]
+   public void GbChiNumber_Gender_ShouldReturnMale_ForValuesWithOddGenderIndicator(
+      Char gender,
+      String separator)
    {
       // Arrange.
-      var value = GetChiNumberWithValidCheckDigit(gender: gender);
+      var value = GetChiNumberWithValidCheckDigit(gender: gender, separator: separator);
       var sut = new GbChiNumber(value);
       Gender.BinaryGender expected = default(Gender.Male);
 
@@ -435,15 +442,22 @@ public class GbChiNumberTests
    }
 
    [Theory]
-   [InlineData('0')]
-   [InlineData('2')]
-   [InlineData('4')]
-   [InlineData('6')]
-   [InlineData('8')]
-   public void GbChiNumber_Gender_ShouldReturnFemale_ForValuesWithEvenGenderIndicator(Char gender)
+   [InlineData('0', "")]
+   [InlineData('2', "")]
+   [InlineData('4', "")]
+   [InlineData('6', "")]
+   [InlineData('8', "")]
+   [InlineData('0', " ")]
+   [InlineData('2', " ")]
+   [InlineData('4', " ")]
+   [InlineData('6', " ")]
+   [InlineData('8', " ")]
+   public void GbChiNumber_Gender_ShouldReturnFemale_ForValuesWithEvenGenderIndicator(
+      Char gender,
+      String separator)
    {
       // Arrange.
-      var value = GetChiNumberWithValidCheckDigit(gender: gender);
+      var value = GetChiNumberWithValidCheckDigit(gender: gender, separator: separator);
       var sut = new GbChiNumber(value);
       Gender.BinaryGender expected = default(Gender.Female);
 

@@ -347,9 +347,8 @@ public record NoFoedselsnummer
    ///   Gets the person's gender, as indicated by the individual number. Odd
    ///   numbers = Male; even numbers = Female.
    /// </summary>
-   public BinaryGender Gender => Value[^GenderOffset] % 2 == 0 // This works because the ASCII character values for digits have the same odd/even pattern
-      ? BinaryGender.Female
-      : BinaryGender.Male;
+   public Gender.BinaryGender Gender
+      => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
 
    /// <summary>
    ///   Gets the type of Norwegian identifier represented by this instance,
