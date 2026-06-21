@@ -161,6 +161,33 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record DkPersonnummer
 {
    /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="DkPersonnummer"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="DkPersonnummer"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
    ///   The latest year of birth supported by <see cref="DkPersonnummer"/>.
    /// </summary>
    public const Int32 MaximumValidYearOfBirth = 2057;
@@ -185,7 +212,7 @@ public record DkPersonnummer
    /// <param name="value">
    ///   String representation of a Danish personnummer.
    /// </param>
-   /// <exception cref="KfValidationException{DkPersonnummerValidationResult}">
+   /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
@@ -216,10 +243,18 @@ public record DkPersonnummer
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         DkPersonnummerValidationResult validationResult = Validate(value);
-         if (validationResult != DkPersonnummerValidationResult.ValidationPassed)
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            throw validationResult.ToValidationException();
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
          }
       }
 
@@ -247,9 +282,8 @@ public record DkPersonnummer
    ///   Gets the person's gender, as indicated by the trailing (right-most)
    ///   digit. Odd numbers = Male; even numbers = Female.
    /// </summary>
-   public BinaryGender Gender => Value[^GenderOffset] % 2 == 0 // This works because the ASCII character values for digits have the same odd/even pattern
-      ? BinaryGender.Female
-      : BinaryGender.Male;
+   public Gender.BinaryGender Gender
+      => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
 
    /// <summary>
    ///   Gets the raw personnummer value.
@@ -261,13 +295,14 @@ public record DkPersonnummer
    ///   <see cref="String"/>, returning an empty string if the source is null.
    /// </summary>
    /// <param name="source">
-   ///   The <see cref="IsKennitala"/> to convert.
+   ///   The <see cref="DkPersonnummer"/> to convert.
    /// </param>
    public static implicit operator String(DkPersonnummer source)
       => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
 
    /// <summary>
-   ///   Defines an explicit conversion of a string to a <see cref="IsKennitala"/>.
+   ///   Defines an explicit conversion of a string to a
+   ///   <see cref="DkPersonnummer"/>.
    /// </summary>
    /// <param name="value">
    ///   String representation of a personnummer.
@@ -291,13 +326,17 @@ public record DkPersonnummer
    ///   the validation rule that was failed if <paramref name="value"/> is
    ///   invalid.
    /// </returns>
-   public static CreateResult<DkPersonnummer, DkPersonnummerValidationResult> Create(String? value)
-   {
-      DkPersonnummerValidationResult validationResult = Validate(value);
-      return validationResult == DkPersonnummerValidationResult.ValidationPassed
-         ? new DkPersonnummer(value, validationMode: ValidationMode.BypassValidation)
-         : validationResult;
-   }
+   public static UCreateResult<DkPersonnummer, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new DkPersonnummer(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
 
    /// <summary>
    ///   Format the personnummer using the supplied <paramref name="mask"/>.
@@ -338,35 +377,65 @@ public record DkPersonnummer
    ///   String representation of a Danish personnummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="DkPersonnummerValidationResult"/> enumeration
-   ///   value that indicates if the <paramref name="value"/> passed
-   ///   validation or what validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
-   public static DkPersonnummerValidationResult Validate(String? value)
+   public static ValidationResult Validate(String? value)
    {
       if (String.IsNullOrWhiteSpace(value))
       {
-         return DkPersonnummerValidationResult.Empty;
-      }
-      else if (value.Length is not UnformattedLength and not FormattedLength)
-      {
-         return DkPersonnummerValidationResult.InvalidLength;
-      }
-      else if (!ValidateAllDigits(value))
-      {
-         return DkPersonnummerValidationResult.InvalidCharacter;
-      }
-      else if (!ValidateSeparator(value))
-      {
-         return DkPersonnummerValidationResult.InvalidSeparator;
-      }
-      else if (!ValidateDateOfBirth(value))
-      {
-         return DkPersonnummerValidationResult.InvalidDateOfBirth;
+         return default(EmptyValue);
       }
 
-      return DkPersonnummerValidationResult.ValidationPassed;
+      if (value.Length is not UnformattedLength and not FormattedLength)
+      {
+         return new InvalidLength(
+            Messages.DkPersonnummerInvalidLength,
+            value.Length,
+            GetValidLengthDefinitions());
+      }
+
+      if (!ValidateAllDigits(value, out var invalidCharacterPosition))
+      {
+         return new InvalidCharacter(
+            Messages.DkPersonnummerInvalidCharacter,
+            value[invalidCharacterPosition],
+            invalidCharacterPosition);
+      }
+
+      if (!ValidateSeparator(value))
+      {
+         return new InvalidSeparator(
+            Messages.DkPersonnummerInvalidSeparator,
+            value[SeparatorOffset],
+            SeparatorOffset);
+      }
+
+      if (!ValidateDateOfBirth(value))
+      {
+         return new InvalidDateOfBirth(
+            Messages.DkPersonnummerInvalidDateOfBirth,
+            value[..SeparatorOffset],
+            DateFormatName.DDMMYY);
+      }
+
+      return default(ValidValue);
    }
+
+   /// <summary>
+   ///   Gets an array of details about valid lengths accepted for a
+   ///   personnummer.
+   /// </summary>
+   /// <returns>
+   ///   An array of <see cref="ValidLengthDefinition"/>s.
+   /// </returns>
+   internal static ValidLengthDefinition[] GetValidLengthDefinitions()
+      =>
+      [
+         new ValidLengthDefinition(UnformattedLength, Messages.DkPersonnummerUnformattedLength),
+         new ValidLengthDefinition(FormattedLength, Messages.DkPersonnummerFormattedLength),
+      ];
 
    private static (Int32 Day, Int32 Month, Int32 Year) GetDayMonthYear(ReadOnlySpan<Char> value)
    {
@@ -420,7 +489,9 @@ public record DkPersonnummer
    private static Boolean IsFormatted(ReadOnlySpan<Char> value)
       => value.Length == FormattedLength;
 
-   private static Boolean ValidateAllDigits(ReadOnlySpan<Char> value)
+   private static Boolean ValidateAllDigits(
+      ReadOnlySpan<Char> value,
+      out Int32 invalidCharacterPosition)
    {
       var isFormatted = IsFormatted(value);
       var processLength = value.Length;
@@ -433,10 +504,12 @@ public record DkPersonnummer
 
          if (!value[index].IsAsciiDigit())
          {
+            invalidCharacterPosition = index;
             return false;
          }
       }
 
+      invalidCharacterPosition = -1;
       return true;
    }
 

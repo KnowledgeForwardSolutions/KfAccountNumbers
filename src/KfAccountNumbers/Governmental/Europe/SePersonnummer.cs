@@ -375,9 +375,8 @@ public record SePersonnummer
    ///   Gets the person's gender, as indicated by the third character of the
    ///   birth sequence number. Odd digits = Male; even digits = Female.
    /// </summary>
-   public BinaryGender Gender => Value[^GenderOffset] % 2 == 0 // This works because the ASCII character values for digits have the same odd/even pattern
-      ? BinaryGender.Female
-      : BinaryGender.Male;
+   public Gender.BinaryGender Gender
+      => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
 
    /// <summary>
    ///   Gets the type of Swedish identifier represented by this instance,

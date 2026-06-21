@@ -3,26 +3,34 @@
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
 
+using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+   KfAccountNumbers.Governmental.Europe.DkPersonnummer,
+   KfAccountNumbers.Governmental.Europe.DkPersonnummer.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.Europe.DkPersonnummer.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.Europe.DkPersonnummer.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.Europe.DkPersonnummer.ValidationResult;
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class DkPersonnummerTests
 {
-   private const String Valid10CharacterPersonnummer = "0707614285";
-   private const String Valid11CharacterPersonnummer = "070761-4285";
-   private const String AltValid10CharacterPersonnummer = "0102036234";
-   private const String AltValid11CharacterPersonnummer = "010203-6234";
+   private const String ValidUnformattedPersonnummer = "0707614285";
+   private const String ValidFormattedPersonnummer = "070761-4285";
+   private const String AltValidUnformattedPersonnummer = "0102036234";
+   private const String AltValidFormattedPersonnummer = "010203-6234";
 
-   private static String GetRawPersonnummer(String personnummer)
-      => personnummer.Length == 10
-         ? personnummer
-         : personnummer[..6] + personnummer[7..];
+   private static String GetRawPersonnummer(String value)
+      => value.Length == 10
+         ? value
+         : value[..6] + value[7..];
 
    public static TheoryData<String> ValidPersonnummerValues =>
    [
-      Valid10CharacterPersonnummer,
-      Valid11CharacterPersonnummer,
-      AltValid10CharacterPersonnummer,
-      AltValid11CharacterPersonnummer,
+      ValidUnformattedPersonnummer,
+      ValidFormattedPersonnummer,
+      AltValidUnformattedPersonnummer,
+      AltValidFormattedPersonnummer,
    ];
 
    public static TheoryData<String> ValidDateOfBirthValues =>
@@ -95,30 +103,33 @@ public class DkPersonnummerTests
       new String('1', 100) // Very long string
    ];
 
-   public static TheoryData<String> InvalidCharacterValues =>
-   [
-      "A707614285",           // Non-digit character 'A'
-      "0 07614285",           // Non-digit character ' '
-      "07-7614285",           // Non-digit character '-'
-      "070=614285",           // Non-digit character '='
-      "0707B14285",           // Non-digit character 'B'
-      "07076C4285",           // Non-digit character 'C'
-      "070761a285",           // Non-digit character 'a'
-      "0707614b85",           // Non-digit character 'b'
-      "07076142~5",           // Non-digit character '~'
-      "070761428\u2153",      // Non-digit character Unicode fraction 1/3
+   // Values that will report an invalid character encountered
+   public static TheoryData<String, Int32> InvalidCharacterValues = new()
+   {
+      // Unformatted values
+      { ".707614285", 0 },          // Non-digit character '.'
+      { "0 07614285", 1 },          // Non-digit character ' '
+      { "07A7614285", 2 },          // Non-digit character 'A'
+      { "070Z614285", 3 },          // Non-digit character 'Z'
+      { "0707^14285", 4 },          // Non-digit character '^'
+      { "07076a4285", 5 },          // Non-digit character 'a'
+      { "070761z285", 6 },          // Non-digit character 'z'
+      { "0707614~85", 7 },          // Non-digit character '~'
+      { "07076143\u21535", 8 },     // Non-digit character Unicode fraction 1/3
+      { "070761436\u00D6", 9 },     // Invalid character unicode O with umlaut
 
-      "A70761-4285",          // Non-digit character 'A'
-      "0 0761-4285",          // Non-digit character ' '
-      "07-761-4285",          // Non-digit character '-'
-      "070=61-4285",          // Non-digit character '='
-      "0707B1-4285",          // Non-digit character 'B'
-      "07076C-4285",          // Non-digit character 'C'
-      "070761-a285",          // Non-digit character 'a'
-      "070761-4b85",          // Non-digit character 'b'
-      "070761-42~5",          // Non-digit character '~'
-      "070761-428\u2153",     // Non-digit character Unicode fraction 1/3
-   ];
+      // Formatted values
+      { ".70761 4285", 0 },         // Non-digit character '.'
+      { "0 0761 4285", 1 },         // Non-digit character ' '
+      { "07A761 4285", 2 },         // Non-digit character 'A'
+      { "070Z61 4285", 3 },         // Non-digit character 'Z'
+      { "0707^1 4285", 4 },         // Non-digit character '^'
+      { "07076a 4285", 5 },         // Non-digit character 'a'
+      { "070761 z285", 7 },         // Non-digit character 'z'
+      { "070761-4~85", 8 },         // Non-digit character '~'
+      { "070761-43\u21535", 9 },    // Non-digit character Unicode fraction 1/3
+      { "070761-436\u00D6", 10 },   // Invalid character unicode O with umlaut
+   };
 
    public static TheoryData<String> InvalidSeparatorValues =>
    [
@@ -151,6 +162,26 @@ public class DkPersonnummerTests
       "711104-2112",       // Invalid day of for November, any year
       "721204-3112",       // Invalid day of for December, any year
    ];
+
+   private static InvalidLength GetInvalidLengthResult(String value)
+      => new(
+         Messages.DkPersonnummerInvalidLength,
+         value.Length,
+         DkPersonnummer.GetValidLengthDefinitions());
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.DkPersonnummerInvalidCharacter,
+         value[position],
+         position);
+
+   private static InvalidSeparator GetInvalidSeparatorResult(String value)
+      => new(Messages.DkPersonnummerInvalidSeparator, value[6], 6);
+
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
+      => new(Messages.DkPersonnummerInvalidDateOfBirth, value[..6], DateFormatName.DDMMYY);
 
    #region Constants Tests
    // ==========================================================================
@@ -203,47 +234,77 @@ public class DkPersonnummerTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void DkPersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new DkPersonnummer(value))
-         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
-         .WithMessage(Messages.DkPersonnummerEmpty + "*")
-         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void DkPersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new DkPersonnummer(value))
-         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
-         .WithMessage(Messages.DkPersonnummerInvalidLength + "*")
-         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void DkPersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
-      => FluentActions
+   public void DkPersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new DkPersonnummer(value))
-         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
-         .WithMessage(Messages.DkPersonnummerInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
    public void DkPersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new DkPersonnummer(value))
-         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
-         .WithMessage(Messages.DkPersonnummerInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]
    public void DkPersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new DkPersonnummer(value))
-         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
-         .WithMessage(Messages.DkPersonnummerInvalidDateOfBirth + "*")
-         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidDateOfBirth);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -320,7 +381,7 @@ public class DkPersonnummerTests
       var expected = DateOnly.ParseExact(
          expectedDateOfBirth,
          "yyyyMMdd",
-         System.Globalization.CultureInfo.InvariantCulture);
+         CultureInfo.InvariantCulture);
 
       // Act/assert.
       sut.DateOfBirth.Should().Be(expected);
@@ -333,26 +394,51 @@ public class DkPersonnummerTests
    // ==========================================================================
 
    [Theory]
-   [InlineData('0', BinaryGender.Female)]
-   [InlineData('1', BinaryGender.Male)]
-   [InlineData('2', BinaryGender.Female)]
-   [InlineData('3', BinaryGender.Male)]
-   [InlineData('4', BinaryGender.Female)]
-   [InlineData('5', BinaryGender.Male)]
-   [InlineData('6', BinaryGender.Female)]
-   [InlineData('7', BinaryGender.Male)]
-   [InlineData('8', BinaryGender.Female)]
-   [InlineData('9', BinaryGender.Male)]
-   public void DkPersonnummer_Gender_ShouldReturnExpectedValue(
-      Char genderChar,
-      BinaryGender expectedGender)
+   [InlineData(ValidUnformattedPersonnummer, '1')]
+   [InlineData(ValidUnformattedPersonnummer, '3')]
+   [InlineData(ValidUnformattedPersonnummer, '5')]
+   [InlineData(ValidUnformattedPersonnummer, '7')]
+   [InlineData(ValidUnformattedPersonnummer, '9')]
+   [InlineData(ValidFormattedPersonnummer, '1')]
+   [InlineData(ValidFormattedPersonnummer, '3')]
+   [InlineData(ValidFormattedPersonnummer, '5')]
+   [InlineData(ValidFormattedPersonnummer, '7')]
+   [InlineData(ValidFormattedPersonnummer, '9')]
+   public void DkPersonnummer_Gender_ShouldReturnMale_ForValuesWithOddGenderIndicator(
+      String value,
+      Char gender)
    {
       // Arrange.
-      var value = $"{Valid10CharacterPersonnummer[..9]}{genderChar}";
+      value = $"{value[..^1]}{gender}";
       var sut = new DkPersonnummer(value);
+      Gender.BinaryGender expected = default(Gender.Male);
 
       // Act/assert.
-      sut.Gender.Should().Be(expectedGender);
+      sut.Gender.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData(ValidUnformattedPersonnummer, '0')]
+   [InlineData(ValidUnformattedPersonnummer, '2')]
+   [InlineData(ValidUnformattedPersonnummer, '4')]
+   [InlineData(ValidUnformattedPersonnummer, '6')]
+   [InlineData(ValidUnformattedPersonnummer, '8')]
+   [InlineData(ValidFormattedPersonnummer, '0')]
+   [InlineData(ValidFormattedPersonnummer, '2')]
+   [InlineData(ValidFormattedPersonnummer, '4')]
+   [InlineData(ValidFormattedPersonnummer, '6')]
+   [InlineData(ValidFormattedPersonnummer, '8')]
+   public void DkPersonnummer_Gender_ShouldReturnFemale_ForValuesWithEvenGenderIndicator(
+      String value,
+      Char gender)
+   {
+      // Arrange.
+      value = $"{value[..^1]}{gender}";
+      var sut = new DkPersonnummer(value);
+      Gender.BinaryGender expected = default(Gender.Female);
+
+      // Act/assert.
+      sut.Gender.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -362,16 +448,12 @@ public class DkPersonnummerTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(Valid10CharacterPersonnummer, Valid10CharacterPersonnummer)]
-   [InlineData(Valid11CharacterPersonnummer, Valid10CharacterPersonnummer)]
-   [InlineData(AltValid10CharacterPersonnummer, AltValid10CharacterPersonnummer)]
-   [InlineData(AltValid11CharacterPersonnummer, AltValid10CharacterPersonnummer)]
-   public void DkPersonnummer_Value_ShouldReturnValidatedPersonnummer(
-      String value,
-      String expected)
+   [MemberData(nameof(ValidPersonnummerValues))]
+   public void DkPersonnummer_Value_ShouldReturnValidatedPersonnummer(String value)
    {
       // Arrange.
       var sut = new DkPersonnummer(value);
+      var expected = GetRawPersonnummer(value);
 
       // Act/assert.
       sut.Value.Should().Be(expected);
@@ -387,31 +469,28 @@ public class DkPersonnummerTests
    public void DkPersonnummer_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid10CharacterPersonnummer;
+      var value = ValidUnformattedPersonnummer;
       var sut = new DkPersonnummer(value);
 
       // Act.
       String str = sut;
 
       // Assert.
-      str.Should().NotBeNullOrEmpty();
-      str.Should().Be(value);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
    public void DkPersonnummer_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid11CharacterPersonnummer;
+      var value = ValidFormattedPersonnummer;
       var sut = new DkPersonnummer(value);
-      var expected = GetRawPersonnummer(value);
 
       // Act.
       var str = (String)sut;
 
       // Assert.
-      str.Should().NotBeNullOrEmpty();
-      str.Should().Be(expected);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
@@ -447,14 +526,13 @@ public class DkPersonnummerTests
    public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expected = GetRawPersonnummer(value);
+      var expected = new DkPersonnummer(value);
 
       // Act.
       var sut = (DkPersonnummer)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -462,60 +540,89 @@ public class DkPersonnummerTests
    public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldCreateInstance_WhenValueHasValidDateOfBirth(String value)
    {
       // Arrange.
-      var expected = GetRawPersonnummer(value);
+      var expected = new DkPersonnummer(value);
 
       // Act.
       var sut = (DkPersonnummer)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (DkPersonnummer)value)
-         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
-         .WithMessage(Messages.DkPersonnummerEmpty + "*")
-         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (DkPersonnummer)value)
-         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
-         .WithMessage(Messages.DkPersonnummerInvalidLength + "*")
-         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
-      => FluentActions
+   public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (DkPersonnummer)value)
-         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
-         .WithMessage(Messages.DkPersonnummerInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
    public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (DkPersonnummer)value)
-         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
-         .WithMessage(Messages.DkPersonnummerInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]
    public void DkPersonnummer_ExplicitCastToDkPersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (DkPersonnummer)value)
-         .Should().Throw<KfValidationException<DkPersonnummerValidationResult>>()
-         .WithMessage(Messages.DkPersonnummerInvalidDateOfBirth + "*")
-         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidDateOfBirth);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -527,8 +634,8 @@ public class DkPersonnummerTests
    public void DkPersonnummer_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
-      var sut2 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut1 = new DkPersonnummer(ValidUnformattedPersonnummer);
+      var sut2 = new DkPersonnummer(ValidUnformattedPersonnummer);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -538,8 +645,8 @@ public class DkPersonnummerTests
    public void DkPersonnummer_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
-      var sut2 = new DkPersonnummer(AltValid10CharacterPersonnummer);
+      var sut1 = new DkPersonnummer(ValidUnformattedPersonnummer);
+      var sut2 = new DkPersonnummer(AltValidUnformattedPersonnummer);
 
       // Act/assert.
       (sut1 == sut2).Should().BeFalse();
@@ -549,8 +656,8 @@ public class DkPersonnummerTests
    public void DkPersonnummer_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 11 character versions for same person should still be equal.
-      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
-      var sut2 = new DkPersonnummer(Valid11CharacterPersonnummer);
+      var sut1 = new DkPersonnummer(ValidUnformattedPersonnummer);
+      var sut2 = new DkPersonnummer(ValidFormattedPersonnummer);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -566,8 +673,8 @@ public class DkPersonnummerTests
    public void DkPersonnummer_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
-      var sut2 = new DkPersonnummer(AltValid10CharacterPersonnummer);
+      var sut1 = new DkPersonnummer(ValidUnformattedPersonnummer);
+      var sut2 = new DkPersonnummer(AltValidUnformattedPersonnummer);
 
       // Act/assert.
       (sut1 != sut2).Should().BeTrue();
@@ -577,8 +684,8 @@ public class DkPersonnummerTests
    public void DkPersonnummer_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 11 character versions for same person should still be equal.
-      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
-      var sut2 = new DkPersonnummer(Valid11CharacterPersonnummer);
+      var sut1 = new DkPersonnummer(ValidUnformattedPersonnummer);
+      var sut2 = new DkPersonnummer(ValidFormattedPersonnummer);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -588,8 +695,8 @@ public class DkPersonnummerTests
    public void DkPersonnummer_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new DkPersonnummer(AltValid10CharacterPersonnummer);
-      var sut2 = new DkPersonnummer(AltValid10CharacterPersonnummer);
+      var sut1 = new DkPersonnummer(AltValidUnformattedPersonnummer);
+      var sut2 = new DkPersonnummer(AltValidUnformattedPersonnummer);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -606,16 +713,13 @@ public class DkPersonnummerTests
    public void DkPersonnummer_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expectedValue = new DkPersonnummer(value);
+      LocalCreateResult expected = new DkPersonnummer(value);
 
       // Act.
       var result = DkPersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -623,86 +727,89 @@ public class DkPersonnummerTests
    public void DkPersonnummer_Create_ShouldCreateInstance_WhenValueHasValidDateOfBirth(String value)
    {
       // Arrange.
-      var expectedValue = new DkPersonnummer(value);
+      LocalCreateResult expected = new DkPersonnummer(value);
 
       // Act.
       var result = DkPersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void DkPersonnummer_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
+
       // Act.
       var result = DkPersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(DkPersonnummerValidationResult.Empty);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void DkPersonnummer_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
+
       // Act.
       var result = DkPersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(DkPersonnummerValidationResult.InvalidLength);
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<LocalValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void DkPersonnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+   public void DkPersonnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacterWhereDigitExpected(
+      String value,
+      Int32 position)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
+
       // Act.
       var result = DkPersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(DkPersonnummerValidationResult.InvalidCharacter);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
    public void DkPersonnummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value);
+
       // Act.
       var result = DkPersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(DkPersonnummerValidationResult.InvalidSeparator);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]
    public void DkPersonnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasInvalidDateOfBirth(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
+
       // Act.
       var result = DkPersonnummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(DkPersonnummerValidationResult.InvalidDateOfBirth);
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -715,8 +822,8 @@ public class DkPersonnummerTests
    public void DkPersonnummer_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
-      var sut2 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut1 = new DkPersonnummer(ValidUnformattedPersonnummer);
+      var sut2 = new DkPersonnummer(ValidUnformattedPersonnummer);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -726,8 +833,8 @@ public class DkPersonnummerTests
    public void DkPersonnummer_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
-      var sut2 = new DkPersonnummer(AltValid10CharacterPersonnummer);
+      var sut1 = new DkPersonnummer(ValidUnformattedPersonnummer);
+      var sut2 = new DkPersonnummer(AltValidUnformattedPersonnummer);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeFalse();
@@ -737,8 +844,8 @@ public class DkPersonnummerTests
    public void DkPersonnummer_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 11 character versions for same person should still be equal.
-      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
-      var sut2 = new DkPersonnummer(Valid11CharacterPersonnummer);
+      var sut1 = new DkPersonnummer(ValidUnformattedPersonnummer);
+      var sut2 = new DkPersonnummer(ValidFormattedPersonnummer);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -754,8 +861,8 @@ public class DkPersonnummerTests
    public void DkPersonnummer_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
    {
       // Arrange.
-      var sut = new DkPersonnummer(Valid10CharacterPersonnummer);
-      var expected = Valid11CharacterPersonnummer;
+      var sut = new DkPersonnummer(ValidUnformattedPersonnummer);
+      var expected = ValidFormattedPersonnummer;
 
       // Act.
       var str = sut.Format();
@@ -768,9 +875,9 @@ public class DkPersonnummerTests
    public void DkPersonnummer_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
    {
       // Arrange.
-      var sut = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut = new DkPersonnummer(ValidUnformattedPersonnummer);
       var mask = "__________";
-      var expected = Valid10CharacterPersonnummer;
+      var expected = ValidUnformattedPersonnummer;
 
       // Act.
       var str = sut.Format(mask);
@@ -783,7 +890,7 @@ public class DkPersonnummerTests
    public void DkPersonnummer_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
    {
       // Arrange.
-      var sut = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut = new DkPersonnummer(ValidUnformattedPersonnummer);
       String mask = null!;
 
       // Act/assert.
@@ -801,7 +908,7 @@ public class DkPersonnummerTests
    public void DkPersonnummer_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
    {
       // Arrange.
-      var sut = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut = new DkPersonnummer(ValidUnformattedPersonnummer);
       var expectedMessage = Messages.FormatMaskEmpty + "*";
       var act = () => _ = sut.Format(mask);
 
@@ -821,8 +928,8 @@ public class DkPersonnummerTests
    public void DkPersonnummer_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
-      var sut2 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut1 = new DkPersonnummer(ValidUnformattedPersonnummer);
+      var sut2 = new DkPersonnummer(ValidUnformattedPersonnummer);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -836,8 +943,8 @@ public class DkPersonnummerTests
    public void DkPersonnummer_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
-      var sut2 = new DkPersonnummer(AltValid10CharacterPersonnummer);
+      var sut1 = new DkPersonnummer(ValidUnformattedPersonnummer);
+      var sut2 = new DkPersonnummer(AltValidUnformattedPersonnummer);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -851,8 +958,8 @@ public class DkPersonnummerTests
    public void DkPersonnummer_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 11 character versions for same person should still be equal.
-      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
-      var sut2 = new DkPersonnummer(Valid11CharacterPersonnummer);
+      var sut1 = new DkPersonnummer(ValidUnformattedPersonnummer);
+      var sut2 = new DkPersonnummer(ValidFormattedPersonnummer);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -876,8 +983,8 @@ public class DkPersonnummerTests
    public void DkPersonnummer_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var sut1 = new DkPersonnummer(Valid10CharacterPersonnummer);
-      var sut2 = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut1 = new DkPersonnummer(ValidUnformattedPersonnummer);
+      var sut2 = new DkPersonnummer(ValidUnformattedPersonnummer);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
@@ -911,37 +1018,105 @@ public class DkPersonnummerTests
    [Theory]
    [MemberData(nameof(ValidPersonnummerValues))]
    public void DkPersonnummer_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
-      => DkPersonnummer.Validate(value).Should().Be(DkPersonnummerValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = DkPersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(ValidDateOfBirthValues))]
    public void DkPersonnummer_Validate_ShouldReturnValidationPassed_WhenDateOfBirthIsValid(String value)
-      => DkPersonnummer.Validate(value).Should().Be(DkPersonnummerValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = DkPersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void DkPersonnummer_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String value)
-      => DkPersonnummer.Validate(value).Should().Be(DkPersonnummerValidationResult.Empty);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(EmptyValue);
+
+      // Act.
+      var result = DkPersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void DkPersonnummer_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
-      => DkPersonnummer.Validate(value).Should().Be(DkPersonnummerValidationResult.InvalidLength);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidLengthResult(value);
+
+      // Act.
+      var result = DkPersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void DkPersonnummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
-      => DkPersonnummer.Validate(value).Should().Be(DkPersonnummerValidationResult.InvalidCharacter);
+   public void DkPersonnummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacterWhereDigitExpected(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
+
+      // Act.
+      var result = DkPersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
    public void DkPersonnummer_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(String value)
-      => DkPersonnummer.Validate(value).Should().Be(DkPersonnummerValidationResult.InvalidSeparator);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidSeparatorResult(value);
+
+      // Act.
+      var result = DkPersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]
    public void DkPersonnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidDateOfBirth(String value)
-      => DkPersonnummer.Validate(value).Should().Be(DkPersonnummerValidationResult.InvalidDateOfBirth);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidDateOfBirthResult(value);
+
+      // Act.
+      var result = DkPersonnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -953,7 +1128,7 @@ public class DkPersonnummerTests
    public void DkPersonnummer_JsonSerialization_ShouldRoundTripSuccessfully()
    {
       // Arrange.
-      var sut = new DkPersonnummer(Valid10CharacterPersonnummer);
+      var sut = new DkPersonnummer(ValidUnformattedPersonnummer);
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
@@ -968,7 +1143,7 @@ public class DkPersonnummerTests
    public void DkPersonnummer_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
    {
       // Arrange.
-      var sut = new DkPersonnummer(AltValid11CharacterPersonnummer);
+      var sut = new DkPersonnummer(AltValidFormattedPersonnummer);
       var expected = sut.Value;
 
       // Act.
@@ -987,7 +1162,7 @@ public class DkPersonnummerTests
    public void DkPersonnummer_JsonSerialization_ShouldDeserializeComplexObject()
    {
       // Arrange.
-      var foo = new Foo { Personnummer = new DkPersonnummer(Valid10CharacterPersonnummer) };
+      var foo = new Foo { Personnummer = new DkPersonnummer(ValidUnformattedPersonnummer) };
       var json = JsonSerializer.Serialize(foo);
 
       // Act.
@@ -1030,15 +1205,14 @@ public class DkPersonnummerTests
    public void DkPersonnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenPersonnummerIsInvalid()
    {
       // Arrange.
-      var json = "{\"Personnummer\":\"100612-707079\"}";  // Invalid length
+      var json = "{\"Personnummer\":\"070761 4285\"}";  // Invalid separator
+      LocalValidationError expected = GetInvalidSeparatorResult("070761 4285");
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should()
-         .ThrowExactly<KfValidationException<DkPersonnummerValidationResult>>()
-         .WithMessage(Messages.DkPersonnummerInvalidLength + "*")
-         .And.ValidationResult.Should().Be(DkPersonnummerValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
