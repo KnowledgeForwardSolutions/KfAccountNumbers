@@ -133,6 +133,42 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record FiHenkilotunnus
 {
    /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="FiHenkilotunnus"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidCentury,
+      FiHenkilotunnusInvalidIndividualNumber,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="FiHenkilotunnus"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidCentury,
+      FiHenkilotunnusInvalidIndividualNumber,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   The name of the check digit algorithm used by henkilötunnus values.
+   /// </summary>
+   public const String CheckDigitAlgorithmName = "Modulus 31";
+
+   /// <summary>
    ///   The latest year of birth supported by <see cref="FiHenkilotunnus"/>.
    /// </summary>
    public const Int32 MaximumValidYearOfBirth = 2099;
@@ -150,13 +186,16 @@ public record FiHenkilotunnus
 
    private const String CheckCharacters = "0123456789ABCDEFHJKLMNPRSTUVWXY";
 
+   private static readonly SegmentRange _individualNumber =
+      new(IndividualNumberStartOffset, CheckCharacterOffset);
+
    /// <summary>
    ///   Initializes a new instance of the <see cref="FiHenkilotunnus"/> class.
    /// </summary>
    /// <param name="value">
    ///   String representation of a Finnish henkilötunnus.
    /// </param>
-   /// <exception cref="KfValidationException{FiHenkilotunnusValidationResult}">
+   /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or
    ///   all whitespace characters.
    ///   - or -
@@ -194,10 +233,20 @@ public record FiHenkilotunnus
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         FiHenkilotunnusValidationResult validationResult = Validate(value);
-         if (validationResult != FiHenkilotunnusValidationResult.ValidationPassed)
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            throw validationResult.ToValidationException();
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidCheckDigit => new UKfValidationException<ValidationError>(invalidCheckDigit),
+               InvalidCentury invalidCentury => new UKfValidationException<ValidationError>(invalidCentury),
+               FiHenkilotunnusInvalidIndividualNumber invalidIndividualNumber => new UKfValidationException<ValidationError>(invalidIndividualNumber),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
          }
       }
 
@@ -227,9 +276,8 @@ public record FiHenkilotunnus
    ///   (character positions 7-9, zero-based). Even numbers = Female; odd
    ///   numbers = Male.
    /// </summary>
-   public BinaryGender Gender => Value[GenderOffset] % 2 == 0 // This works because the ASCII character values for digits have the same odd/even pattern
-      ? BinaryGender.Female
-      : BinaryGender.Male;
+   public Gender.BinaryGender Gender
+      => Value[GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);    // This works because the ASCII character values for digits have the same odd/even pattern
 
    /// <summary>
    ///   Gets the type of henkilötunnus identifier represented by this instance,
@@ -241,6 +289,7 @@ public record FiHenkilotunnus
    ///   the identifier type. 002-899 are issued to permanent residents and
    ///   900-999 are used for temporary identifiers.
    /// </remarks>
+   // TODO: convert to union
    public FiIdentifierType IdentifierType => Value[IndividualNumberStartOffset] == Chars.DigitNine
       ? FiIdentifierType.Temporary
       : FiIdentifierType.PermanentResident;
@@ -279,20 +328,24 @@ public record FiHenkilotunnus
    ///   String representation of a Finnish henkilötunnus.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{FiHenkilotunnus, FiHenkilotunnusValidationResult}"/>.
-   ///   Will contain the new <see cref="FiHenkilotunnus"/> if
-   ///   <paramref name="value"/> is valid or an
-   ///   <see cref="FiHenkilotunnusValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="value"/>
-   ///   is invalid.
+   ///   A <see cref="UCreateResult{FiHenkilotunnus, ValidationError}"/>. Will
+   ///   contain the new <see cref="FiHenkilotunnus"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<FiHenkilotunnus, FiHenkilotunnusValidationResult> Create(String? value)
-   {
-      FiHenkilotunnusValidationResult validationResult = Validate(value);
-      return validationResult == FiHenkilotunnusValidationResult.ValidationPassed
-         ? new FiHenkilotunnus(value, validationMode: ValidationMode.BypassValidation)
-         : validationResult;
-   }
+   public static UCreateResult<FiHenkilotunnus, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new FiHenkilotunnus(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidCheckDigit => (ValidationError)invalidCheckDigit,
+         InvalidCentury invalidCentury => (ValidationError)invalidCentury,
+         FiHenkilotunnusInvalidIndividualNumber invalidIndividualNumber => (ValidationError)invalidIndividualNumber,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
 
    /// <summary>
    ///   Get a string representation of the henkilötunnus.
@@ -310,44 +363,58 @@ public record FiHenkilotunnus
    ///   String representation of a Finnish henkilötunnus.
    /// </param>
    /// <returns>
-   ///   A <see cref="FiHenkilotunnusValidationResult"/> enumeration
-   ///   value that indicates if the <paramref name="value"/> passed
-   ///   validation or what validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
-   public static FiHenkilotunnusValidationResult Validate(String? value)
+   public static ValidationResult Validate(String? value)
    {
       if (String.IsNullOrWhiteSpace(value))
       {
-         return FiHenkilotunnusValidationResult.Empty;
+         return default(EmptyValue);
       }
-      else if (value.Length != ValidLength)
+
+      if (value.Length != ValidLength)
       {
-         return FiHenkilotunnusValidationResult.InvalidLength;
+         return new InvalidLength(
+            Messages.FiHenkilotunnusInvalidLength,
+            value.Length,
+            new ValidLengthDefinition(ValidLength, Messages.FiHenkilotunnusValidLength));
       }
 
       // After performing basic checks, validate the check digit because the
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
-      FiHenkilotunnusValidationResult validationResult = ValidateCheckDigit(value);
-      if (validationResult != FiHenkilotunnusValidationResult.ValidationPassed)
+      ValidationResult validationResult = ValidateCheckDigit(value);
+      if (validationResult is not ValidValue)
       {
          // Could be either InvalidCharacter or InvalidCheckDigit.
          return validationResult;
       }
-      else if (!ValidateCenturyIndicator(value))
+
+      if (!ValidateCenturyIndicator(value))
       {
-         return FiHenkilotunnusValidationResult.InvalidCenturyIndicator;
-      }
-      else if (!ValidateIndividualNumber(value))
-      {
-         return FiHenkilotunnusValidationResult.InvalidIndividualNumber;
-      }
-      else if (!ValidateDateOfBirth(value))
-      {
-         return FiHenkilotunnusValidationResult.InvalidDateOfBirth;
+         return new InvalidCentury(
+            Messages.FiHenkilotunnusInvalidCenturyIndicator,
+            value[CenturyIndicatorOffset]);
       }
 
-      return FiHenkilotunnusValidationResult.ValidationPassed;
+      if (!ValidateIndividualNumber(value))
+      {
+         return new FiHenkilotunnusInvalidIndividualNumber(
+            Messages.FiHenkilotunnusInvalidIndividualNumber,
+            _individualNumber.Extract(value).ToString());
+      }
+
+      if (!ValidateDateOfBirth(value))
+      {
+         return new InvalidDateOfBirth(
+            Messages.FiHenkilotunnusInvalidDateOfBirth,
+            value[..CenturyIndicatorOffset],
+            DateFormatName.DDMMYY);
+      }
+
+      return default(ValidValue);
    }
 
    private static (Int32 Day, Int32 Month, Int32 Year) GetDayMonthYear(ReadOnlySpan<Char> value)
@@ -380,15 +447,15 @@ public record FiHenkilotunnus
       return (day, month, year);
    }
 
-   private static FiHenkilotunnusValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
+   private static ValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
    {
       const Int32 processLength = 10;     // Exclude check digit from main process loop.
 
       var sum = 0;
 
-      // Convert date of birth and individual number to an integer value.
       for (var index = 0; index < processLength; index++)
       {
+         // Century indicator is ignored for check digit calcualtion.
          if (index == CenturyIndicatorOffset)
          {
             continue;
@@ -398,7 +465,10 @@ public record FiHenkilotunnus
          var num = value[index] - Chars.DigitZero;
          if (num is < 0 or > 9)
          {
-            return FiHenkilotunnusValidationResult.InvalidCharacter;
+            return new InvalidCharacter(
+               Messages.FiHenkilotunnusInvalidCharacter,
+               value[index],
+               index);
          }
 
          sum += num;
@@ -408,8 +478,10 @@ public record FiHenkilotunnus
       var checkCharacter = CheckCharacters[checkDigit];
 
       return value[CheckCharacterOffset] == checkCharacter
-         ? FiHenkilotunnusValidationResult.ValidationPassed
-         : FiHenkilotunnusValidationResult.InvalidCheckDigit;
+         ? default(ValidValue)
+         : new InvalidChecksum(
+            Messages.FiHenkilotunnusInvalidCheckDigit,
+            CheckDigitAlgorithmName);
    }
 
    private static Boolean ValidateCenturyIndicator(ReadOnlySpan<Char> value)

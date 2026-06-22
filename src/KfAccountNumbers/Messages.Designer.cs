@@ -439,6 +439,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to FI Henkilotunnus should be 11 characters without separator or format characters.
+        /// </summary>
+        internal static string FiHenkilotunnusValidLength {
+            get {
+                return ResourceManager.GetString("FiHenkilotunnusValidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to String formatting mask may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string FormatMaskEmpty {
