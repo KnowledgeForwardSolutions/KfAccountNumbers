@@ -1,5 +1,8 @@
 // Ignore Spelling: Fi Henkilotunnus Json
 
+#pragma warning disable IDE0250 // Make struct 'readonly'
+#pragma warning disable IDE0046 // Convert to conditional expression
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -8,8 +11,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A Finnish henkilötunnus is an eleven-digit number structured as DDMMYYCZZZQ,
-///      with the following elements:
+///      A Finnish henkilötunnus is an eleven-digit number structured as
+///      DDMMYYCZZZQ, with the following elements:
 ///      <list type="bullet">
 ///         <item>
 ///            <term>DDMMYY</term>
@@ -27,23 +30,24 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <term>ZZZ</term>
 ///            <description>
-///               Three digit individual number used to differentiate between two
-///               persons born on the same date. The individual number also encodes
-///               additional information. The person's gender is indicated with
-///               even numbers for females and odd numbers for males. Individual
-///               numbers between 002 and 899 indicate persons born in Finland or
-///               permanent residents and numbers between 900 and 999 are reserved
-///               for temporary identifiers. Individual numbers less than 002 are not
-///               valid.
+///               Three digit individual number used to differentiate between
+///               two persons born on the same date. The individual number also
+///               encodes additional information. The person's gender is
+///               indicated with even numbers for females and odd numbers for
+///               males. Individual numbers between 002 and 899 indicate persons
+///               born in Finland or permanent residents and numbers between 900
+///               and 999 are reserved for temporary identifiers. Individual
+///               numbers less than 002 are not valid.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>Q</term>
 ///            <description>
 ///               Check character, calculated as modulus 31 of the date of birth
-///               and individual number. Will be one of 31 alphanumeric characters,
-///               "0123456789ABCDEFHJKLMNPRSTUVWXY" (the letters `G, I, O, Q and Z`
-///               are excluded to avoid possible confusion with digit characters).
+///               and individual number. Will be one of 31 alphanumeric
+///               characters, "0123456789ABCDEFHJKLMNPRSTUVWXY" (the letters `G,
+///               I, O, Q and Z` are excluded to avoid possible confusion with
+///               digit characters).
 ///            </description>
 ///         </item>
 ///      </list>
@@ -54,13 +58,15 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <term>230526-034N</term>
 ///            <description>
-///               Date of birth May 23, 1926, gender = female, permanent resident
+///               Date of birth May 23, 1926, gender = female, permanent
+///               resident
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>160117A275C</term>
 ///            <description>
-///               Date of birth January 16, 2017, gender = male, permanent resident
+///               Date of birth January 16, 2017, gender = male, permanent
+///               resident
 ///            </description>
 ///         </item>
 ///         <item>
@@ -93,7 +99,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The century indicator must be +, -, U, V, W, X, Y, A, B, C, D, E or F.
+///               The century indicator must be +, -, U, V, W, X, Y, A, B, C, D,
+///               E or F.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -105,7 +112,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The individual number must be &ge; 002.
+///               The individual number must be &gt;= 002.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -144,47 +151,50 @@ public record FiHenkilotunnus
    private const String CheckCharacters = "0123456789ABCDEFHJKLMNPRSTUVWXY";
 
    /// <summary>
-   ///   Initialize a new instance of the <see cref="FiHenkilotunnus"/> class.
+   ///   Initializes a new instance of the <see cref="FiHenkilotunnus"/> class.
    /// </summary>
-   /// <param name="henkilotunnus">
+   /// <param name="value">
    ///   String representation of a Finnish henkilötunnus.
    /// </param>
    /// <exception cref="KfValidationException{FiHenkilotunnusValidationResult}">
-   ///   <paramref name="henkilotunnus"/> is <see langword="null"/>, empty or all 
-   ///   whitespace characters.
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or
+   ///   all whitespace characters.
    ///   - or -
-   ///   <paramref name="henkilotunnus"/> is not length 11.
+   ///   <paramref name="value"/> is not length 11.
    ///   - or -
-   ///   <paramref name="henkilotunnus"/> contains a non-digit character in
+   ///   <paramref name="value"/> contains a non-digit character in
    ///   the date of birth and/or individual number element.
    ///   - or -
-   ///   <paramref name="henkilotunnus"/> has an invalid modulus 31 check character
-   ///   in the trailing (right-most) position.
+   ///   <paramref name="value"/> has an invalid modulus 31 check
+   ///   character in the trailing (right-most) position.
    ///   - or -
-   ///   <paramref name="henkilotunnus"/> has an invalid century indicator in
+   ///   <paramref name="value"/> has an invalid century indicator in
    ///   position 6 (zero-based). Valid century indicators are + (1800s),
    ///   -, U, V, W, X or Y (1900s) and A, B, C, D, E, F (2000s).
    ///   - or -
-   ///   <paramref name="henkilotunnus"/> has an invalid individual number in
+   ///   <paramref name="value"/> has an invalid individual number in
    ///   character positions 7-9 (zero-based). Valid individual numbers are
-   ///   &ge; 002.
+   ///   &gt;= 002.
    ///   - or -
-   ///   <paramref name="henkilotunnus"/> contains an invalid date of birth in
+   ///   <paramref name="value"/> contains an invalid date of birth in
    ///   positions 0-5 (zero-based).
    /// </exception>
-   public FiHenkilotunnus(String? henkilotunnus)
-      : this(henkilotunnus, ValidationMode.ValidationRequired) { }
+   public FiHenkilotunnus(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports bypassing
-   ///   validation when creating a new instance from a value that has already
-   ///   been validated.
+   ///   Initializes a new instance of the <see cref="FiHenkilotunnus"/> class.
    /// </summary>
-   private FiHenkilotunnus(String? henkilotunnus, ValidationMode validationMode)
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private FiHenkilotunnus(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         FiHenkilotunnusValidationResult validationResult = Validate(henkilotunnus);
+         FiHenkilotunnusValidationResult validationResult = Validate(value);
          if (validationResult != FiHenkilotunnusValidationResult.ValidationPassed)
          {
             throw validationResult.ToValidationException();
@@ -192,12 +202,13 @@ public record FiHenkilotunnus
       }
 
       // Validation passed, just assign to Value property.
-      Value = henkilotunnus!;
+      Value = value!;
    }
 
    /// <summary>
-   ///   The person's date of birth, derived from the first six digits in DDMMYY
-   ///   format and the exact century of birth derived from the century indicator.
+   ///   Gets the person's date of birth, derived from the first six digits in
+   ///   DDMMYY format and the exact century of birth derived from the century
+   ///   indicator.
    /// </summary>
    public DateOnly DateOfBirth
    {
@@ -212,16 +223,16 @@ public record FiHenkilotunnus
    }
 
    /// <summary>
-   ///   The person's gender, as indicated by the individual number element
+   ///   Gets the person's gender, as indicated by the individual number element
    ///   (character positions 7-9, zero-based). Even numbers = Female; odd
    ///   numbers = Male.
    /// </summary>
-   public BinaryGender Gender => Value[GenderOffset] % 2 == 0       // This works because the ASCII character values for digits have the same odd/even pattern
+   public BinaryGender Gender => Value[GenderOffset] % 2 == 0 // This works because the ASCII character values for digits have the same odd/even pattern
       ? BinaryGender.Female
       : BinaryGender.Male;
 
    /// <summary>
-   ///   The type of henkilötunnus identifier represented by this instance,
+   ///   Gets the type of henkilötunnus identifier represented by this instance,
    ///   indicating if this is identifier assigned to a permanent resident or
    ///   a temporary identifier.
    /// </summary>
@@ -235,66 +246,81 @@ public record FiHenkilotunnus
       : FiIdentifierType.PermanentResident;
 
    /// <summary>
-   ///   The validated henkilötunnus.
+   ///   Gets the validated henkilötunnus.
    /// </summary>
    public String Value { get; private init; }
 
-   public static implicit operator String(FiHenkilotunnus henkilotunnus)
-      => henkilotunnus?.Value ?? String.Empty;      // Handle null henkilotunnus object gracefully by returning empty string
+   /// <summary>
+   ///   Implicitly converts a <see cref="FiHenkilotunnus"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="FiHenkilotunnus"/> to convert.
+   /// </param>
+   public static implicit operator String(FiHenkilotunnus source)
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
 
-   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
-   public static explicit operator FiHenkilotunnus(String? henkilotunnus) => new(henkilotunnus);
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a
+   ///   <see cref="FiHenkilotunnus"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Finnish henkilötunnus.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid henkilötunnus.
+   /// </exception>
+   public static explicit operator FiHenkilotunnus(String? value) => new(value);
 
    /// <summary>
    ///   Create a new <see cref="FiHenkilotunnus"/> using the Result pattern.
    /// </summary>
-   /// <param name="henkilotunnus">
+   /// <param name="value">
    ///   String representation of a Finnish henkilötunnus.
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{FiHenkilotunnus, FiHenkilotunnusValidationResult}"/>.
-   ///   Will contain the new <see cref="FiHenkilotunnus"/> if 
-   ///   <paramref name="henkilotunnus"/> is valid or an
+   ///   Will contain the new <see cref="FiHenkilotunnus"/> if
+   ///   <paramref name="value"/> is valid or an
    ///   <see cref="FiHenkilotunnusValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="henkilotunnus"/> is 
-   ///   invalid.
+   ///   the validation rule that was failed if <paramref name="value"/>
+   ///   is invalid.
    /// </returns>
-   public static CreateResult<FiHenkilotunnus, FiHenkilotunnusValidationResult> Create(String? henkilotunnus)
+   public static CreateResult<FiHenkilotunnus, FiHenkilotunnusValidationResult> Create(String? value)
    {
-      FiHenkilotunnusValidationResult validationResult = Validate(henkilotunnus);
+      FiHenkilotunnusValidationResult validationResult = Validate(value);
       return validationResult == FiHenkilotunnusValidationResult.ValidationPassed
-         ? new FiHenkilotunnus(henkilotunnus, validationMode: ValidationMode.BypassValidation)
+         ? new FiHenkilotunnus(value, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
    /// <summary>
    ///   Get a string representation of the henkilötunnus.
    /// </summary>
-   /// <remarks>
-   ///   Will return the validated henkilötunnus, the same as the
-   ///   <see cref="Value"/> property.
-   /// </remarks>
+   /// <returns>
+   ///   The validated henkilötunnus.
+   /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="henkilotunnus"/> to determine if it contains a
-   ///   valid Finnish henkilötunnus.
+   ///   Check the <paramref name="value"/> to determine if it contains
+   ///   a valid Finnish henkilötunnus.
    /// </summary>
-   /// <param name="henkilotunnus">
+   /// <param name="value">
    ///   String representation of a Finnish henkilötunnus.
    /// </param>
    /// <returns>
-   ///   A <see cref="FiHenkilotunnusValidationResult"/> enumeration 
-   ///   value that indicates if the <paramref name="henkilotunnus"/> passed
+   ///   A <see cref="FiHenkilotunnusValidationResult"/> enumeration
+   ///   value that indicates if the <paramref name="value"/> passed
    ///   validation or what validation error was encountered.
    /// </returns>
-   public static FiHenkilotunnusValidationResult Validate(String? henkilotunnus)
+   public static FiHenkilotunnusValidationResult Validate(String? value)
    {
-      if (String.IsNullOrWhiteSpace(henkilotunnus))
+      if (String.IsNullOrWhiteSpace(value))
       {
          return FiHenkilotunnusValidationResult.Empty;
       }
-      else if (henkilotunnus.Length != ValidLength)
+      else if (value.Length != ValidLength)
       {
          return FiHenkilotunnusValidationResult.InvalidLength;
       }
@@ -302,21 +328,21 @@ public record FiHenkilotunnus
       // After performing basic checks, validate the check digit because the
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
-      FiHenkilotunnusValidationResult validationResult = ValidateCheckDigit(henkilotunnus);
+      FiHenkilotunnusValidationResult validationResult = ValidateCheckDigit(value);
       if (validationResult != FiHenkilotunnusValidationResult.ValidationPassed)
       {
          // Could be either InvalidCharacter or InvalidCheckDigit.
          return validationResult;
       }
-      else if (!ValidateCenturyIndicator(henkilotunnus))
+      else if (!ValidateCenturyIndicator(value))
       {
          return FiHenkilotunnusValidationResult.InvalidCenturyIndicator;
       }
-      else if (!ValidateIndividualNumber(henkilotunnus))
+      else if (!ValidateIndividualNumber(value))
       {
          return FiHenkilotunnusValidationResult.InvalidIndividualNumber;
       }
-      else if (!ValidateDateOfBirth(henkilotunnus))
+      else if (!ValidateDateOfBirth(value))
       {
          return FiHenkilotunnusValidationResult.InvalidDateOfBirth;
       }
@@ -324,14 +350,14 @@ public record FiHenkilotunnus
       return FiHenkilotunnusValidationResult.ValidationPassed;
    }
 
-   private static (Int32 day, Int32 month, Int32 year) GetDayMonthYear(ReadOnlySpan<Char> henkilotunnus)
+   private static (Int32 Day, Int32 Month, Int32 Year) GetDayMonthYear(ReadOnlySpan<Char> value)
    {
-      var day = henkilotunnus.ParseTwoDigits();
-      var month = henkilotunnus[2..].ParseTwoDigits();
-      var year = henkilotunnus[4..].ParseTwoDigits();
+      var day = value.ParseTwoDigits();
+      var month = value[2..].ParseTwoDigits();
+      var year = value[4..].ParseTwoDigits();
 
       // Adjust the year according to the value of the century indicator.
-      var centuryIndicator = henkilotunnus[CenturyIndicatorOffset];
+      var centuryIndicator = value[CenturyIndicatorOffset];
 
       year += centuryIndicator switch
       {
@@ -348,13 +374,13 @@ public record FiHenkilotunnus
          Chars.UpperCaseW => 1900,
          Chars.UpperCaseX => 1900,
          Chars.UpperCaseY => 1900,
-         _ => 0
+         _ => 0,
       };
 
       return (day, month, year);
    }
 
-   private static FiHenkilotunnusValidationResult ValidateCheckDigit(ReadOnlySpan<Char> henkilotunnus)
+   private static FiHenkilotunnusValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
    {
       const Int32 processLength = 10;     // Exclude check digit from main process loop.
 
@@ -369,8 +395,8 @@ public record FiHenkilotunnus
          }
 
          sum *= 10;
-         var num = henkilotunnus[index] - Chars.DigitZero;
-         if (num < 0 || num > 9)
+         var num = value[index] - Chars.DigitZero;
+         if (num is < 0 or > 9)
          {
             return FiHenkilotunnusValidationResult.InvalidCharacter;
          }
@@ -381,13 +407,13 @@ public record FiHenkilotunnus
       var checkDigit = sum % 31;
       var checkCharacter = CheckCharacters[checkDigit];
 
-      return henkilotunnus[CheckCharacterOffset] == checkCharacter
+      return value[CheckCharacterOffset] == checkCharacter
          ? FiHenkilotunnusValidationResult.ValidationPassed
          : FiHenkilotunnusValidationResult.InvalidCheckDigit;
    }
 
-   private static Boolean ValidateCenturyIndicator(ReadOnlySpan<Char> henkilotunnus)
-      => henkilotunnus[CenturyIndicatorOffset] switch
+   private static Boolean ValidateCenturyIndicator(ReadOnlySpan<Char> value)
+      => value[CenturyIndicatorOffset] switch
       {
          Chars.Plus => true,
          Chars.Dash => true,
@@ -402,16 +428,16 @@ public record FiHenkilotunnus
          Chars.UpperCaseW => true,
          Chars.UpperCaseX => true,
          Chars.UpperCaseY => true,
-         _ => false
+         _ => false,
       };
 
-   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> personnummer)
+   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> value)
    {
 #pragma warning disable IDE0008 // Use explicit type
-      var (day, month, year) = GetDayMonthYear(personnummer);
+      var (day, month, year) = GetDayMonthYear(value);
 #pragma warning restore IDE0008 // Use explicit type
 
-      if (year < MinimumValidYearOfBirth || year > MaximumValidYearOfBirth)
+      if (year is < MinimumValidYearOfBirth or > MaximumValidYearOfBirth)
       {
          // Should be impossible to ever reach this point because century indicator
          // has been validated, but return false out of abundance of caution and
@@ -419,7 +445,7 @@ public record FiHenkilotunnus
          return false;
       }
 
-      if (month < 1 || month > 12)
+      if (month is < 1 or > 12)
       {
          return false;
       }
@@ -427,14 +453,16 @@ public record FiHenkilotunnus
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);
    }
 
-   private static Boolean ValidateIndividualNumber(ReadOnlySpan<Char> henkilotunnus)
+   private static Boolean ValidateIndividualNumber(ReadOnlySpan<Char> value)
    {
-      var individualNumber = henkilotunnus[IndividualNumberStartOffset..].ParseThreeDigits();
+      var individualNumber = value[IndividualNumberStartOffset..].ParseThreeDigits();
 
       return individualNumber >= 2;
    }
 }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class FiHenkilotunnusJsonConverter : JsonConverter<FiHenkilotunnus>
 {
    public override FiHenkilotunnus Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
