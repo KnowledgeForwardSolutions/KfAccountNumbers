@@ -161,7 +161,7 @@ public record IsKennitala
       InvalidCharacter,
       InvalidChecksum,
       InvalidSeparator,
-      IsKennitalaInvalidCentury,
+      InvalidCentury,
       InvalidDateOfBirth)
    {
    }
@@ -177,7 +177,7 @@ public record IsKennitala
       InvalidCharacter,
       InvalidChecksum,
       InvalidSeparator,
-      IsKennitalaInvalidCentury,
+      InvalidCentury,
       InvalidDateOfBirth)
    {
    }
@@ -276,7 +276,7 @@ public record IsKennitala
                InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
                InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
-               IsKennitalaInvalidCentury invalidCentury => new UKfValidationException<ValidationError>(invalidCentury),
+               InvalidCentury invalidCentury => new UKfValidationException<ValidationError>(invalidCentury),
                InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
                _ => new UnreachableException("This branch should never be reached"),
             };
@@ -369,7 +369,7 @@ public record IsKennitala
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
          InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
          InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
-         IsKennitalaInvalidCentury invalidCentury => (ValidationError)invalidCentury,
+         InvalidCentury invalidCentury => (ValidationError)invalidCentury,
          InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
          _ => throw new UnreachableException("This branch should never be reached"),
       };
@@ -523,7 +523,7 @@ public record IsKennitala
 
       return ch is Chars.DigitZero or Chars.DigitNine
          ? default(ValidValue)
-         : new IsKennitalaInvalidCentury(
+         : new InvalidCentury(
             Messages.IsKennitalaInvalidCentury,
             value[^CenturyIndicatorOffset]);
    }
