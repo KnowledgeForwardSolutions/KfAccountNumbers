@@ -255,7 +255,8 @@ A Finnish henkilötunnus is an 11 character value structured as DDMMYYCZZZQ with
   indicate males and even numbers indicate females. Values from 002-899 indicate persons born in Finland or permanent residents
   and values from 900-999 indicate a temporary value (for example, a hospital patient where the official henkilötunnus is unknown).
   Individual numbers less than 002 are not valid.
-* Q - a modulus 31 check digit (or check character, actually). The check character will be one of 31 alphanumeric
+* Q - a modulus 31 check digit (or check character, actually) calculated from the digits of the date of birth and the individual
+* number. (The century indicator is excluded from the calculation.) The check character will be one of 31 alphanumeric
   characters, `0123456789ABCDEFHJKLMNPRSTUVWXY` (the letters `G, I, O, Q and Z` are excluded to avoid possible confusion with
   digit characters).
 
@@ -267,6 +268,10 @@ A henkilötunnus must meet all of the following rules:
 * The date of birth, after deriving the century of birth from the century indicator, must be a valid date between January 1, 1800 and December 31, 2099.
 * The individual number must be greater than or equal to 002.
 * The check character must be a valid modulus 31 check character calculated from the date of birth and the individual number.
+
+FiHenkilotunnus is case-insensitive for validation and parsing purposes. The FiHenkilotunnus constructor, Create
+method and implicit string to FiHenkilotunnus operator will normalize any lowercase letters to uppercase. Equality and
+inequality comparisons between instances of FiHenkilotunnus will compare the normalized uppercase versions of the value.
 
 Example values:
 * 230526-034N - date of birth May 23, 1926, gender = female, permanent resident
@@ -582,7 +587,9 @@ A valid CURP must meet all of the following rules (specific character offsets ar
 * Character 17 must be a digit (0-9)
 
 MxCurp is case-insensitive for validation and parsing purposes. The MxCurp constructor, Create
-method and implicit string to MxCurp operator will convert any lowercase letters to uppercase.
+method and implicit string to MxCurp operator will normalize any lowercase letters to uppercase.
+Equality and inequality comparisons between instances of MxCurp will compare the normalized
+uppercase versions of the value.
 
 Note that the homoclave value is used to determine the century of birth. This has two implications.
 First, the DateOfBirth property will return a DateOnly value with a year in the range 1900-1999 for

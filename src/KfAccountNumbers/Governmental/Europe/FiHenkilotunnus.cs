@@ -43,11 +43,12 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <term>Q</term>
 ///            <description>
-///               Check character, calculated as modulus 31 of the date of birth
-///               and individual number. Will be one of 31 alphanumeric
-///               characters, "0123456789ABCDEFHJKLMNPRSTUVWXY" (the letters `G,
-///               I, O, Q and Z` are excluded to avoid possible confusion with
-///               digit characters).
+///               Check character, calculated as modulus 31 of the digits of the
+///               date of birth and individual number. (The century indicator is
+///               excluded from the calculation.) Will be one of 31 alphanumeric
+///               characters, "0123456789ABCDEFHJKLMNPRSTUVWXY" (the letters
+///               `G, I, O, Q and Z` are excluded to avoid possible confusion
+///               with digit characters).
 ///            </description>
 ///         </item>
 ///      </list>
@@ -124,6 +125,14 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      </list>
 ///   </para>
 ///   <para>
+///      <see cref="FiHenkilotunnus"/> is case-insensitive for validation and
+///      parsing purposes. The FiHenkilotunnus constructor, Create method and
+///      implicit string to FiHenkilotunnus operator will normalize any
+///      lowercase letters to uppercase. Equality and inequality comparisons
+///      between instances of FiHenkilotunnus will compare the normalized
+///      uppercase versions of the value.
+///   </para>
+///   <para>
 ///      See https://en.wikipedia.org/wiki/National_identification_number#Finland
 ///      for more info. Also see https://kenda.fi/tools/hetu/ for tools to generate
 ///      test henkilötunnus values.
@@ -132,6 +141,12 @@ namespace KfAccountNumbers.Governmental.Europe;
 [JsonConverter(typeof(FiHenkilotunnusJsonConverter))]
 public record FiHenkilotunnus
 {
+   /// <summary>
+   ///   Discriminated union defining the types of identifier that
+   ///   <see cref="FiHenkilotunnus"/> can represent.
+   /// </summary>
+   public union IdentifierCategory(FiIdentifierType.PermanentResident, FiIdentifierType.Temporary) { }
+
    /// <summary>
    ///   Discriminated union defining the possible validation errors that can
    ///   occur when creating a new <see cref="FiHenkilotunnus"/>.
@@ -250,8 +265,9 @@ public record FiHenkilotunnus
          }
       }
 
-      // Validation passed, just assign to Value property.
-      Value = value!;
+      // Validation passed, just assign to Value property, normalizing to
+      // uppercase if necessary.
+      Value = value!.ToUpperInvariant();
    }
 
    /// <summary>
@@ -289,10 +305,9 @@ public record FiHenkilotunnus
    ///   the identifier type. 002-899 are issued to permanent residents and
    ///   900-999 are used for temporary identifiers.
    /// </remarks>
-   // TODO: convert to union
-   public FiIdentifierType IdentifierType => Value[IndividualNumberStartOffset] == Chars.DigitNine
-      ? FiIdentifierType.Temporary
-      : FiIdentifierType.PermanentResident;
+   public IdentifierCategory IdentifierType => Value[IndividualNumberStartOffset] == Chars.DigitNine
+      ? default(FiIdentifierType.Temporary)
+      : default(FiIdentifierType.PermanentResident);
 
    /// <summary>
    ///   Gets the validated henkilötunnus.
@@ -441,6 +456,17 @@ public record FiHenkilotunnus
          Chars.UpperCaseW => 1900,
          Chars.UpperCaseX => 1900,
          Chars.UpperCaseY => 1900,
+         Chars.LowerCaseA => 2000,
+         Chars.LowerCaseB => 2000,
+         Chars.LowerCaseC => 2000,
+         Chars.LowerCaseD => 2000,
+         Chars.LowerCaseE => 2000,
+         Chars.LowerCaseF => 2000,
+         Chars.LowerCaseU => 1900,
+         Chars.LowerCaseV => 1900,
+         Chars.LowerCaseW => 1900,
+         Chars.LowerCaseX => 1900,
+         Chars.LowerCaseY => 1900,
          _ => 0,
       };
 
@@ -475,9 +501,13 @@ public record FiHenkilotunnus
       }
 
       var checkDigit = sum % 31;
-      var checkCharacter = CheckCharacters[checkDigit];
+      var checkCharacter = value[CheckCharacterOffset];
+      if (Char.IsLower(checkCharacter))
+      {
+         checkCharacter = Char.ToUpper(checkCharacter, CultureInfo.InvariantCulture);
+      }
 
-      return value[CheckCharacterOffset] == checkCharacter
+      return checkCharacter == CheckCharacters[checkDigit]
          ? default(ValidValue)
          : new InvalidChecksum(
             Messages.FiHenkilotunnusInvalidCheckDigit,
@@ -500,6 +530,17 @@ public record FiHenkilotunnus
          Chars.UpperCaseW => true,
          Chars.UpperCaseX => true,
          Chars.UpperCaseY => true,
+         Chars.LowerCaseA => true,
+         Chars.LowerCaseB => true,
+         Chars.LowerCaseC => true,
+         Chars.LowerCaseD => true,
+         Chars.LowerCaseE => true,
+         Chars.LowerCaseF => true,
+         Chars.LowerCaseU => true,
+         Chars.LowerCaseV => true,
+         Chars.LowerCaseW => true,
+         Chars.LowerCaseX => true,
+         Chars.LowerCaseY => true,
          _ => false,
       };
 

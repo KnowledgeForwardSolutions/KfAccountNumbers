@@ -73,6 +73,14 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///      </list>
 ///   </para>
 ///   <para>
+///      <see cref="MxCurp"/> is case-insensitive for validation and
+///      parsing purposes. The MxCurp constructor, Create method and
+///      implicit string to MxCurp operator will normalize any
+///      lowercase letters to uppercase. Equality and inequality comparisons
+///      between instances of MxCurp will compare the normalized
+///      uppercase versions of the value.
+///   </para>
+///   <para>
 ///      Note that YYMMDD date of birth format presents some ambiguity for the
 ///      century of birth. This has several impacts:
 ///      <list type="bullet">

@@ -20,6 +20,10 @@ public class FiHenkilotunnusTests
    private const String AltValidHenkilotunnus = "160117A275C";
    private const String ValidTestHenkilotunnus = "020508D929B";
    private const String AltValidTestHenkilotunnus = "051272X990D";
+   private const String ValidLowercaseHenkilotunnus = "230526-034n";
+   private const String AltValidLowercaseHenkilotunnus = "160117a275c";
+   private const String ValidLowercaseTestHenkilotunnus = "020508d929b";
+   private const String AltValidLowercaseTestHenkilotunnus = "051272x990d";
 
    private static String GetHenkilotunnusWithValidCheckDigit(
       String dateOfBirth = "160117",
@@ -55,6 +59,10 @@ public class FiHenkilotunnusTests
       AltValidHenkilotunnus,
       ValidTestHenkilotunnus,
       AltValidTestHenkilotunnus,
+      ValidLowercaseHenkilotunnus,
+      AltValidLowercaseHenkilotunnus,
+      ValidLowercaseTestHenkilotunnus,
+      AltValidLowercaseTestHenkilotunnus,
    ];
 
    public static TheoryData<String, Char> ValidDateOfBirthValues = new()
@@ -236,6 +244,22 @@ public class FiHenkilotunnusTests
       { "321004", 'X' },      // Invalid day of for October, any year
       { "311104", 'E' },      // Invalid day of for November, any year
       { "321204", '+' },      // Invalid day of for December, any year
+
+      // Invalid day values (lowercase century indicator)
+      { "320104", 'a' },      // Invalid day of month for January, any year
+      { "290201", 'b' },      // Invalid day of for February, non-leap year
+      { "300204", 'c' },      // Invalid day of for February, leap year
+      { "300200", 'd' },      // Invalid day of for February, leap year (2000 is leap-year)
+      { "320304", 'e' },      // Invalid day of for March, any year
+      { "310404", 'f' },      // Invalid day of for April, any year
+      { "320504", 'u' },      // Invalid day of for May, any year
+      { "310604", 'v' },      // Invalid day of for June, any year
+      { "320704", 'w' },      // Invalid day of for July, any year
+      { "320804", 'x' },      // Invalid day of for August, any year
+      { "310904", 'y' },      // Invalid day of for September, any year
+      { "321004", 'a' },      // Invalid day of for October, any year
+      { "311104", 'b' },      // Invalid day of for November, any year
+      { "321204", 'c' },      // Invalid day of for December, any year
    };
 
    private static InvalidLength GetInvalidLengthResult(String value)
@@ -326,8 +350,50 @@ public class FiHenkilotunnusTests
    [InlineData("010100+030D")]
    [InlineData("010100+031E")]
    [InlineData("010100+032F")]
+
+   // Lowercase check characters
+   [InlineData("010100+002h")]      // Starting point. "010100+002" mod 31 = 16, or check character H.
+   [InlineData("010100+003j")]      // Increment individual number to get next check character
+   [InlineData("010100+004k")]
+   [InlineData("010100+005l")]
+   [InlineData("010100+006m")]
+   [InlineData("010100+007n")]
+   [InlineData("010100+008p")]
+   [InlineData("010100+009r")]
+   [InlineData("010100+010s")]
+   [InlineData("010100+011t")]
+   [InlineData("010100+012u")]
+   [InlineData("010100+013v")]
+   [InlineData("010100+014w")]
+   [InlineData("010100+015x")]
+   [InlineData("010100+016y")]
+   // [InlineData("010100+0170")]      // Roll over to check character 0
+   // [InlineData("010100+0181")]
+   // [InlineData("010100+0192")]
+   // [InlineData("010100+0203")]
+   // [InlineData("010100+0214")]
+   // [InlineData("010100+0225")]
+   // [InlineData("010100+0236")]
+   // [InlineData("010100+0247")]
+   // [InlineData("010100+0258")]
+   // [InlineData("010100+0269")]
+   [InlineData("010100+027a")]
+   [InlineData("010100+028b")]
+   [InlineData("010100+029c")]
+   [InlineData("010100+030d")]
+   [InlineData("010100+031e")]
+   [InlineData("010100+032f")]
    public void FiHenkilotunnus_CheckDigitAlgorithm_ShouldGenerateAllPossibleCharacters(String value)
-      => FiHenkilotunnus.Validate(value).Should().Be((LocalValidationResult)default(ValidValue));
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = FiHenkilotunnus.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -341,10 +407,11 @@ public class FiHenkilotunnusTests
    {
       // Act.
       var sut = new FiHenkilotunnus(value);
+      var expected = value.ToUpperInvariant();
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(value);
+      sut.Value.Should().Be(expected);
    }
 
    [Theory]
@@ -362,6 +429,22 @@ public class FiHenkilotunnusTests
       // Assert.
       sut.Should().NotBeNull();
       sut.Value.Should().Be(value);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidCenturyIndicatorValues))]
+   public void FiHenkilotunnus_Constructor_ShouldCreateInstance_WhenValueHasValidCenturyIndicator(Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(centuryIndicator: centuryIndicator);
+      var expected = value.ToUpperInvariant();
+
+      // Act.
+      var sut = new FiHenkilotunnus(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
    }
 
    [Theory]
@@ -592,27 +675,38 @@ public class FiHenkilotunnusTests
    // ==========================================================================
 
    [Theory]
-   [InlineData('0', FiIdentifierType.PermanentResident)]
-   [InlineData('1', FiIdentifierType.PermanentResident)]
-   [InlineData('2', FiIdentifierType.PermanentResident)]
-   [InlineData('3', FiIdentifierType.PermanentResident)]
-   [InlineData('4', FiIdentifierType.PermanentResident)]
-   [InlineData('5', FiIdentifierType.PermanentResident)]
-   [InlineData('6', FiIdentifierType.PermanentResident)]
-   [InlineData('7', FiIdentifierType.PermanentResident)]
-   [InlineData('8', FiIdentifierType.PermanentResident)]
-   [InlineData('9', FiIdentifierType.Temporary)]
-   public void FiHenkilotunnus_IdentifierType_ShouldReturnExpectedValue(
-      Char leadingIndividualNumberChar,
-      FiIdentifierType expectedIdentifierType)
+   [InlineData("002")]
+   [InlineData("101")]
+   [InlineData("201")]
+   [InlineData("301")]
+   [InlineData("401")]
+   [InlineData("501")]
+   [InlineData("601")]
+   [InlineData("701")]
+   [InlineData("899")]
+   public void FiHenkilotunnus_IdentifierType_ShouldReturnPermanentResident_WhenIdentifierNumberIsLessThan900(String individualNumber)
    {
       // Arrange.
-      var individualNumber = $"{leadingIndividualNumberChar}12";
       var value = GetHenkilotunnusWithValidCheckDigit(individualNumber: individualNumber);
       var sut = new FiHenkilotunnus(value);
+      FiHenkilotunnus.IdentifierCategory expected = default(FiIdentifierType.PermanentResident);
 
       // Act/assert.
-      sut.IdentifierType.Should().Be(expectedIdentifierType);
+      sut.IdentifierType.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData("900")]
+   [InlineData("999")]
+   public void FiHenkilotunnus_IdentifierType_ShouldReturnPermanentResident_WhenIdentifierNumberIsGreaterThanOrEqualTo900(String individualNumber)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(individualNumber: individualNumber);
+      var sut = new FiHenkilotunnus(value);
+      FiHenkilotunnus.IdentifierCategory expected = default(FiIdentifierType.Temporary);
+
+      // Act/assert.
+      sut.IdentifierType.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -627,9 +721,10 @@ public class FiHenkilotunnusTests
    {
       // Arrange.
       var sut = new FiHenkilotunnus(value);
+      var expected = value.ToUpperInvariant();
 
       // Act/assert.
-      sut.Value.Should().Be(value);
+      sut.Value.Should().Be(expected);
    }
 
    #endregion
@@ -716,6 +811,21 @@ public class FiHenkilotunnusTests
    {
       // Arrange.
       var value = GetHenkilotunnusWithValidCheckDigit(dateOfBirth, centuryIndicator);
+      var expected = new FiHenkilotunnus(value);
+
+      // Act.
+      var sut = (FiHenkilotunnus)value;
+
+      // Assert.
+      sut.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidCenturyIndicatorValues))]
+   public void FiHenkilotunnus_ExplicitCastToFiHenkilotunnus_ShouldCreateInstance_WhenValueHasValidCenturyIndicator(Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(centuryIndicator: centuryIndicator);
       var expected = new FiHenkilotunnus(value);
 
       // Act.
@@ -861,6 +971,23 @@ public class FiHenkilotunnusTests
       (sut1 == sut2).Should().BeFalse();
    }
 
+   [Theory]
+   [InlineData(ValidHenkilotunnus, ValidLowercaseHenkilotunnus)]
+   [InlineData(AltValidHenkilotunnus, AltValidLowercaseHenkilotunnus)]
+   [InlineData("160117A275C", "160117a275C")]
+   [InlineData("160117A275C", "160117A275c")]
+   public void FiHenkilotunnus_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase(
+      String value1,
+      String value2)
+   {
+      // Arrange.
+      var sut1 = new FiHenkilotunnus(value1);
+      var sut2 = new FiHenkilotunnus(value2);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
    #endregion
 
    #region Inequality Operator Tests
@@ -883,6 +1010,23 @@ public class FiHenkilotunnusTests
    {
       var sut1 = new FiHenkilotunnus(ValidHenkilotunnus);
       var sut2 = new FiHenkilotunnus(ValidHenkilotunnus);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Theory]
+   [InlineData(ValidHenkilotunnus, ValidLowercaseHenkilotunnus)]
+   [InlineData(AltValidHenkilotunnus, AltValidLowercaseHenkilotunnus)]
+   [InlineData("160117A275C", "160117a275C")]
+   [InlineData("160117A275C", "160117A275c")]
+   public void FiHenkilotunnus_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase(
+      String value1,
+      String value2)
+   {
+      // Arrange.
+      var sut1 = new FiHenkilotunnus(value1);
+      var sut2 = new FiHenkilotunnus(value2);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -916,6 +1060,21 @@ public class FiHenkilotunnusTests
    {
       // Arrange.
       var value = GetHenkilotunnusWithValidCheckDigit(dateOfBirth, centuryIndicator);
+      LocalCreateResult expected = new FiHenkilotunnus(value);
+
+      // Act.
+      var result = FiHenkilotunnus.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidCenturyIndicatorValues))]
+   public void FiHenkilotunnus_Create_ShouldCreateInstance_WhenValueHasValidCenturyIndicator(Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(centuryIndicator: centuryIndicator);
       LocalCreateResult expected = new FiHenkilotunnus(value);
 
       // Act.
@@ -1062,6 +1221,23 @@ public class FiHenkilotunnusTests
       sut1.Equals(sut2).Should().BeFalse();
    }
 
+   [Theory]
+   [InlineData(ValidHenkilotunnus, ValidLowercaseHenkilotunnus)]
+   [InlineData(AltValidHenkilotunnus, AltValidLowercaseHenkilotunnus)]
+   [InlineData("160117A275C", "160117a275C")]
+   [InlineData("160117A275C", "160117A275c")]
+   public void FiHenkilotunnus_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase(
+      String value1,
+      String value2)
+   {
+      // Arrange.
+      var sut1 = new FiHenkilotunnus(value1);
+      var sut2 = new FiHenkilotunnus(value2);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
    #endregion
 
    #region GetHashCode Method Tests
@@ -1098,6 +1274,27 @@ public class FiHenkilotunnusTests
       hash1.Should().NotBe(hash2);
    }
 
+   [Theory]
+   [InlineData(ValidHenkilotunnus, ValidLowercaseHenkilotunnus)]
+   [InlineData(AltValidHenkilotunnus, AltValidLowercaseHenkilotunnus)]
+   [InlineData("160117A275C", "160117a275C")]
+   [InlineData("160117A275C", "160117A275c")]
+   public void FiHenkilotunnus_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase(
+      String value1,
+      String value2)
+   {
+      // Arrange.
+      var sut1 = new FiHenkilotunnus(value1);
+      var sut2 = new FiHenkilotunnus(value2);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
    #endregion
 
    #region ReferenceEquals Method Tests
@@ -1132,9 +1329,10 @@ public class FiHenkilotunnusTests
    {
       // Arrange.
       var sut = new FiHenkilotunnus(value);
+      var expected = value.ToUpperInvariant();
 
       // Act/assert.
-      sut.ToString().Should().Be(value);
+      sut.ToString().Should().Be(expected);
    }
 
    #endregion
@@ -1165,6 +1363,21 @@ public class FiHenkilotunnusTests
    {
       // Arrange.
       var value = GetHenkilotunnusWithValidCheckDigit(dateOfBirth, centuryIndicator);
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = FiHenkilotunnus.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidCenturyIndicatorValues))]
+   public void FiHenkilotunnus_Validate_ShouldReturnValidationPassed_WhenValueHasValidCenturyIndicator(Char centuryIndicator)
+   {
+      // Arrange.
+      var value = GetHenkilotunnusWithValidCheckDigit(centuryIndicator: centuryIndicator);
       LocalValidationResult expected = default(ValidValue);
 
       // Act.
