@@ -294,7 +294,7 @@ public class FiHenkilotunnusTests
 
    #region Constants Tests
    // ==========================================================================
-   // ==========================================================================\
+   // ==========================================================================
 
    [Fact]
    public void FiHenkilotunnus_CheckDigitAlgorithmName_ShouldHaveExpectedValue()
@@ -368,7 +368,7 @@ public class FiHenkilotunnusTests
    [InlineData("010100+015x")]
    [InlineData("010100+016y")]
    // [InlineData("010100+0170")]      // Roll over to check character 0
-   // [InlineData("010100+0181")]
+   // [InlineData("010100+0181")]      // Digits ignored because not lowercase
    // [InlineData("010100+0192")]
    // [InlineData("010100+0203")]
    // [InlineData("010100+0214")]
@@ -1148,7 +1148,7 @@ public class FiHenkilotunnusTests
 
    [Theory]
    [MemberData(nameof(InvalidCenturyIndicatorValues))]
-   public void FiHenkilotunnus_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidCenturyIndicator(Char centuryIndicator)
+   public void FiHenkilotunnus_Create_ShouldReturnInvalidCenturyValidationResult_WhenValueHasInvalidCenturyIndicator(Char centuryIndicator)
    {
       // Arrange.
       var value = GetHenkilotunnusWithValidCheckDigit(centuryIndicator: centuryIndicator);

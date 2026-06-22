@@ -440,33 +440,12 @@ public record FiHenkilotunnus
 
       // Adjust the year according to the value of the century indicator.
       var centuryIndicator = value[CenturyIndicatorOffset];
-
       year += centuryIndicator switch
       {
          Chars.Plus => 1800,
          Chars.Dash => 1900,
-         Chars.UpperCaseA => 2000,
-         Chars.UpperCaseB => 2000,
-         Chars.UpperCaseC => 2000,
-         Chars.UpperCaseD => 2000,
-         Chars.UpperCaseE => 2000,
-         Chars.UpperCaseF => 2000,
-         Chars.UpperCaseU => 1900,
-         Chars.UpperCaseV => 1900,
-         Chars.UpperCaseW => 1900,
-         Chars.UpperCaseX => 1900,
-         Chars.UpperCaseY => 1900,
-         Chars.LowerCaseA => 2000,
-         Chars.LowerCaseB => 2000,
-         Chars.LowerCaseC => 2000,
-         Chars.LowerCaseD => 2000,
-         Chars.LowerCaseE => 2000,
-         Chars.LowerCaseF => 2000,
-         Chars.LowerCaseU => 1900,
-         Chars.LowerCaseV => 1900,
-         Chars.LowerCaseW => 1900,
-         Chars.LowerCaseX => 1900,
-         Chars.LowerCaseY => 1900,
+         (>= Chars.UpperCaseA and <= Chars.UpperCaseF) or (>= Chars.LowerCaseA and <= Chars.LowerCaseF) => 2000,
+         (>= Chars.UpperCaseU and <= Chars.UpperCaseY) or (>= Chars.LowerCaseU and <= Chars.LowerCaseY) => 1900,
          _ => 0,
       };
 
@@ -481,7 +460,7 @@ public record FiHenkilotunnus
 
       for (var index = 0; index < processLength; index++)
       {
-         // Century indicator is ignored for check digit calcualtion.
+         // Century indicator is ignored for check digit calculation.
          if (index == CenturyIndicatorOffset)
          {
             continue;
@@ -517,30 +496,9 @@ public record FiHenkilotunnus
    private static Boolean ValidateCenturyIndicator(ReadOnlySpan<Char> value)
       => value[CenturyIndicatorOffset] switch
       {
-         Chars.Plus => true,
-         Chars.Dash => true,
-         Chars.UpperCaseA => true,
-         Chars.UpperCaseB => true,
-         Chars.UpperCaseC => true,
-         Chars.UpperCaseD => true,
-         Chars.UpperCaseE => true,
-         Chars.UpperCaseF => true,
-         Chars.UpperCaseU => true,
-         Chars.UpperCaseV => true,
-         Chars.UpperCaseW => true,
-         Chars.UpperCaseX => true,
-         Chars.UpperCaseY => true,
-         Chars.LowerCaseA => true,
-         Chars.LowerCaseB => true,
-         Chars.LowerCaseC => true,
-         Chars.LowerCaseD => true,
-         Chars.LowerCaseE => true,
-         Chars.LowerCaseF => true,
-         Chars.LowerCaseU => true,
-         Chars.LowerCaseV => true,
-         Chars.LowerCaseW => true,
-         Chars.LowerCaseX => true,
-         Chars.LowerCaseY => true,
+         Chars.Plus or Chars.Dash => true,
+         (>= Chars.UpperCaseA and <= Chars.UpperCaseF) or (>= Chars.LowerCaseA and <= Chars.LowerCaseF) => true,
+         (>= Chars.UpperCaseU and <= Chars.UpperCaseY) or (>= Chars.LowerCaseU and <= Chars.LowerCaseY) => true,
          _ => false,
       };
 
