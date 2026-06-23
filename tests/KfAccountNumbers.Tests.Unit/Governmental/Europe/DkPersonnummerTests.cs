@@ -115,8 +115,8 @@ public class DkPersonnummerTests
       { "07076a4285", 5 },          // Non-digit character 'a'
       { "070761z285", 6 },          // Non-digit character 'z'
       { "0707614~85", 7 },          // Non-digit character '~'
-      { "07076143\u21535", 8 },     // Non-digit character Unicode fraction 1/3
-      { "070761436\u00D6", 9 },     // Invalid character unicode O with umlaut
+      { "07076142\u21535", 8 },     // Non-digit character Unicode fraction 1/3
+      { "070761428\u00D6", 9 },     // Invalid character unicode O with umlaut
 
       // Formatted values
       { ".70761 4285", 0 },         // Non-digit character '.'
@@ -127,8 +127,8 @@ public class DkPersonnummerTests
       { "07076a 4285", 5 },         // Non-digit character 'a'
       { "070761 z285", 7 },         // Non-digit character 'z'
       { "070761-4~85", 8 },         // Non-digit character '~'
-      { "070761-43\u21535", 9 },    // Non-digit character Unicode fraction 1/3
-      { "070761-436\u00D6", 10 },   // Invalid character unicode O with umlaut
+      { "070761-42\u21535", 9 },    // Non-digit character Unicode fraction 1/3
+      { "070761-428\u00D6", 10 },   // Invalid character unicode O with umlaut
    };
 
    public static TheoryData<String> InvalidSeparatorValues =>
