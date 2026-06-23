@@ -439,7 +439,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FI Henkilotunnus should be 11 characters without separator or format characters.
+        ///   Looks up a localized string similar to FI Henkilotunnus should be 11 characters (including century indicator).
         /// </summary>
         internal static string FiHenkilotunnusValidLength {
             get {

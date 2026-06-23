@@ -538,6 +538,6 @@
     <value>DK Personnummer without a separator character</value>
   </data>
   <data name="FiHenkilotunnusValidLength" xml:space="preserve">
-    <value>FI Henkilotunnus should be 11 characters without separator or format characters</value>
+    <value>FI Henkilotunnus should be 11 characters (including century indicator)</value>
   </data>
 </root>

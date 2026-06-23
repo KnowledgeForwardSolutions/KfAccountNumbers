@@ -11,12 +11,12 @@ public class FiIdentifierType
    /// <summary>
    ///   Henkilötunnus assigned to a person born in Finland or a permanent resident.
    /// </summary>
-   public record struct PermanentResident { }
+   public struct PermanentResident { }
 
    /// <summary>
    /// Temporary henkilötunnus assigned to a person not eligible for a permanent
    /// identifier. For example, a hospital patient where the official henkilötunnus
    /// is unknown.
    /// </summary>
-   public record struct Temporary { }
+   public struct Temporary { }
 }

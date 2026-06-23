@@ -256,7 +256,7 @@ A Finnish henkilötunnus is an 11 character value structured as DDMMYYCZZZQ with
   and values from 900-999 indicate a temporary value (for example, a hospital patient where the official henkilötunnus is unknown).
   Individual numbers less than 002 are not valid.
 * Q - a modulus 31 check digit (or check character, actually) calculated from the digits of the date of birth and the individual
-* number. (The century indicator is excluded from the calculation.) The check character will be one of 31 alphanumeric
+  number. (The century indicator is excluded from the calculation.) The check character will be one of 31 alphanumeric
   characters, `0123456789ABCDEFHJKLMNPRSTUVWXY` (the letters `G, I, O, Q and Z` are excluded to avoid possible confusion with
   digit characters).
 

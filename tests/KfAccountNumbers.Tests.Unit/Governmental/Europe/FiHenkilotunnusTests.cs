@@ -47,12 +47,6 @@ public class FiHenkilotunnusTests
       return $"{dateOfBirth}{centuryIndicator}{individualNumber}{checkCharacter}";
    }
 
-   private enum CharacterCase
-   {
-      UpperCase = 0,
-      LowerCase,
-   }
-
    public static TheoryData<String> ValidHenkilotunnusValues =>
    [
       ValidHenkilotunnus,
@@ -698,7 +692,7 @@ public class FiHenkilotunnusTests
    [Theory]
    [InlineData("900")]
    [InlineData("999")]
-   public void FiHenkilotunnus_IdentifierType_ShouldReturnPermanentResident_WhenIdentifierNumberIsGreaterThanOrEqualTo900(String individualNumber)
+   public void FiHenkilotunnus_IdentifierType_ShouldReturnTemporary_WhenIdentifierNumberIsGreaterThanOrEqualTo900(String individualNumber)
    {
       // Arrange.
       var value = GetHenkilotunnusWithValidCheckDigit(individualNumber: individualNumber);
@@ -976,7 +970,7 @@ public class FiHenkilotunnusTests
    [InlineData(AltValidHenkilotunnus, AltValidLowercaseHenkilotunnus)]
    [InlineData("160117A275C", "160117a275C")]
    [InlineData("160117A275C", "160117A275c")]
-   public void FiHenkilotunnus_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase(
+   public void FiHenkilotunnus_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyByCase(
       String value1,
       String value2)
    {
@@ -1020,7 +1014,7 @@ public class FiHenkilotunnusTests
    [InlineData(AltValidHenkilotunnus, AltValidLowercaseHenkilotunnus)]
    [InlineData("160117A275C", "160117a275C")]
    [InlineData("160117A275C", "160117A275c")]
-   public void FiHenkilotunnus_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase(
+   public void FiHenkilotunnus_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyByCase(
       String value1,
       String value2)
    {
@@ -1226,7 +1220,7 @@ public class FiHenkilotunnusTests
    [InlineData(AltValidHenkilotunnus, AltValidLowercaseHenkilotunnus)]
    [InlineData("160117A275C", "160117a275C")]
    [InlineData("160117A275C", "160117A275c")]
-   public void FiHenkilotunnus_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase(
+   public void FiHenkilotunnus_Equals_ShouldReturnTrue_WhenValuesDifferOnlyByCase(
       String value1,
       String value2)
    {
@@ -1279,7 +1273,7 @@ public class FiHenkilotunnusTests
    [InlineData(AltValidHenkilotunnus, AltValidLowercaseHenkilotunnus)]
    [InlineData("160117A275C", "160117a275C")]
    [InlineData("160117A275C", "160117A275c")]
-   public void FiHenkilotunnus_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase(
+   public void FiHenkilotunnus_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyByCase(
       String value1,
       String value2)
    {
@@ -1582,7 +1576,7 @@ public class FiHenkilotunnusTests
    public void FiHenkilotunnus_JsonDeserialization_ShouldThrowKfValidationException_WhenHenkilotunnusIsInvalid()
    {
       // Arrange.
-      var json = "{\"Henkilotunnus\":\"230626-034N\"}";  // Invalid length
+      var json = "{\"Henkilotunnus\":\"230626-034N\"}";  // Invalid check digit
       LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
