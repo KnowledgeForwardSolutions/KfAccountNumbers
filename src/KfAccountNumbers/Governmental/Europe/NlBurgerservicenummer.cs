@@ -59,8 +59,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///               If the length of the value is 11 characters, then character
 ///               positions 4 and 7 (zero-based) must be valid separator
 ///               characters. Valid separator characters are any non-ASCII digit
-///               characters. The same character must be used for both separator
-///               characters.
+///               characters ('0'-'9'). The same character must be used for both
+///               separator characters.
 ///            </description>
 ///         </item>
 ///         <item>

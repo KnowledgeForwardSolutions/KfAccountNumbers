@@ -970,7 +970,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NL Burgerservicenummer formatted as NNNNNNNNN.
+        ///   Looks up a localized string similar to NL Burgerservicenummer without separator characters (NNNNNNNNN).
         /// </summary>
         internal static string NlBurgerservicenummerUnformattedLength {
             get {
