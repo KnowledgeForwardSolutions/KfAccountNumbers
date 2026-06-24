@@ -85,6 +85,33 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record NlBurgerservicenummer
 {
    /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="IsKennitala"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="IsKennitala"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator)
+   {
+   }
+
+   /// <summary>
    ///   The name of the check digit algorithm used by kennitala values.
    /// </summary>
    public const String CheckDigitAlgorithmName = "11-proef";
@@ -104,7 +131,7 @@ public record NlBurgerservicenummer
    /// <param name="value">
    ///   String representation of a Dutch burgerservicenummer.
    /// </param>
-   /// <exception cref="KfValidationException{NlBurgerservicenummerValidationResult}">
+   /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty
    ///   or all whitespace characters.
    ///   - or -
@@ -139,10 +166,18 @@ public record NlBurgerservicenummer
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         NlBurgerservicenummerValidationResult validationResult = Validate(value);
-         if (validationResult != NlBurgerservicenummerValidationResult.ValidationPassed)
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            throw validationResult.ToValidationException();
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
          }
       }
 
@@ -182,20 +217,22 @@ public record NlBurgerservicenummer
    ///   String representation of a Dutch burgerservicenummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{NlBurgerservicenummer, NlBurgerservicenummerValidationResult}"/>.
-   ///   Will contain the new <see cref="NlBurgerservicenummer"/> if
-   ///   <paramref name="value"/> is valid or an
-   ///   <see cref="NlBurgerservicenummerValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="value"/> is
-   ///   invalid.
+   ///   A <see cref="UCreateResult{IsKennitala, ValidationError}"/>. Will
+   ///   contain the new <see cref="IsKennitala"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<NlBurgerservicenummer, NlBurgerservicenummerValidationResult> Create(String? value)
-   {
-      NlBurgerservicenummerValidationResult validationResult = Validate(value);
-      return validationResult == NlBurgerservicenummerValidationResult.ValidationPassed
-         ? new NlBurgerservicenummer(value, validationMode: ValidationMode.BypassValidation)
-         : validationResult;
-   }
+   public static UCreateResult<NlBurgerservicenummer, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new NlBurgerservicenummer(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
 
    /// <summary>
    ///   Format the burgerservicenummer using the supplied
@@ -237,39 +274,59 @@ public record NlBurgerservicenummer
    ///   String representation of a Dutch burgerservicenummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="NlBurgerservicenummerValidationResult"/> enumeration
-   ///   value that indicates if the <paramref name="value"/>
-   ///   passed validation or what validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
-   public static NlBurgerservicenummerValidationResult Validate(String? value)
+   public static ValidationResult Validate(String? value)
    {
       if (String.IsNullOrWhiteSpace(value))
       {
-         return NlBurgerservicenummerValidationResult.Empty;
+         return default(EmptyValue);
       }
 
       if (value.Length is not UnformattedLength and not FormattedLength)
       {
-         return NlBurgerservicenummerValidationResult.InvalidLength;
+         return new InvalidLength(
+            Messages.NlBurgerservicenummerInvalidLength,
+            value.Length,
+            GetValidLengthDefinitions());
       }
 
       // After performing basic checks, validate the check digit because the
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
-      NlBurgerservicenummerValidationResult validationResult = ValidateCheckDigit(value);
-      if (validationResult != NlBurgerservicenummerValidationResult.ValidationPassed)
+      ValidationResult validationResult = ValidateCheckDigit(value);
+      if (validationResult is not ValidValue)
       {
          // Could be either InvalidCharacter or InvalidCheckDigit.
          return validationResult;
       }
 
-      if (!ValidateSeparator(value))
+      if (!ValidateSeparators(value, out var invalidSeparatorPosition))
       {
-         return NlBurgerservicenummerValidationResult.InvalidSeparator;
+         return new InvalidSeparator(
+            Messages.NlBurgerservicenummerInvalidSeparator,
+            value[invalidSeparatorPosition],
+            invalidSeparatorPosition);
       }
 
-      return NlBurgerservicenummerValidationResult.ValidationPassed;
+      return default(ValidValue);
    }
+
+   /// <summary>
+   ///   Gets an array of details about valid lengths accepted for a
+   ///   burgerservicenummer.
+   /// </summary>
+   /// <returns>
+   ///   An array of <see cref="ValidLengthDefinition"/>s.
+   /// </returns>
+   internal static ValidLengthDefinition[] GetValidLengthDefinitions()
+      =>
+      [
+         new ValidLengthDefinition(UnformattedLength, Messages.NlBurgerservicenummerUnformattedLength),
+         new ValidLengthDefinition(FormattedLength, Messages.NlBurgerservicenummerFormattedLength),
+      ];
 
    private static String GetRawValue(String value)
       => value.Length == UnformattedLength
@@ -283,7 +340,7 @@ public record NlBurgerservicenummer
    private static Boolean IsFormatted(ReadOnlySpan<Char> value)
       => value.Length == FormattedLength;
 
-   private static NlBurgerservicenummerValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
+   private static ValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
    {
       var sum = 0;
       var weight = 9;      // Weights applied left to right: 9, 8, 7, 6, 5, 4, 3, 2
@@ -300,7 +357,10 @@ public record NlBurgerservicenummer
          var num = value[index] - Chars.DigitZero;
          if (!num.IsValidDigit())
          {
-            return NlBurgerservicenummerValidationResult.InvalidCharacter;
+            return new InvalidCharacter(
+               Messages.NlBurgerservicenummerInvalidCharacter,
+               value[index],
+               index);
          }
 
          sum += num * weight;
@@ -310,27 +370,47 @@ public record NlBurgerservicenummer
       var checkDigit = value[^CheckDigitOffset] - Chars.DigitZero;
       if (!checkDigit.IsValidDigit())
       {
-         return NlBurgerservicenummerValidationResult.InvalidCharacter;
+         return new InvalidCharacter(
+            Messages.NlBurgerservicenummerInvalidCharacter,
+            value[^CheckDigitOffset],
+            value.Length - CheckDigitOffset);
       }
 
       sum -= checkDigit;      // Check digit weight = -1
 
       return sum % 11 == 0
-         ? NlBurgerservicenummerValidationResult.ValidationPassed
-         : NlBurgerservicenummerValidationResult.InvalidCheckDigit;
+         ? default(ValidValue)
+         : new InvalidChecksum(
+            Messages.NlBurgerservicenummerInvalidCheckDigit,
+            CheckDigitAlgorithmName);
    }
 
-   private static Boolean ValidateSeparator(ReadOnlySpan<Char> value)
+   // A formatted burgerservicenummer must contain the same separator character
+   // at the expected offsets. And the separator character must be a non-digit
+   // character.
+   private static Boolean ValidateSeparators(
+      ReadOnlySpan<Char> value,
+      out Int32 invalidSeparatorPosition)
    {
+      invalidSeparatorPosition = -1;
       if (value.Length == UnformattedLength)
       {
          return true;
       }
 
-      var s1 = value[FirstSeparatorOffset];
-      var s2 = value[SecondSeparatorOffset];
+      var groupSeparator = value[FirstSeparatorOffset];
+      if (groupSeparator.IsAsciiDigit())
+      {
+         invalidSeparatorPosition = FirstSeparatorOffset;
+         return false;
+      }
+      else if (value[SecondSeparatorOffset] != groupSeparator)
+      {
+         invalidSeparatorPosition = SecondSeparatorOffset;
+         return false;
+      }
 
-      return s1 == s2 && !s1.IsAsciiDigit();
+      return true;
    }
 }
 

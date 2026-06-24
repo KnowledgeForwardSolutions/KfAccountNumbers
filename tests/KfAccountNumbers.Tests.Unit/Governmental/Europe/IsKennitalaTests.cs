@@ -30,7 +30,7 @@ public class IsKennitalaTests
          ? kennitala
          : kennitala[..6] + kennitala[7..];
 
-   private static String GetKennitalaWithValidCheckDigits(
+   private static String GetKennitalaWithValidCheckDigit(
       String dateOfBirth = "130295",
       String separator = "",
       String randomDigits = "37",
@@ -331,7 +331,7 @@ public class IsKennitalaTests
    public void IsKennitala_Constructor_ShouldCreateInstance_WhenValueHasValidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
       var expected = GetRawKennitala(value);
 
       // Act.
@@ -350,7 +350,7 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
@@ -444,7 +444,7 @@ public class IsKennitalaTests
    public void IsKennitala_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
       LocalValidationError expected = GetInvalidSeparatorResult(value);
 
       // Act/assert.
@@ -462,7 +462,7 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
@@ -505,7 +505,7 @@ public class IsKennitalaTests
       String expectedDateOfBirth)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
@@ -534,7 +534,7 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
@@ -554,7 +554,7 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
@@ -670,7 +670,7 @@ public class IsKennitalaTests
    public void IsKennitala_ExplicitCastToIsKennitala_ShouldCreateInstance_WhenValueHasValidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
       var expected = new IsKennitala(value);
 
       // Act.
@@ -688,7 +688,7 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
@@ -781,7 +781,7 @@ public class IsKennitalaTests
    public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
       LocalValidationError expected = GetInvalidSeparatorResult(value);
 
       // Act/assert.
@@ -799,7 +799,7 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
@@ -959,7 +959,7 @@ public class IsKennitalaTests
    public void IsKennitala_Create_ShouldCreateInstance_WhenValueHasValidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
       LocalCreateResult expected = new IsKennitala(value);
 
       // Act.
@@ -977,7 +977,7 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
@@ -1071,7 +1071,7 @@ public class IsKennitalaTests
    public void IsKennitala_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
       LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value);
 
       // Act.
@@ -1089,7 +1089,7 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
@@ -1396,7 +1396,7 @@ public class IsKennitalaTests
    public void IsKennitala_Validate_ShouldReturnValidationPassed_WhenValueHasValidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
       LocalValidationResult expected = default(ValidValue);
 
       // Act.
@@ -1414,7 +1414,7 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
@@ -1476,7 +1476,7 @@ public class IsKennitalaTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void IsKennitala_Validate_ShouldReturnInvalidCheckDigit_WhenValueHasInvalidCheckDigits(String value)
+   public void IsKennitala_Validate_ShouldReturnInvalidCheckDigit_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
       LocalValidationResult expected = GetInvalidChecksumResult();
@@ -1507,7 +1507,7 @@ public class IsKennitalaTests
    public void IsKennitala_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
       LocalValidationResult expected = GetInvalidSeparatorResult(value);
 
       // Act.
@@ -1525,7 +1525,7 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
