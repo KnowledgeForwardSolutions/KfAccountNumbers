@@ -632,7 +632,7 @@ public class IsKennitalaTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -646,7 +646,7 @@ public class IsKennitalaTests
       // Act.
       var str = (String)sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }

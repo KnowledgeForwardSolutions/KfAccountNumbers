@@ -751,7 +751,7 @@ public class NoFoedselsnummerTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -765,7 +765,7 @@ public class NoFoedselsnummerTests
       // Act.
       var str = (String)sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }

@@ -86,7 +86,7 @@ public record NlBurgerservicenummer
 {
    /// <summary>
    ///   Discriminated union defining the possible validation errors that can
-   ///   occur when creating a new <see cref="IsKennitala"/>.
+   ///   occur when creating a new <see cref="NlBurgerservicenummer"/>.
    /// </summary>
    public union ValidationError(
       EmptyValue,
@@ -99,7 +99,7 @@ public record NlBurgerservicenummer
 
    /// <summary>
    ///   Discriminated union defining the possible results that can occur when
-   ///   validating a <see cref="IsKennitala"/>.
+   ///   validating a <see cref="NlBurgerservicenummer"/>.
    /// </summary>
    public union ValidationResult(
       ValidValue,
@@ -112,7 +112,7 @@ public record NlBurgerservicenummer
    }
 
    /// <summary>
-   ///   The name of the check digit algorithm used by kennitala values.
+   ///   The name of the check digit algorithm used by burgerservicenummer values.
    /// </summary>
    public const String CheckDigitAlgorithmName = "11-proef";
 
@@ -217,8 +217,8 @@ public record NlBurgerservicenummer
    ///   String representation of a Dutch burgerservicenummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{IsKennitala, ValidationError}"/>. Will
-   ///   contain the new <see cref="IsKennitala"/> if <paramref name="value"/>
+   ///   A <see cref="UCreateResult{NlBurgerservicenummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="NlBurgerservicenummer"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>

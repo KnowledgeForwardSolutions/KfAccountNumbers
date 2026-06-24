@@ -365,7 +365,7 @@ public class NlBurgerservicenummerTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -379,7 +379,7 @@ public class NlBurgerservicenummerTests
       // Act.
       var str = (String)sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -604,8 +604,8 @@ public class NlBurgerservicenummerTests
    public void NlBurgerservicenummer_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
    {
       // Arrange.
-      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace(' ', 'A'));
-      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace(' ', 'a'));
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'A'));
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'a'));
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();

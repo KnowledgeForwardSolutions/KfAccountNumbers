@@ -353,7 +353,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -367,7 +367,7 @@ public class UsIndividualTaxpayerIdentificationNumberTests
       // Act.
       var str = (String)sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
