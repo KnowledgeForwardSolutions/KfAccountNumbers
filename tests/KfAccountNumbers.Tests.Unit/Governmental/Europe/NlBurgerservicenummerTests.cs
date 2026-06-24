@@ -528,6 +528,28 @@ public class NlBurgerservicenummerTests
       (sut1 == sut2).Should().BeTrue();
    }
 
+   [Fact]
+   public void NlBurgerservicenummer_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', '.'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'A'));
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'a'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
    #endregion
 
    #region Inequality Operator Tests
@@ -562,6 +584,28 @@ public class NlBurgerservicenummerTests
       // Arrange.
       var sut1 = new NlBurgerservicenummer(ValidBurgerservicenummer);
       var sut2 = new NlBurgerservicenummer(ValidBurgerservicenummer);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', '.'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace(' ', 'A'));
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace(' ', 'a'));
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -718,6 +762,48 @@ public class NlBurgerservicenummerTests
       sut1.Equals(sut2).Should().BeTrue();
    }
 
+   [Fact]
+   public void NlBurgerservicenummer_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', '.'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'A'));
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'a'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+
+      // Act/assert.
+      sut.Equals(ValidFormattedBurgerservicenummer).Should().BeFalse();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
+   }
+
    #endregion
 
    #region Format Method Tests
@@ -827,6 +913,36 @@ public class NlBurgerservicenummerTests
       // Arrange. 9 and 11 character versions for same person should still be equal.
       var sut1 = new NlBurgerservicenummer(ValidBurgerservicenummer);
       var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', '.'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'A'));
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'a'));
 
       // Act.
       var hash1 = sut1.GetHashCode();
