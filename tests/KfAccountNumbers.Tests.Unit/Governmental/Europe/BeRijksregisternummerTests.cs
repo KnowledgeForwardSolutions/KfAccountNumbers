@@ -24,15 +24,10 @@ public class BeRijksregisternummerTests
    private const String UnknownDateOfBirthUnknownGenderBisnummer = "00 20 01 003-10";
 
    private static String GetRawRijksregisternummer(String rijksregisternummer)
-   {
-      if (rijksregisternummer.Length == 11)
-      {
-         return rijksregisternummer;
-      }
-
-      return rijksregisternummer[0..2] + rijksregisternummer[3..5] + rijksregisternummer[6..8] +
+      => rijksregisternummer.Length == 11
+         ? rijksregisternummer
+         : rijksregisternummer[0..2] + rijksregisternummer[3..5] + rijksregisternummer[6..8] +
          rijksregisternummer[9..12] + rijksregisternummer[13..];
-   }
 
    private static String GetRijksregisternummerWithValidCheckDigits(
       Int32 year = 1987,
