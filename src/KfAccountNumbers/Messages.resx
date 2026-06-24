@@ -546,4 +546,13 @@
   <data name="NlBurgerservicenummerFormattedLength" xml:space="preserve">
     <value>NL Burgerservicenummer formatted as NNNN-NN-NNN, where '-' may be any non-digit character (same character must be used in both locations)</value>
   </data>
+  <data name="BeRijksregisternummerUnformattedLength" xml:space="preserve">
+    <value>BE Rijksregisternummer without separator characters (YYMMDDXXXCC)</value>
+  </data>
+  <data name="BeRijksregisternummerFormattedLength" xml:space="preserve">
+    <value>BE Rijksregisternummer formatted as YY.MM.DD-XXX.CC</value>
+  </data>
+  <data name="&#x8;" xml:space="preserve">
+    <value>BE Rijksregisternummer without separator characters (YYMMDDXXXCC)</value>
+  </data>
 </root>

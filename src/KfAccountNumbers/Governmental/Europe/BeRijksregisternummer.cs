@@ -2,6 +2,7 @@
 
 #pragma warning disable IDE0250 // Make struct 'readonly'
 #pragma warning disable IDE0046 // Convert to conditional expression
+#pragma warning disable SA1025 // Code should not contain multiple whitespace in a row
 
 namespace KfAccountNumbers.Governmental.Europe;
 
@@ -209,6 +210,37 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record BeRijksregisternummer
 {
    /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="BeRijksregisternummer"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      BeRijksregisternummerInvalidSequenceNumber,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="BeRijksregisternummer"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      BeRijksregisternummerInvalidSequenceNumber,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
    ///   Represents the month offset used to distinguish BIS-nummers from
    ///   rijksregisternummers when the person's gender is known.
    /// </summary>
@@ -229,12 +261,20 @@ public record BeRijksregisternummer
    public const Int32 BisNummerUnknownGenderMonthOffset = 20;
 
    /// <summary>
-   ///   The latest year of birth supported by <see cref="BeRijksregisternummer"/>.
+   ///   The name of the check digit algorithm used by rijksregisternummer
+   ///   values.
+   /// </summary>
+   public const String CheckDigitAlgorithmName = "Modulus 97";
+
+   /// <summary>
+   ///   The latest year of birth supported by
+   ///   <see cref="BeRijksregisternummer"/>.
    /// </summary>
    public const Int32 MaximumValidYearOfBirth = 2099;
 
    /// <summary>
-   ///   The earliest year of birth supported by <see cref="BeRijksregisternummer"/>.
+   ///   The earliest year of birth supported by
+   ///   <see cref="BeRijksregisternummer"/>.
    /// </summary>
    public const Int32 MinimumValidYearOfBirth = 1900;
 
@@ -245,6 +285,14 @@ public record BeRijksregisternummer
    private const Int32 Separator2Offset = 5;
    private const Int32 Separator3Offset = 8;
    private const Int32 Separator4Offset = 12;
+
+   private static readonly Int32[] _separatorOffsets =
+   [
+      Separator1Offset,
+      Separator2Offset,
+      Separator3Offset,
+      Separator4Offset
+   ];
 
    // These items are measured from the end of the value.
    private const Int32 GenderOffset = 3;
@@ -293,10 +341,20 @@ public record BeRijksregisternummer
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         BeRijksregisternummerValidationResult validationResult = Validate(value);
-         if (validationResult != BeRijksregisternummerValidationResult.ValidationPassed)
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            throw validationResult.ToValidationException();
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               BeRijksregisternummerInvalidSequenceNumber invalidSequenceNumber => new UKfValidationException<ValidationError>(invalidSequenceNumber),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
          }
       }
 
@@ -396,20 +454,24 @@ public record BeRijksregisternummer
    ///   String representation of a Belgian rijksregisternummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{BeRijksregisternummer, BeRijksregisternummerValidationResult}"/>.
-   ///   Will contain the new <see cref="BeRijksregisternummer"/> if
-   ///   <paramref name="value"/> is valid or an
-   ///   <see cref="BeRijksregisternummerValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="value"/> is
-   ///   invalid.
+   ///   A <see cref="UCreateResult{BeRijksregisternummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="BeRijksregisternummer"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<BeRijksregisternummer, BeRijksregisternummerValidationResult> Create(String? value)
-   {
-      BeRijksregisternummerValidationResult validationResult = Validate(value);
-      return validationResult == BeRijksregisternummerValidationResult.ValidationPassed
-         ? new BeRijksregisternummer(value, validationMode: ValidationMode.BypassValidation)
-         : validationResult;
-   }
+   public static UCreateResult<BeRijksregisternummer, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new BeRijksregisternummer(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         BeRijksregisternummerInvalidSequenceNumber invalidSequenceNumber => (ValidationError)invalidSequenceNumber,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
 
    /// <summary>
    ///   Format the rijksregisternummer using the supplied <paramref name="mask"/>.
@@ -450,45 +512,84 @@ public record BeRijksregisternummer
    ///   String representation of a Belgian rijksregisternummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="BeRijksregisternummerValidationResult"/> enumeration
-   ///   value that indicates if the <paramref name="value"/> passed
-   ///   validation or what validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
-   public static BeRijksregisternummerValidationResult Validate(String? value)
+   public static ValidationResult Validate(String? value)
    {
       if (String.IsNullOrWhiteSpace(value))
       {
-         return BeRijksregisternummerValidationResult.Empty;
+         return default(EmptyValue);
       }
-      else if (value.Length is not UnformattedLength and not FormattedLength)
+
+      if (value.Length is not UnformattedLength and not FormattedLength)
       {
-         return BeRijksregisternummerValidationResult.InvalidLength;
+         return new InvalidLength(
+            Messages.BeRijksregisternummerInvalidLength,
+            value.Length,
+            GetValidLengthDefinitions());
       }
 
       // After performing basic checks, validate the check digits because the
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
-      BeRijksregisternummerValidationResult validationResult = ValidateCheckDigits(value);
-      if (validationResult != BeRijksregisternummerValidationResult.ValidationPassed)
+      ValidationResult validationResult = ValidateCheckDigits(value);
+      if (validationResult is not ValidValue)
       {
          // Could be either InvalidCharacter or InvalidCheckDigit.
          return validationResult;
       }
-      else if (!ValidateSeparators(value))
+
+      var isFormatted = IsFormatted(value);
+      if (!ValidateSeparators(value, out var invalidSeparatorPosition))
       {
-         return BeRijksregisternummerValidationResult.InvalidSeparator;
-      }
-      else if (!ValidateSequenceNumber(value))
-      {
-         return BeRijksregisternummerValidationResult.InvalidSequenceNumber;
-      }
-      else if (!ValidateDateOfBirth(value))
-      {
-         return BeRijksregisternummerValidationResult.InvalidDateOfBirth;
+         return new InvalidSeparator(
+            Messages.BeRijksregisternummerInvalidSeparator,
+            value[invalidSeparatorPosition],
+            invalidSeparatorPosition);
       }
 
-      return BeRijksregisternummerValidationResult.ValidationPassed;
+      if (!ValidateSequenceNumber(value))
+      {
+         return new BeRijksregisternummerInvalidSequenceNumber(
+            Messages.BeRijksregisternummerInvalidSequenceNumber,
+            isFormatted ? value[9..12] : value[6..9]);
+      }
+
+      if (!ValidateDateOfBirth(value))
+      {
+         var dateOfBirthLength = isFormatted ? 8 : 6;
+         return new InvalidDateOfBirth(
+            Messages.BeRijksregisternummerInvalidDateOfBirth,
+            value[..dateOfBirthLength],
+            DateFormatName.YYMMDD);
+      }
+
+      return default(ValidValue);
    }
+
+   /// <summary>
+   ///   Gets an array of details about valid lengths accepted for a
+   ///   rijksregisternummer.
+   /// </summary>
+   /// <returns>
+   ///   An array of <see cref="ValidLengthDefinition"/>s.
+   /// </returns>
+   internal static ValidLengthDefinition[] GetValidLengthDefinitions()
+      =>
+      [
+         new ValidLengthDefinition(UnformattedLength, Messages.BeRijksregisternummerUnformattedLength),
+         new ValidLengthDefinition(FormattedLength, Messages.BeRijksregisternummerFormattedLength),
+      ];
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      ReadOnlySpan<Char> value,
+      Int32 position)
+      => new(
+         Messages.BeRijksregisternummerInvalidCharacter,
+         value[position],
+         position);
 
    private static String GetRawValue(String value)
    {
@@ -567,7 +668,7 @@ public record BeRijksregisternummer
    private static Boolean IsFormatted(ReadOnlySpan<Char> value)
       => value.Length == FormattedLength;
 
-   private static BeRijksregisternummerValidationResult ValidateCheckDigits(ReadOnlySpan<Char> value)
+   private static ValidationResult ValidateCheckDigits(ReadOnlySpan<Char> value)
    {
       var processLength = value.Length - 2;      // Exclude check digits from main loop
       var isFormatted = IsFormatted(value);
@@ -585,17 +686,22 @@ public record BeRijksregisternummer
          var num = value[index].ToSingleDigit();
          if (!num.IsValidDigit())
          {
-            return BeRijksregisternummerValidationResult.InvalidCharacter;
+            return GetInvalidCharacterResult(value, index);
          }
 
          sum += num;
       }
 
       var c1 = value[^CheckDigit1Offset].ToSingleDigit();
-      var c2 = value[^CheckDigit2Offset].ToSingleDigit();
-      if (!c1.IsValidDigit() || !c2.IsValidDigit())
+      if (!c1.IsValidDigit())
       {
-         return BeRijksregisternummerValidationResult.InvalidCharacter;
+         return GetInvalidCharacterResult(value, value.Length - CheckDigit1Offset);
+      }
+
+      var c2 = value[^CheckDigit2Offset].ToSingleDigit();
+      if (!c2.IsValidDigit())
+      {
+         return GetInvalidCharacterResult(value, value.Length - CheckDigit2Offset);
       }
 
       var checkSum = (c1 * 10) + c2;
@@ -604,14 +710,16 @@ public record BeRijksregisternummer
       var remainder = 97 - (sum % 97);
       if (remainder == checkSum)
       {
-         return BeRijksregisternummerValidationResult.ValidationPassed;
+         return default(ValidValue);
       }
 
       // Then for persons born 2000-2099;
       var longRemainder = 97 - ((2000000000L + sum) % 97);           // Long int to handle possible int overflow
       return longRemainder == checkSum
-         ? BeRijksregisternummerValidationResult.ValidationPassed
-         : BeRijksregisternummerValidationResult.InvalidCheckDigits;
+         ? default(ValidValue)
+         : new InvalidChecksum(
+            Messages.BeRijksregisternummerInvalidCheckDigits,
+            CheckDigitAlgorithmName);
    }
 
    private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> value)
@@ -621,8 +729,8 @@ public record BeRijksregisternummer
 #pragma warning restore IDE0008 // Use explicit type
 
       // Allow zero for incomplete dates of birth.
-      if ((year > 0 && month == 0) // Incomplete date of birth
-         || (year == 0 && month == 0 && day > 0)) // Unknown date of birth
+      if ((year > 0 && month == 0)                    // Incomplete date of birth
+         || (year == 0 && month == 0 && day > 0))     // Unknown date of birth
       {
          return true;
       }
@@ -643,12 +751,27 @@ public record BeRijksregisternummer
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);
    }
 
-   private static Boolean ValidateSeparators(ReadOnlySpan<Char> value)
-      => value.Length == UnformattedLength
-         || (!value[Separator1Offset].IsAsciiDigit()
-            && !value[Separator2Offset].IsAsciiDigit()
-            && !value[Separator3Offset].IsAsciiDigit()
-            && !value[Separator4Offset].IsAsciiDigit());
+   private static Boolean ValidateSeparators(
+      ReadOnlySpan<Char> value,
+      out Int32 invalidSeparatorPosition)
+   {
+      invalidSeparatorPosition = -1;
+      if (value.Length == UnformattedLength)
+      {
+         return true;
+      }
+
+      foreach (var offset in _separatorOffsets)
+      {
+         if (value[offset].IsAsciiDigit())
+         {
+            invalidSeparatorPosition = offset;
+            return false;
+         }
+      }
+
+      return true;
+   }
 
    private static Boolean ValidateSequenceNumber(ReadOnlySpan<Char> value)
    {

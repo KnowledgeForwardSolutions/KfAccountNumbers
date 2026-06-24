@@ -354,7 +354,7 @@ public record NlBurgerservicenummer
             continue;
          }
 
-         var num = value[index] - Chars.DigitZero;
+         var num = value[index].ToSingleDigit();
          if (!num.IsValidDigit())
          {
             return new InvalidCharacter(
@@ -367,7 +367,7 @@ public record NlBurgerservicenummer
          weight--;
       }
 
-      var checkDigit = value[^CheckDigitOffset] - Chars.DigitZero;
+      var checkDigit = value[^CheckDigitOffset].ToSingleDigit();
       if (!checkDigit.IsValidDigit())
       {
          return new InvalidCharacter(
