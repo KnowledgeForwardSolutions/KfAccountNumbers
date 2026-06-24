@@ -502,7 +502,7 @@ public class DkPersonnummerTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -516,7 +516,7 @@ public class DkPersonnummerTests
       // Act.
       var str = (String)sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }

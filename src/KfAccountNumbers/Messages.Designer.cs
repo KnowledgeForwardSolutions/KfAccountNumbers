@@ -925,6 +925,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NL Burgerservicenummer formatted as NNNN-NN-NNN, where &apos;-&apos; may be any non-digit character (same character must be used in both locations).
+        /// </summary>
+        internal static string NlBurgerservicenummerFormattedLength {
+            get {
+                return ResourceManager.GetString("NlBurgerservicenummerFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to NL Burgerservicenummer contains a non-digit character where a digit was expected.
         /// </summary>
         internal static string NlBurgerservicenummerInvalidCharacter {
@@ -957,6 +966,15 @@ namespace KfAccountNumbers {
         internal static string NlBurgerservicenummerInvalidSeparator {
             get {
                 return ResourceManager.GetString("NlBurgerservicenummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NL Burgerservicenummer without separator characters (NNNNNNNNN).
+        /// </summary>
+        internal static string NlBurgerservicenummerUnformattedLength {
+            get {
+                return ResourceManager.GetString("NlBurgerservicenummerUnformattedLength", resourceCulture);
             }
         }
         

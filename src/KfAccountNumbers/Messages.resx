@@ -540,4 +540,10 @@
   <data name="FiHenkilotunnusValidLength" xml:space="preserve">
     <value>FI Henkilotunnus should be 11 characters (including century indicator)</value>
   </data>
+  <data name="NlBurgerservicenummerUnformattedLength" xml:space="preserve">
+    <value>NL Burgerservicenummer without separator characters (NNNNNNNNN)</value>
+  </data>
+  <data name="NlBurgerservicenummerFormattedLength" xml:space="preserve">
+    <value>NL Burgerservicenummer formatted as NNNN-NN-NNN, where '-' may be any non-digit character (same character must be used in both locations)</value>
+  </data>
 </root>

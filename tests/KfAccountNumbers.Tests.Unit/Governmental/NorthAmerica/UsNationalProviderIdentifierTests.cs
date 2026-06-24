@@ -231,7 +231,7 @@ public class UsNationalProviderIdentifierTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -245,7 +245,7 @@ public class UsNationalProviderIdentifierTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
