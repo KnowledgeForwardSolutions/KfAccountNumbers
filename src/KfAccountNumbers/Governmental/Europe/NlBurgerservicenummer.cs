@@ -1,5 +1,8 @@
 // Ignore Spelling: Burgerservicenummer Json
 
+#pragma warning disable IDE0250 // Make struct 'readonly'
+#pragma warning disable IDE0046 // Convert to conditional expression
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -41,22 +44,23 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The value must be either 9 characters (without separators) or 11
-///               characters (with separators) in length.
+///               The value must be either 9 characters (without separators) or
+///               11 characters (with separators) in length.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               All characters (except the optional separator characters) must be
-///               ASCII digits ('0'-'9').
+///               All characters (except the optional separator characters) must
+///               be ASCII digits ('0'-'9').
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
 ///               If the length of the value is 11 characters, then character
-///               positions 4 and 7 (zero-based) must be valid separator characters.
-///               Valid separator characters are any non-ASCII digit characters.
-///               The same character must be used for both separator characters.
+///               positions 4 and 7 (zero-based) must be valid separator
+///               characters. Valid separator characters are any non-ASCII digit
+///               characters. The same character must be used for both separator
+///               characters.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -73,12 +77,18 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      normally used for modulus 11 check digits.
 ///   </para>
 ///   <para>
-///      See https://nl.wikipedia.org/wiki/Burgerservicenummer (Dutch) for more info.
+///      See https://nl.wikipedia.org/wiki/Burgerservicenummer (Dutch) for more
+///      info.
 ///   </para>
 /// </remarks>
 [JsonConverter(typeof(NlBurgerservicenummerJsonConverter))]
 public record NlBurgerservicenummer
 {
+   /// <summary>
+   ///   The name of the check digit algorithm used by kennitala values.
+   /// </summary>
+   public const String CheckDigitAlgorithmName = "11-proef";
+
    private const Int32 UnformattedLength = 9;
    private const Int32 FormattedLength = 11;
 
@@ -88,87 +98,108 @@ public record NlBurgerservicenummer
    private const Int32 CheckDigitOffset = 1;    // Measured from end of value
 
    /// <summary>
-   ///   Initialize a new instance of the <see cref="NlBurgerservicenummer"/> class.
+   ///   Initializes a new instance of the <see cref="NlBurgerservicenummer"/>
+   ///   class.
    /// </summary>
-   /// <param name="burgerservicenummer">
+   /// <param name="value">
    ///   String representation of a Dutch burgerservicenummer.
    /// </param>
    /// <exception cref="KfValidationException{NlBurgerservicenummerValidationResult}">
-   ///   <paramref name="burgerservicenummer"/> is <see langword="null"/>, empty or all 
-   ///   whitespace characters.
+   ///   <paramref name="value"/> is <see langword="null"/>, empty
+   ///   or all whitespace characters.
    ///   - or -
-   ///   <paramref name="burgerservicenummer"/> is not length 9 (or 11 if a separator
-   ///   character is used).
+   ///   <paramref name="value"/> is not length 9 (or 11 if a
+   ///   separator character is used).
    ///   - or -
-   ///   <paramref name="burgerservicenummer"/> contains a non-digit character in
-   ///   any position other than the separator locations.
+   ///   <paramref name="value"/> contains a non-digit character
+   ///   in any position other than the separator locations.
    ///   - or -
-   ///   <paramref name="burgerservicenummer"/> is 11 characters in length and has an
-   ///   ASCII digit ('0'-'9') in a separator location
+   ///   <paramref name="value"/> is 11 characters in length and
+   ///   has an ASCII digit ('0'-'9') in a separator location
    ///   - or -
-   ///   <paramref name="burgerservicenummer"/> is 11 characters in length and has
-   ///   two different separator characters.
+   ///   <paramref name="value"/> is 11 characters in length and
+   ///   has two different separator characters.
    ///   - or -
-   ///   <paramref name="burgerservicenummer"/> contains an invalid modulus 11 (11-proef)
-   ///   check digit in the trailing (right-most) character position.
+   ///   <paramref name="value"/> contains an invalid modulus 11
+   ///   (11-proef) check digit in the trailing (right-most) character position.
    /// </exception>
-   public NlBurgerservicenummer(String? burgerservicenummer)
-      : this(burgerservicenummer, ValidationMode.ValidationRequired) { }
+   public NlBurgerservicenummer(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports bypassing
-   ///   validation when creating a new instance from a value that has already
-   ///   been validated.
+   ///   Initializes a new instance of the <see cref="NlBurgerservicenummer"/>
+   ///   class.
    /// </summary>
-   private NlBurgerservicenummer(String? burgerservicenummer, ValidationMode validationMode)
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private NlBurgerservicenummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         NlBurgerservicenummerValidationResult validationResult = Validate(burgerservicenummer);
+         NlBurgerservicenummerValidationResult validationResult = Validate(value);
          if (validationResult != NlBurgerservicenummerValidationResult.ValidationPassed)
          {
             throw validationResult.ToValidationException();
          }
       }
 
-      Value = GetRawValue(burgerservicenummer!);
+      Value = GetRawValue(value!);
    }
 
    /// <summary>
-   ///   The raw burgerservicenummer value.
+   ///   Gets the raw burgerservicenummer value.
    /// </summary>
    public String Value { get; private init; }
 
-   public static implicit operator String(NlBurgerservicenummer burgerservicenummer)
-      => burgerservicenummer?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+   /// <summary>
+   ///   Implicitly converts a <see cref="NlBurgerservicenummer"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="NlBurgerservicenummer"/> to convert.
+   /// </param>
+   public static implicit operator String(NlBurgerservicenummer source)
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
 
-   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
-   public static explicit operator NlBurgerservicenummer(String? burgerservicenummer) => new(burgerservicenummer);
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="NlBurgerservicenummer"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Dutch burgerservicenummer.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid burgerservicenummer.
+   /// </exception>
+   public static explicit operator NlBurgerservicenummer(String? value) => new(value);
 
    /// <summary>
    ///   Create a new <see cref="NlBurgerservicenummer"/> using the Result pattern.
    /// </summary>
-   /// <param name="burgerservicenummer">
+   /// <param name="value">
    ///   String representation of a Dutch burgerservicenummer.
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{NlBurgerservicenummer, NlBurgerservicenummerValidationResult}"/>.
-   ///   Will contain the new <see cref="NlBurgerservicenummer"/> if 
-   ///   <paramref name="burgerservicenummer"/> is valid or an
+   ///   Will contain the new <see cref="NlBurgerservicenummer"/> if
+   ///   <paramref name="value"/> is valid or an
    ///   <see cref="NlBurgerservicenummerValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="burgerservicenummer"/> is 
+   ///   the validation rule that was failed if <paramref name="value"/> is
    ///   invalid.
    /// </returns>
-   public static CreateResult<NlBurgerservicenummer, NlBurgerservicenummerValidationResult> Create(String? burgerservicenummer)
+   public static CreateResult<NlBurgerservicenummer, NlBurgerservicenummerValidationResult> Create(String? value)
    {
-      NlBurgerservicenummerValidationResult validationResult = Validate(burgerservicenummer);
+      NlBurgerservicenummerValidationResult validationResult = Validate(value);
       return validationResult == NlBurgerservicenummerValidationResult.ValidationPassed
-         ? new NlBurgerservicenummer(burgerservicenummer, validationMode: ValidationMode.BypassValidation)
+         ? new NlBurgerservicenummer(value, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
    /// <summary>
-   ///   Format the burgerservicenummer using the supplied <paramref name="mask"/>.
+   ///   Format the burgerservicenummer using the supplied
+   ///   <paramref name="mask"/>.
    /// </summary>
    /// <param name="mask">
    ///   Optional. The mask that specifies the final output. If not supplied
@@ -193,30 +224,31 @@ public record NlBurgerservicenummer
    /// <summary>
    ///   Get a string representation of the burgerservicenummer.
    /// </summary>
-   /// <remarks>
-   ///   Will return the raw burgerservicenummer, without separator characters.
-   /// </remarks>
+   /// <returns>
+   ///   The raw burgerservicenummer, without separator characters.
+   /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="burgerservicenummer"/> to determine if it contains a
-   ///   valid Dutch burgerservicenummer.
+   ///   Check the <paramref name="value"/> to determine if it
+   ///   contains a valid Dutch burgerservicenummer.
    /// </summary>
-   /// <param name="burgerservicenummer">
+   /// <param name="value">
    ///   String representation of a Dutch burgerservicenummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="NlBurgerservicenummerValidationResult"/> enumeration 
-   ///   value that indicates if the <paramref name="burgerservicenummer"/> passed
-   ///   validation or what validation error was encountered.
+   ///   A <see cref="NlBurgerservicenummerValidationResult"/> enumeration
+   ///   value that indicates if the <paramref name="value"/>
+   ///   passed validation or what validation error was encountered.
    /// </returns>
-   public static NlBurgerservicenummerValidationResult Validate(String? burgerservicenummer)
+   public static NlBurgerservicenummerValidationResult Validate(String? value)
    {
-      if (String.IsNullOrWhiteSpace(burgerservicenummer))
+      if (String.IsNullOrWhiteSpace(value))
       {
          return NlBurgerservicenummerValidationResult.Empty;
       }
-      else if (burgerservicenummer.Length is not UnformattedLength and not FormattedLength)
+
+      if (value.Length is not UnformattedLength and not FormattedLength)
       {
          return NlBurgerservicenummerValidationResult.InvalidLength;
       }
@@ -224,59 +256,59 @@ public record NlBurgerservicenummer
       // After performing basic checks, validate the check digit because the
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
-      NlBurgerservicenummerValidationResult validationResult = ValidateCheckDigit(burgerservicenummer);
+      NlBurgerservicenummerValidationResult validationResult = ValidateCheckDigit(value);
       if (validationResult != NlBurgerservicenummerValidationResult.ValidationPassed)
       {
          // Could be either InvalidCharacter or InvalidCheckDigit.
          return validationResult;
       }
-      else if (!ValidateSeparator(burgerservicenummer))
+
+      if (!ValidateSeparator(value))
       {
          return NlBurgerservicenummerValidationResult.InvalidSeparator;
       }
 
-
       return NlBurgerservicenummerValidationResult.ValidationPassed;
    }
 
-   private static String GetRawValue(String burgerservicenummer)
-      => burgerservicenummer.Length == UnformattedLength
-         ? burgerservicenummer
+   private static String GetRawValue(String value)
+      => value.Length == UnformattedLength
+         ? value
          : String.Concat(
-            burgerservicenummer.AsSpan(0, FirstSeparatorOffset),
-            burgerservicenummer.AsSpan(FirstSeparatorOffset + 1, 2),
-            burgerservicenummer.AsSpan(SecondSeparatorOffset + 1));
+            value.AsSpan(0, FirstSeparatorOffset),
+            value.AsSpan(FirstSeparatorOffset + 1, 2),
+            value.AsSpan(SecondSeparatorOffset + 1));
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static Boolean IsFormatted(ReadOnlySpan<Char> burgerservicenummer)
-      => burgerservicenummer.Length == FormattedLength;
+   private static Boolean IsFormatted(ReadOnlySpan<Char> value)
+      => value.Length == FormattedLength;
 
-   private static NlBurgerservicenummerValidationResult ValidateCheckDigit(ReadOnlySpan<Char> burgerservicenummer)
+   private static NlBurgerservicenummerValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
    {
       var sum = 0;
       var weight = 9;      // Weights applied left to right: 9, 8, 7, 6, 5, 4, 3, 2
-      var isFormatted = IsFormatted(burgerservicenummer);
-      var processLength = burgerservicenummer.Length - 1;      // Handle check digit separately
+      var isFormatted = IsFormatted(value);
+      var processLength = value.Length - 1;      // Handle check digit separately
 
-      for (var index = 0; index < processLength; index ++)
+      for (var index = 0; index < processLength; index++)
       {
-         if (isFormatted && (index == FirstSeparatorOffset || index == SecondSeparatorOffset))
+         if (isFormatted && (index is FirstSeparatorOffset or SecondSeparatorOffset))
          {
             continue;
          }
 
-         var num = burgerservicenummer[index] - Chars.DigitZero;
-         if (num < 0 || num > 9)
+         var num = value[index] - Chars.DigitZero;
+         if (!num.IsValidDigit())
          {
             return NlBurgerservicenummerValidationResult.InvalidCharacter;
          }
 
-         sum += (num * weight);
+         sum += num * weight;
          weight--;
       }
 
-      var checkDigit = burgerservicenummer[^CheckDigitOffset] - Chars.DigitZero;
-      if (checkDigit < 0 || checkDigit > 9)
+      var checkDigit = value[^CheckDigitOffset] - Chars.DigitZero;
+      if (!checkDigit.IsValidDigit())
       {
          return NlBurgerservicenummerValidationResult.InvalidCharacter;
       }
@@ -288,20 +320,22 @@ public record NlBurgerservicenummer
          : NlBurgerservicenummerValidationResult.InvalidCheckDigit;
    }
 
-   private static Boolean ValidateSeparator(ReadOnlySpan<Char> burgerservicenummer)
+   private static Boolean ValidateSeparator(ReadOnlySpan<Char> value)
    {
-      if (burgerservicenummer.Length == UnformattedLength)
+      if (value.Length == UnformattedLength)
       {
          return true;
       }
 
-      var s1 = burgerservicenummer[FirstSeparatorOffset];
-      var s2 = burgerservicenummer[SecondSeparatorOffset];
+      var s1 = value[FirstSeparatorOffset];
+      var s2 = value[SecondSeparatorOffset];
 
       return s1 == s2 && !s1.IsAsciiDigit();
    }
 }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class NlBurgerservicenummerJsonConverter : JsonConverter<NlBurgerservicenummer>
 {
    public override NlBurgerservicenummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
