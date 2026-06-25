@@ -26,9 +26,9 @@ public class BeRijksregisternummerTests
    private const String AltValidUnformattedBisnummer = "17510804640";
    private const String ValidFormattedBisnummer = "01.43.08-016.95";
    private const String AltValidFormattedBisnummer = "17.51.08-046.40";
-   private const String IncompleteDateOfBirthFormattedBisnummer = "01 40 00 955-54";               // 2001
+   private const String IncompleteDateOfBirthFormattedBisnummer = "01 40 00 955-54";                // 2001
    private const String UnknownDateOfBirthFormattedBisnummer = "00 40 01 003-53";
-   private const String IncompleteDateOfBirthUnknownGenderFormattedBisnummer = "01 20 00 955-11";  // 2001
+   private const String IncompleteDateOfBirthUnknownGenderFormattedBisnummer = "01 20 00 955-11";   // 2001
    private const String UnknownDateOfBirthUnknownGenderFormattedBisnummer = "00 20 01 003-10";
 
    private static String GetRawRijksregisternummer(String rijksregisternummer)
