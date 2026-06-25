@@ -7,8 +7,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A French INSEE number is a 15-digit number structured as SYYMMLLOOOKKKCC
-///      with the following elements:
+///      A French INSEE number is a 15-digit number structured as
+///      SYYMMLLOOOKKKCC with the following elements:
 ///      <list type="bullet">
 ///         <item>
 ///            <term>S</term>
@@ -42,23 +42,24 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <term>KKK</term>
 ///            <description>
-///               Three digits used to distinguish between people born in the same
-///               year/month/department/commune.
+///               Three digits used to distinguish between people born in the
+///               same year/month/department/commune.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>CC</term>
 ///            <description>
-///               Two-digit modulus 97 check sum calculated for the preceding 13 digits.
-///               When calculating the checksum, department code "2A" is replaced by 19,
-///               and department code "2B" is replaced by 18.
+///               Two-digit modulus 97 check sum calculated for the preceding 13
+///               digits. When calculating the checksum, department code "2A" is
+///               replaced by 19, and department code "2B" is replaced by 18.
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
-///      An INSEE number may be formatted as 15 consecutive digits or as 21 characters
-///      with spaces separating the different elements, i.e. "S YY MM LL OOO KKK CC".
+///      An INSEE number may be formatted as 15 consecutive digits or as 21
+///      characters with spaces separating the different elements, i.e.
+///      "S YY MMLL OOO KKK CC".
 ///   </para>
 ///   <para>
 ///      When creating a new <see cref="FrInseeNumber"/>, the following
@@ -71,26 +72,26 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The value must be either 15 characters (without separators) or 21
-///               characters (with separators) in length.
+///               The value must be either 15 characters (without separators) or
+///               21 characters (with separators) in length.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///              All characters (except the optional separator characters or Corsican
-///              department codes) must be ASCII digits ('0'-'9').
+///              All characters (except the optional separator characters or
+///              Corsican department codes) must be ASCII digits ('0'-'9').
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               The two trailing (right-most) characters must be a valid modulus 97
-///               check sum.
+///               The two trailing (right-most) characters must be a valid
+///               modulus 97 check sum.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               The separator characters (if used) may not be ASCII digits ('0'-'9').
-///               All separator characters must be the same character.
+///               The separator characters (if used) may not be ASCII digits
+///               ('0'-'9'). All separator characters must be the same character.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -100,16 +101,17 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The month element (MM) must be a number between 01 and 12 (for known
-///               dates) or 13, 20-42, 50-99 (for persons with unknown or incomplete date
-///               of birth documentation).
+///               The month element (MM) must be a number between 01 and 12 (for
+///               known dates) or 13, 20-42, 50-99 (for persons with unknown or
+///               incomplete date of birth documentation).
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               The COG element (LLOOO) must start with a valid department code, or
-///               99 for persons born abroad.  For departments with alphabetic characters
-///               (Corsica 2A, 2B), the alphabetic character must be uppercase.
+///               The COG element (LLOOO) must start with a valid department
+///               code, or 99 for persons born abroad.  For departments with
+///               alphabetic characters (Corsica 2A, 2B), the alphabetic
+///               character must be uppercase.
 ///            </description>
 ///         </item>
 ///      </list>
@@ -120,25 +122,29 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <term>188121884813236</term>
 ///            <description>
-///               gender = male, year of birth = 88, month of birth = 12, department = 18 (Cher)
+///               gender = male, year of birth = 88, month of birth = 12,
+///               department = 18 (Cher)
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>255102445387701</term>
 ///            <description>
-///               gender = female, year of birth = 55, month of birth = 10, department = 24 (Dordogne)
+///               gender = female, year of birth = 55, month of birth = 10,
+///               department = 24 (Dordogne)
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>112072A28806058</term>
 ///            <description>
-///               gender = male, year of birth = 12, month of birth = 07, department = 2A (Corse-du-Sud)
+///               gender = male, year of birth = 12, month of birth = 07,
+///               department = 2A (Corse-du-Sud)
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>821099901013371</term>
 ///            <description>
-///               temporary INSEE, gender = female, year of birth = 21, month of birth = 09, department = 99 (born abroad)
+///               temporary INSEE, gender = female, year of birth = 21,
+///               month of birth = 09, department = 99 (born abroad)
 ///            </description>
 ///         </item>
 ///      </list>
@@ -181,64 +187,67 @@ public record FrInseeNumber
    private const String BornAbroadDepartment = "99";
 
    /// <summary>
-   ///   Initialize a new instance of the <see cref="FrInseeNumber"/> class.
+   ///   Initializes a new instance of the <see cref="FrInseeNumber"/> class.
    /// </summary>
-   /// <param name="insee">
+   /// <param name="value">
    ///   String representation of a French INSEE number.
    /// </param>
-   /// <exception cref="KfValidationException{FrInseeNumberValidationResult}">
-   ///   <paramref name="insee"/> is <see langword="null"/>, empty or all 
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
-   ///   <paramref name="insee"/> is not length 15 (or 21 if separator
+   ///   <paramref name="value"/> is not length 15 (or 21 if separator
    ///   characters are used).
    ///   - or -
-   ///   <paramref name="insee"/> contains a non-digit character in
+   ///   <paramref name="value"/> contains a non-digit character in
    ///   any position other than the separator locations. (Exception: Corsican
    ///   departments - 2A and 2B.)
    ///   - or -
-   ///   <paramref name="insee"/> has invalid modulus 97 check digit
+   ///   <paramref name="value"/> has invalid modulus 97 check digit
    ///   characters in the trailing (right-most) character positions.
    ///   - or -
-   ///   <paramref name="insee"/> is 21 characters in length and has
+   ///   <paramref name="value"/> is 21 characters in length and has
    ///   an ASCII digit character ('0'-'9') in a separator location or does not
    ///   use the same separator character in each location.
    ///   - or -
-   ///   <paramref name="insee"/> contains an invalid gender value. Valid gender
+   ///   <paramref name="value"/> contains an invalid gender value. Valid gender
    ///   values are 1 (male) and 2 (female) or 7 (male) and 8 (female) for
    ///   temporary INSEE numbers.
    ///   - or -
-   ///   <paramref name="insee"/> contains an invalid value for month of birth.
+   ///   <paramref name="value"/> contains an invalid value for month of birth.
    ///   Valid values for month of birth are 01-12 (for known dates of birth)
    ///   and 13, 20-42, 50-99 for persons with unknown or incomplete date of
    ///   birth documentation.
    ///   - or -
-   ///   <paramref name="insee"/> contains an invalid department code.
+   ///   <paramref name="value"/> contains an invalid department code.
    /// </exception>
-   public FrInseeNumber(String? insee)
-      : this(insee, ValidationMode.ValidationRequired) { }
+   public FrInseeNumber(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports bypassing
-   ///   validation when creating a new instance from a value that has already
-   ///   been validated.
+   ///   Initializes a new instance of the <see cref="FrInseeNumber"/> class.
    /// </summary>
-   private FrInseeNumber(String? insee, ValidationMode validationMode)
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private FrInseeNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         FrInseeNumberValidationResult validationResult = Validate(insee);
+         FrInseeNumberValidationResult validationResult = Validate(value);
          if (validationResult != FrInseeNumberValidationResult.ValidationPassed)
          {
             throw validationResult.ToValidationException();
          }
       }
 
-      Value = GetRawValue(insee!);
+      Value = GetRawValue(value!);
    }
 
    /// <summary>
-   ///   Get the person's integer month of birth.
+   ///   Gets the person's integer month of birth.
    /// </summary>
    /// <remarks>
    ///   Birth month is normally 1-12, but may be other values for persons with
@@ -248,13 +257,13 @@ public record FrInseeNumber
    public Int32 BirthMonth => Value.AsSpan(UnformattedMonthOffset..).ParseTwoDigits();
 
    /// <summary>
-   ///   Get the person's two digit year of birth (0-99).
+   ///   Gets the person's two digit year of birth (0-99).
    /// </summary>
    public Int32 BirthYear => Value.AsSpan(UnformattedYearOffset..).ParseTwoDigits();
 
    /// <summary>
-   ///   The five-digit INSEE COG (Code officiel géographique) identifying the
-   ///   person's department and commune of birth.
+   ///   Gets the five-digit INSEE COG (Code officiel géographique) identifying
+   ///   the person's department and commune of birth.
    /// </summary>
    /// <remarks>
    ///   The COG is the combination of department and commune of birth. There
@@ -262,19 +271,20 @@ public record FrInseeNumber
    ///   <list type="bullet">
    ///      <item>
    ///         <description>
-   ///            For persons born in metropolitan France, 2-digit department + 3-digit
-   ///            commune (including Corsican departments 2A and 2B).
+   ///            For persons born in metropolitan France, 2-digit department +
+   ///            3-digit commune (including Corsican departments 2A and 2B).
    ///         </description>
    ///      </item>
    ///      <item>
    ///         <description>
-   ///            For persons born in overseas departments, 3-digit department + 2-digit commune.
+   ///            For persons born in overseas departments, 3-digit department +
+   ///            2-digit commune.
    ///         </description>
    ///      </item>
    ///      <item>
    ///         <description>
-   ///            For persons born abroad, fixed 2-digit department of 99 + three-digit
-   ///            ISO 3166-1 country code.
+   ///            For persons born abroad, fixed 2-digit department of 99 +
+   ///            three-digit ISO 3166-1 country code.
    ///         </description>
    ///      </item>
    ///   </list>
@@ -282,17 +292,17 @@ public record FrInseeNumber
    public String Cog => Value[UnformattedDepartmentOffset..UnformattedSequenceOffset];
 
    /// <summary>
-   ///   Get the INSEE code for the department where the person was born, as
+   ///   Gets the INSEE code for the department where the person was born, as
    ///   encoded in the INSEE number.
    /// </summary>
    public String Department
    {
       get
       {
-         var endOffset =UnformattedCommuneOffset;
+         var endOffset = UnformattedCommuneOffset;
          if (Value.AsSpan(UnformattedDepartmentOffset..endOffset).Equals(OverseasDepartmentPrefix, StringComparison.OrdinalIgnoreCase))
          {
-            endOffset ++;
+            endOffset++;
             return Value[UnformattedDepartmentOffset..endOffset];
          }
 
@@ -302,8 +312,8 @@ public record FrInseeNumber
    }
 
    /// <summary>
-   ///   The person's gender, as indicated by the leading (left-most) digit in
-   ///   the INSEE number.
+   ///   Gets the person's gender, as indicated by the leading (left-most) digit
+   ///   in the INSEE number.
    /// </summary>
    public BinaryGender Gender
       => Value[GenderOffset] switch
@@ -312,11 +322,13 @@ public record FrInseeNumber
          Chars.DigitTwo => BinaryGender.Female,
          Chars.DigitSeven => BinaryGender.Male,
          Chars.DigitEight => BinaryGender.Female,
-         _ => throw new InvalidOperationException()      // Validation during construction ensures this can never be reached
+         _ => throw new InvalidOperationException(),      // Validation during construction ensures this can never be reached
       };
 
    /// <summary>
-   ///   Indicates if the person was born abroad.
+   ///   Gets a value indicating whether the person was born abroad.
+   ///   <see langword="true"/> if the person was born abroad; otherwise
+   ///   <see langword="false"/>.
    /// </summary>
    /// <remarks>
    ///   Persons born abroad have a fixed department code of "99".
@@ -325,7 +337,9 @@ public record FrInseeNumber
       => Value.AsSpan(UnformattedDepartmentOffset..UnformattedCommuneOffset).Equals(BornAbroadDepartment, StringComparison.OrdinalIgnoreCase);
 
    /// <summary>
-   ///   Indicates if this INSEE number is temporary or permanent.
+   ///   Gets a value indicating whether this INSEE number is temporary or
+   ///   permanent. <see langword="true"/> if this INSEE is temporary; otherwise
+   ///   <see langword="false"/>.
    /// </summary>
    /// <remarks>
    ///   Permanent INSEE numbers use gender codes '1' or '2' while temporary
@@ -338,38 +352,53 @@ public record FrInseeNumber
          Chars.DigitTwo => false,
          Chars.DigitSeven => true,
          Chars.DigitEight => true,
-         _ => throw new InvalidOperationException()      // Validation during construction ensures this can never be reached
+         _ => throw new InvalidOperationException(),     // Validation during construction ensures this can never be reached
       };
 
    /// <summary>
-   ///   The raw INSEE number.
+   ///   Gets the raw INSEE number.
    /// </summary>
    public String Value { get; private init; }
 
-   public static implicit operator String(FrInseeNumber insee)
-      => insee?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+   /// <summary>
+   ///   Implicitly converts a <see cref="FrInseeNumber"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="FrInseeNumber"/> to convert.
+   /// </param>
+   public static implicit operator String(FrInseeNumber source)
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
 
-   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
-   public static explicit operator FrInseeNumber(String? insee) => new(insee);
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="FrInseeNumber"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a French INSEE number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid INSEE number.
+   /// </exception>
+   public static explicit operator FrInseeNumber(String? value) => new(value);
 
    /// <summary>
    ///   Create a new <see cref="FrInseeNumber"/> using the Result pattern.
    /// </summary>
-   /// <param name="insee">
+   /// <param name="value">
    ///   String representation of a French INSEE number.
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{FrInseeNumber, FrInseeNumberValidationResult}"/>.
-   ///   Will contain the new <see cref="FrInseeNumber"/> if 
-   ///   <paramref name="insee"/> is valid or an <see cref="FrInseeNumber"/> that
-   ///   identifies the validation rule that was failed if <paramref name="insee"/>
+   ///   Will contain the new <see cref="FrInseeNumber"/> if
+   ///   <paramref name="value"/> is valid or an <see cref="FrInseeNumber"/> that
+   ///   identifies the validation rule that was failed if <paramref name="value"/>
    ///   is invalid.
    /// </returns>
-   public static CreateResult<FrInseeNumber, FrInseeNumberValidationResult> Create(String? insee)
+   public static CreateResult<FrInseeNumber, FrInseeNumberValidationResult> Create(String? value)
    {
-      FrInseeNumberValidationResult validationResult = Validate(insee);
+      FrInseeNumberValidationResult validationResult = Validate(value);
       return validationResult == FrInseeNumberValidationResult.ValidationPassed
-         ? new FrInseeNumber(insee, validationMode: ValidationMode.BypassValidation)
+         ? new FrInseeNumber(value, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
@@ -399,30 +428,30 @@ public record FrInseeNumber
    /// <summary>
    ///   Get a string representation of the INSEE number.
    /// </summary>
-   /// <remarks>
-   ///   Will return the raw INSEE number, without  separator characters.
-   /// </remarks>
+   /// <returns>
+   ///   The raw INSEE number, without  separator characters.
+   /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="insee"/> to determine if it contains a
+   ///   Check the <paramref name="value"/> to determine if it contains a
    ///   valid French INSEE number.
    /// </summary>
-   /// <param name="insee">
+   /// <param name="value">
    ///   String representation of a French INSEE number.
    /// </param>
    /// <returns>
-   ///   A <see cref="FrInseeNumberValidationResult"/> enumeration 
-   ///   value that indicates if the <paramref name="insee"/> passed
+   ///   A <see cref="FrInseeNumberValidationResult"/> enumeration
+   ///   value that indicates if the <paramref name="value"/> passed
    ///   validation or what validation error was encountered.
    /// </returns>
-   public static FrInseeNumberValidationResult Validate(String? insee)
+   public static FrInseeNumberValidationResult Validate(String? value)
    {
-      if (String.IsNullOrWhiteSpace(insee))
+      if (String.IsNullOrWhiteSpace(value))
       {
          return FrInseeNumberValidationResult.Empty;
       }
-      else if (insee.Length is not UnformattedLength and not FormattedLength)
+      else if (value.Length is not UnformattedLength and not FormattedLength)
       {
          return FrInseeNumberValidationResult.InvalidLength;
       }
@@ -430,25 +459,25 @@ public record FrInseeNumber
       // After performing basic checks, validate the check digits because the
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
-      FrInseeNumberValidationResult validationResult = ValidateCheckDigits(insee);
+      FrInseeNumberValidationResult validationResult = ValidateCheckDigits(value);
       if (validationResult != FrInseeNumberValidationResult.ValidationPassed)
       {
          // Could be either InvalidCharacter or InvalidCheckDigit.
          return validationResult;
       }
-      else if (!ValidateSeparators(insee))
+      else if (!ValidateSeparators(value))
       {
          return FrInseeNumberValidationResult.InvalidSeparator;
       }
-      else if (!ValidateGender(insee))
+      else if (!ValidateGender(value))
       {
          return FrInseeNumberValidationResult.InvalidGender;
       }
-      else if (!ValidateMonth(insee))
+      else if (!ValidateMonth(value))
       {
          return FrInseeNumberValidationResult.InvalidMonth;
       }
-      else if (!ValidateDepartment(insee))
+      else if (!ValidateDepartment(value))
       {
          return FrInseeNumberValidationResult.InvalidDepartment;
       }
@@ -456,17 +485,17 @@ public record FrInseeNumber
       return FrInseeNumberValidationResult.ValidationPassed;
    }
 
-   private static String GetRawValue(String insee)
+   private static String GetRawValue(String value)
    {
-      if (insee.Length == UnformattedLength)
+      if (value.Length == UnformattedLength)
       {
-         return insee;
+         return value;
       }
 
       var buffer = ArrayPool<Char>.Shared.Rent(UnformattedLength);
       try
       {
-         ReadOnlySpan<Char> source = insee.AsSpan();
+         ReadOnlySpan<Char> source = value.AsSpan();
          var span = new Span<Char>(buffer);
 
          ReadOnlySpan<Int32> segmentLengths = [1, 2, 2, 2, 3, 3, 2];
@@ -500,10 +529,10 @@ public record FrInseeNumber
       => index is Separator1Offset or Separator2Offset or Separator3Offset or
             Separator4Offset or Separator5Offset or Separator6Offset;
 
-   private static FrInseeNumberValidationResult ValidateCheckDigits(ReadOnlySpan<Char> insee)
+   private static FrInseeNumberValidationResult ValidateCheckDigits(ReadOnlySpan<Char> value)
    {
-      var processLength = insee.Length - 2;      // Exclude check digits from main loop
-      var isFormatted = IsFormatted(insee);
+      var processLength = value.Length - 2;      // Exclude check digits from main loop
+      var isFormatted = IsFormatted(value);
       var letterOffset = isFormatted ? FormattedCorsicanDepartmentLetterOffset : UnformattedCorsicanDepartmentLetterOffset;
       var corsicanOffset = 0L;
 
@@ -516,7 +545,7 @@ public record FrInseeNumber
          }
 
          sum *= 10;
-         var num = insee[index].ToSingleDigit();
+         var num = value[index].ToSingleDigit();
          if (!num.IsValidDigit())
          {
             // Handle possible valid letter character in department code (2A or 2B are valid for Corsica).
@@ -530,11 +559,11 @@ public record FrInseeNumber
             // department character if the department code starts with 2.
             if (index == letterOffset)
             {
-               corsicanOffset = insee[index] switch
+               corsicanOffset = value[index] switch
                {
                   Chars.UpperCaseA => 1000000,
                   Chars.UpperCaseB => 2000000,
-                  _ => 0L                          // Not a valid Corsican department code
+                  _ => 0L,                         // Not a valid Corsican department code
                };
             }
 
@@ -554,12 +583,13 @@ public record FrInseeNumber
       sum -= corsicanOffset;
       var remainder = 97 - (sum % 97);
 
-      var c1 = insee[^CheckDigit1Offset].ToSingleDigit();
-      var c2 = insee[^CheckDigit2Offset].ToSingleDigit();
+      var c1 = value[^CheckDigit1Offset].ToSingleDigit();
+      var c2 = value[^CheckDigit2Offset].ToSingleDigit();
       if (!c1.IsValidDigit() || !c2.IsValidDigit())
       {
          return FrInseeNumberValidationResult.InvalidCharacter;
       }
+
       var checkSum = (c1 * 10) + c2;
 
       return checkSum == remainder
@@ -567,14 +597,14 @@ public record FrInseeNumber
          : FrInseeNumberValidationResult.InvalidCheckDigits;
    }
 
-   private static Boolean ValidateDepartment(ReadOnlySpan<Char> insee)
+   private static Boolean ValidateDepartment(ReadOnlySpan<Char> value)
    {
-      var start = IsFormatted(insee)
+      var start = IsFormatted(value)
          ? FormattedDepartmentOffset
          : UnformattedDepartmentOffset;
       var end = start + 2;
 
-      ReadOnlySpan<Char> department = insee[start..end];
+      ReadOnlySpan<Char> department = value[start..end];
       if (FrDepartmentCodes.ValidateDepartmentCode(department))
       {
          return true;
@@ -582,9 +612,9 @@ public record FrInseeNumber
       else if (department.Equals(OverseasDepartmentPrefix, StringComparison.OrdinalIgnoreCase))
       {
          // Possible overseas department.
-         ReadOnlySpan<Char> extendedDepartment = IsFormatted(insee)
-            ? [ ..department, insee[end + 1] ]                       // If formatted, we have to skip over separator between department and commune
-            : insee[start..(end + 1)];                               // If not formatted, simply extend the slice
+         ReadOnlySpan<Char> extendedDepartment = IsFormatted(value)
+            ? [.. department, value[end + 1]]                        // If formatted, we have to skip over separator between department and commune
+            : value[start..(end + 1)];                               // If not formatted, simply extend the slice
 
          return FrDepartmentCodes.ValidateDepartmentCode(extendedDepartment);
       }
@@ -592,14 +622,14 @@ public record FrInseeNumber
       return false;
    }
 
-   private static Boolean ValidateGender(ReadOnlySpan<Char> insee)
-      => insee[GenderOffset] is Chars.DigitOne or Chars.DigitTwo or Chars.DigitSeven or Chars.DigitEight;
+   private static Boolean ValidateGender(ReadOnlySpan<Char> value)
+      => value[GenderOffset] is Chars.DigitOne or Chars.DigitTwo or Chars.DigitSeven or Chars.DigitEight;
 
-   private static Boolean ValidateMonth(ReadOnlySpan<Char> insee)
+   private static Boolean ValidateMonth(ReadOnlySpan<Char> value)
    {
-      var month = IsFormatted(insee)
-         ? insee[FormattedMonthOffset..].ParseTwoDigits()
-         : insee[UnformattedMonthOffset..].ParseTwoDigits();
+      var month = IsFormatted(value)
+         ? value[FormattedMonthOffset..].ParseTwoDigits()
+         : value[UnformattedMonthOffset..].ParseTwoDigits();
 
       return month switch
       {
@@ -607,7 +637,7 @@ public record FrInseeNumber
          13 => true,
          >= 20 and <= 42 => true,
          >= 50 => true,
-         _ => false
+         _ => false,
       };
    }
 
@@ -630,6 +660,8 @@ public record FrInseeNumber
    }
 }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class FrInseeNumberJsonConverter : JsonConverter<FrInseeNumber>
 {
    public override FrInseeNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
