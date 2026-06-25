@@ -392,7 +392,7 @@ public record BeRijksregisternummer
    }
 
    /// <summary>
-   ///   Gets an <see cref="KfOption{Gender.BinaryGender}"/> that indicates the
+   ///   Gets an <see cref="KfOption{TS}"/> that indicates the
    ///   person's gender, as indicated by the sequence number (and in the case
    ///   of a BIS-nummer, the month offset). May be <see cref="None"/> in the
    ///   case of a BIS-nummer with an unknown gender.

@@ -16,20 +16,20 @@ namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class BeRijksregisternummerTests
 {
-   private const String Valid11CharacterRijksregisternummer = "17110804680";
-   private const String AltValid11CharacterRijksregisternummer = "85073003328";
-   private const String Valid15CharacterRijksregisternummer = "17.11.08-046.80";
-   private const String AltValid15CharacterRijksregisternummer = "85.07.30-033.28";
-   private const String IncompleteDateOfBirthRijksregisternummer = "40 00 00 955-79";
-   private const String UnknownDateOfBirthRijksregisternummer = "00 00 01 003-64";
-   private const String Valid11CharacterBisnummer = "01430801695";
-   private const String AltValid11CharacterBisnummer = "17510804640";
-   private const String Valid15CharacterBisnummer = "01.43.08-016.95";
-   private const String AltValid15CharacterBisnummer = "17.51.08-046.40";
-   private const String IncompleteDateOfBirthBisnummer = "01 40 00 955-54";               // 2001
-   private const String UnknownDateOfBirthBisnummer = "00 40 01 003-53";
-   private const String IncompleteDateOfBirthUnknownGenderBisnummer = "01 20 00 955-11";  // 2001
-   private const String UnknownDateOfBirthUnknownGenderBisnummer = "00 20 01 003-10";
+   private const String ValidUnformattedRijksregisternummer = "17110804680";
+   private const String AltValidUnformattedRijksregisternummer = "85073003328";
+   private const String ValidFormattedRijksregisternummer = "17.11.08-046.80";
+   private const String AltValidFormattedRijksregisternummer = "85.07.30-033.28";
+   private const String IncompleteDateOfBirthFormattedRijksregisternummer = "40 00 00 955-79";
+   private const String UnknownDateOfBirthFormattedRijksregisternummer = "00 00 01 003-64";
+   private const String ValidUnformattedBisnummer = "01430801695";
+   private const String AltValidUnformattedBisnummer = "17510804640";
+   private const String ValidFormattedBisnummer = "01.43.08-016.95";
+   private const String AltValidFormattedBisnummer = "17.51.08-046.40";
+   private const String IncompleteDateOfBirthFormattedBisnummer = "01 40 00 955-54";               // 2001
+   private const String UnknownDateOfBirthFormattedBisnummer = "00 40 01 003-53";
+   private const String IncompleteDateOfBirthUnknownGenderFormattedBisnummer = "01 20 00 955-11";  // 2001
+   private const String UnknownDateOfBirthUnknownGenderFormattedBisnummer = "00 20 01 003-10";
 
    private static String GetRawRijksregisternummer(String rijksregisternummer)
       => rijksregisternummer.Length == 11
@@ -67,29 +67,31 @@ public class BeRijksregisternummerTests
 
    public static TheoryData<String> ValidRijksregisternummerValues =>
    [
-      Valid11CharacterRijksregisternummer,
-      AltValid11CharacterRijksregisternummer,
-      Valid15CharacterRijksregisternummer,
-      AltValid15CharacterRijksregisternummer,
-      IncompleteDateOfBirthRijksregisternummer,
-      UnknownDateOfBirthRijksregisternummer,
-      Valid11CharacterBisnummer,
-      Valid15CharacterBisnummer,
-      AltValid11CharacterBisnummer,
-      AltValid15CharacterBisnummer,
-      IncompleteDateOfBirthBisnummer,
-      UnknownDateOfBirthBisnummer,
-      IncompleteDateOfBirthUnknownGenderBisnummer,
-      UnknownDateOfBirthUnknownGenderBisnummer,
+      ValidUnformattedRijksregisternummer,
+      AltValidUnformattedRijksregisternummer,
+      ValidFormattedRijksregisternummer,
+      AltValidFormattedRijksregisternummer,
+      IncompleteDateOfBirthFormattedRijksregisternummer,
+      UnknownDateOfBirthFormattedRijksregisternummer,
+      ValidUnformattedBisnummer,
+      ValidFormattedBisnummer,
+      AltValidUnformattedBisnummer,
+      AltValidFormattedBisnummer,
+      IncompleteDateOfBirthFormattedBisnummer,
+      UnknownDateOfBirthFormattedBisnummer,
+      IncompleteDateOfBirthUnknownGenderFormattedBisnummer,
+      UnknownDateOfBirthUnknownGenderFormattedBisnummer,
    ];
 
    public static TheoryData<Int32, Int32, Boolean> ValidSequenceNumberBoundaryValues = new()
    {
+      // Unformatted values
       { 1965,   1, false },      // Sequence number lower bound
       { 1965, 998, false },      // Sequence number upper bound
       { 2010,   1, false },
       { 2010, 998, false },
 
+      // Formatted values
       { 1965,   1, true },
       { 1965, 998, true },
       { 2010,   1, true },
@@ -98,14 +100,13 @@ public class BeRijksregisternummerTests
 
    public static TheoryData<Int32, Int32, Int32, Boolean> ValidDateOfBirthValues = new()
    {
-      // false = unformatted
-      // rijksregisternummers
+      // rijksregisternummers, year boundaries, false = unformatted
       { 1900,  1,  1, false },   // January 1, 1900
       { 1999, 12, 31, false },   // December 31, 1999
-
       { 2000,  1,  1, false },   // January 1, 2000
       { 2099, 12, 31, false },   // December 31, 2099
 
+      // rijksregisternummers, maximum days per month
       { 1901,  1, 31, false },   // maximum days for January, any year
       { 1991,  2, 28, false },   // maximum days for February, non leap year
       { 1996,  2, 29, false },   // maximum days for February, leap year
@@ -121,17 +122,18 @@ public class BeRijksregisternummerTests
       { 2004, 11, 30, false },   // maximum days for November, any year
       { 2004, 12, 31, false },   // maximum days for December, any year
 
+      // rijksregisternummers, incomplete/unknown dates of birth
       { 1950,  0,  0, false },   // Incomplete date of birth, only year known
       { 2010,  0,  1, false },   // Incomplete date of birth, with rollover for to many incomplete dates of birth for known year
       {    0,  0,  1, false },   // Unknown date of birth
 
-      // BIS-nummers
+      // BIS-nummers, year boundaries, false = unformatted
       { 1900, 41,  1, false },   // January 1, 1900
       { 1999, 52, 31, false },   // December 31, 1999
-
       { 2000, 41,  1, false },   // January 1, 2000
       { 2099, 52, 31, false },   // December 31, 2099
 
+      // BIS-nummers, maximum days per month
       { 1901, 41, 31, false },   // maximum days for January, any year
       { 1991, 42, 28, false },   // maximum days for February, non leap year
       { 1996, 42, 29, false },   // maximum days for February, leap year
@@ -147,17 +149,18 @@ public class BeRijksregisternummerTests
       { 2004, 51, 30, false },   // maximum days for November, any year
       { 2004, 52, 31, false },   // maximum days for December, any year
 
+      // BIS-nummers, incomplete/unknown dates of birth
       { 1950, 40,  0, false },   // Incomplete date of birth, only year known
       { 2010, 40,  1, false },   // Incomplete date of birth,  with rollover for to many incomplete dates of birth for known year
       {    0, 40,  1, false },   // Unknown date of birth
 
-      // BIS-nummers, unknown gender
+      // BIS-nummers, unknown gender, year boundaries, false = unformatted
       { 1900, 21,  1, false },   // January 1, 1900
       { 1999, 32, 31, false },   // December 31, 1999
-
       { 2000, 21,  1, false },   // January 1, 2000
       { 2099, 32, 31, false },   // December 31, 2099
 
+      // BIS-nummers, unknown gender, maximum days per month
       { 1901, 21, 31, false },   // maximum days for January, any year
       { 1991, 22, 28, false },   // maximum days for February, non leap year
       { 1996, 22, 29, false },   // maximum days for February, leap year
@@ -173,16 +176,18 @@ public class BeRijksregisternummerTests
       { 2004, 31, 30, false },   // maximum days for November, any year
       { 2004, 32, 31, false },   // maximum days for December, any year
 
+      // BIS-nummers, unknown gender, incomplete/unknown dates of birth
       { 1950, 20,  0, false },   // Incomplete date of birth, only year known
       { 2010, 20,  1, false },   // Incomplete date of birth,  with rollover for to many incomplete dates of birth for known year
       {    0, 20,  1, false },   // Unknown date of birth
 
-      // true = formatted
+      // rijksregisternummers, year boundaries, true = formatted
       { 1900,  1,  1, true },    // January 1, 1900
       { 1999, 12, 31, true },    // December 31, 1999
       { 2000,  1,  1, true },    // January 1, 2000
       { 2099, 12, 31, true },    // December 31, 2099
 
+      // rijksregisternummers, maximum days per month
       { 1901,  1, 31, true },    // maximum days for January, any year
       { 1991,  2, 28, true },    // maximum days for February, non leap year
       { 1996,  2, 29, true },    // maximum days for February, leap year
@@ -198,17 +203,18 @@ public class BeRijksregisternummerTests
       { 2004, 11, 30, true },    // maximum days for November, any year
       { 2004, 12, 31, true },    // maximum days for December, any year
 
+      // rijksregisternummers, incomplete/unknown dates of birth
       { 1950,  0,  0, true },    // Incomplete date of birth, only year known
       { 2010,  0,  1, true },    // Incomplete date of birth,  with rollover for to many incomplete dates of birth for known year
       {    0,  0,  1, true },    // Unknown date of birth
 
-      // BIS-nummers
+      // BIS-nummers, year boundaries, true = formatted
       { 1900, 41,  1, true },    // January 1, 1900
       { 1999, 52, 31, true },    // December 31, 1999
-
       { 2000, 41,  1, true },    // January 1, 2000
       { 2099, 52, 31, true },    // December 31, 2099
 
+      // BIS-nummers, maximum days per month
       { 1901, 41, 31, true },    // maximum days for January, any year
       { 1991, 42, 28, true },    // maximum days for February, non leap year
       { 1996, 42, 29, true },    // maximum days for February, leap year
@@ -224,17 +230,18 @@ public class BeRijksregisternummerTests
       { 2004, 51, 30, true },    // maximum days for November, any year
       { 2004, 52, 31, true },    // maximum days for December, any year
 
+      // BIS-nummers, incomplete/unknown dates of birth
       { 1950, 40,  0, true },    // Incomplete date of birth, only year known
       { 2010, 40,  1, true },    // Incomplete date of birth,  with rollover for to many incomplete dates of birth for known year
       {    0, 40,  1, true },    // Unknown date of birth
 
-      // BIS-nummers, unknown gender
+      // BIS-nummers, unknown gender, year boundaries, true = formatted
       { 1900, 21,  1, true },    // January 1, 1900
       { 1999, 32, 31, true },    // December 31, 1999
-
       { 2000, 21,  1, true },    // January 1, 2000
       { 2099, 32, 31, true },    // December 31, 2099
 
+      // BIS-nummers, unknown gender, maximum days per month
       { 1901, 21, 31, true },    // maximum days for January, any year
       { 1991, 22, 28, true },    // maximum days for February, non leap year
       { 1996, 22, 29, true },    // maximum days for February, leap year
@@ -250,6 +257,7 @@ public class BeRijksregisternummerTests
       { 2004, 31, 30, true },    // maximum days for November, any year
       { 2004, 32, 31, true },    // maximum days for December, any year
 
+      // BIS-nummers, unknown gender, incomplete/unknown dates of birth
       { 1950, 20,  0, true },    // Incomplete date of birth, only year known
       { 2010, 20,  1, true },    // Incomplete date of birth,  with rollover for to many incomplete dates of birth for known year
       {    0, 20,  1, true },    // Unknown date of birth
@@ -323,6 +331,7 @@ public class BeRijksregisternummerTests
 
    public static TheoryData<String, Int32> InvalidSeparatorValues = new()
    {
+      // First separator location
       { "85007.30-033.28", 2 },
       { "85107.30-033.28", 2 },
       { "85207.30-033.28", 2 },
@@ -334,6 +343,7 @@ public class BeRijksregisternummerTests
       { "85807.30-033.28", 2 },
       { "85907.30-033.28", 2 },
 
+      // Second separator location
       { "85.07030-033.28", 5 },
       { "85.07130-033.28", 5 },
       { "85.07230-033.28", 5 },
@@ -345,6 +355,7 @@ public class BeRijksregisternummerTests
       { "85.07830-033.28", 5 },
       { "85.07930-033.28", 5 },
 
+      // Third separator location
       { "85.07.300033.28", 8 },
       { "85.07.301033.28", 8 },
       { "85.07.302033.28", 8 },
@@ -356,6 +367,7 @@ public class BeRijksregisternummerTests
       { "85.07.308033.28", 8 },
       { "85.07.309033.28", 8 },
 
+      // Fourth separator location
       { "85.07.30-033028", 12 },
       { "85.07.30-033128", 12 },
       { "85.07.30-033228", 12 },
@@ -841,10 +853,10 @@ public class BeRijksregisternummerTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(Valid11CharacterRijksregisternummer)]
-   [InlineData(AltValid15CharacterRijksregisternummer)]
-   [InlineData(IncompleteDateOfBirthRijksregisternummer)]
-   [InlineData(UnknownDateOfBirthRijksregisternummer)]
+   [InlineData(ValidUnformattedRijksregisternummer)]
+   [InlineData(AltValidFormattedRijksregisternummer)]
+   [InlineData(IncompleteDateOfBirthFormattedRijksregisternummer)]
+   [InlineData(UnknownDateOfBirthFormattedRijksregisternummer)]
    public void BeRijksregisternummer_IdentifierType_ShouldReturnExpectedValue_WhenVAlueIsRijksregisternummer(String value)
    {
       // Arrange.
@@ -856,11 +868,11 @@ public class BeRijksregisternummerTests
    }
 
    [Theory]
-   [InlineData(Valid11CharacterBisnummer)]
-   [InlineData(AltValid15CharacterBisnummer)]
-   [InlineData(IncompleteDateOfBirthBisnummer)]
-   [InlineData(UnknownDateOfBirthBisnummer)]
-   [InlineData(UnknownDateOfBirthUnknownGenderBisnummer)]
+   [InlineData(ValidUnformattedBisnummer)]
+   [InlineData(AltValidFormattedBisnummer)]
+   [InlineData(IncompleteDateOfBirthFormattedBisnummer)]
+   [InlineData(UnknownDateOfBirthFormattedBisnummer)]
+   [InlineData(UnknownDateOfBirthUnknownGenderFormattedBisnummer)]
    public void BeRijksregisternummer_IdentifierType_ShouldReturnExpectedValue_WhenVAlueIsBisnummer(String value)
    {
       // Arrange.
@@ -908,10 +920,10 @@ public class BeRijksregisternummerTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(Valid11CharacterRijksregisternummer, Valid11CharacterRijksregisternummer)]
-   [InlineData(Valid15CharacterRijksregisternummer, Valid11CharacterRijksregisternummer)]
-   [InlineData(Valid11CharacterBisnummer, Valid11CharacterBisnummer)]
-   [InlineData(Valid15CharacterBisnummer, Valid11CharacterBisnummer)]
+   [InlineData(ValidUnformattedRijksregisternummer, ValidUnformattedRijksregisternummer)]
+   [InlineData(ValidFormattedRijksregisternummer, ValidUnformattedRijksregisternummer)]
+   [InlineData(ValidUnformattedBisnummer, ValidUnformattedBisnummer)]
+   [InlineData(ValidFormattedBisnummer, ValidUnformattedBisnummer)]
    public void BeRijksregisternummer_Value_ShouldReturnValidatedRijksregisternummer(
       String value,
       String expected)
@@ -933,7 +945,7 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid11CharacterRijksregisternummer;
+      var value = ValidUnformattedRijksregisternummer;
       var sut = new BeRijksregisternummer(value);
 
       // Act.
@@ -947,7 +959,7 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid15CharacterBisnummer;
+      var value = ValidFormattedBisnummer;
       var sut = new BeRijksregisternummer(value);
 
       // Act.
@@ -1159,8 +1171,8 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
-      var sut2 = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
+      var sut1 = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -1170,8 +1182,8 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
-      var sut2 = new BeRijksregisternummer(AltValid11CharacterRijksregisternummer);
+      var sut1 = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(AltValidUnformattedRijksregisternummer);
 
       // Act/assert.
       (sut1 == sut2).Should().BeFalse();
@@ -1181,8 +1193,8 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 15 character versions for same person should still be equal.
-      var sut1 = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
-      var sut2 = new BeRijksregisternummer(Valid15CharacterRijksregisternummer);
+      var sut1 = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(ValidFormattedRijksregisternummer);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -1191,8 +1203,30 @@ public class BeRijksregisternummerTests
    [Fact]
    public void BeRijksregisternummer_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqualAndHaveIncompleteDateOfBirth()
    {
-      var sut1 = new BeRijksregisternummer(IncompleteDateOfBirthRijksregisternummer);
-      var sut2 = new BeRijksregisternummer(IncompleteDateOfBirthRijksregisternummer);
+      var sut1 = new BeRijksregisternummer(IncompleteDateOfBirthFormattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(IncompleteDateOfBirthFormattedRijksregisternummer);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void BeRijksregisternummer_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new BeRijksregisternummer(ValidFormattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(ValidFormattedRijksregisternummer.Replace('.', ' '));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void BeRijksregisternummer_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new BeRijksregisternummer(ValidFormattedRijksregisternummer.Replace('.', 'A'));
+      var sut2 = new BeRijksregisternummer(ValidFormattedRijksregisternummer.Replace('.', 'a'));
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -1208,8 +1242,8 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
-      var sut2 = new BeRijksregisternummer(AltValid11CharacterRijksregisternummer);
+      var sut1 = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(AltValidUnformattedRijksregisternummer);
 
       // Act/assert.
       (sut1 != sut2).Should().BeTrue();
@@ -1219,8 +1253,8 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 15 character versions for same person should still be equal.
-      var sut1 = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
-      var sut2 = new BeRijksregisternummer(Valid15CharacterRijksregisternummer);
+      var sut1 = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(ValidFormattedRijksregisternummer);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -1230,8 +1264,8 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
-      var sut2 = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
+      var sut1 = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -1241,8 +1275,30 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqualAndHaveIncompleteDateOfBirth()
    {
       // Arrange.
-      var sut1 = new BeRijksregisternummer(IncompleteDateOfBirthRijksregisternummer);
-      var sut2 = new BeRijksregisternummer(IncompleteDateOfBirthRijksregisternummer);
+      var sut1 = new BeRijksregisternummer(IncompleteDateOfBirthFormattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(IncompleteDateOfBirthFormattedRijksregisternummer);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void BeRijksregisternummer_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new BeRijksregisternummer(ValidFormattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(ValidFormattedRijksregisternummer.Replace('.', ' '));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void BeRijksregisternummer_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new BeRijksregisternummer(ValidFormattedRijksregisternummer.Replace('.', 'A'));
+      var sut2 = new BeRijksregisternummer(ValidFormattedRijksregisternummer.Replace('.', 'a'));
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -1429,8 +1485,8 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
-      var sut2 = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
+      var sut1 = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -1440,8 +1496,8 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
-      var sut2 = new BeRijksregisternummer(AltValid11CharacterRijksregisternummer);
+      var sut1 = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(AltValidUnformattedRijksregisternummer);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeFalse();
@@ -1451,8 +1507,8 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 15 character versions for same person should still be equal.
-      var sut1 = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
-      var sut2 = new BeRijksregisternummer(Valid15CharacterRijksregisternummer);
+      var sut1 = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(ValidFormattedRijksregisternummer);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -1462,11 +1518,53 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_Equals_ShouldReturnTrue_WhenValuesAreEqualAndHaveIncompleteDateOfBirth()
    {
       // Arrange.
-      var sut1 = new BeRijksregisternummer(IncompleteDateOfBirthUnknownGenderBisnummer);
-      var sut2 = new BeRijksregisternummer(IncompleteDateOfBirthUnknownGenderBisnummer);
+      var sut1 = new BeRijksregisternummer(IncompleteDateOfBirthUnknownGenderFormattedBisnummer);
+      var sut2 = new BeRijksregisternummer(IncompleteDateOfBirthUnknownGenderFormattedBisnummer);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void BeRijksregisternummer_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new BeRijksregisternummer(ValidFormattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(ValidFormattedRijksregisternummer.Replace('.', ' '));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void BeRijksregisternummer_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new BeRijksregisternummer(ValidFormattedRijksregisternummer.Replace('.', 'A'));
+      var sut2 = new BeRijksregisternummer(ValidFormattedRijksregisternummer.Replace('.', 'a'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void BeRijksregisternummer_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new BeRijksregisternummer(ValidFormattedRijksregisternummer);
+
+      // Act/assert.
+      sut.Equals(ValidFormattedRijksregisternummer).Should().BeFalse();
+   }
+
+   [Fact]
+   public void BeRijksregisternummer_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new BeRijksregisternummer(ValidFormattedRijksregisternummer);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
    }
 
    #endregion
@@ -1479,8 +1577,8 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
    {
       // Arrange.
-      var sut = new BeRijksregisternummer(Valid11CharacterBisnummer);
-      var expected = Valid15CharacterBisnummer;
+      var sut = new BeRijksregisternummer(ValidUnformattedBisnummer);
+      var expected = ValidFormattedBisnummer;
 
       // Act.
       var str = sut.Format();
@@ -1493,9 +1591,9 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
    {
       // Arrange.
-      var sut = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
+      var sut = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
       var mask = "___________";
-      var expected = Valid11CharacterRijksregisternummer;
+      var expected = ValidUnformattedRijksregisternummer;
 
       // Act.
       var str = sut.Format(mask);
@@ -1508,7 +1606,7 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
    {
       // Arrange.
-      var sut = new BeRijksregisternummer(Valid11CharacterBisnummer);
+      var sut = new BeRijksregisternummer(ValidUnformattedBisnummer);
       String mask = null!;
 
       // Act/assert.
@@ -1526,7 +1624,7 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
    {
       // Arrange.
-      var sut = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
+      var sut = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
       var expectedMessage = Messages.FormatMaskEmpty + "*";
       var act = () => _ = sut.Format(mask);
 
@@ -1546,8 +1644,8 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new BeRijksregisternummer(Valid11CharacterBisnummer);
-      var sut2 = new BeRijksregisternummer(Valid11CharacterBisnummer);
+      var sut1 = new BeRijksregisternummer(ValidUnformattedBisnummer);
+      var sut2 = new BeRijksregisternummer(ValidUnformattedBisnummer);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1561,8 +1659,8 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var sut1 = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
-      var sut2 = new BeRijksregisternummer(AltValid11CharacterRijksregisternummer);
+      var sut1 = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(AltValidUnformattedRijksregisternummer);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1576,8 +1674,38 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 15 character versions for same person should still be equal.
-      var sut1 = new BeRijksregisternummer(Valid11CharacterRijksregisternummer);
-      var sut2 = new BeRijksregisternummer(Valid15CharacterRijksregisternummer);
+      var sut1 = new BeRijksregisternummer(ValidUnformattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(ValidFormattedRijksregisternummer);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void BeRijksregisternummer_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new BeRijksregisternummer(ValidFormattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(ValidFormattedRijksregisternummer.Replace('.', ' '));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void BeRijksregisternummer_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new BeRijksregisternummer(ValidFormattedRijksregisternummer.Replace('.', 'A'));
+      var sut2 = new BeRijksregisternummer(ValidFormattedRijksregisternummer.Replace('.', 'a'));
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1601,8 +1729,8 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var sut1 = new BeRijksregisternummer(UnknownDateOfBirthRijksregisternummer);
-      var sut2 = new BeRijksregisternummer(UnknownDateOfBirthRijksregisternummer);
+      var sut1 = new BeRijksregisternummer(UnknownDateOfBirthFormattedRijksregisternummer);
+      var sut2 = new BeRijksregisternummer(UnknownDateOfBirthFormattedRijksregisternummer);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
@@ -1807,7 +1935,7 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_JsonSerialization_ShouldRoundTripSuccessfully()
    {
       // Arrange.
-      var sut = new BeRijksregisternummer(Valid15CharacterRijksregisternummer);
+      var sut = new BeRijksregisternummer(ValidFormattedRijksregisternummer);
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
@@ -1822,7 +1950,7 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
    {
       // Arrange.
-      var sut = new BeRijksregisternummer(AltValid11CharacterBisnummer);
+      var sut = new BeRijksregisternummer(AltValidUnformattedBisnummer);
       var expected = sut.Value;
 
       // Act.
@@ -1841,7 +1969,7 @@ public class BeRijksregisternummerTests
    public void BeRijksregisternummer_JsonSerialization_ShouldDeserializeComplexObject()
    {
       // Arrange.
-      var foo = new Foo { Rijksregisternummer = new BeRijksregisternummer(Valid15CharacterBisnummer) };
+      var foo = new Foo { Rijksregisternummer = new BeRijksregisternummer(ValidFormattedBisnummer) };
       var json = JsonSerializer.Serialize(foo);
 
       // Act.
