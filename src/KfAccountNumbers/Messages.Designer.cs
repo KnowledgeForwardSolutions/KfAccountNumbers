@@ -70,6 +70,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer formatted as YY.MM.DD-XXX.CC.
+        /// </summary>
+        internal static string BeRijksregisternummerFormattedLength {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to BE Rijksregisternummer contains a non-digit character where a digit was expected.
         /// </summary>
         internal static string BeRijksregisternummerInvalidCharacter {
@@ -120,6 +129,15 @@ namespace KfAccountNumbers {
         internal static string BeRijksregisternummerInvalidSequenceNumber {
             get {
                 return ResourceManager.GetString("BeRijksregisternummerInvalidSequenceNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer without separator characters (YYMMDDXXXCC).
+        /// </summary>
+        internal static string BeRijksregisternummerUnformattedLength {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerUnformattedLength", resourceCulture);
             }
         }
         
