@@ -507,7 +507,7 @@ public record BeRijksregisternummer
    ///   Get a string representation of the rijksregisternummer.
    /// </summary>
    /// <returns>
-   ///   The raw burgerservicenummer, without separator characters.
+   ///   The raw rijksregisternummer, without separator characters.
    /// </returns>
    public override String ToString() => Value;
 

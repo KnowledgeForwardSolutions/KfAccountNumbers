@@ -124,7 +124,7 @@ public class BeRijksregisternummerTests
 
       // rijksregisternummers, incomplete/unknown dates of birth
       { 1950,  0,  0, false },   // Incomplete date of birth, only year known
-      { 2010,  0,  1, false },   // Incomplete date of birth, with rollover for to many incomplete dates of birth for known year
+      { 2010,  0,  1, false },   // Incomplete date of birth, with rollover for too many incomplete dates of birth for known year
       {    0,  0,  1, false },   // Unknown date of birth
 
       // BIS-nummers, year boundaries, false = unformatted
@@ -151,7 +151,7 @@ public class BeRijksregisternummerTests
 
       // BIS-nummers, incomplete/unknown dates of birth
       { 1950, 40,  0, false },   // Incomplete date of birth, only year known
-      { 2010, 40,  1, false },   // Incomplete date of birth,  with rollover for to many incomplete dates of birth for known year
+      { 2010, 40,  1, false },   // Incomplete date of birth,  with rollover for too many incomplete dates of birth for known year
       {    0, 40,  1, false },   // Unknown date of birth
 
       // BIS-nummers, unknown gender, year boundaries, false = unformatted
@@ -178,7 +178,7 @@ public class BeRijksregisternummerTests
 
       // BIS-nummers, unknown gender, incomplete/unknown dates of birth
       { 1950, 20,  0, false },   // Incomplete date of birth, only year known
-      { 2010, 20,  1, false },   // Incomplete date of birth,  with rollover for to many incomplete dates of birth for known year
+      { 2010, 20,  1, false },   // Incomplete date of birth,  with rollover for too many incomplete dates of birth for known year
       {    0, 20,  1, false },   // Unknown date of birth
 
       // rijksregisternummers, year boundaries, true = formatted
@@ -205,7 +205,7 @@ public class BeRijksregisternummerTests
 
       // rijksregisternummers, incomplete/unknown dates of birth
       { 1950,  0,  0, true },    // Incomplete date of birth, only year known
-      { 2010,  0,  1, true },    // Incomplete date of birth,  with rollover for to many incomplete dates of birth for known year
+      { 2010,  0,  1, true },    // Incomplete date of birth,  with rollover for too many incomplete dates of birth for known year
       {    0,  0,  1, true },    // Unknown date of birth
 
       // BIS-nummers, year boundaries, true = formatted
@@ -232,7 +232,7 @@ public class BeRijksregisternummerTests
 
       // BIS-nummers, incomplete/unknown dates of birth
       { 1950, 40,  0, true },    // Incomplete date of birth, only year known
-      { 2010, 40,  1, true },    // Incomplete date of birth,  with rollover for to many incomplete dates of birth for known year
+      { 2010, 40,  1, true },    // Incomplete date of birth,  with rollover for too many incomplete dates of birth for known year
       {    0, 40,  1, true },    // Unknown date of birth
 
       // BIS-nummers, unknown gender, year boundaries, true = formatted
@@ -259,7 +259,7 @@ public class BeRijksregisternummerTests
 
       // BIS-nummers, unknown gender, incomplete/unknown dates of birth
       { 1950, 20,  0, true },    // Incomplete date of birth, only year known
-      { 2010, 20,  1, true },    // Incomplete date of birth,  with rollover for to many incomplete dates of birth for known year
+      { 2010, 20,  1, true },    // Incomplete date of birth,  with rollover for too many incomplete dates of birth for known year
       {    0, 20,  1, true },    // Unknown date of birth
    };
 
@@ -857,7 +857,7 @@ public class BeRijksregisternummerTests
    [InlineData(AltValidFormattedRijksregisternummer)]
    [InlineData(IncompleteDateOfBirthFormattedRijksregisternummer)]
    [InlineData(UnknownDateOfBirthFormattedRijksregisternummer)]
-   public void BeRijksregisternummer_IdentifierType_ShouldReturnExpectedValue_WhenVAlueIsRijksregisternummer(String value)
+   public void BeRijksregisternummer_IdentifierType_ShouldReturnExpectedValue_WhenValueIsRijksregisternummer(String value)
    {
       // Arrange.
       var sut = new BeRijksregisternummer(value);
@@ -873,7 +873,7 @@ public class BeRijksregisternummerTests
    [InlineData(IncompleteDateOfBirthFormattedBisnummer)]
    [InlineData(UnknownDateOfBirthFormattedBisnummer)]
    [InlineData(UnknownDateOfBirthUnknownGenderFormattedBisnummer)]
-   public void BeRijksregisternummer_IdentifierType_ShouldReturnExpectedValue_WhenVAlueIsBisnummer(String value)
+   public void BeRijksregisternummer_IdentifierType_ShouldReturnExpectedValue_WhenValueIsBisnummer(String value)
    {
       // Arrange.
       var sut = new BeRijksregisternummer(value);
@@ -1878,7 +1878,7 @@ public class BeRijksregisternummerTests
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void BeRijksregisternummer_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidInvalidSeparator(
+   public void BeRijksregisternummer_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
       String value,
       Int32 position)
    {
@@ -1894,7 +1894,7 @@ public class BeRijksregisternummerTests
 
    [Theory]
    [MemberData(nameof(InvalidSequenceNumberValues))]
-   public void BeRijksregisternummer_Validate_ShouldReturnInvalidSequenceNumber_WhenValueHasInvalidInvalidSequenceNumber(String value)
+   public void BeRijksregisternummer_Validate_ShouldReturnInvalidSequenceNumber_WhenValueHasInvalidSequenceNumber(String value)
    {
       // Arrange.
       LocalValidationResult expected = GetInvalidSequenceNumberResult(value);
