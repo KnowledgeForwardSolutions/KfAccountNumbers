@@ -210,6 +210,12 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record BeRijksregisternummer
 {
    /// <summary>
+   ///   Discriminated union defining the types of identifier that
+   ///   <see cref="BeRijksregisternummer"/> can represent.
+   /// </summary>
+   public union IdentifierCategory(BeIdentifierType.Rijksregisternummer, BeIdentifierType.BisNummer) { }
+
+   /// <summary>
    ///   Discriminated union defining the possible validation errors that can
    ///   occur when creating a new <see cref="BeRijksregisternummer"/>.
    /// </summary>
@@ -386,10 +392,12 @@ public record BeRijksregisternummer
    }
 
    /// <summary>
-   ///   Gets the person's gender, as indicated by the sequence number (and in
-   ///   the case of a BIS-nummer, the month offset).
+   ///   Gets an <see cref="KfOption{Gender.BinaryGender}"/> that indicates the
+   ///   person's gender, as indicated by the sequence number (and in the case
+   ///   of a BIS-nummer, the month offset). May be <see cref="None"/> in the
+   ///   case of a BIS-nummer with an unknown gender.
    /// </summary>
-   public BinaryOrUnknownGender Gender
+   public KfOption<Gender.BinaryGender> Gender
    {
       get
       {
@@ -399,12 +407,11 @@ public record BeRijksregisternummer
          var num = span[2..].ParseTwoDigits();
          if (num is >= 20 and <= 32)
          {
-            return BinaryOrUnknownGender.Unknown;
+            return default(None);
          }
 
-         return span[^GenderOffset] % 2 == 0 // This works because the ASCII character values for digits have the same odd/even pattern
-            ? BinaryOrUnknownGender.Female
-            : BinaryOrUnknownGender.Male;
+         Gender.BinaryGender gender = Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
+         return gender;
       }
    }
 
@@ -416,10 +423,10 @@ public record BeRijksregisternummer
    ///   BIS-nummers add an offset (either 20 or 40) to the month so month values
    ///   greater than 12 indicate that the identifier is a BIS-nummer.
    /// </remarks>
-   public BeIdentifierType IdentifierType
+   public IdentifierCategory IdentifierType
       => Value.AsSpan(2..).ParseTwoDigits() > 12
-         ? BeIdentifierType.BisNummer
-         : BeIdentifierType.Rijksregisternummer;
+         ? default(BeIdentifierType.BisNummer)
+         : default(BeIdentifierType.Rijksregisternummer);
 
    /// <summary>
    ///   Gets the raw rijksregisternummer value.

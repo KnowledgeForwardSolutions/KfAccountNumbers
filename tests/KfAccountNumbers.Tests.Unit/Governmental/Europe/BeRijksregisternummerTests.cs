@@ -769,23 +769,14 @@ public class BeRijksregisternummerTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(10, 180, BinaryOrUnknownGender.Female, false)]
-   [InlineData(10, 181, BinaryOrUnknownGender.Male, false)]
-   [InlineData(10, 182, BinaryOrUnknownGender.Female, false)]
-   [InlineData(10, 183, BinaryOrUnknownGender.Male, false)]
-   [InlineData(10, 184, BinaryOrUnknownGender.Female, false)]
-   [InlineData(10, 185, BinaryOrUnknownGender.Male, true)]
-   [InlineData(10, 186, BinaryOrUnknownGender.Female, true)]
-   [InlineData(10, 187, BinaryOrUnknownGender.Male, true)]
-   [InlineData(10, 188, BinaryOrUnknownGender.Female, true)]
-   [InlineData(10, 189, BinaryOrUnknownGender.Male, true)]
-
-   [InlineData(21, 181, BinaryOrUnknownGender.Unknown, false)]
-   [InlineData(32, 182, BinaryOrUnknownGender.Unknown, true)]
-   public void BeRijksregisternummer_Gender_ShouldReturnExpectedValue(
+   [InlineData(10, 181, false)]
+   [InlineData(10, 183, false)]
+   [InlineData(10, 185, true)]
+   [InlineData(10, 187, true)]
+   [InlineData(10, 189, true)]
+   public void BeRijksregisternummer_Gender_ShouldReturnMale_WhenSequenceNumberIsOdd(
       Int32 month,
       Int32 sequenceNumber,
-      BinaryOrUnknownGender expectedGender,
       Boolean formatted)
    {
       // Arrange.
@@ -794,9 +785,53 @@ public class BeRijksregisternummerTests
          sequenceNumber: sequenceNumber,
          formatted: formatted);
       var sut = new BeRijksregisternummer(value);
+      KfOption<Gender.BinaryGender> expected = (Gender.BinaryGender)default(Gender.Male);
 
       // Act/assert.
-      sut.Gender.Should().Be(expectedGender);
+      sut.Gender.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData(10, 180, false)]
+   [InlineData(10, 182, false)]
+   [InlineData(10, 184, false)]
+   [InlineData(10, 186, true)]
+   [InlineData(10, 188, true)]
+   public void BeRijksregisternummer_Gender_ShouldReturnFemale_WhenSequenceNumberIsEven(
+      Int32 month,
+      Int32 sequenceNumber,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetRijksregisternummerWithValidCheckDigits(
+         month: month,
+         sequenceNumber: sequenceNumber,
+         formatted: formatted);
+      var sut = new BeRijksregisternummer(value);
+      KfOption<Gender.BinaryGender> expected = (Gender.BinaryGender)default(Gender.Female);
+
+      // Act/assert.
+      sut.Gender.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData(21, 181, false)]
+   [InlineData(32, 182, true)]
+   public void BeRijksregisternummer_Gender_ShouldReturnNone_WhenMonthIndicatesUnknownGender(
+      Int32 month,
+      Int32 sequenceNumber,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetRijksregisternummerWithValidCheckDigits(
+         month: month,
+         sequenceNumber: sequenceNumber,
+         formatted: formatted);
+      var sut = new BeRijksregisternummer(value);
+      KfOption<Gender.BinaryGender> expected = default(None);
+
+      // Act/assert.
+      sut.Gender.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -806,43 +841,64 @@ public class BeRijksregisternummerTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(Valid11CharacterRijksregisternummer, BeIdentifierType.Rijksregisternummer)]
-   [InlineData(AltValid15CharacterRijksregisternummer, BeIdentifierType.Rijksregisternummer)]
-   [InlineData(IncompleteDateOfBirthRijksregisternummer, BeIdentifierType.Rijksregisternummer)]
-   [InlineData(UnknownDateOfBirthRijksregisternummer, BeIdentifierType.Rijksregisternummer)]
-   [InlineData(Valid11CharacterBisnummer, BeIdentifierType.BisNummer)]
-   [InlineData(AltValid15CharacterBisnummer, BeIdentifierType.BisNummer)]
-   [InlineData(IncompleteDateOfBirthBisnummer, BeIdentifierType.BisNummer)]
-   [InlineData(UnknownDateOfBirthBisnummer, BeIdentifierType.BisNummer)]
-   [InlineData(UnknownDateOfBirthUnknownGenderBisnummer, BeIdentifierType.BisNummer)]
-   public void BeRijksregisternummer_IdentifierType_ShouldReturnExpectedValue(
-      String value,
-      BeIdentifierType expectedIdentifierType)
+   [InlineData(Valid11CharacterRijksregisternummer)]
+   [InlineData(AltValid15CharacterRijksregisternummer)]
+   [InlineData(IncompleteDateOfBirthRijksregisternummer)]
+   [InlineData(UnknownDateOfBirthRijksregisternummer)]
+   public void BeRijksregisternummer_IdentifierType_ShouldReturnExpectedValue_WhenVAlueIsRijksregisternummer(String value)
    {
       // Arrange.
       var sut = new BeRijksregisternummer(value);
+      BeRijksregisternummer.IdentifierCategory expected = default(BeIdentifierType.Rijksregisternummer);
 
       // Act/assert.
-      sut.IdentifierType.Should().Be(expectedIdentifierType);
+      sut.IdentifierType.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
-   [InlineData(1, BeIdentifierType.Rijksregisternummer)]     // Month 1 = rijksregisternummer
-   [InlineData(12, BeIdentifierType.Rijksregisternummer)]    // Month 12 = rijksregisternummer
-   [InlineData(20, BeIdentifierType.BisNummer)]              // Month 20 = BIS unknown gender (min)
-   [InlineData(32, BeIdentifierType.BisNummer)]              // Month 32 = BIS unknown gender (max)
-   [InlineData(40, BeIdentifierType.BisNummer)]              // Month 40 = BIS (min)
-   [InlineData(52, BeIdentifierType.BisNummer)]              // Month 52 = BIS (max)
-   public void BeRijksregisternummer_IdentifierType_ShouldReturnExpectedValue_ForMonthBoundaries(
-      Int32 month,
-      BeIdentifierType expectedType)
+   [InlineData(Valid11CharacterBisnummer)]
+   [InlineData(AltValid15CharacterBisnummer)]
+   [InlineData(IncompleteDateOfBirthBisnummer)]
+   [InlineData(UnknownDateOfBirthBisnummer)]
+   [InlineData(UnknownDateOfBirthUnknownGenderBisnummer)]
+   public void BeRijksregisternummer_IdentifierType_ShouldReturnExpectedValue_WhenVAlueIsBisnummer(String value)
+   {
+      // Arrange.
+      var sut = new BeRijksregisternummer(value);
+      BeRijksregisternummer.IdentifierCategory expected = default(BeIdentifierType.BisNummer);
+
+      // Act/assert.
+      sut.IdentifierType.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData(1)]     // Month 1 = rijksregisternummer
+   [InlineData(12)]    // Month 12 = rijksregisternummer
+   public void BeRijksregisternummer_IdentifierType_ShouldReturnExpectedValue_ForRijksregisternummerMonthBoundaries(Int32 month)
    {
       // Arrange.
       var value = GetRijksregisternummerWithValidCheckDigits(month: month);
       var sut = new BeRijksregisternummer(value);
+      BeRijksregisternummer.IdentifierCategory expected = default(BeIdentifierType.Rijksregisternummer);
 
       // Act/assert.
-      sut.IdentifierType.Should().Be(expectedType);
+      sut.IdentifierType.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData(20)]              // Month 20 = BIS unknown gender (min)
+   [InlineData(32)]              // Month 32 = BIS unknown gender (max)
+   [InlineData(40)]              // Month 40 = BIS (min)
+   [InlineData(52)]              // Month 52 = BIS (max)
+   public void BeRijksregisternummer_IdentifierType_ShouldReturnExpectedValue_ForBisnummerMonthBoundaries(Int32 month)
+   {
+      // Arrange.
+      var value = GetRijksregisternummerWithValidCheckDigits(month: month);
+      var sut = new BeRijksregisternummer(value);
+      BeRijksregisternummer.IdentifierCategory expected = default(BeIdentifierType.BisNummer);
+
+      // Act/assert.
+      sut.IdentifierType.Should().BeEquivalentTo(expected);
    }
 
    #endregion
