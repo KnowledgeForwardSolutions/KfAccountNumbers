@@ -219,13 +219,13 @@ public class UsSocialSecurityNumberTests
          value[position],
          position);
 
-   private static UsTinInvalidAreaNumber GetInvalidAreaNumberResult(String value)
+   private static InvalidUsTinAreaNumber GetInvalidAreaNumberResult(String value)
       => new(Messages.UsSsnInvalidAreaNumber, GetAreaNumber(value));
 
-   private static UsTinInvalidGroupNumber GetInvalidGroupNumberResult(String value)
+   private static InvalidUsTinGroupNumber GetInvalidGroupNumberResult(String value)
       => new(Messages.UsSsnInvalidGroupNumber, GetGroupNumber(value));
 
-   private static UsSsnInvalidSerialNumber GetInvalidSerialNumberResult(String value)
+   private static InvalidUsSsnSerialNumber GetInvalidSerialNumberResult(String value)
       => new(Messages.UsSsnInvalidSerialNumber, GetSerialNumber(value));
 
    #region Constructor Tests
@@ -358,7 +358,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      LocalValidationError expected = default(UsSsnAllIdenticalDigits);
+      LocalValidationError expected = default(InvalidUsSsnAllIdenticalDigits);
 
       // Act/assert.
       FluentActions
@@ -372,7 +372,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasConsecutiveRun(String value)
    {
       // Arrange.
-      LocalValidationError expected = default(UsSsnInvalidRun);
+      LocalValidationError expected = default(InvalidUsSsnRun);
 
       // Act/assert.
       FluentActions
@@ -592,7 +592,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      LocalValidationError expected = default(UsSsnAllIdenticalDigits);
+      LocalValidationError expected = default(InvalidUsSsnAllIdenticalDigits);
 
       // Act/assert.
       FluentActions
@@ -606,7 +606,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHasConsecutiveRun(String value)
    {
       // Arrange.
-      LocalValidationError expected = default(UsSsnInvalidRun);
+      LocalValidationError expected = default(InvalidUsSsnRun);
 
       // Act/assert.
       FluentActions
@@ -869,7 +869,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Create_ShouldReturnAllIdenticalDigits_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (LocalValidationError)default(UsSsnAllIdenticalDigits);
+      LocalCreateResult expected = (LocalValidationError)default(InvalidUsSsnAllIdenticalDigits);
 
       // Act.
       var result = UsSocialSecurityNumber.Create(value);
@@ -883,7 +883,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Create_ShouldReturnInvalidRun_WhenValueHasConsecutiveRun(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (LocalValidationError)default(UsSsnInvalidRun);
+      LocalCreateResult expected = (LocalValidationError)default(InvalidUsSsnRun);
 
       // Act.
       var result = UsSocialSecurityNumber.Create(value);
@@ -1295,7 +1295,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Validate_ShouldReturnAllIdenticalDigits_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      LocalValidationResult expected = default(UsSsnAllIdenticalDigits);
+      LocalValidationResult expected = default(InvalidUsSsnAllIdenticalDigits);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);
@@ -1309,7 +1309,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Validate_ShouldReturnInvalidRun_WhenValueHasConsecutiveRun(String value)
    {
       // Arrange.
-      LocalValidationResult expected = default(UsSsnInvalidRun);
+      LocalValidationResult expected = default(InvalidUsSsnRun);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);

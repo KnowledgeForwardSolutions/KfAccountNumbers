@@ -4,13 +4,13 @@ namespace KfAccountNumbers.Results;
 
 /// <summary>
 ///   Represents a validation error indicating that a US Social Security Number
-///   (SSN) is composed of nine identical digits.
+///   (SSN) is composed of nine sequential digits (123456789).
 /// </summary>
-public readonly record struct UsSsnAllIdenticalDigits
+public readonly record struct InvalidUsSsnRun
 {
    /// <summary>
    ///   Gets a message describing the validation error, indicating that the
-   ///   value is composed of nine identical digits.
+   ///   value is composed of nine sequential digits (123456789).
    /// </summary>
-   public String Description => Messages.UsSsnAllIdenticalDigits;
+   public String Description => Messages.UsSsnInvalidRun;
 }

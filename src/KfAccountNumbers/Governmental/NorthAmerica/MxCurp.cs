@@ -128,7 +128,7 @@ public record MxCurp
       InvalidDateOfBirth,
       InvalidGender,
       InvalidStateProvince,
-      MxCurpInvalidHomoclave,
+      InvalidMxCurpHomoclave,
       InvalidChecksum)
    {
    }
@@ -145,7 +145,7 @@ public record MxCurp
       InvalidDateOfBirth,
       InvalidGender,
       InvalidStateProvince,
-      MxCurpInvalidHomoclave,
+      InvalidMxCurpHomoclave,
       InvalidChecksum)
    {
    }
@@ -223,7 +223,7 @@ public record MxCurp
                InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
                InvalidGender invalidGender => new UKfValidationException<ValidationError>(invalidGender),
                InvalidStateProvince invalidState => new UKfValidationException<ValidationError>(invalidState),
-               MxCurpInvalidHomoclave invalidHomoclave => new UKfValidationException<ValidationError>(invalidHomoclave),
+               InvalidMxCurpHomoclave invalidHomoclave => new UKfValidationException<ValidationError>(invalidHomoclave),
                InvalidChecksum invalidCheckDigit => new UKfValidationException<ValidationError>(invalidCheckDigit),
                _ => new UnreachableException("This branch should never be reached"),
             };
@@ -328,7 +328,7 @@ public record MxCurp
          InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
          InvalidGender invalidGender => (ValidationError)invalidGender,
          InvalidStateProvince invalidState => (ValidationError)invalidState,
-         MxCurpInvalidHomoclave invalidHomoclave => (ValidationError)invalidHomoclave,
+         InvalidMxCurpHomoclave invalidHomoclave => (ValidationError)invalidHomoclave,
          InvalidChecksum invalidCheckDigit => (ValidationError)invalidCheckDigit,
          _ => throw new UnreachableException("This branch should never be reached"),
       };
@@ -376,7 +376,7 @@ public record MxCurp
          // Required to check prior to date of birth validation since homoclave
          // is used to determine the century for leap year date of birth
          // validation.
-         return new MxCurpInvalidHomoclave(
+         return new InvalidMxCurpHomoclave(
             Messages.MxCurpInvalidHomoclave,
             value[HomoclaveOffset]);
       }

@@ -188,10 +188,10 @@ public class UsIndividualTaxpayerIdentificationNumberTests
          value[position],
          position);
 
-   private static UsTinInvalidAreaNumber GetInvalidAreaNumberResult(String value)
+   private static InvalidUsTinAreaNumber GetInvalidAreaNumberResult(String value)
       => new(Messages.UsItinInvalidAreaNumber, GetAreaNumber(value));
 
-   private static UsTinInvalidGroupNumber GetInvalidGroupNumberResult(String value)
+   private static InvalidUsTinGroupNumber GetInvalidGroupNumberResult(String value)
       => new(Messages.UsItinInvalidGroupNumber, GetGroupNumber(value));
 
    #region Constructor Tests

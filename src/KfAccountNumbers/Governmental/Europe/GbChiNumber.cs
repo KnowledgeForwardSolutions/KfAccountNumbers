@@ -151,7 +151,7 @@ public record class GbChiNumber : GbPatientNumberBase
       InvalidCharacter,
       InvalidChecksum,
       InvalidSeparator,
-      GbPatientNumberInvalidRange,
+      InvalidGbPatientNumberRange,
       InvalidDateOfBirth)
    {
    }
@@ -167,7 +167,7 @@ public record class GbChiNumber : GbPatientNumberBase
       InvalidCharacter,
       InvalidChecksum,
       InvalidSeparator,
-      GbPatientNumberInvalidRange,
+      InvalidGbPatientNumberRange,
       InvalidDateOfBirth)
    {
    }
@@ -234,7 +234,7 @@ public record class GbChiNumber : GbPatientNumberBase
                InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
                InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
-               GbPatientNumberInvalidRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
+               InvalidGbPatientNumberRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
                InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
                _ => new UnreachableException("This branch should never be reached"),
             };
@@ -301,7 +301,7 @@ public record class GbChiNumber : GbPatientNumberBase
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
          InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
          InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
-         GbPatientNumberInvalidRange invalidRange => (ValidationError)invalidRange,
+         InvalidGbPatientNumberRange invalidRange => (ValidationError)invalidRange,
          InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
          _ => throw new UnreachableException("This branch should never be reached"),
       };
@@ -400,7 +400,7 @@ public record class GbChiNumber : GbPatientNumberBase
 
       if (GetIdentifierCategory(value) is not IdentifierRangeCategory.Chi)
       {
-         return new GbPatientNumberInvalidRange(Messages.GbChiNumberInvalidRange);
+         return new InvalidGbPatientNumberRange(Messages.GbChiNumberInvalidRange);
       }
 
       return ValidateChiNumberDateOfBirth(value)

@@ -105,11 +105,11 @@ public record UsSocialSecurityNumber
       InvalidLength,
       InvalidSeparator,
       InvalidCharacter,
-      UsTinInvalidAreaNumber,
-      UsTinInvalidGroupNumber,
-      UsSsnInvalidSerialNumber,
-      UsSsnAllIdenticalDigits,
-      UsSsnInvalidRun)
+      InvalidUsTinAreaNumber,
+      InvalidUsTinGroupNumber,
+      InvalidUsSsnSerialNumber,
+      InvalidUsSsnAllIdenticalDigits,
+      InvalidUsSsnRun)
    {
    }
 
@@ -123,11 +123,11 @@ public record UsSocialSecurityNumber
       InvalidLength,
       InvalidSeparator,
       InvalidCharacter,
-      UsTinInvalidAreaNumber,
-      UsTinInvalidGroupNumber,
-      UsSsnInvalidSerialNumber,
-      UsSsnAllIdenticalDigits,
-      UsSsnInvalidRun)
+      InvalidUsTinAreaNumber,
+      InvalidUsTinGroupNumber,
+      InvalidUsSsnSerialNumber,
+      InvalidUsSsnAllIdenticalDigits,
+      InvalidUsSsnRun)
    {
    }
 
@@ -197,11 +197,11 @@ public record UsSocialSecurityNumber
                InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
                InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
-               UsTinInvalidAreaNumber invalidAreaNumber => new UKfValidationException<ValidationError>(invalidAreaNumber),
-               UsTinInvalidGroupNumber invalidGroupNumber => new UKfValidationException<ValidationError>(invalidGroupNumber),
-               UsSsnInvalidSerialNumber invalidSerialNumber => new UKfValidationException<ValidationError>(invalidSerialNumber),
-               UsSsnAllIdenticalDigits allIdenticalDigits => new UKfValidationException<ValidationError>(allIdenticalDigits),
-               UsSsnInvalidRun invalidRun => new UKfValidationException<ValidationError>(invalidRun),
+               InvalidUsTinAreaNumber invalidAreaNumber => new UKfValidationException<ValidationError>(invalidAreaNumber),
+               InvalidUsTinGroupNumber invalidGroupNumber => new UKfValidationException<ValidationError>(invalidGroupNumber),
+               InvalidUsSsnSerialNumber invalidSerialNumber => new UKfValidationException<ValidationError>(invalidSerialNumber),
+               InvalidUsSsnAllIdenticalDigits allIdenticalDigits => new UKfValidationException<ValidationError>(allIdenticalDigits),
+               InvalidUsSsnRun invalidRun => new UKfValidationException<ValidationError>(invalidRun),
                _ => new UnreachableException("This branch should never be reached"),
             };
          }
@@ -257,11 +257,11 @@ public record UsSocialSecurityNumber
          InvalidLength invalidLength => (ValidationError)invalidLength,
          InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
-         UsTinInvalidAreaNumber invalidAreaNumber => (ValidationError)invalidAreaNumber,
-         UsTinInvalidGroupNumber invalidGroupNumber => (ValidationError)invalidGroupNumber,
-         UsSsnInvalidSerialNumber invalidSerialNumber => (ValidationError)invalidSerialNumber,
-         UsSsnAllIdenticalDigits allIdenticalDigits => (ValidationError)allIdenticalDigits,
-         UsSsnInvalidRun invalidRun => (ValidationError)invalidRun,
+         InvalidUsTinAreaNumber invalidAreaNumber => (ValidationError)invalidAreaNumber,
+         InvalidUsTinGroupNumber invalidGroupNumber => (ValidationError)invalidGroupNumber,
+         InvalidUsSsnSerialNumber invalidSerialNumber => (ValidationError)invalidSerialNumber,
+         InvalidUsSsnAllIdenticalDigits allIdenticalDigits => (ValidationError)allIdenticalDigits,
+         InvalidUsSsnRun invalidRun => (ValidationError)invalidRun,
          _ => throw new UnreachableException("This branch should never be reached"),
       };
 
@@ -344,7 +344,7 @@ public record UsSocialSecurityNumber
       ReadOnlySpan<Char> areaNumber = GetAreaNumber(value);
       if (!ValidateAreaNumber(areaNumber))
       {
-         return new UsTinInvalidAreaNumber(
+         return new InvalidUsTinAreaNumber(
             Messages.UsSsnInvalidAreaNumber,
             areaNumber.ToString());
       }
@@ -352,7 +352,7 @@ public record UsSocialSecurityNumber
       ReadOnlySpan<Char> groupNumber = GetGroupNumber(value);
       if (!ValidateGroupNumber(groupNumber))
       {
-         return new UsTinInvalidGroupNumber(
+         return new InvalidUsTinGroupNumber(
             Messages.UsSsnInvalidGroupNumber,
             groupNumber.ToString());
       }
@@ -360,19 +360,19 @@ public record UsSocialSecurityNumber
       ReadOnlySpan<Char> serialNumber = GetSerialNumber(value);
       if (!ValidateSerialNumber(serialNumber))
       {
-         return new UsSsnInvalidSerialNumber(
+         return new InvalidUsSsnSerialNumber(
             Messages.UsSsnInvalidSerialNumber,
             serialNumber.ToString());
       }
 
       if (!ValidateNotAllIdenticalDigits(value))
       {
-         return default(UsSsnAllIdenticalDigits);
+         return default(InvalidUsSsnAllIdenticalDigits);
       }
 
       if (!ValidateNotConsecutiveRun(areaNumber, groupNumber, serialNumber))
       {
-         return default(UsSsnInvalidRun);
+         return default(InvalidUsSsnRun);
       }
 
       return default(ValidValue);

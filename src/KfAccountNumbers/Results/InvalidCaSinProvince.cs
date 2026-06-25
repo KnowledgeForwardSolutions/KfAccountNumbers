@@ -10,6 +10,6 @@ namespace KfAccountNumbers.Results;
 /// <param name="ProvinceCode">
 ///   The invalid province indicator.
 /// </param>
-public readonly record struct CaSinInvalidProvince(
+public readonly record struct InvalidCaSinProvince(
    String Description,
    Char ProvinceCode);

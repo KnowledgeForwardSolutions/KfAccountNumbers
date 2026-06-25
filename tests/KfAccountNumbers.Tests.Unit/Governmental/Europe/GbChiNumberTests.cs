@@ -277,7 +277,7 @@ public class GbChiNumberTests
          value[position],
          position);
 
-   private static GbPatientNumberInvalidRange GetInvalidRangeResult()
+   private static InvalidGbPatientNumberRange GetInvalidRangeResult()
       => new(Messages.GbChiNumberInvalidRange);
 
    private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)

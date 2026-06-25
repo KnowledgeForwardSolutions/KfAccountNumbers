@@ -242,7 +242,7 @@ public class MxCurpTests
    private static InvalidStateProvince GetInvalidStateResult(String value)
       => new(Messages.MxCurpInvalidState, value[11..13].ToString());
 
-   private static MxCurpInvalidHomoclave GetInvalidHomoclaveResult(String value)
+   private static InvalidMxCurpHomoclave GetInvalidHomoclaveResult(String value)
       => new(Messages.MxCurpInvalidHomoclave, value[16]);
 
    private static InvalidChecksum GetInvalidChecksumResult()

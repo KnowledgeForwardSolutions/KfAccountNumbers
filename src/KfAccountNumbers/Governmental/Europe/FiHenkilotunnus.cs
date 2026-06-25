@@ -157,7 +157,7 @@ public record FiHenkilotunnus
       InvalidCharacter,
       InvalidChecksum,
       InvalidCentury,
-      FiHenkilotunnusInvalidIndividualNumber,
+      InvalidFiHenkilotunnusIndividualNumber,
       InvalidDateOfBirth)
    {
    }
@@ -173,7 +173,7 @@ public record FiHenkilotunnus
       InvalidCharacter,
       InvalidChecksum,
       InvalidCentury,
-      FiHenkilotunnusInvalidIndividualNumber,
+      InvalidFiHenkilotunnusIndividualNumber,
       InvalidDateOfBirth)
    {
    }
@@ -258,7 +258,7 @@ public record FiHenkilotunnus
                InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
                InvalidChecksum invalidCheckDigit => new UKfValidationException<ValidationError>(invalidCheckDigit),
                InvalidCentury invalidCentury => new UKfValidationException<ValidationError>(invalidCentury),
-               FiHenkilotunnusInvalidIndividualNumber invalidIndividualNumber => new UKfValidationException<ValidationError>(invalidIndividualNumber),
+               InvalidFiHenkilotunnusIndividualNumber invalidIndividualNumber => new UKfValidationException<ValidationError>(invalidIndividualNumber),
                InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
                _ => new UnreachableException("This branch should never be reached"),
             };
@@ -357,7 +357,7 @@ public record FiHenkilotunnus
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
          InvalidChecksum invalidCheckDigit => (ValidationError)invalidCheckDigit,
          InvalidCentury invalidCentury => (ValidationError)invalidCentury,
-         FiHenkilotunnusInvalidIndividualNumber invalidIndividualNumber => (ValidationError)invalidIndividualNumber,
+         InvalidFiHenkilotunnusIndividualNumber invalidIndividualNumber => (ValidationError)invalidIndividualNumber,
          InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
          _ => throw new UnreachableException("This branch should never be reached"),
       };
@@ -411,12 +411,12 @@ public record FiHenkilotunnus
       {
          return new InvalidCentury(
             Messages.FiHenkilotunnusInvalidCenturyIndicator,
-            value[CenturyIndicatorOffset]);
+            value[CenturyIndicatorOffset].ToString());
       }
 
       if (!ValidateIndividualNumber(value))
       {
-         return new FiHenkilotunnusInvalidIndividualNumber(
+         return new InvalidFiHenkilotunnusIndividualNumber(
             Messages.FiHenkilotunnusInvalidIndividualNumber,
             _individualNumber.Extract(value).ToString());
       }

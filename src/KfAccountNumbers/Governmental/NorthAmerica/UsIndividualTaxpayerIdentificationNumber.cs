@@ -66,8 +66,8 @@ public record UsIndividualTaxpayerIdentificationNumber
       InvalidLength,
       InvalidSeparator,
       InvalidCharacter,
-      UsTinInvalidAreaNumber,
-      UsTinInvalidGroupNumber)
+      InvalidUsTinAreaNumber,
+      InvalidUsTinGroupNumber)
    {
    }
 
@@ -81,8 +81,8 @@ public record UsIndividualTaxpayerIdentificationNumber
       InvalidLength,
       InvalidSeparator,
       InvalidCharacter,
-      UsTinInvalidAreaNumber,
-      UsTinInvalidGroupNumber)
+      InvalidUsTinAreaNumber,
+      InvalidUsTinGroupNumber)
    {
    }
 
@@ -146,8 +146,8 @@ public record UsIndividualTaxpayerIdentificationNumber
                InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
                InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
-               UsTinInvalidAreaNumber invalidAreaNumber => new UKfValidationException<ValidationError>(invalidAreaNumber),
-               UsTinInvalidGroupNumber invalidGroupNumber => new UKfValidationException<ValidationError>(invalidGroupNumber),
+               InvalidUsTinAreaNumber invalidAreaNumber => new UKfValidationException<ValidationError>(invalidAreaNumber),
+               InvalidUsTinGroupNumber invalidGroupNumber => new UKfValidationException<ValidationError>(invalidGroupNumber),
                _ => new UnreachableException("This branch should never be reached"),
             };
          }
@@ -204,8 +204,8 @@ public record UsIndividualTaxpayerIdentificationNumber
          InvalidLength invalidLength => (ValidationError)invalidLength,
          InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
-         UsTinInvalidAreaNumber invalidAreaNumber => (ValidationError)invalidAreaNumber,
-         UsTinInvalidGroupNumber invalidGroupNumber => (ValidationError)invalidGroupNumber,
+         InvalidUsTinAreaNumber invalidAreaNumber => (ValidationError)invalidAreaNumber,
+         InvalidUsTinGroupNumber invalidGroupNumber => (ValidationError)invalidGroupNumber,
          _ => throw new UnreachableException("This branch should never be reached"),
       };
 
@@ -269,7 +269,7 @@ public record UsIndividualTaxpayerIdentificationNumber
 
       if (value[0] != Chars.DigitNine)
       {
-         return new UsTinInvalidAreaNumber(
+         return new InvalidUsTinAreaNumber(
             Messages.UsItinInvalidAreaNumber,
             GetAreaNumber(value).ToString());
       }
@@ -292,7 +292,7 @@ public record UsIndividualTaxpayerIdentificationNumber
 
       if (!ValidateGroupNumber(value))
       {
-         return new UsTinInvalidGroupNumber(
+         return new InvalidUsTinGroupNumber(
             Messages.UsItinInvalidGroupNumber,
             GetGroupNumber(value).ToString());
       }

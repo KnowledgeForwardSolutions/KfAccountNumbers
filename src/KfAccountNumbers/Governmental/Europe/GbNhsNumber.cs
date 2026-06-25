@@ -148,7 +148,7 @@ public record GbNhsNumber : GbPatientNumberBase
       InvalidCharacter,
       InvalidChecksum,
       InvalidSeparator,
-      GbPatientNumberInvalidRange)
+      InvalidGbPatientNumberRange)
    {
    }
 
@@ -163,7 +163,7 @@ public record GbNhsNumber : GbPatientNumberBase
       InvalidCharacter,
       InvalidChecksum,
       InvalidSeparator,
-      GbPatientNumberInvalidRange)
+      InvalidGbPatientNumberRange)
    {
    }
 
@@ -226,7 +226,7 @@ public record GbNhsNumber : GbPatientNumberBase
                InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
                InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
-               GbPatientNumberInvalidRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
+               InvalidGbPatientNumberRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
                _ => new UnreachableException("This branch should never be reached"),
             };
          }
@@ -298,7 +298,7 @@ public record GbNhsNumber : GbPatientNumberBase
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
          InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
          InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
-         GbPatientNumberInvalidRange invalidRange => (ValidationError)invalidRange,
+         InvalidGbPatientNumberRange invalidRange => (ValidationError)invalidRange,
          _ => throw new UnreachableException("This branch should never be reached"),
       };
 
@@ -372,7 +372,7 @@ public record GbNhsNumber : GbPatientNumberBase
 #pragma warning restore IDE0046 // Convert to conditional expression
 
       return GetIdentifierCategory(value) is not IdentifierRangeCategory.Nhs and not IdentifierRangeCategory.Test
-         ? new GbPatientNumberInvalidRange(Messages.GbNhsNumberInvalidRange)
+         ? new InvalidGbPatientNumberRange(Messages.GbNhsNumberInvalidRange)
          : default(ValidValue);
    }
 

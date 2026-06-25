@@ -533,7 +533,7 @@ public class BeRijksregisternummerTests
       Int32 position)
       => new(Messages.BeRijksregisternummerInvalidSeparator, value[position], position);
 
-   private static BeRijksregisternummerInvalidSequenceNumber GetInvalidSequenceNumberResult(String value)
+   private static InvalidBeRijksregisternummerSequenceNumber GetInvalidSequenceNumberResult(String value)
       => new(
          Messages.BeRijksregisternummerInvalidSequenceNumber,
          value.Length == 11 ? value[6..9] : value[9..12]);

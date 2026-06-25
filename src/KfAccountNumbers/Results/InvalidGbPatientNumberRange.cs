@@ -8,4 +8,4 @@ namespace KfAccountNumbers.Results;
 /// <param name="Description">
 ///   Description of the specific range that was violated.
 /// </param>
-public readonly record struct GbPatientNumberInvalidRange(String Description);
+public readonly record struct InvalidGbPatientNumberRange(String Description);

@@ -231,7 +231,7 @@ public class GbHcNumberTests
          value[position],
          position);
 
-   private static GbPatientNumberInvalidRange GetInvalidRangeResult()
+   private static InvalidGbPatientNumberRange GetInvalidRangeResult()
       => new(Messages.GbHcNumberInvalidRange);
 
    #region Constructor Tests
@@ -336,7 +336,7 @@ public class GbHcNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      LocalValidationError expected = new GbPatientNumberInvalidRange(Messages.GbHcNumberInvalidRange);
+      LocalValidationError expected = new InvalidGbPatientNumberRange(Messages.GbHcNumberInvalidRange);
 
       // Act/assert.
       FluentActions
@@ -551,7 +551,7 @@ public class GbHcNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      LocalValidationError expected = new GbPatientNumberInvalidRange(Messages.GbHcNumberInvalidRange);
+      LocalValidationError expected = new InvalidGbPatientNumberRange(Messages.GbHcNumberInvalidRange);
 
       // Act/assert.
       FluentActions

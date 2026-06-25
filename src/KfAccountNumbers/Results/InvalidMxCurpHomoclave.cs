@@ -3,11 +3,10 @@
 namespace KfAccountNumbers.Results;
 
 /// <summary>
-///   The MxCurpInvalidHomoclave struct represents a validation error indicating
-///   that the homoclave character located at character position 16 (zero-based)
-///   in the value is invalid. Homoclave characters are alphanumeric characters
-///   (A-Z, 0-9) issued by RENAPO (Registro Nacional de Población) to avoid
-///   duplicate CURP values.
+///   Represents a validation error indicating that the homoclave character
+///   located at character position 16 (zero-based) in the value is invalid.
+///   Homoclave characters are alphanumeric characters (A-Z, 0-9) issued by
+///   RENAPO (Registro Nacional de Población) to avoid duplicate CURP values.
 /// </summary>
 /// <param name="Description">
 ///   Message describing the validation error, indicating that one or more
@@ -16,6 +15,6 @@ namespace KfAccountNumbers.Results;
 /// <param name="Homoclave">
 ///   The invalid homoclave character that was found in the input value.
 /// </param>
-public readonly record struct MxCurpInvalidHomoclave(
+public readonly record struct InvalidMxCurpHomoclave(
    String Description,
    Char Homoclave);

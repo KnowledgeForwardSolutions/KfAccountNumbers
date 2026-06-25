@@ -225,7 +225,7 @@ public record BeRijksregisternummer
       InvalidCharacter,
       InvalidChecksum,
       InvalidSeparator,
-      BeRijksregisternummerInvalidSequenceNumber,
+      InvalidBeRijksregisternummerSequenceNumber,
       InvalidDateOfBirth)
    {
    }
@@ -241,7 +241,7 @@ public record BeRijksregisternummer
       InvalidCharacter,
       InvalidChecksum,
       InvalidSeparator,
-      BeRijksregisternummerInvalidSequenceNumber,
+      InvalidBeRijksregisternummerSequenceNumber,
       InvalidDateOfBirth)
    {
    }
@@ -357,7 +357,7 @@ public record BeRijksregisternummer
                InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
                InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
-               BeRijksregisternummerInvalidSequenceNumber invalidSequenceNumber => new UKfValidationException<ValidationError>(invalidSequenceNumber),
+               InvalidBeRijksregisternummerSequenceNumber invalidSequenceNumber => new UKfValidationException<ValidationError>(invalidSequenceNumber),
                InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
                _ => new UnreachableException("This branch should never be reached"),
             };
@@ -475,7 +475,7 @@ public record BeRijksregisternummer
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
          InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
          InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
-         BeRijksregisternummerInvalidSequenceNumber invalidSequenceNumber => (ValidationError)invalidSequenceNumber,
+         InvalidBeRijksregisternummerSequenceNumber invalidSequenceNumber => (ValidationError)invalidSequenceNumber,
          InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
          _ => throw new UnreachableException("This branch should never be reached"),
       };
@@ -559,7 +559,7 @@ public record BeRijksregisternummer
 
       if (!ValidateSequenceNumber(value))
       {
-         return new BeRijksregisternummerInvalidSequenceNumber(
+         return new InvalidBeRijksregisternummerSequenceNumber(
             Messages.BeRijksregisternummerInvalidSequenceNumber,
             isFormatted ? value[9..12] : value[6..9]);
       }

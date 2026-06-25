@@ -373,7 +373,7 @@ public class GbPatientNumberTests
          value[position],
          position);
 
-   private static GbPatientNumberInvalidRange GetInvalidRangeResult()
+   private static InvalidGbPatientNumberRange GetInvalidRangeResult()
       => new(Messages.GbPatientNumberInvalidRange);
 
    private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
@@ -737,7 +737,7 @@ public class GbPatientNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      LocalValidationError expected = new GbPatientNumberInvalidRange(Messages.GbPatientNumberInvalidRange);
+      LocalValidationError expected = new InvalidGbPatientNumberRange(Messages.GbPatientNumberInvalidRange);
 
       // Act/assert.
       FluentActions
@@ -1007,7 +1007,7 @@ public class GbPatientNumberTests
    {
       // Arrange.
       var value = nineDigits + GetCheckDigit(nineDigits);
-      LocalCreateResult expected = (LocalValidationError)new GbPatientNumberInvalidRange(
+      LocalCreateResult expected = (LocalValidationError)new InvalidGbPatientNumberRange(
          Messages.GbPatientNumberInvalidRange);
 
       // Act.

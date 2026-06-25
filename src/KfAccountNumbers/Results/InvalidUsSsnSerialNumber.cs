@@ -10,6 +10,6 @@ namespace KfAccountNumbers.Results;
 /// <param name="SerialNumber">
 ///   The invalid serial number.
 /// </param>
-public readonly record struct UsSsnInvalidSerialNumber(
+public readonly record struct InvalidUsSsnSerialNumber(
    String Description,
    String SerialNumber);
