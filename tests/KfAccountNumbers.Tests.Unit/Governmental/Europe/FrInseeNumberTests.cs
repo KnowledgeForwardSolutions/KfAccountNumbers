@@ -1101,6 +1101,28 @@ public class FrInseeNumberTests
       (sut1 == sut2).Should().BeTrue();
    }
 
+   [Fact]
+   public void FrInseeNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', '.'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FrInseeNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'A'));
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'a'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
    #endregion
 
    #region Inequality Operator Tests
@@ -1135,6 +1157,28 @@ public class FrInseeNumberTests
       // Arrange.
       var sut1 = new FrInseeNumber(ValidUnformattedInseeNumber);
       var sut2 = new FrInseeNumber(ValidUnformattedInseeNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void FrInseeNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', '.'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void FrInseeNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'A'));
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'a'));
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -1375,6 +1419,48 @@ public class FrInseeNumberTests
       sut1.Equals(sut2).Should().BeTrue();
    }
 
+   [Fact]
+   public void FrInseeNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', '.'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FrInseeNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'A'));
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'a'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FrInseeNumber_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new FrInseeNumber(ValidFormattedInseeNumber);
+
+      // Act/assert.
+      sut.Equals(ValidFormattedInseeNumber).Should().BeFalse();
+   }
+
+   [Fact]
+   public void FrInseeNumber_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new FrInseeNumber(ValidFormattedInseeNumber);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
+   }
+
    #endregion
 
    #region Format Method Tests
@@ -1493,6 +1579,35 @@ public class FrInseeNumberTests
       hash1.Should().Be(hash2);
    }
 
+   [Fact]
+   public void FrInseeNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', '.'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void FrInseeNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'A'));
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'a'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
    #endregion
 
    #region ReferenceEquals Method Tests
