@@ -358,7 +358,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      LocalValidationError expected = default(InvalidUsSsnAllIdenticalDigits);
+      LocalValidationError expected = default(UsSsnAllIdenticalDigits);
 
       // Act/assert.
       FluentActions
@@ -592,7 +592,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_ExplicitCastToUsSsn_ShouldThrowKfValidationException_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      LocalValidationError expected = default(InvalidUsSsnAllIdenticalDigits);
+      LocalValidationError expected = default(UsSsnAllIdenticalDigits);
 
       // Act/assert.
       FluentActions
@@ -869,7 +869,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Create_ShouldReturnAllIdenticalDigits_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      LocalCreateResult expected = (LocalValidationError)default(InvalidUsSsnAllIdenticalDigits);
+      LocalCreateResult expected = (LocalValidationError)default(UsSsnAllIdenticalDigits);
 
       // Act.
       var result = UsSocialSecurityNumber.Create(value);
@@ -1295,7 +1295,7 @@ public class UsSocialSecurityNumberTests
    public void UsSocialSecurityNumber_Validate_ShouldReturnAllIdenticalDigits_WhenValueHas9IdenticalDigits(String value)
    {
       // Arrange.
-      LocalValidationResult expected = default(InvalidUsSsnAllIdenticalDigits);
+      LocalValidationResult expected = default(UsSsnAllIdenticalDigits);
 
       // Act.
       var result = UsSocialSecurityNumber.Validate(value);

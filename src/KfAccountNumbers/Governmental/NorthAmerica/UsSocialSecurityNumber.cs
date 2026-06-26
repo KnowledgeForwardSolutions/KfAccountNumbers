@@ -108,7 +108,7 @@ public record UsSocialSecurityNumber
       InvalidUsTinAreaNumber,
       InvalidUsTinGroupNumber,
       InvalidUsSsnSerialNumber,
-      InvalidUsSsnAllIdenticalDigits,
+      UsSsnAllIdenticalDigits,
       InvalidUsSsnRun)
    {
    }
@@ -126,7 +126,7 @@ public record UsSocialSecurityNumber
       InvalidUsTinAreaNumber,
       InvalidUsTinGroupNumber,
       InvalidUsSsnSerialNumber,
-      InvalidUsSsnAllIdenticalDigits,
+      UsSsnAllIdenticalDigits,
       InvalidUsSsnRun)
    {
    }
@@ -200,7 +200,7 @@ public record UsSocialSecurityNumber
                InvalidUsTinAreaNumber invalidAreaNumber => new UKfValidationException<ValidationError>(invalidAreaNumber),
                InvalidUsTinGroupNumber invalidGroupNumber => new UKfValidationException<ValidationError>(invalidGroupNumber),
                InvalidUsSsnSerialNumber invalidSerialNumber => new UKfValidationException<ValidationError>(invalidSerialNumber),
-               InvalidUsSsnAllIdenticalDigits allIdenticalDigits => new UKfValidationException<ValidationError>(allIdenticalDigits),
+               UsSsnAllIdenticalDigits allIdenticalDigits => new UKfValidationException<ValidationError>(allIdenticalDigits),
                InvalidUsSsnRun invalidRun => new UKfValidationException<ValidationError>(invalidRun),
                _ => new UnreachableException("This branch should never be reached"),
             };
@@ -260,7 +260,7 @@ public record UsSocialSecurityNumber
          InvalidUsTinAreaNumber invalidAreaNumber => (ValidationError)invalidAreaNumber,
          InvalidUsTinGroupNumber invalidGroupNumber => (ValidationError)invalidGroupNumber,
          InvalidUsSsnSerialNumber invalidSerialNumber => (ValidationError)invalidSerialNumber,
-         InvalidUsSsnAllIdenticalDigits allIdenticalDigits => (ValidationError)allIdenticalDigits,
+         UsSsnAllIdenticalDigits allIdenticalDigits => (ValidationError)allIdenticalDigits,
          InvalidUsSsnRun invalidRun => (ValidationError)invalidRun,
          _ => throw new UnreachableException("This branch should never be reached"),
       };
@@ -367,7 +367,7 @@ public record UsSocialSecurityNumber
 
       if (!ValidateNotAllIdenticalDigits(value))
       {
-         return default(InvalidUsSsnAllIdenticalDigits);
+         return default(UsSsnAllIdenticalDigits);
       }
 
       if (!ValidateNotConsecutiveRun(areaNumber, groupNumber, serialNumber))

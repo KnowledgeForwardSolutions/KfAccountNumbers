@@ -552,4 +552,10 @@
   <data name="BeRijksregisternummerFormattedLength" xml:space="preserve">
     <value>BE Rijksregisternummer formatted as YY.MM.DD-XXX.CC</value>
   </data>
+  <data name="FrInseeNumberUnformattedLength" xml:space="preserve">
+    <value>FR INSEE number without separator characters (SYYMMLLOOOKKKCC)</value>
+  </data>
+  <data name="FrInseeNumberFormattedLength" xml:space="preserve">
+    <value>FR INSEE number formatted as S YY MM LL OOO KKK CC</value>
+  </data>
 </root>

@@ -1,5 +1,9 @@
 // Ignore Spelling: Insee
 
+#pragma warning disable IDE0250 // Make struct 'readonly'
+#pragma warning disable IDE0046 // Convert to conditional expression
+#pragma warning disable SA1025 // Code should not contain multiple whitespace in a row
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -59,7 +63,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   <para>
 ///      An INSEE number may be formatted as 15 consecutive digits or as 21
 ///      characters with spaces separating the different elements, i.e.
-///      "S YY MMLL OOO KKK CC".
+///      "S YY MM LL OOO KKK CC".
 ///   </para>
 ///   <para>
 ///      When creating a new <see cref="FrInseeNumber"/>, the following
@@ -157,8 +161,59 @@ namespace KfAccountNumbers.Governmental.Europe;
 [JsonConverter(typeof(FrInseeNumberJsonConverter))]
 public record FrInseeNumber
 {
+
+   /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="FrInseeNumber"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidGender,
+      InvalidMonth,
+      InvalidFrInseeDepartment)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="FrInseeNumber"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidGender,
+      InvalidMonth,
+      InvalidFrInseeDepartment)
+   {
+   }
+
+   /// <summary>
+   ///   The name of the check digit algorithm used by INSEE numbers.
+   /// </summary>
+   public const String CheckDigitAlgorithmName = "Modulus 97";
+
    private const Int32 UnformattedLength = 15;
    private const Int32 FormattedLength = 21;
+
+   // Used to validate formatted values.
+   private static readonly SegmentRange _formattedDepartment = new(8, 10);
+   private static readonly SegmentRange _formattedMonth = new(5, 7);
+
+   // Used to validate unformatted values or to extract elements from raw values
+   // post validation.
+   private static readonly SegmentRange _commune = new(7, 10);
+   private static readonly SegmentRange _department = new(5, 7);
+   private static readonly SegmentRange _month = new(3, 5);
+   private static readonly SegmentRange _overseasDepartment = new(5, 8);
+   private static readonly SegmentRange _year = new(1, 2);
 
    private const Int32 GenderOffset = 0;
    private const Int32 FormattedMonthOffset = 5;
@@ -175,6 +230,15 @@ public record FrInseeNumber
    private const Int32 Separator4Offset = 10;
    private const Int32 Separator5Offset = 14;
    private const Int32 Separator6Offset = 18;
+
+   private static readonly Int32[] _separatorOffsets =
+   [
+      Separator2Offset,             // Skip Separator1Offset because it's handled slightly differently.
+      Separator3Offset,             // See ValidateSeparators.
+      Separator4Offset,
+      Separator5Offset,
+      Separator6Offset
+   ];
 
    private const Int32 UnformattedCorsicanDepartmentLetterOffset = 6;
    private const Int32 FormattedCorsicanDepartmentLetterOffset = 9;
@@ -236,10 +300,21 @@ public record FrInseeNumber
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         FrInseeNumberValidationResult validationResult = Validate(value);
-         if (validationResult != FrInseeNumberValidationResult.ValidationPassed)
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            throw validationResult.ToValidationException();
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               InvalidGender invalidGender => new UKfValidationException<ValidationError>(invalidGender),
+               InvalidMonth invalidMonth => new UKfValidationException<ValidationError>(invalidMonth),
+               InvalidFrInseeDepartment invalidDepartment => new UKfValidationException<ValidationError>(invalidDepartment),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
          }
       }
 
@@ -303,7 +378,8 @@ public record FrInseeNumber
          if (Value.AsSpan(UnformattedDepartmentOffset..endOffset).Equals(OverseasDepartmentPrefix, StringComparison.OrdinalIgnoreCase))
          {
             endOffset++;
-            return Value[UnformattedDepartmentOffset..endOffset];
+            // TODO: can this be eliminated?
+            // return Value[UnformattedDepartmentOffset..endOffset];
          }
 
          // Overseas departments use an additional character for department code.
@@ -388,19 +464,25 @@ public record FrInseeNumber
    ///   String representation of a French INSEE number.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{FrInseeNumber, FrInseeNumberValidationResult}"/>.
-   ///   Will contain the new <see cref="FrInseeNumber"/> if
-   ///   <paramref name="value"/> is valid or an <see cref="FrInseeNumber"/> that
-   ///   identifies the validation rule that was failed if <paramref name="value"/>
-   ///   is invalid.
+   ///   A <see cref="UCreateResult{BeRijksregisternummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="BeRijksregisternummer"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<FrInseeNumber, FrInseeNumberValidationResult> Create(String? value)
-   {
-      FrInseeNumberValidationResult validationResult = Validate(value);
-      return validationResult == FrInseeNumberValidationResult.ValidationPassed
-         ? new FrInseeNumber(value, validationMode: ValidationMode.BypassValidation)
-         : validationResult;
-   }
+   public static UCreateResult<FrInseeNumber, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new FrInseeNumber(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         InvalidGender invalidGender => (ValidationError)invalidGender,
+         InvalidMonth invalidMonth => (ValidationError)invalidMonth,
+         InvalidFrInseeDepartment invalidDepartment => (ValidationError)invalidDepartment,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
 
    /// <summary>
    ///   Format the INSEE number using the supplied <paramref name="mask"/>.
@@ -441,49 +523,116 @@ public record FrInseeNumber
    ///   String representation of a French INSEE number.
    /// </param>
    /// <returns>
-   ///   A <see cref="FrInseeNumberValidationResult"/> enumeration
-   ///   value that indicates if the <paramref name="value"/> passed
-   ///   validation or what validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
-   public static FrInseeNumberValidationResult Validate(String? value)
+   public static ValidationResult Validate(String? value)
    {
       if (String.IsNullOrWhiteSpace(value))
       {
-         return FrInseeNumberValidationResult.Empty;
+         return default(EmptyValue);
       }
-      else if (value.Length is not UnformattedLength and not FormattedLength)
+
+      if (value.Length is not UnformattedLength and not FormattedLength)
       {
-         return FrInseeNumberValidationResult.InvalidLength;
+         return new InvalidLength(
+            Messages.FrInseeNumberInvalidLength,
+            value.Length,
+            GetValidLengthDefinitions());
       }
 
       // After performing basic checks, validate the check digits because the
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
-      FrInseeNumberValidationResult validationResult = ValidateCheckDigits(value);
-      if (validationResult != FrInseeNumberValidationResult.ValidationPassed)
+      ValidationResult validationResult = ValidateCheckDigits(value);
+      if (validationResult is not ValidValue)
       {
          // Could be either InvalidCharacter or InvalidCheckDigit.
          return validationResult;
       }
-      else if (!ValidateSeparators(value))
+
+      if (!ValidateSeparators(value, out var invalidSeparatorPosition))
       {
-         return FrInseeNumberValidationResult.InvalidSeparator;
-      }
-      else if (!ValidateGender(value))
-      {
-         return FrInseeNumberValidationResult.InvalidGender;
-      }
-      else if (!ValidateMonth(value))
-      {
-         return FrInseeNumberValidationResult.InvalidMonth;
-      }
-      else if (!ValidateDepartment(value))
-      {
-         return FrInseeNumberValidationResult.InvalidDepartment;
+         return new InvalidSeparator(
+            Messages.FrInseeNumberInvalidSeparator,
+            value[invalidSeparatorPosition],
+            invalidSeparatorPosition);
       }
 
-      return FrInseeNumberValidationResult.ValidationPassed;
+      if (!ValidateGender(value))
+      {
+         return new InvalidGender(
+            Messages.FrInseeNumberInvalidGender,
+            value[GenderOffset].ToString());
+      }
+
+      if (!ValidateMonth(value))
+      {
+         return new InvalidMonth(
+            Messages.FrInseeNumberInvalidMonth,
+            GetMonth(value).ToString());
+      }
+
+      if (!ValidateDepartment(value))
+      {
+         return new InvalidFrInseeDepartment(
+            Messages.FrInseeNumberInvalidDepartment,
+            GetDepartmentCode(value));
+      }
+
+      return default(ValidValue);
    }
+
+   /// <summary>
+   ///   Gets the department code from the supplied value.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a French INSEE number.
+   /// </param>
+   /// <returns>
+   ///   The department code from the supplied value.
+   /// </returns>
+   internal static String GetDepartmentCode(ReadOnlySpan<Char> value)
+   {
+      var isFormatted = IsFormatted(value);
+      ReadOnlySpan<Char> department =
+         (isFormatted ? _formattedDepartment : _department).Extract(value);
+      if (department.Equals(OverseasDepartmentPrefix, StringComparison.OrdinalIgnoreCase))
+      {
+         return isFormatted
+            ? $"{department}{value[_formattedDepartment.End + 1]}"
+            : _overseasDepartment.Extract(value).ToString();
+      }
+
+      return department.ToString();
+   }
+
+   /// <summary>
+   ///   Gets an array of details about valid lengths accepted for an INSEE
+   ///   number.
+   /// </summary>
+   /// <returns>
+   ///   An array of <see cref="ValidLengthDefinition"/>s.
+   /// </returns>
+   internal static ValidLengthDefinition[] GetValidLengthDefinitions()
+      =>
+      [
+         new ValidLengthDefinition(UnformattedLength, Messages.FrInseeNumberUnformattedLength),
+         new ValidLengthDefinition(FormattedLength, Messages.FrInseeNumberFormattedLength),
+      ];
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      ReadOnlySpan<Char> value,
+      Int32 position)
+      => new(
+         Messages.FrInseeNumberInvalidCharacter,
+         value[position],
+         position);
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static ReadOnlySpan<Char> GetMonth(ReadOnlySpan<Char> value)
+      => (IsFormatted(value) ? _formattedMonth : _month).Extract(value);
 
    private static String GetRawValue(String value)
    {
@@ -529,7 +678,7 @@ public record FrInseeNumber
       => index is Separator1Offset or Separator2Offset or Separator3Offset or
             Separator4Offset or Separator5Offset or Separator6Offset;
 
-   private static FrInseeNumberValidationResult ValidateCheckDigits(ReadOnlySpan<Char> value)
+   private static ValidationResult ValidateCheckDigits(ReadOnlySpan<Char> value)
    {
       var processLength = value.Length - 2;      // Exclude check digits from main loop
       var isFormatted = IsFormatted(value);
@@ -570,7 +719,7 @@ public record FrInseeNumber
             // If not part of a valid Corsican department code then the character is invalid.
             if (corsicanOffset == 0L)
             {
-               return FrInseeNumberValidationResult.InvalidCharacter;
+               return GetInvalidCharacterResult(value, index);
             }
 
             // If using corsican offset then num is ignored for this character.
@@ -584,37 +733,42 @@ public record FrInseeNumber
       var remainder = 97 - (sum % 97);
 
       var c1 = value[^CheckDigit1Offset].ToSingleDigit();
-      var c2 = value[^CheckDigit2Offset].ToSingleDigit();
-      if (!c1.IsValidDigit() || !c2.IsValidDigit())
+      if (!c1.IsValidDigit())
       {
-         return FrInseeNumberValidationResult.InvalidCharacter;
+         return GetInvalidCharacterResult(value, value.Length - CheckDigit1Offset);
+      }
+
+      var c2 = value[^CheckDigit2Offset].ToSingleDigit();
+      if (!c2.IsValidDigit())
+      {
+         return GetInvalidCharacterResult(value, value.Length - CheckDigit2Offset);
       }
 
       var checkSum = (c1 * 10) + c2;
 
       return checkSum == remainder
-         ? FrInseeNumberValidationResult.ValidationPassed
-         : FrInseeNumberValidationResult.InvalidCheckDigits;
+         ? default(ValidValue)
+         : new InvalidChecksum(
+            Messages.FrInseeNumberInvalidCheckDigits,
+            CheckDigitAlgorithmName);
    }
 
    private static Boolean ValidateDepartment(ReadOnlySpan<Char> value)
    {
-      var start = IsFormatted(value)
-         ? FormattedDepartmentOffset
-         : UnformattedDepartmentOffset;
-      var end = start + 2;
-
-      ReadOnlySpan<Char> department = value[start..end];
+      var isFormatted = IsFormatted(value);
+      ReadOnlySpan<Char> department =
+         (isFormatted ? _formattedDepartment : _department).Extract(value);
       if (FrDepartmentCodes.ValidateDepartmentCode(department))
       {
          return true;
       }
       else if (department.Equals(OverseasDepartmentPrefix, StringComparison.OrdinalIgnoreCase))
       {
-         // Possible overseas department.
+         // Possible overseas department. Check three character department code
+         // that includes the first character of the commune.
          ReadOnlySpan<Char> extendedDepartment = IsFormatted(value)
-            ? [.. department, value[end + 1]]                        // If formatted, we have to skip over separator between department and commune
-            : value[start..(end + 1)];                               // If not formatted, simply extend the slice
+            ? [.. department, value[_formattedDepartment.End + 1]]                        // If formatted, we have to skip over separator between department and commune
+            : value[_department.Start..(_department.End + 1)];                            // If not formatted, simply extend the slice
 
          return FrDepartmentCodes.ValidateDepartmentCode(extendedDepartment);
       }
@@ -627,9 +781,7 @@ public record FrInseeNumber
 
    private static Boolean ValidateMonth(ReadOnlySpan<Char> value)
    {
-      var month = IsFormatted(value)
-         ? value[FormattedMonthOffset..].ParseTwoDigits()
-         : value[UnformattedMonthOffset..].ParseTwoDigits();
+      var month = GetMonth(value).ParseTwoDigits();
 
       return month switch
       {
@@ -641,22 +793,34 @@ public record FrInseeNumber
       };
    }
 
-   private static Boolean ValidateSeparators(ReadOnlySpan<Char> insee)
+   private static Boolean ValidateSeparators(
+      ReadOnlySpan<Char> value,
+      out Int32 invalidSeparatorPosition)
    {
-      if (insee.Length == UnformattedLength)
+      invalidSeparatorPosition = -1;
+      if (value.Length == UnformattedLength)
       {
          return true;
       }
 
-      var separator = insee[Separator1Offset];
+      var separator = value[Separator1Offset];
+      if (separator.IsAsciiDigit())
+      {
+         invalidSeparatorPosition = Separator1Offset;
+         return false;
+      }
 
-      // Separator may not be an ASCII digit and all separators must be the same.
-      return !separator.IsAsciiDigit()
-             && insee[Separator2Offset] == separator
-             && insee[Separator3Offset] == separator
-             && insee[Separator4Offset] == separator
-             && insee[Separator5Offset] == separator
-             && insee[Separator6Offset] == separator;
+      // All separators must be the same.
+      foreach (var offset in _separatorOffsets)
+      {
+         if (value[offset] != separator)
+         {
+            invalidSeparatorPosition = offset;
+            return false;
+         }
+      }
+
+      return true;
    }
 }
 

@@ -1,10 +1,10 @@
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
-///   Collection of French department codes
+///   Collection of French department codes.
 /// </summary>
 /// <remarks>
-///   See https://en.wikipedia.org/wiki/Departments_of_France
+///   See https://en.wikipedia.org/wiki/Departments_of_France.
 /// </remarks>
 public static class FrDepartmentCodes
 {
@@ -135,7 +135,7 @@ public static class FrDepartmentCodes
    ///   <see cref="String.Empty"/> if the departmentCode is not valid.
    /// </returns>
    /// <remarks>
-   ///   This method performs a case-insensitive comparison of the supplied 
+   ///   This method performs a case-insensitive comparison of the supplied
    ///   <paramref name="departmentCode"/> to the valid department codes.
    /// </remarks>
    public static String GetDepartmentName(ReadOnlySpan<Char> departmentCode)
@@ -153,7 +153,7 @@ public static class FrDepartmentCodes
    ///   code; otherwise <see langword="false"/>.
    /// </returns>
    /// <remarks>
-   ///   This method performs a case-insensitive comparison of the supplied 
+   ///   This method performs a case-insensitive comparison of the supplied
    ///   <paramref name="departmentCode"/> to the valid department codes.
    /// </remarks>
    public static Boolean ValidateDepartmentCode(ReadOnlySpan<Char> departmentCode)
