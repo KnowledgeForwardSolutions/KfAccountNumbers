@@ -115,10 +115,18 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///               The COG element (LLOOO) must start with a valid department
 ///               code, or 99 for persons born abroad.  For departments with
 ///               alphabetic characters (Corsica 2A, 2B), the alphabetic
-///               character must be uppercase.
+///               character may be uppercase or lowercase.
 ///            </description>
 ///         </item>
 ///      </list>
+///   </para>
+///   <para>
+///      <see cref="FrInseeNumber"/> is case-insensitive for validation and
+///      parsing purposes. The FrInseeNumber constructor, Create method and
+///      implicit string to FrInseeNumber operator will normalize any
+///      lowercase letters to uppercase. Equality and inequality comparisons
+///      between instances of FrInseeNumber will compare the normalized
+///      uppercase versions of the value.
 ///   </para>
 ///   <para>
 ///      Example values:

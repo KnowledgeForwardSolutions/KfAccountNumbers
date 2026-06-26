@@ -313,7 +313,12 @@ A valid INSEE number must meet all of the following rules:
 * The month element (MM) must be a number between 01 and 12 (for known dates) or 13, 20-42, 50-99 (for persons with unknown or
   incomplete date of birth documentation).
 * The COG element (LLOOO) must start with a valid department code, or 99 for persons born abroad. For departments
-  with alphabetic characters (Corsica 2A, 2B), the alphabetic character must be uppercase.
+  with alphabetic characters (Corsica 2A, 2B), the alphabetic character may be uppercase or lowercase.
+
+FrInseeNumber is case-insensitive for validation and parsing purposes. The FrInseeNumber constructor, Create
+method and implicit string to FrInseeNumber operator will normalize any lowercase letters to uppercase.
+Equality and inequality comparisons between instances of FrInseeNumber will compare the normalized
+uppercase versions of the value.
 
 Example values:
 * 188121884813236 - gender = male, year of birth = 88, month of birth = 12, department = 18 (Cher)
