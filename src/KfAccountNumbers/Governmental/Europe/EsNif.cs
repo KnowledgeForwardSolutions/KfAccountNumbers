@@ -1,13 +1,16 @@
 // Ignore Spelling: Json Nif
 
+#pragma warning disable IDE0250 // Make struct 'readonly'
+#pragma warning disable IDE0046 // Convert to conditional expression
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
 ///   Strongly typed business object that represents a Spanish tax identifier,
 ///   officially known as the Número de Identificación Fiscal (NIF). NIF may be
 ///   either of two different values, a documento nacional de identidad (DNI)
-///   issued to Spanish citizens or a número de identificación de extranjero (NIE)
-///   issued to foreigners residing in Spain.
+///   issued to Spanish citizens or a número de identificación de extranjero
+///   (NIE) issued to foreigners residing in Spain.
 /// </summary>
 /// <remarks>
 ///   <para>
@@ -24,27 +27,28 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <term>C</term>
 ///            <description>
-///               is an alphabetic character representing the modulus 23 check digit
-///               calculated from the previous eight digits.
+///               is an alphabetic character representing the modulus 23 check
+///               digit calculated from the previous eight digits.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>P</term>
 ///            <description>
-///               is one of the letters X, Y or Z (when calculating the check digit,
-///               X = 0, Y = 1 and Z = 2).
+///               is one of the letters X, Y or Z (when calculating the check
+///               digit, X = 0, Y = 1 and Z = 2).
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
-///      The only difference between a DNI and a NIE is if the leading (left-most)
-///      character is a digit or the letter X, Y or Z. Both values may be formatted
-///      as a sequence of nine characters or may be formatted for greater readability
-///      by using separators. For a DNI, a separator (generally a dash '-') is
-///      placed between the digits and the trailing alphabetic character. For a NIE,
-///      separators are placed between the leading letter and the digits, and between
-///      the digits and the trailing alphabetic character.
+///      The only difference between a DNI and a NIE is if the leading
+///      (left-most) character is a digit or the letter X, Y or Z. Both values
+///      may be formatted as a sequence of nine characters or may be formatted
+///      for greater readability by using separators. For a DNI, a separator
+///      (generally a dash '-') is placed between the digits and the trailing
+///      alphabetic character. For a NIE, eparators are placed between the
+///      leading letter and the digits, and between the digits and the trailing
+///      alphabetic character.
 ///   </para>
 ///   <para>
 ///      When creating a new <see cref="EsNif"/>, the following
@@ -57,39 +61,42 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The value must be 9 characters in length (without separators) or
-///               10 characters (DNI with one separator) or 11 characters (NIE with
-///               two separators).
+///               The value must be 9 characters in length (without separators)
+///               or 10 characters (DNI with one separator) or 11 characters
+///               (NIE with two separators).
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
 ///               All characters other than the leading and trailing characters
-///               (and the optional separators) must be ASCII digits ('0'-'9'). The
-///               leading character must be either an ASCII digit or X, Y, or Z.
+///               (and the optional separators) must be ASCII digits ('0'-'9').
+///               The leading character must be either an ASCII digit or X, Y,
+///               or Z.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               The trailing character must be a valid modulus 23 check character.
-///               Valid characters are "TRWAGMYFPDXBNJZSQVHLCKE" (where T represents a
-///               remainder of 0 and E represents a remainder of 22).
+///               The trailing character must be a valid modulus 23 check
+///               character. Valid characters are "TRWAGMYFPDXBNJZSQVHLCKE"
+///               (where T represents a remainder of 0 and E represents a
+///               remainder of 22).
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               The optional separator character(s), if included, may not be an ASCII
-///               digit. Any non-digit character is allowed as a separator. For a DNI,
-///               the separator must be in character position 8 (zero-based). For a NIE,
-///               the separators must be in character positions 1 and 9 (zero-based) and
-///               both separator characters must be the same.
+///               The optional separator character(s), if included, may not be
+///               an ASCII digit. Any non-digit character is allowed as a
+///               separator. For a DNI, the separator must be in character
+///               position 8 (zero-based). For a NIE, the separators must be in
+///               character positions 1 and 9 (zero-based) and both separator
+///               characters must be the same.
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
-///      Note that the `EsNif` constructor and Create/Validate methods are case-sensitive and
-///      require that alphabetic characters be upper-case.
+///      Note that the `EsNif` constructor and Create/Validate methods are
+///      case-sensitive and require that alphabetic characters be upper-case.
 ///   </para>
 ///   <para>
 ///      Example values:
@@ -129,61 +136,65 @@ public record EsNif
    private const Int32 TrailingSeparatorOffset = 2;         // Measured from end of string
 
    private const String CheckCharacters = "TRWAGMYFPDXBNJZSQVHLCKE";
-   private static readonly HashSet<Char> ValidCheckCharacters = CheckCharacters.ToHashSet();
+   private static readonly HashSet<Char> _validCheckCharacters = [.. CheckCharacters];
 
    /// <summary>
-   ///   Initialize a new instance of the <see cref="EsNif"/> class.
+   ///   Initializes a new instance of the <see cref="EsNif"/> class.
    /// </summary>
-   /// <param name="nif">
+   /// <param name="value">
    ///   String representation of a Spanish Número de Identificación
    ///   Fiscal (NIF).
    /// </param>
    /// <exception cref="KfValidationException{EsNifValidationResult}">
-   ///   <paramref name="nif"/> is <see langword="null"/>, empty or all 
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
-   ///   <paramref name="nif"/> is not length 9 (without separators)
+   ///   <paramref name="value"/> is not length 9 (without separators)
    ///   or 10 (DNI with 1 separator) or 11 (NIE with 2 separators).
    ///   - or -
-   ///   <paramref name="nif"/> contains an invalid character. Leading (left-most)
-   ///   character must be an ASCII digit ('0'-'9') or 'X', 'Y' or 'Z'. Trailing
-   ///   (right-most) character must be an alphabetic character from the subset
-   ///   used by modulus 23. All other characters must be ASCII digits.
+   ///   <paramref name="value"/> contains an invalid character. Leading
+   ///   (left-most) character must be an ASCII digit ('0'-'9') or 'X', 'Y' or
+   ///   'Z'. Trailing (right-most) character must be an alphabetic character
+   ///   from the subset used by modulus 23. All other characters must be ASCII
+   ///   digits.
    ///   - or -
-   ///   <paramref name="nif"/> has invalid modulus 23 check character
+   ///   <paramref name="value"/> has invalid modulus 23 check character
    ///   in the trailing (right-most) character position. Valid characters are
    ///   "TRWAGMYFPDXBNJZSQVHLCKE" (where T represents a remainder of 0 and E
    ///   represents a remainder of 22).
    ///   - or -
-   ///   <paramref name="nif"/> is greater than 9 characters in length and has
+   ///   <paramref name="value"/> is greater than 9 characters in length and has
    ///   an ASCII digit ('0'-'9') in a separator location or is 11 characters
    ///   in length and has two different separator characters.
    /// </exception>
-   public EsNif(String? nif)
-      : this(nif, ValidationMode.ValidationRequired) { }
+   public EsNif(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports bypassing
-   ///   validation when creating a new instance from a value that has already
-   ///   been validated.
+   ///   Initializes a new instance of the <see cref="EsNif"/> class.
    /// </summary>
-   private EsNif(String? nif, ValidationMode validationMode)
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private EsNif(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         EsNifValidationResult validationResult = Validate(nif);
+         EsNifValidationResult validationResult = Validate(value);
          if (validationResult != EsNifValidationResult.ValidationPassed)
          {
             throw validationResult.ToValidationException();
          }
       }
 
-      Value = GetRawValue(nif!);
+      Value = GetRawValue(value!);
    }
 
    /// <summary>
-   ///   The type of Spanish Número de Identificación Fiscal represented by the
-   ///   current value.
+   ///   Gets the type of Spanish Número de Identificación Fiscal represented by
+   ///   the current value.
    /// </summary>
    /// <remarks>
    ///   The leading character determines the identifier type. Documento nacional
@@ -195,35 +206,50 @@ public record EsNif
       : EsIdentifierType.Nie;
 
    /// <summary>
-   ///   The raw Número de Identificación Fiscal value.
+   ///   Gets the raw Número de Identificación Fiscal value.
    /// </summary>
    public String Value { get; private init; }
 
-   public static implicit operator String(EsNif nif)
-      => nif?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+   /// <summary>
+   ///   Implicitly converts a <see cref="EsNif"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="EsNif"/> to convert.
+   /// </param>
+   public static implicit operator String(EsNif source)
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
 
-   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
-   public static explicit operator EsNif(String? nif) => new(nif);
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="EsNif"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Spanish Número de Identificación Fiscal.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid NIF number.
+   /// </exception>
+   public static explicit operator EsNif(String? value) => new(value);
 
    /// <summary>
    ///   Create a new <see cref="EsNif"/> using the Result pattern.
    /// </summary>
-   /// <param name="nif">
+   /// <param name="value">
    ///   String representation of a Spanish Número de Identificación Fiscal.
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{EsNif, EsNifValidationResult}"/>.
-   ///   Will contain the new <see cref="EsNif"/> if 
-   ///   <paramref name="nif"/> is valid or an
+   ///   Will contain the new <see cref="EsNif"/> if
+   ///   <paramref name="value"/> is valid or an
    ///   <see cref="EsNifValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="nif"/> is
+   ///   the validation rule that was failed if <paramref name="value"/> is
    ///   invalid.
    /// </returns>
-   public static CreateResult<EsNif, EsNifValidationResult> Create(String? nif)
+   public static CreateResult<EsNif, EsNifValidationResult> Create(String? value)
    {
-      EsNifValidationResult validationResult = Validate(nif);
+      EsNifValidationResult validationResult = Validate(value);
       return validationResult == EsNifValidationResult.ValidationPassed
-         ? new EsNif(nif, validationMode: ValidationMode.BypassValidation)
+         ? new EsNif(value, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
@@ -259,30 +285,30 @@ public record EsNif
    /// <summary>
    ///   Get a string representation of the NIF.
    /// </summary>
-   /// <remarks>
-   ///   Will return the raw NIF, without  separator characters.
-   /// </remarks>
+   /// <returns>
+   ///   The raw NIF, without  separator characters.
+   /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="nif"/> to determine if it contains a
+   ///   Check the <paramref name="value"/> to determine if it contains a
    ///   valid Spanish Número de Identificación Fiscal (NIF).
    /// </summary>
-   /// <param name="nif">
+   /// <param name="value">
    ///   String representation of a Spanish Número de Identificación Fiscal (NIF).
    /// </param>
    /// <returns>
    ///   A <see cref="EsNifValidationResult"/> enumeration
-   ///   value that indicates if the <paramref name="nif"/> passed
+   ///   value that indicates if the <paramref name="value"/> passed
    ///   validation or what validation error was encountered.
    /// </returns>
-   public static EsNifValidationResult Validate(String? nif)
+   public static EsNifValidationResult Validate(String? value)
    {
-      if (String.IsNullOrWhiteSpace(nif))
+      if (String.IsNullOrWhiteSpace(value))
       {
          return EsNifValidationResult.Empty;
       }
-      else if (!ValidateLength(nif))
+      else if (!ValidateLength(value))
       {
          return EsNifValidationResult.InvalidLength;
       }
@@ -290,13 +316,13 @@ public record EsNif
       // After performing basic checks, validate the check digit because the
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
-      EsNifValidationResult validationResult = ValidateCheckDigit(nif);
+      EsNifValidationResult validationResult = ValidateCheckDigit(value);
       if (validationResult != EsNifValidationResult.ValidationPassed)
       {
          // Could be either InvalidCharacter or InvalidCheckDigit.
          return validationResult;
       }
-      else if (!ValidateSeparators(nif))
+      else if (!ValidateSeparators(value))
       {
          return EsNifValidationResult.InvalidSeparator;
       }
@@ -304,38 +330,39 @@ public record EsNif
       return EsNifValidationResult.ValidationPassed;
    }
 
-   private static String GetRawValue(String nif)
-      => nif.Length switch
+   private static String GetRawValue(String value)
+      => value.Length switch
       {
-         UnformattedLength => nif,
-         DniFormattedLength => String.Concat(nif.AsSpan(..8), nif.AsSpan(^1..)),
-         NieFormattedLength => String.Concat(nif.AsSpan(..1), nif.AsSpan(2..^2), nif.AsSpan(^1..)),
+         UnformattedLength => value,
+         DniFormattedLength => String.Concat(value.AsSpan(..8), value.AsSpan(^1..)),
+         NieFormattedLength => String.Concat(value.AsSpan(..1), value.AsSpan(2..^2), value.AsSpan(^1..)),
          _ => throw new InvalidOperationException(),      // Validation ensures this is never reached
       };
 
-   private static EsNifValidationResult ValidateCheckDigit(ReadOnlySpan<Char> nif)
+   private static EsNifValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
    {
       // Process leading character outside main loop.
-      var leadingCharacter = nif[0];
+      var leadingCharacter = value[0];
       var num = leadingCharacter.ToSingleDigit();
       if (!num.IsValidDigit())
       {
          // Handle possible NIE.
          num = leadingCharacter - Chars.UpperCaseX;
-         if (num is < 0 or > 2)              // X = 0, Y = 1, Z = 2
+         if (num is < 0 or > 2) // X = 0, Y = 1, Z = 2
          {
             return EsNifValidationResult.InvalidCharacter;
          }
       }
+
       var sum = num;
 
       // Handle inner digits.
-      var start = nif.Length == NieFormattedLength ? 2 : 1;
-      var end = nif.Length == NieFormattedLength ? 9 : 8;
+      var start = value.Length == NieFormattedLength ? 2 : 1;
+      var end = value.Length == NieFormattedLength ? 9 : 8;
       for (var index = start; index < end; index++)
       {
          sum *= 10;
-         num = nif[index].ToSingleDigit();
+         num = value[index].ToSingleDigit();
          if (!num.IsValidDigit())
          {
             return EsNifValidationResult.InvalidCharacter;
@@ -346,7 +373,7 @@ public record EsNif
 
       var remainder = sum % 23;
       var checkCharacter = CheckCharacters[remainder];
-      var trailingCharacter = nif[^1];
+      var trailingCharacter = value[^1];
       if (trailingCharacter == checkCharacter)
       {
          return EsNifValidationResult.ValidationPassed;
@@ -354,28 +381,28 @@ public record EsNif
 
       // If check character doesn't match, check for character not in
       // set of valid check characters.
-      return ValidCheckCharacters.Contains(trailingCharacter)
+      return _validCheckCharacters.Contains(trailingCharacter)
          ? EsNifValidationResult.InvalidCheckDigit
          : EsNifValidationResult.InvalidCharacter;
    }
 
-   private static Boolean ValidateLength(ReadOnlySpan<Char> nif)
+   private static Boolean ValidateLength(ReadOnlySpan<Char> value)
    {
-      var isLeadingDigit = nif[0].IsAsciiDigit();
+      var isLeadingDigit = value[0].IsAsciiDigit();
 
-      return nif.Length == UnformattedLength
-         || (isLeadingDigit && nif.Length == DniFormattedLength)
-         || (!isLeadingDigit && nif.Length == NieFormattedLength);
+      return value.Length == UnformattedLength
+         || (isLeadingDigit && value.Length == DniFormattedLength)
+         || (!isLeadingDigit && value.Length == NieFormattedLength);
    }
 
-   private static Boolean ValidateSeparators(ReadOnlySpan<Char> nif)
+   private static Boolean ValidateSeparators(ReadOnlySpan<Char> value)
    {
-      if (nif.Length == UnformattedLength)
+      if (value.Length == UnformattedLength)
       {
          return true;  // No separators to validate
       }
 
-      var trailingSeparator = nif[^TrailingSeparatorOffset];
+      var trailingSeparator = value[^TrailingSeparatorOffset];
 
       // Separator must not be a digit
       if (trailingSeparator.IsAsciiDigit())
@@ -384,16 +411,18 @@ public record EsNif
       }
 
       // DNI has only trailing separator
-      if (nif.Length == DniFormattedLength)
+      if (value.Length == DniFormattedLength)
       {
          return true;
       }
 
       // NIE has leading and trailing separators - must match
-      return trailingSeparator == nif[LeadingSeparatorOffset];
+      return trailingSeparator == value[LeadingSeparatorOffset];
    }
 }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class EsNifJsonConverter : JsonConverter<EsNif>
 {
    public override EsNif Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
