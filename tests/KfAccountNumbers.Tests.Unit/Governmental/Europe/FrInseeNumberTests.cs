@@ -699,25 +699,39 @@ public class FrInseeNumberTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(Chars.DigitOne, BinaryGender.Male, true)]
-   [InlineData(Chars.DigitTwo, BinaryGender.Female, true)]
-   [InlineData(Chars.DigitSeven, BinaryGender.Male, true)]
-   [InlineData(Chars.DigitEight, BinaryGender.Female, true)]
-   [InlineData(Chars.DigitOne, BinaryGender.Male, false)]
-   [InlineData(Chars.DigitTwo, BinaryGender.Female, false)]
-   [InlineData(Chars.DigitSeven, BinaryGender.Male, false)]
-   [InlineData(Chars.DigitEight, BinaryGender.Female, false)]
-   public void FrInseeNumber_Gender_ShouldReturnExpectedValue(
+   [InlineData(Chars.DigitOne, true)]
+   [InlineData(Chars.DigitSeven, true)]
+   [InlineData(Chars.DigitOne, false)]
+   [InlineData(Chars.DigitSeven, false)]
+   public void FrInseeNumber_Gender_ShouldReturnMale_WhenGenderCodeIsOdd(
       Char gender,
-      BinaryGender expectedGender,
       Boolean formatted)
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(gender, formatted: formatted);
       var sut = new FrInseeNumber(value);
+      Gender.BinaryGender expected = default(Gender.Male);
 
       // Act/arrange
-      sut.Gender.Should().Be(expectedGender);
+      sut.Gender.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData(Chars.DigitTwo, true)]
+   [InlineData(Chars.DigitEight, true)]
+   [InlineData(Chars.DigitTwo, false)]
+   [InlineData(Chars.DigitEight, false)]
+   public void FrInseeNumber_Gender_ShouldReturnFemale_WhenGenderCodeIsOdd(
+      Char gender,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender, formatted: formatted);
+      var sut = new FrInseeNumber(value);
+      Gender.BinaryGender expected = default(Gender.Female);
+
+      // Act/arrange
+      sut.Gender.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -819,7 +833,6 @@ public class FrInseeNumberTests
       // Arrange.
       var value = ValidFormattedInseeNumberCorsica;
       var sut = new FrInseeNumber(value);
-      var expected = GetRawInsee(value);
 
       // Act.
       var str = (String)sut;

@@ -161,7 +161,6 @@ namespace KfAccountNumbers.Governmental.Europe;
 [JsonConverter(typeof(FrInseeNumberJsonConverter))]
 public record FrInseeNumber
 {
-
    /// <summary>
    ///   Discriminated union defining the possible validation errors that can
    ///   occur when creating a new <see cref="FrInseeNumber"/>.
@@ -209,11 +208,9 @@ public record FrInseeNumber
 
    // Used to validate unformatted values or to extract elements from raw values
    // post validation.
-   private static readonly SegmentRange _commune = new(7, 10);
    private static readonly SegmentRange _department = new(5, 7);
    private static readonly SegmentRange _month = new(3, 5);
    private static readonly SegmentRange _overseasDepartment = new(5, 8);
-   private static readonly SegmentRange _year = new(1, 2);
 
    private const Int32 GenderOffset = 0;
    private const Int32 FormattedMonthOffset = 5;
@@ -377,12 +374,10 @@ public record FrInseeNumber
          var endOffset = UnformattedCommuneOffset;
          if (Value.AsSpan(UnformattedDepartmentOffset..endOffset).Equals(OverseasDepartmentPrefix, StringComparison.OrdinalIgnoreCase))
          {
+            // Overseas departments use an additional character for department code.
             endOffset++;
-            // TODO: can this be eliminated?
-            // return Value[UnformattedDepartmentOffset..endOffset];
          }
 
-         // Overseas departments use an additional character for department code.
          return Value[UnformattedDepartmentOffset..endOffset];
       }
    }
@@ -391,15 +386,8 @@ public record FrInseeNumber
    ///   Gets the person's gender, as indicated by the leading (left-most) digit
    ///   in the INSEE number.
    /// </summary>
-   public BinaryGender Gender
-      => Value[GenderOffset] switch
-      {
-         Chars.DigitOne => BinaryGender.Male,
-         Chars.DigitTwo => BinaryGender.Female,
-         Chars.DigitSeven => BinaryGender.Male,
-         Chars.DigitEight => BinaryGender.Female,
-         _ => throw new InvalidOperationException(),      // Validation during construction ensures this can never be reached
-      };
+   public Gender.BinaryGender Gender
+      => Value[GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);    // This works because the ASCII character values for digits have the same odd/even pattern
 
    /// <summary>
    ///   Gets a value indicating whether the person was born abroad.
@@ -422,14 +410,7 @@ public record FrInseeNumber
    ///   INSEE numbers use gender codes '7' or '8'.
    /// </remarks>
    public Boolean IsTemporaryInsee
-      => Value[GenderOffset] switch
-      {
-         Chars.DigitOne => false,
-         Chars.DigitTwo => false,
-         Chars.DigitSeven => true,
-         Chars.DigitEight => true,
-         _ => throw new InvalidOperationException(),     // Validation during construction ensures this can never be reached
-      };
+      => Value[GenderOffset] is Chars.DigitSeven or Chars.DigitEight;
 
    /// <summary>
    ///   Gets the raw INSEE number.
