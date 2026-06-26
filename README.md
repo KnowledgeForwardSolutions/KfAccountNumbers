@@ -11,7 +11,7 @@ The business objects in KfAccountNumbers all have the following capabilities:
 * Implicit conversion to string and explicit conversion from string.
 
 If the business object represents an account number that has a defined format (ex. US Social Security
-Number, etc.), the constructor, Create and Validate methods and implicit string to business object
+Number, etc.), the constructor, Create and Validate methods and explicit string to business object
 operator will accept either a string that consists of only the characters in the account number or a
 string that includes format characters (ex. dashes, spaces, etc.) in the appropriate places. The
 business object will also implement a Format method that returns a string representation of the
@@ -19,7 +19,7 @@ account number with the appropriate format characters in the appropriate places.
 
 If the business object represents an account number that normally has no formatting other than the
 raw characters of the account number then the business object constructor, Create and Validate methods
-and implicit string to business object operator will only accept strings that consist of the raw
+and explicit string to business object operator will only accept strings that consist of the raw
 characters of the account number. Nor will the business object implement a Format method since there
 is no formatting to be done.
 
@@ -270,7 +270,7 @@ A henkilötunnus must meet all of the following rules:
 * The check character must be a valid modulus 31 check character calculated from the date of birth and the individual number.
 
 FiHenkilotunnus is case-insensitive for validation and parsing purposes. The FiHenkilotunnus constructor, Create
-method and implicit string to FiHenkilotunnus operator will normalize any lowercase letters to uppercase. Equality and
+method and explicit string to FiHenkilotunnus operator will normalize any lowercase letters to uppercase. Equality and
 inequality comparisons between instances of FiHenkilotunnus will compare the normalized uppercase versions of the value.
 
 Example values:
@@ -316,7 +316,7 @@ A valid INSEE number must meet all of the following rules:
   with alphabetic characters (Corsica 2A, 2B), the alphabetic character may be uppercase or lowercase.
 
 FrInseeNumber is case-insensitive for validation and parsing purposes. The FrInseeNumber constructor, Create
-method and implicit string to FrInseeNumber operator will normalize any lowercase letters to uppercase.
+method and explicit string to FrInseeNumber operator will normalize any lowercase letters to uppercase.
 Equality and inequality comparisons between instances of FrInseeNumber will compare the normalized
 uppercase versions of the value.
 
@@ -592,7 +592,7 @@ A valid CURP must meet all of the following rules (specific character offsets ar
 * Character 17 must be a digit (0-9)
 
 MxCurp is case-insensitive for validation and parsing purposes. The MxCurp constructor, Create
-method and implicit string to MxCurp operator will normalize any lowercase letters to uppercase.
+method and explicit string to MxCurp operator will normalize any lowercase letters to uppercase.
 Equality and inequality comparisons between instances of MxCurp will compare the normalized
 uppercase versions of the value.
 

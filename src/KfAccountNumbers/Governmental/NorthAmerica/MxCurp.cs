@@ -75,7 +75,7 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///   <para>
 ///      <see cref="MxCurp"/> is case-insensitive for validation and
 ///      parsing purposes. The MxCurp constructor, Create method and
-///      implicit string to MxCurp operator will normalize any
+///      explicit string to MxCurp operator will normalize any
 ///      lowercase letters to uppercase. Equality and inequality comparisons
 ///      between instances of MxCurp will compare the normalized
 ///      uppercase versions of the value.

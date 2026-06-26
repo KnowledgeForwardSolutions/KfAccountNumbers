@@ -123,7 +123,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   <para>
 ///      <see cref="FrInseeNumber"/> is case-insensitive for validation and
 ///      parsing purposes. The FrInseeNumber constructor, Create method and
-///      implicit string to FrInseeNumber operator will normalize any
+///      explicit string to FrInseeNumber operator will normalize any
 ///      lowercase letters to uppercase. Equality and inequality comparisons
 ///      between instances of FrInseeNumber will compare the normalized
 ///      uppercase versions of the value.

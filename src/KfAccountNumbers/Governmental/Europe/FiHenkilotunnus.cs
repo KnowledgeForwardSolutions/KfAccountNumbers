@@ -127,7 +127,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   <para>
 ///      <see cref="FiHenkilotunnus"/> is case-insensitive for validation and
 ///      parsing purposes. The FiHenkilotunnus constructor, Create method and
-///      implicit string to FiHenkilotunnus operator will normalize any
+///      explicit string to FiHenkilotunnus operator will normalize any
 ///      lowercase letters to uppercase. Equality and inequality comparisons
 ///      between instances of FiHenkilotunnus will compare the normalized
 ///      uppercase versions of the value.
