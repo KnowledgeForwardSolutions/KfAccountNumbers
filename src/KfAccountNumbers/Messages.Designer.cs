@@ -493,6 +493,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to FR INSEE number formatted as S YY MM LL OOO KKK CC.
+        /// </summary>
+        internal static string FrInseeNumberFormattedLength {
+            get {
+                return ResourceManager.GetString("FrInseeNumberFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to FR INSEE number contains a non-digit character where a digit was expected.
         /// </summary>
         internal static string FrInseeNumberInvalidCharacter {
@@ -552,6 +561,15 @@ namespace KfAccountNumbers {
         internal static string FrInseeNumberInvalidSeparator {
             get {
                 return ResourceManager.GetString("FrInseeNumberInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FR INSEE number without separator characters (SYYMMLLOOOKKKCC).
+        /// </summary>
+        internal static string FrInseeNumberUnformattedLength {
+            get {
+                return ResourceManager.GetString("FrInseeNumberUnformattedLength", resourceCulture);
             }
         }
         

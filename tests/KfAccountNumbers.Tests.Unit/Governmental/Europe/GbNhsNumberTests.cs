@@ -232,7 +232,7 @@ public class GbNhsNumberTests
          value[position],
          position);
 
-   private static GbPatientNumberInvalidRange GetInvalidRangeResult()
+   private static InvalidGbPatientNumberRange GetInvalidRangeResult()
       => new(Messages.GbNhsNumberInvalidRange);
 
    #region Constructor Tests

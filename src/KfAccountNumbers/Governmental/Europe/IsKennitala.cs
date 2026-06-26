@@ -525,7 +525,7 @@ public record IsKennitala
          ? default(ValidValue)
          : new InvalidCentury(
             Messages.IsKennitalaInvalidCentury,
-            value[^CenturyIndicatorOffset]);
+            value[^CenturyIndicatorOffset].ToString());
    }
 
    private static ValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)

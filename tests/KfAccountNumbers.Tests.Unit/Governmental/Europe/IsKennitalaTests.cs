@@ -280,7 +280,7 @@ public class IsKennitalaTests
       => new(Messages.IsKennitalaInvalidSeparator, value[6], 6);
 
    private static InvalidCentury GetInvalidCenturyResult(String value)
-      => new(Messages.IsKennitalaInvalidCentury, value[^1]);
+      => new(Messages.IsKennitalaInvalidCentury, value[^1].ToString());
 
    private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
       => new(Messages.IsKennitalaInvalidDateOfBirth, value[..6], DateFormatName.DDMMYY);

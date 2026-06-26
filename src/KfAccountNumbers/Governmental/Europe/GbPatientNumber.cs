@@ -267,7 +267,7 @@ public record GbPatientNumber : GbPatientNumberBase
       InvalidCharacter,
       InvalidChecksum,
       InvalidSeparator,
-      GbPatientNumberInvalidRange,
+      InvalidGbPatientNumberRange,
       InvalidDateOfBirth)
    {
    }
@@ -283,7 +283,7 @@ public record GbPatientNumber : GbPatientNumberBase
       InvalidCharacter,
       InvalidChecksum,
       InvalidSeparator,
-      GbPatientNumberInvalidRange,
+      InvalidGbPatientNumberRange,
       InvalidDateOfBirth)
    {
    }
@@ -352,7 +352,7 @@ public record GbPatientNumber : GbPatientNumberBase
                InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
                InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
-               GbPatientNumberInvalidRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
+               InvalidGbPatientNumberRange invalidRange => new UKfValidationException<ValidationError>(invalidRange),
                InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
                _ => new UnreachableException("This branch should never be reached"),
             };
@@ -427,7 +427,7 @@ public record GbPatientNumber : GbPatientNumberBase
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
          InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
          InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
-         GbPatientNumberInvalidRange invalidRange => (ValidationError)invalidRange,
+         InvalidGbPatientNumberRange invalidRange => (ValidationError)invalidRange,
          InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
          _ => throw new UnreachableException("This branch should never be reached"),
       };
@@ -556,7 +556,7 @@ public record GbPatientNumber : GbPatientNumberBase
       IdentifierRangeCategory identifierCategory = GetIdentifierCategory(value);
       if (identifierCategory is IdentifierRangeCategory.Invalid)
       {
-         return new GbPatientNumberInvalidRange(Messages.GbPatientNumberInvalidRange);
+         return new InvalidGbPatientNumberRange(Messages.GbPatientNumberInvalidRange);
       }
 
       // Secondary length validation for formatted values. Formatted length must

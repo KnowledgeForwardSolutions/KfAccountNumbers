@@ -1,9 +1,8 @@
 namespace KfAccountNumbers.Results;
 
 /// <summary>
-///   The FiHenkilotunnusInvalidIndividualNumber struct represents a validation
-///   error indicating that a Finnish henkilötunnus value contains an invalid
-///   individual number component.
+///   Represents a validation error indicating that a Finnish henkilötunnus
+///   value contains an invalid individual number component.
 /// </summary>
 /// <param name="Description">
 ///   Message describing the validation error, indicating that an invalid
@@ -12,6 +11,6 @@ namespace KfAccountNumbers.Results;
 /// <param name="IndividualNumber">
 ///   The invalid individual number that was found in the input value.
 /// </param>
-public readonly record struct FiHenkilotunnusInvalidIndividualNumber(
+public readonly record struct InvalidFiHenkilotunnusIndividualNumber(
    String Description,
    String IndividualNumber);

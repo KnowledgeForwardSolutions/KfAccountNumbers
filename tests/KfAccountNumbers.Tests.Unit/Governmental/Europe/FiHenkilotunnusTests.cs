@@ -275,7 +275,7 @@ public class FiHenkilotunnusTests
          Messages.FiHenkilotunnusInvalidCheckDigit,
          FiHenkilotunnus.CheckDigitAlgorithmName);
 
-   private static FiHenkilotunnusInvalidIndividualNumber GetInvalidIndividualNumberResult(String value)
+   private static InvalidFiHenkilotunnusIndividualNumber GetInvalidIndividualNumberResult(String value)
       => new(
          Messages.FiHenkilotunnusInvalidIndividualNumber,
          value[7..10]);
@@ -284,7 +284,7 @@ public class FiHenkilotunnusTests
       => new(Messages.FiHenkilotunnusInvalidDateOfBirth, value[..6], DateFormatName.DDMMYY);
 
    private static InvalidCentury GetInvalidCenturyResult(String value)
-      => new(Messages.FiHenkilotunnusInvalidCenturyIndicator, value[6]);
+      => new(Messages.FiHenkilotunnusInvalidCenturyIndicator, value[6].ToString());
 
    #region Constants Tests
    // ==========================================================================
