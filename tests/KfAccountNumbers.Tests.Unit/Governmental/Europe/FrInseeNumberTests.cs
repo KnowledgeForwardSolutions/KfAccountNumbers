@@ -710,7 +710,7 @@ public class FrInseeNumberTests
       var sut = new FrInseeNumber(value);
       Gender.BinaryGender expected = default(Gender.Male);
 
-      // Act/arrange
+      // Act/assert.
       sut.Gender.Should().BeEquivalentTo(expected);
    }
 
@@ -719,7 +719,7 @@ public class FrInseeNumberTests
    [InlineData(Chars.DigitEight, true)]
    [InlineData(Chars.DigitTwo, false)]
    [InlineData(Chars.DigitEight, false)]
-   public void FrInseeNumber_Gender_ShouldReturnFemale_WhenGenderCodeIsOdd(
+   public void FrInseeNumber_Gender_ShouldReturnFemale_WhenGenderCodeIsEven(
       Char gender,
       Boolean formatted)
    {
@@ -728,7 +728,7 @@ public class FrInseeNumberTests
       var sut = new FrInseeNumber(value);
       Gender.BinaryGender expected = default(Gender.Female);
 
-      // Act/arrange
+      // Act/assert.
       sut.Gender.Should().BeEquivalentTo(expected);
    }
 
@@ -790,7 +790,7 @@ public class FrInseeNumberTests
       var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
       var sut = new FrInseeNumber(value);
 
-      // Act/arrange
+      // Act/assert.
       sut.IsBornAbroad.Should().Be(expectedResult);
    }
 
@@ -1379,7 +1379,7 @@ public class FrInseeNumberTests
 
    [Theory]
    [MemberData(nameof(InvalidMonthValues))]
-   public void FrInseeNumber_Create_ShouldReturnInvaliMonthValidationResult_WhenValueHasInvalidMonth(
+   public void FrInseeNumber_Create_ShouldReturnInvalidMonthValidationResult_WhenValueHasInvalidMonth(
       String month,
       Boolean formatted)
    {

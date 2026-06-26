@@ -454,8 +454,8 @@ public record FrInseeNumber
    ///   String representation of a French INSEE number.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{BeRijksregisternummer, ValidationError}"/>. Will
-   ///   contain the new <see cref="BeRijksregisternummer"/> if <paramref name="value"/>
+   ///   A <see cref="UCreateResult{FrInseeNumber, ValidationError}"/>. Will
+   ///   contain the new <see cref="FrInseeNumber"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
@@ -501,7 +501,7 @@ public record FrInseeNumber
    ///   Get a string representation of the INSEE number.
    /// </summary>
    /// <returns>
-   ///   The raw INSEE number, without  separator characters.
+   ///   The raw INSEE number, without separator characters.
    /// </returns>
    public override String ToString() => Value;
 
