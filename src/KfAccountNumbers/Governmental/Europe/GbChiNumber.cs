@@ -362,16 +362,14 @@ public record class GbChiNumber : GbPatientNumberBase
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="value"/> to determine if it contains a valid
-   ///   CHI number.
+   ///   Check the <paramref name="value"/> to determine if it contains a valid CHI number.
    /// </summary>
    /// <param name="value">
    ///   String representation of a CHI number.
    /// </param>
    /// <returns>
-   ///   A <see cref="ValidationResult"/> union that indicates if the
-   ///   <paramref name="value"/> passed validation or what validation error was
-   ///   encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the <paramref name="value"/> passed validation or what
+   ///   validation error was encountered.
    /// </returns>
 #pragma warning disable IDE0046 // Convert to conditional expression
    public static ValidationResult Validate(String? value)
