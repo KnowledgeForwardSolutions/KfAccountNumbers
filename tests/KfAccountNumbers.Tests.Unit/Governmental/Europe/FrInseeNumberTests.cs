@@ -19,12 +19,14 @@ public class FrInseeNumberTests
    private const String ValidUnformattedInseeNumber = "188121884813236";
    private const String AltValidUnformattedInseeNumber = "255102445387701";
    private const String ValidUnformattedInseeNumberCorsica = "112072A28806058";
+   private const String ValidUnformattedLowercaseInseeNumberCorsica = "112072a28806058";
    private const String AltValidUnformattedInseeNumberCorsica = "112072B28806085";
    private const String ValidUnformattedTemporaryInseeNumber = "821099901013371";
    private const String ValidFormattedInseeNumber = "1 88 12 18 848 132 36";
    private const String AltValidFormattedInseeNumber = "2 55 10 24 453 877 01";
    private const String ValidFormattedInseeNumberCorsica = "1 12 07 2A 288 060 58";
    private const String AltValidFormattedInseeNumberCorsica = "1 12 07 2B 288 060 85";
+   private const String AltValidFormattedLowercaseInseeNumberCorsica = "1 12 07 2b 288 060 85";
    private const String ValidFormattedTemporaryInseeNumber = "8-21-09-99-010-133-71";
 
    private static String GetInseeWithValidCheckDigits(
@@ -71,8 +73,8 @@ public class FrInseeNumberTests
 
    private static String GetRawInsee(String insee)
       => insee.Length == 15
-      ? insee
-      : insee[..1] + insee[2..4] + insee[5..7] + insee[8..10] + insee[11..14] + insee[15..18] + insee[19..];
+      ? insee.ToUpperInvariant()
+      : (insee[..1] + insee[2..4] + insee[5..7] + insee[8..10] + insee[11..14] + insee[15..18] + insee[19..]).ToUpperInvariant();
 
    public static TheoryData<String> ValidInseeNumbers =>
    [
@@ -86,6 +88,8 @@ public class FrInseeNumberTests
       ValidFormattedInseeNumberCorsica,
       AltValidFormattedInseeNumberCorsica,
       ValidFormattedTemporaryInseeNumber,
+      ValidUnformattedLowercaseInseeNumberCorsica,
+      AltValidFormattedLowercaseInseeNumberCorsica,
    ];
 
    public static TheoryData<Char> ValidGenders =>
@@ -186,12 +190,6 @@ public class FrInseeNumberTests
       { "1 88 12 18 848 13  36", 17 },       // Non-digit character ' '
       { "1 88 12 18 848 132 A6", 19 },       // Non-digit character 'A'
       { "1 88 12 18 848 132 3Z", 20 },       // Non-digit character 'Z'
-
-      // Special cases for Corsican departments
-      { "112072a28806058", 6 },              // lowercase 'a' in Corsican department position
-      { "112072b28806085", 6 },              // lowercase 'b' in Corsican department position
-      { "1 12 07 2a 288 060 58", 9 },        // lowercase 'a' formatted
-      { "1 12 07 2b 288 060 85", 9 },        // lowercase 'b' formatted
    };
 
    public static TheoryData<String> InvalidCheckDigitValues =>
@@ -736,6 +734,40 @@ public class FrInseeNumberTests
 
    #endregion
 
+   #region IdentifierType Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Chars.DigitOne)]
+   [InlineData(Chars.DigitTwo)]
+   public void FrInseeNumber_IdentifierType_ShouldReturnExpectedValue_WhenValueIsPermanentInsee(Char gender)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender);
+      var sut = new FrInseeNumber(value);
+      FrInseeNumber.IdentifierCategory expected = default(FrIdentifierType.Insee);
+
+      // Act/assert.
+      sut.IdentifierType.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData(Chars.DigitSeven)]
+   [InlineData(Chars.DigitEight)]
+   public void FrInseeNumber_IdentifierType_ShouldReturnExpectedValue_WhenValueIsTemporaryInsee(Char gender)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender);
+      var sut = new FrInseeNumber(value);
+      FrInseeNumber.IdentifierCategory expected = default(FrIdentifierType.TemporaryInsee);
+
+      // Act/assert.
+      sut.IdentifierType.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
    #region IsBornAbroad Property Tests
    // ==========================================================================
    // ==========================================================================
@@ -760,29 +792,6 @@ public class FrInseeNumberTests
 
       // Act/arrange
       sut.IsBornAbroad.Should().Be(expectedResult);
-   }
-
-   #endregion
-
-   #region IsTemporary Property Tests
-   // ==========================================================================
-   // ==========================================================================
-
-   [Theory]
-   [InlineData(Chars.DigitOne, false)]
-   [InlineData(Chars.DigitTwo, false)]
-   [InlineData(Chars.DigitSeven, true)]
-   [InlineData(Chars.DigitEight, true)]
-   public void FrInseeNumber_IsTemporary_ShouldReturnExpectedValue(
-      Char gender,
-      Boolean expected)
-   {
-      // Arrange.
-      var value = GetInseeWithValidCheckDigits(gender);
-      var sut = new FrInseeNumber(value);
-
-      // Act/arrange
-      sut.IsTemporaryInsee.Should().Be(expected);
    }
 
    #endregion
@@ -1123,6 +1132,17 @@ public class FrInseeNumberTests
       (sut1 == sut2).Should().BeTrue();
    }
 
+   [Fact]
+   public void FrInseeNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyByDepartmentCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumberCorsica);
+      var sut2 = new FrInseeNumber(ValidUnformattedLowercaseInseeNumberCorsica);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
    #endregion
 
    #region Inequality Operator Tests
@@ -1179,6 +1199,17 @@ public class FrInseeNumberTests
       // Arrange.
       var sut1 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'A'));
       var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'a'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void FrInseeNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyByDepartmentCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumberCorsica);
+      var sut2 = new FrInseeNumber(ValidUnformattedLowercaseInseeNumberCorsica);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -1461,6 +1492,17 @@ public class FrInseeNumberTests
       sut.Equals(null).Should().BeFalse();
    }
 
+   [Fact]
+   public void FrInseeNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyByDepartmentCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumberCorsica);
+      var sut2 = new FrInseeNumber(ValidUnformattedLowercaseInseeNumberCorsica);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
    #endregion
 
    #region Format Method Tests
@@ -1608,6 +1650,22 @@ public class FrInseeNumberTests
       // Assert.
       hash1.Should().Be(hash2);
    }
+
+   [Fact]
+   public void FrInseeNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyByDepartmentCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumberCorsica);
+      var sut2 = new FrInseeNumber(ValidUnformattedLowercaseInseeNumberCorsica);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
    #endregion
 
    #region ReferenceEquals Method Tests

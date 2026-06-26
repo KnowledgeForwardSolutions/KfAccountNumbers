@@ -162,6 +162,12 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record FrInseeNumber
 {
    /// <summary>
+   ///   Discriminated union defining the types of identifier that
+   ///   <see cref="FrInseeNumber"/> can represent.
+   /// </summary>
+   public union IdentifierCategory(FrIdentifierType.Insee, FrIdentifierType.TemporaryInsee) { }
+
+   /// <summary>
    ///   Discriminated union defining the possible validation errors that can
    ///   occur when creating a new <see cref="FrInseeNumber"/>.
    /// </summary>
@@ -208,19 +214,12 @@ public record FrInseeNumber
 
    // Used to validate unformatted values or to extract elements from raw values
    // post validation.
+   private static readonly SegmentRange _cog = new(5, 10);
    private static readonly SegmentRange _department = new(5, 7);
    private static readonly SegmentRange _month = new(3, 5);
    private static readonly SegmentRange _overseasDepartment = new(5, 8);
-
+   private static readonly SegmentRange _year = new(1, 3);
    private const Int32 GenderOffset = 0;
-   private const Int32 FormattedMonthOffset = 5;
-   private const Int32 FormattedDepartmentOffset = 8;
-   private const Int32 UnformattedYearOffset = 1;
-   private const Int32 UnformattedMonthOffset = 3;
-   private const Int32 UnformattedDepartmentOffset = 5;
-   private const Int32 UnformattedCommuneOffset = 7;
-   private const Int32 UnformattedSequenceOffset = 10;
-
    private const Int32 Separator1Offset = 1;
    private const Int32 Separator2Offset = 4;
    private const Int32 Separator3Offset = 7;
@@ -231,7 +230,7 @@ public record FrInseeNumber
    private static readonly Int32[] _separatorOffsets =
    [
       Separator2Offset,             // Skip Separator1Offset because it's handled slightly differently.
-      Separator3Offset,             // See ValidateSeparators.
+      Separator3Offset,             // See ValidateSeparators method for details.
       Separator4Offset,
       Separator5Offset,
       Separator6Offset
@@ -321,17 +320,18 @@ public record FrInseeNumber
    /// <summary>
    ///   Gets the person's integer month of birth.
    /// </summary>
+
    /// <remarks>
    ///   Birth month is normally 1-12, but may be other values for persons with
    ///   unknown or incomplete documentation. Other possible values are 13,
    ///   20-42 and 50-99.
    /// </remarks>
-   public Int32 BirthMonth => Value.AsSpan(UnformattedMonthOffset..).ParseTwoDigits();
+   public Int32 BirthMonth => _month.Extract(Value).ParseTwoDigits();
 
    /// <summary>
    ///   Gets the person's two digit year of birth (0-99).
    /// </summary>
-   public Int32 BirthYear => Value.AsSpan(UnformattedYearOffset..).ParseTwoDigits();
+   public Int32 BirthYear => _year.Extract(Value).ParseTwoDigits();
 
    /// <summary>
    ///   Gets the five-digit INSEE COG (Code officiel géographique) identifying
@@ -361,7 +361,7 @@ public record FrInseeNumber
    ///      </item>
    ///   </list>
    /// </remarks>
-   public String Cog => Value[UnformattedDepartmentOffset..UnformattedSequenceOffset];
+   public String Cog => _cog.Extract(Value).ToString();
 
    /// <summary>
    ///   Gets the INSEE code for the department where the person was born, as
@@ -371,14 +371,14 @@ public record FrInseeNumber
    {
       get
       {
-         var endOffset = UnformattedCommuneOffset;
-         if (Value.AsSpan(UnformattedDepartmentOffset..endOffset).Equals(OverseasDepartmentPrefix, StringComparison.OrdinalIgnoreCase))
+         SegmentRange departmentSegment = _department;
+         if (departmentSegment.Extract(Value).Equals(OverseasDepartmentPrefix, StringComparison.OrdinalIgnoreCase))
          {
             // Overseas departments use an additional character for department code.
-            endOffset++;
+            departmentSegment = _overseasDepartment;
          }
 
-         return Value[UnformattedDepartmentOffset..endOffset];
+         return departmentSegment.Extract(Value).ToString();
       }
    }
 
@@ -390,6 +390,19 @@ public record FrInseeNumber
       => Value[GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);    // This works because the ASCII character values for digits have the same odd/even pattern
 
    /// <summary>
+   ///   Gets the type of French identifier represented by the current value.
+   /// </summary>
+   /// <remarks>
+   ///   The leading gender character identifies the type of INSEE. A '1' or '2'
+   ///   indicates a permanent INSEE while a '7' or '8' indicates a temporary
+   ///   INSEE.
+   /// </remarks>
+   public IdentifierCategory IdentifierType
+      => Value[GenderOffset] >= Chars.DigitSeven
+         ? default(FrIdentifierType.TemporaryInsee)
+         : default(FrIdentifierType.Insee);
+
+   /// <summary>
    ///   Gets a value indicating whether the person was born abroad.
    ///   <see langword="true"/> if the person was born abroad; otherwise
    ///   <see langword="false"/>.
@@ -398,19 +411,7 @@ public record FrInseeNumber
    ///   Persons born abroad have a fixed department code of "99".
    /// </remarks>
    public Boolean IsBornAbroad
-      => Value.AsSpan(UnformattedDepartmentOffset..UnformattedCommuneOffset).Equals(BornAbroadDepartment, StringComparison.OrdinalIgnoreCase);
-
-   /// <summary>
-   ///   Gets a value indicating whether this INSEE number is temporary or
-   ///   permanent. <see langword="true"/> if this INSEE is temporary; otherwise
-   ///   <see langword="false"/>.
-   /// </summary>
-   /// <remarks>
-   ///   Permanent INSEE numbers use gender codes '1' or '2' while temporary
-   ///   INSEE numbers use gender codes '7' or '8'.
-   /// </remarks>
-   public Boolean IsTemporaryInsee
-      => Value[GenderOffset] is Chars.DigitSeven or Chars.DigitEight;
+      => _department.Extract(Value).Equals(BornAbroadDepartment, StringComparison.OrdinalIgnoreCase);
 
    /// <summary>
    ///   Gets the raw INSEE number.
@@ -619,7 +620,7 @@ public record FrInseeNumber
    {
       if (value.Length == UnformattedLength)
       {
-         return value;
+         return value.ToUpperInvariant();
       }
 
       var buffer = ArrayPool<Char>.Shared.Rent(UnformattedLength);
@@ -636,7 +637,7 @@ public record FrInseeNumber
             ReadOnlySpan<Char> sourceSpan = source[sourceOffset..(sourceOffset + length)];
             Span<Char> targetSpan = span[targetOffset..(targetOffset + length)];
 
-            sourceSpan.CopyTo(targetSpan);
+            _ = sourceSpan.ToUpperInvariant(targetSpan);
 
             sourceOffset += length + 1;
             targetOffset += length;
@@ -693,6 +694,8 @@ public record FrInseeNumber
                {
                   Chars.UpperCaseA => 1000000,
                   Chars.UpperCaseB => 2000000,
+                  Chars.LowerCaseA => 1000000,
+                  Chars.LowerCaseB => 2000000,
                   _ => 0L,                         // Not a valid Corsican department code
                };
             }
