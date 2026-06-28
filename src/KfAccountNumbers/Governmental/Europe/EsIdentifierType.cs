@@ -4,15 +4,15 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   Defines the possible types of identifiers that can be represented with a
 ///   <see cref="EsNif"/> object.
 /// </summary>
-public enum EsIdentifierType
+public class EsIdentifierType
 {
    /// <summary>
    ///   Identifier assigned to Spanish citizens.
    /// </summary>
-   Dni = 0,
+   public struct Dni { }
 
    /// <summary>
    ///   Identifier assigned to foreigners residing in Spain.
    /// </summary>
-   Nie = 1
+   public struct Nie { }
 }

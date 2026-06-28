@@ -441,19 +441,29 @@ public class EsNifTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(Valid9CharacterDni, EsIdentifierType.Dni)]
-   [InlineData(Valid10CharacterDni, EsIdentifierType.Dni)]
-   [InlineData(Valid9CharacterNie, EsIdentifierType.Nie)]
-   [InlineData(Valid11CharacterNie, EsIdentifierType.Nie)]
-   public void EsNif_IdentifierType_ShouldReturnExpectedValue(
-      String value,
-      EsIdentifierType expectedIdentifierType)
+   [InlineData(Valid9CharacterDni)]
+   [InlineData(Valid10CharacterDni)]
+   public void EsNif_IdentifierType_ShouldReturnExpectedValue_WhenValueIsDni(String value)
    {
       // Arrange.
       var sut = new EsNif(value);
+      EsNif.IdentifierCategory expected = default(EsIdentifierType.Dni);
 
       // Act/assert.
-      sut.IdentifierType.Should().Be(expectedIdentifierType);
+      sut.IdentifierType.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData(Valid9CharacterNie)]
+   [InlineData(Valid11CharacterNie)]
+   public void EsNif_IdentifierType_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new EsNif(value);
+      EsNif.IdentifierCategory expected = default(EsIdentifierType.Nie);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(expected);
    }
 
    #endregion

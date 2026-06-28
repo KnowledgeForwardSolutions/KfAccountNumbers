@@ -132,6 +132,12 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record EsNif
 {
    /// <summary>
+   ///   Discriminated union defining the types of identifier that
+   ///   <see cref="EsNif"/> can represent.
+   /// </summary>
+   public union IdentifierCategory(EsIdentifierType.Dni, EsIdentifierType.Nie) { }
+
+   /// <summary>
    ///   Discriminated union defining the possible validation errors that can
    ///   occur when creating a new <see cref="EsNif"/>.
    /// </summary>
@@ -245,9 +251,9 @@ public record EsNif
    ///   de identidad (DNI) start with a digit character while número de
    ///   identificación de extranjero (NIE) start with 'X', 'Y' or 'Z'.
    /// </remarks>
-   public EsIdentifierType IdentifierType => Value[0].IsAsciiDigit()
-      ? EsIdentifierType.Dni
-      : EsIdentifierType.Nie;
+   public IdentifierCategory IdentifierType => Value[0].IsAsciiDigit()
+      ? default(EsIdentifierType.Dni)
+      : default(EsIdentifierType.Nie);
 
    /// <summary>
    ///   Gets the raw Número de Identificación Fiscal value.
@@ -321,7 +327,7 @@ public record EsNif
    /// </remarks>
    public String Format(String? mask = null)
    {
-      mask ??= IdentifierType == EsIdentifierType.Dni
+      mask ??= IdentifierType is EsIdentifierType.Dni
             ? "________-_"
             : "_-_______-_";
 
