@@ -2,6 +2,7 @@
 
 #pragma warning disable IDE0250 // Make struct 'readonly'
 #pragma warning disable IDE0046 // Convert to conditional expression
+#pragma warning disable SA1025 // Code should not contain multiple whitespace in a row
 
 namespace KfAccountNumbers.Governmental.Europe;
 
@@ -63,7 +64,9 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            <description>
 ///               The value must be 9 characters in length (without separators)
 ///               or 10 characters (DNI with one separator) or 11 characters
-///               (NIE with two separators).
+///               (NIE with two separators). Additionally, if a value has length
+///               10, it must be a DNI (starts with a digit) and if a value has
+///               length 11, it must be a NIE (starts with X, Y or Z).
 ///            </description>
 ///         </item>
 ///         <item>
@@ -379,6 +382,15 @@ public record EsNif
             invalidSeparatorPosition);
       }
 
+      // Ensure that the value length corresponds to the identifier type.
+      if (!ValidateLengthAndType(value))
+      {
+         return new InvalidLength(
+            Messages.EsNifInvalidLengthForType,
+            value.Length,
+            GetValidLengthDefinitions());
+      }
+
       return default(ValidValue);
    }
 
@@ -465,6 +477,16 @@ public record EsNif
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean ValidateLength(ReadOnlySpan<Char> value)
       => value.Length is UnformattedLength or DniFormattedLength or NieFormattedLength;
+
+   private static Boolean ValidateLengthAndType(ReadOnlySpan<Char> value)
+      => value.Length switch
+      {
+         UnformattedLength => true,
+         DniFormattedLength => value[0].IsAsciiDigit(),                                   // Formatted DNI must start with digit
+         NieFormattedLength => value[0] is (>= Chars.UpperCaseX and <= Chars.UpperCaseZ)  // Formatted NIE must start with X, Y or Z
+            or (>= Chars.LowerCaseX and <= Chars.LowerCaseZ),
+         _ => false,
+      };
 
    private static Boolean ValidateSeparators(
       ReadOnlySpan<Char> value,

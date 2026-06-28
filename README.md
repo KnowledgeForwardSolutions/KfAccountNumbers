@@ -220,7 +220,8 @@ the trailing alphabetic character.
 A NIF must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
 * The value must be 9 characters in length (without separators) or 10 characters (DNI with one separator) or
-  11 characters (NIE with two separators).
+  11 characters (NIE with two separators). Additionally, if a value has length 10, it must be a DNI (starts with
+  a digit) and if a value has length 11, it must be a NIE (starts with X, Y or Z).
 * All characters other than the leading and trailing characters (and the optional separators) must be ASCII digits
   ('0'-'9'). The leading character must be either an ASCII digit or X, Y, or Z.
 * The trailing character must be a valid modulus 23 check character. Valid characters are "TRWAGMYFPDXBNJZSQVHLCKE"

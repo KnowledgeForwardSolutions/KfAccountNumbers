@@ -567,4 +567,7 @@
   <data name="EsNieFormattedLength" xml:space="preserve">
     <value>ES NIE formatted as P-DDDDDDD-C</value>
   </data>
+  <data name="EsNifInvalidLengthForType" xml:space="preserve">
+    <value>ES NIF with length 10 must be a DNI (starts with digit) and ES NIF with length 11 must be a NIE (starts with X, Y or Z)</value>
+  </data>
 </root>

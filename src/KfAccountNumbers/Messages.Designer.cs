@@ -403,6 +403,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ES NIF with length 10 must be a DNI (starts with digit) and ES NIF with length 11 must be a NIE (starts with X, Y or Z).
+        /// </summary>
+        internal static string EsNifInvalidLengthForType {
+            get {
+                return ResourceManager.GetString("EsNifInvalidLengthForType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ES NIF separator character may not be an ASCII digit (&apos;0&apos;-&apos;9&apos;). For NIE both separator characters must be the same.
         /// </summary>
         internal static string EsNifInvalidSeparator {

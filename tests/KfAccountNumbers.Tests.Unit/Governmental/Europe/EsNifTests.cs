@@ -54,6 +54,12 @@ public class EsNifTests
       new String('1', 100)    // Very long string
    ];
 
+   public static TheoryData<String> InvalidLengthForTypeValues =>
+   [
+      "1-2345678-Z",          // DNI Length 11
+      "X1234567-L",           // NIE Length 10
+   ];
+
    public static TheoryData<String, Int32> InvalidCharacterValues = new()
    {
       // Unformatted DNI
@@ -211,9 +217,11 @@ public class EsNifTests
       { "X 1234567-L", 9 },
    };
 
-   private static InvalidLength GetInvalidLengthResult(String value)
+   private static InvalidLength GetInvalidLengthResult(
+      String value,
+      String? message = null)
       => new(
-         Messages.EsNifInvalidLength,
+         message ?? Messages.EsNifInvalidLength,
          value.Length,
          EsNif.GetValidLengthDefinitions());
 
@@ -350,6 +358,25 @@ public class EsNifTests
    {
       // Arrange.
       LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new EsNif(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthForTypeValues))]
+   public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLengthForType(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(
+         value,
+         Messages.EsNifInvalidLengthForType);
 
       // Act/assert.
       FluentActions
