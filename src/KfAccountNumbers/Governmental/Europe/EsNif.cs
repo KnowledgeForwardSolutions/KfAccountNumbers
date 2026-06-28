@@ -46,7 +46,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      may be formatted as a sequence of nine characters or may be formatted
 ///      for greater readability by using separators. For a DNI, a separator
 ///      (generally a dash '-') is placed between the digits and the trailing
-///      alphabetic character. For a NIE, eparators are placed between the
+///      alphabetic character. For a NIE, separators are placed between the
 ///      leading letter and the digits, and between the digits and the trailing
 ///      alphabetic character.
 ///   </para>
@@ -128,12 +128,45 @@ namespace KfAccountNumbers.Governmental.Europe;
 [JsonConverter(typeof(EsNifJsonConverter))]
 public record EsNif
 {
+   /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="EsNif"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="EsNif"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator)
+   {
+   }
+
+   /// <summary>
+   ///   The name of the check digit algorithm used by INSEE numbers.
+   /// </summary>
+   public const String CheckDigitAlgorithmName = "Modulus 23";
+
    private const Int32 UnformattedLength = 9;
    private const Int32 DniFormattedLength = 10;
    private const Int32 NieFormattedLength = 11;
 
    private const Int32 LeadingSeparatorOffset = 1;
    private const Int32 TrailingSeparatorOffset = 2;         // Measured from end of string
+   private const Int32 CheckCharacterOffset = 1;            // Measured from end of string
 
    private const String CheckCharacters = "TRWAGMYFPDXBNJZSQVHLCKE";
    private static readonly HashSet<Char> _validCheckCharacters = [.. CheckCharacters];
@@ -145,7 +178,7 @@ public record EsNif
    ///   String representation of a Spanish Número de Identificación
    ///   Fiscal (NIF).
    /// </param>
-   /// <exception cref="KfValidationException{EsNifValidationResult}">
+   /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
@@ -182,10 +215,18 @@ public record EsNif
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         EsNifValidationResult validationResult = Validate(value);
-         if (validationResult != EsNifValidationResult.ValidationPassed)
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            throw validationResult.ToValidationException();
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
          }
       }
 
@@ -238,20 +279,22 @@ public record EsNif
    ///   String representation of a Spanish Número de Identificación Fiscal.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{EsNif, EsNifValidationResult}"/>.
-   ///   Will contain the new <see cref="EsNif"/> if
-   ///   <paramref name="value"/> is valid or an
-   ///   <see cref="EsNifValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="value"/> is
-   ///   invalid.
+   ///   A <see cref="UCreateResult{EsNif, ValidationError}"/>. Will
+   ///   contain the new <see cref="EsNif"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<EsNif, EsNifValidationResult> Create(String? value)
-   {
-      EsNifValidationResult validationResult = Validate(value);
-      return validationResult == EsNifValidationResult.ValidationPassed
-         ? new EsNif(value, validationMode: ValidationMode.BypassValidation)
-         : validationResult;
-   }
+   public static UCreateResult<EsNif, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new EsNif(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
 
    /// <summary>
    ///   Format the NIF using the supplied <paramref name="mask"/>.
@@ -295,40 +338,71 @@ public record EsNif
    ///   valid Spanish Número de Identificación Fiscal (NIF).
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Spanish Número de Identificación Fiscal (NIF).
+   ///   String representation of a Spanish Número de Identificación Fiscal
+   ///   (NIF).
    /// </param>
    /// <returns>
-   ///   A <see cref="EsNifValidationResult"/> enumeration
-   ///   value that indicates if the <paramref name="value"/> passed
-   ///   validation or what validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
-   public static EsNifValidationResult Validate(String? value)
+   public static ValidationResult Validate(String? value)
    {
       if (String.IsNullOrWhiteSpace(value))
       {
-         return EsNifValidationResult.Empty;
+         return default(EmptyValue);
       }
-      else if (!ValidateLength(value))
+
+      if (!ValidateLength(value))
       {
-         return EsNifValidationResult.InvalidLength;
+         return new InvalidLength(
+            Messages.EsNifInvalidLength,
+            value.Length,
+            GetValidLengthDefinitions());
       }
 
       // After performing basic checks, validate the check digit because the
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
-      EsNifValidationResult validationResult = ValidateCheckDigit(value);
-      if (validationResult != EsNifValidationResult.ValidationPassed)
+      ValidationResult validationResult = ValidateCheckDigit(value);
+      if (validationResult is not ValidValue)
       {
          // Could be either InvalidCharacter or InvalidCheckDigit.
          return validationResult;
       }
-      else if (!ValidateSeparators(value))
+
+      if (!ValidateSeparators(value, out var invalidSeparatorPosition))
       {
-         return EsNifValidationResult.InvalidSeparator;
+         return new InvalidSeparator(
+            Messages.EsNifInvalidSeparator,
+            value[invalidSeparatorPosition],
+            invalidSeparatorPosition);
       }
 
-      return EsNifValidationResult.ValidationPassed;
+      return default(ValidValue);
    }
+
+   /// <summary>
+   ///   Gets an array of details about valid lengths accepted for a NIF.
+   /// </summary>
+   /// <returns>
+   ///   An array of <see cref="ValidLengthDefinition"/>s.
+   /// </returns>
+   internal static ValidLengthDefinition[] GetValidLengthDefinitions()
+      =>
+      [
+         new ValidLengthDefinition(UnformattedLength, Messages.EsNifUnformattedLength),
+         new ValidLengthDefinition(DniFormattedLength, Messages.EsDniFormattedLength),
+         new ValidLengthDefinition(NieFormattedLength, Messages.EsNieFormattedLength),
+      ];
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      ReadOnlySpan<Char> value,
+      Int32 position)
+      => new(
+         Messages.EsNifInvalidCharacter,
+         value[position],
+         position);
 
    private static String GetRawValue(String value)
       => value.Length switch
@@ -336,10 +410,10 @@ public record EsNif
          UnformattedLength => value,
          DniFormattedLength => String.Concat(value.AsSpan(..8), value.AsSpan(^1..)),
          NieFormattedLength => String.Concat(value.AsSpan(..1), value.AsSpan(2..^2), value.AsSpan(^1..)),
-         _ => throw new InvalidOperationException(),      // Validation ensures this is never reached
+         _ => throw new UnreachableException("This branch should never be reached"),
       };
 
-   private static EsNifValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
+   private static ValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
    {
       // Process leading character outside main loop.
       var leadingCharacter = value[0];
@@ -350,7 +424,7 @@ public record EsNif
          num = leadingCharacter - Chars.UpperCaseX;
          if (num is < 0 or > 2) // X = 0, Y = 1, Z = 2
          {
-            return EsNifValidationResult.InvalidCharacter;
+            return GetInvalidCharacterResult(value, 0);
          }
       }
 
@@ -365,7 +439,7 @@ public record EsNif
          num = value[index].ToSingleDigit();
          if (!num.IsValidDigit())
          {
-            return EsNifValidationResult.InvalidCharacter;
+            return GetInvalidCharacterResult(value, index);
          }
 
          sum += num;
@@ -373,30 +447,30 @@ public record EsNif
 
       var remainder = sum % 23;
       var checkCharacter = CheckCharacters[remainder];
-      var trailingCharacter = value[^1];
-      if (trailingCharacter == checkCharacter)
+      var trailingCharacter = value[^CheckCharacterOffset];
+      if (trailingCharacter.Equals(checkCharacter, StringComparison.OrdinalIgnoreCase))
       {
-         return EsNifValidationResult.ValidationPassed;
+         return default(ValidValue);
       }
 
       // If check character doesn't match, check for character not in
       // set of valid check characters.
       return _validCheckCharacters.Contains(trailingCharacter)
-         ? EsNifValidationResult.InvalidCheckDigit
-         : EsNifValidationResult.InvalidCharacter;
+         ? new InvalidChecksum(
+            Messages.EsNifInvalidCheckDigit,
+            CheckDigitAlgorithmName)
+         : GetInvalidCharacterResult(value, value.Length - CheckCharacterOffset);
    }
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean ValidateLength(ReadOnlySpan<Char> value)
-   {
-      var isLeadingDigit = value[0].IsAsciiDigit();
+      => value.Length is UnformattedLength or DniFormattedLength or NieFormattedLength;
 
-      return value.Length == UnformattedLength
-         || (isLeadingDigit && value.Length == DniFormattedLength)
-         || (!isLeadingDigit && value.Length == NieFormattedLength);
-   }
-
-   private static Boolean ValidateSeparators(ReadOnlySpan<Char> value)
+   private static Boolean ValidateSeparators(
+      ReadOnlySpan<Char> value,
+      out Int32 invalidSeparatorPosition)
    {
+      invalidSeparatorPosition = -1;
       if (value.Length == UnformattedLength)
       {
          return true;  // No separators to validate
@@ -407,6 +481,7 @@ public record EsNif
       // Separator must not be a digit
       if (trailingSeparator.IsAsciiDigit())
       {
+         invalidSeparatorPosition = value.Length - TrailingSeparatorOffset;
          return false;
       }
 
@@ -417,7 +492,20 @@ public record EsNif
       }
 
       // NIE has leading and trailing separators - must match
-      return trailingSeparator == value[LeadingSeparatorOffset];
+      var leadingSeparator = value[LeadingSeparatorOffset];
+      if (leadingSeparator.IsAsciiDigit())
+      {
+         invalidSeparatorPosition = LeadingSeparatorOffset;
+         return false;
+      }
+
+      if (leadingSeparator != trailingSeparator)
+      {
+         invalidSeparatorPosition = value.Length - TrailingSeparatorOffset;
+         return false;
+      }
+
+      return true;
    }
 }
 

@@ -349,6 +349,24 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ES DNI formatted as DDDDDDDD-C.
+        /// </summary>
+        internal static string EsDniFormattedLength {
+            get {
+                return ResourceManager.GetString("EsDniFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES NIE formatted as P-DDDDDDD-C.
+        /// </summary>
+        internal static string EsNieFormattedLength {
+            get {
+                return ResourceManager.GetString("EsNieFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ES NIF may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string EsNifEmpty {
@@ -390,6 +408,15 @@ namespace KfAccountNumbers {
         internal static string EsNifInvalidSeparator {
             get {
                 return ResourceManager.GetString("EsNifInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES NIF without separator characters.
+        /// </summary>
+        internal static string EsNifUnformattedLength {
+            get {
+                return ResourceManager.GetString("EsNifUnformattedLength", resourceCulture);
             }
         }
         

@@ -1,5 +1,13 @@
 // Ignore Spelling: Deserialize Deserialization Json Kf Nif
 
+using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+   KfAccountNumbers.Governmental.Europe.EsNif,
+   KfAccountNumbers.Governmental.Europe.EsNif.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.Europe.EsNif.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.Europe.EsNif.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.Europe.EsNif.ValidationResult;
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 #pragma warning disable IDE0008 // Use explicit type
@@ -41,83 +49,85 @@ public class EsNifTests
    public static TheoryData<String> InvalidLengthValues =>
    [
       "2345678Z",             // DNI Length 8
-      "012345678-Z",          // DNI Length 11
       "X123567L",             // NIE Length 8
-      "X1234567-L",           // NIE Length 10
       "X-01234567-L",         // NIE Length 12
       new String('1', 100)    // Very long string
    ];
 
-   public static TheoryData<String> InvalidCharacterValues =>
-   [
-      "1 345678Z",               // Unformatted DNI, non-digit character ' '
-      "1-345678Z",               // Unformatted DNI, non-digit character '-'
-      "12=45678Z",               // Unformatted DNI, non-digit character '='
-      "123A5678Z",               // Unformatted DNI, non-digit character 'A'
-      "1234B678Z",               // Unformatted DNI, non-digit character 'B'
-      "12345C78Z",               // Unformatted DNI, non-digit character 'C'
-      "123456a8Z",               // Unformatted DNI, non-digit character 'a'
-      "1234567bZ",               // Unformatted DNI, non-digit character 'b'
-      "12345678~",               // Unformatted DNI, non-digit character '~'
-      "12345678U",               // Unformatted DNI, invalid trailing character 'U'
-      "12345678t",               // Unformatted DNI, invalid trailing character 't'
-      "123456782",               // Unformatted DNI, invalid trailing character '2'
-      "\u21532345678Z",          // Unformatted DNI, non-digit character Unicode fraction 1/3
-      "1\u00D6345678Z",          // Unformatted DNI, invalid character unicode O with umlaut
+   public static TheoryData<String, Int32> InvalidCharacterValues = new()
+   {
+      // Unformatted DNI
+      { " 2345678Z", 0 },          // Unformatted DNI, non-digit character ' '
+      { "1-345678Z", 1 },          // Unformatted DNI, non-digit character '-'
+      { "12=45678Z", 2 },          // Unformatted DNI, non-digit character '='
+      { "123A5678Z", 3 },          // Unformatted DNI, non-digit character 'A'
+      { "1234B678Z", 4 },          // Unformatted DNI, non-digit character 'B'
+      { "12345C78Z", 5 },          // Unformatted DNI, non-digit character 'C'
+      { "123456a8Z", 6 },          // Unformatted DNI, non-digit character 'a'
+      { "1234567bZ", 7 },          // Unformatted DNI, non-digit character 'b'
+      { "12345678~", 8 },          // Unformatted DNI, non-digit character '~'
+      { "12345678U", 8 },          // Unformatted DNI, invalid trailing character 'U'
+      { "12345678t", 8 },          // Unformatted DNI, invalid trailing character 't'
+      { "123456782", 8 },          // Unformatted DNI, invalid trailing character '2'
+      { "\u21532345678Z", 0 },     // Unformatted DNI, non-digit character Unicode fraction 1/3
+      { "1\u00D6345678Z", 1 },     // Unformatted DNI, invalid character unicode O with umlaut
 
-      "1 345678-Z",              // Formatted DNI, non-digit character ' '
-      "1-345678-Z",              // Formatted DNI, non-digit character '-'
-      "12=45678-Z",              // Formatted DNI, non-digit character '='
-      "123A5678-Z",              // Formatted DNI, non-digit character 'A'
-      "1234B678-Z",              // Formatted DNI, non-digit character 'B'
-      "12345C78-Z",              // Formatted DNI, non-digit character 'C'
-      "123456a8-Z",              // Formatted DNI, non-digit character 'a'
-      "1234567b Z",              // Formatted DNI, non-digit character 'b'
-      "12345678 ~",              // Formatted DNI, non-digit character '~'
-      "12345678 U",              // Formatted DNI, invalid trailing character 'U'
-      "12345678 t",              // Formatted DNI, invalid trailing character 't'
-      "12345678 2",              // Formatted DNI, invalid trailing character '2'
-      "1\u2153345678 Z",         // Formatted DNI, non-digit character Unicode fraction 1/3
-      "1\u00D6345678 Z",         // Formatted DNI, invalid character unicode O with umlaut
+      // Formatted DNI
+      { " 2345678-Z", 0 },         // Formatted DNI, non-digit character ' '
+      { "1-345678-Z", 1 },         // Formatted DNI, non-digit character '-'
+      { "12=45678-Z", 2 },         // Formatted DNI, non-digit character '='
+      { "123A5678-Z", 3 },         // Formatted DNI, non-digit character 'A'
+      { "1234B678-Z", 4 },         // Formatted DNI, non-digit character 'B'
+      { "12345C78-Z", 5 },         // Formatted DNI, non-digit character 'C'
+      { "123456a8-Z", 6 },         // Formatted DNI, non-digit character 'a'
+      { "1234567b Z", 7 },         // Formatted DNI, non-digit character 'b'
+      { "12345678 ~", 9 },         // Formatted DNI, non-digit character '~'
+      { "12345678 U", 9 },         // Formatted DNI, invalid trailing character 'U'
+      { "12345678 t", 9 },         // Formatted DNI, invalid trailing character 't'
+      { "12345678 2", 9 },         // Formatted DNI, invalid trailing character '2'
+      { "1\u2153345678 Z", 1 },    // Formatted DNI, non-digit character Unicode fraction 1/3
+      { "1\u00D6345678 Z", 1 },    // Formatted DNI, invalid character unicode O with umlaut
 
-      "A1234567L",               // Unformatted NIE, invalid leading character 'A'
-      "W1234567L",               // Unformatted NIE, invalid leading character 'B'
-      "x1234567L",               // Unformatted NIE, invalid leading character 'x'
-      "y1234567L",               // Unformatted NIE, invalid leading character 'y'
-      "z1234567L",               // Unformatted NIE, invalid leading character 'z'
-      "X-234567L",               // Unformatted NIE, non-digit character '-'
-      "X1=34567L",               // Unformatted NIE, non-digit character '='
-      "X12A4567L",               // Unformatted NIE, non-digit character 'A'
-      "X123B567L",               // Unformatted NIE, non-digit character 'B'
-      "X1234C67L",               // Unformatted NIE, non-digit character 'C'
-      "X12345a7L",               // Unformatted NIE, non-digit character 'a'
-      "X123456bL",               // Unformatted NIE, non-digit character 'b'
-      "X1234567~",               // Unformatted NIE, non-digit character '~'
-      "X1234567U",               // Unformatted NIE, invalid trailing character 'U'
-      "X1234567t",               // Unformatted NIE, invalid trailing character 't'
-      "X12345672",               // Unformatted NIE, invalid trailing character '2'
-      "\u21531234567L",          // Unformatted NIE, non-digit character Unicode fraction 1/3
-      "X\u00D6234567L",          // Unformatted NIE, invalid character unicode O with umlaut
+      // Unformatted NIE
+      { "A1234567L", 0 },          // Unformatted NIE, invalid leading character 'A'
+      { "W1234567L", 0 },          // Unformatted NIE, invalid leading character 'B'
+      { "x1234567L", 0 },          // Unformatted NIE, invalid leading character 'x'
+      { "y1234567L", 0 },          // Unformatted NIE, invalid leading character 'y'
+      { "z1234567L", 0 },          // Unformatted NIE, invalid leading character 'z'
+      { "X-234567L", 1 },          // Unformatted NIE, non-digit character '-'
+      { "X1=34567L", 2 },          // Unformatted NIE, non-digit character '='
+      { "X12A4567L", 3 },          // Unformatted NIE, non-digit character 'A'
+      { "X123B567L", 4 },          // Unformatted NIE, non-digit character 'B'
+      { "X1234C67L", 5 },          // Unformatted NIE, non-digit character 'C'
+      { "X12345a7L", 6 },          // Unformatted NIE, non-digit character 'a'
+      { "X123456bL", 7 },          // Unformatted NIE, non-digit character 'b'
+      { "X1234567~", 8 },          // Unformatted NIE, non-digit character '~'
+      { "X1234567U", 8 },          // Unformatted NIE, invalid trailing character 'U'
+      { "X1234567t", 8 },          // Unformatted NIE, invalid trailing character 't'
+      { "X12345672", 8 },          // Unformatted NIE, invalid trailing character '2'
+      { "\u21531234567L", 0 },     // Unformatted NIE, non-digit character Unicode fraction 1/3
+      { "X\u00D6234567L", 1 },     // Unformatted NIE, invalid character unicode O with umlaut
 
-      "A-1234567 L",             // Formatted NIE, invalid leading character 'A'
-      "W-1234567 L",             // Formatted NIE, invalid leading character 'B'
-      "x-1234567 L",             // Formatted NIE, invalid leading character 'x'
-      "y-1234567 L",             // Formatted NIE, invalid leading character 'y'
-      "z-1234567 L",             // Formatted NIE, invalid leading character 'z'
-      "X--234567 L",             // Formatted NIE, non-digit character '-'
-      "X-1=34567 L",             // Formatted NIE, non-digit character '='
-      "X-12A4567 L",             // Formatted NIE, non-digit character 'A'
-      "X 123B567 L",             // Formatted NIE, non-digit character 'B'
-      "X 1234C67 L",             // Formatted NIE, non-digit character 'C'
-      "X 12345a7 L",             // Formatted NIE, non-digit character 'a'
-      "X 123456b L",             // Formatted NIE, non-digit character 'b'
-      "X 1234567 ~",             // Formatted NIE, non-digit character '~'
-      "X 1234567 U",             // Formatted NIE, invalid trailing character 'U'
-      "X 1234567 t",             // Formatted NIE, invalid trailing character 't'
-      "X 1234567 2",             // Formatted NIE, invalid trailing character '2'
-      "\u2153 1234567 L",        // Formatted NIE, non-digit character Unicode fraction 1/3
-      "X \u00D6234567 L",        // Formatted NIE, invalid character unicode O with umlaut
-   ];
+      // Formatted NIE
+      { "A-1234567 L", 0 },         // Formatted NIE, invalid leading character 'A'
+      { "W-1234567 L", 0 },         // Formatted NIE, invalid leading character 'B'
+      { "x-1234567 L", 0 },         // Formatted NIE, invalid leading character 'x'
+      { "y-1234567 L", 0 },         // Formatted NIE, invalid leading character 'y'
+      { "z-1234567 L", 0 },         // Formatted NIE, invalid leading character 'z'
+      { "X--234567 L", 2 },         // Formatted NIE, non-digit character '-'
+      { "X-1=34567 L", 3 },         // Formatted NIE, non-digit character '='
+      { "X-12A4567 L", 4 },         // Formatted NIE, non-digit character 'A'
+      { "X 123B567 L", 5 },         // Formatted NIE, non-digit character 'B'
+      { "X 1234C67 L", 6 },         // Formatted NIE, non-digit character 'C'
+      { "X 12345a7 L", 7 },         // Formatted NIE, non-digit character 'a'
+      { "X 123456b L", 8 },         // Formatted NIE, non-digit character 'b'
+      { "X 1234567 ~", 10 },        // Formatted NIE, non-digit character '~'
+      { "X 1234567 U", 10 },        // Formatted NIE, invalid trailing character 'U'
+      { "X 1234567 t", 10 },        // Formatted NIE, invalid trailing character 't'
+      { "X 1234567 2", 10 },        // Formatted NIE, invalid trailing character '2'
+      { "\u2153 1234567 L", 0 },    // Formatted NIE, non-digit character Unicode fraction 1/3
+      { "X \u00D6234567 L", 2 },    // Formatted NIE, invalid character unicode O with umlaut
+   };
 
    public static TheoryData<String> InvalidCheckDigitValues =>
    [
@@ -158,44 +168,72 @@ public class EsNifTests
       "X 2222334 A",           // X1122334A with two digit twin error, 11 -> 22
    ];
 
-   public static TheoryData<String> InvalidSeparatorValues =>
-   [
-      "123456780Z",        // Digit separator
-      "123456781Z",
-      "123456782Z",
-      "123456783Z",
-      "123456784Z",
-      "123456785Z",
-      "123456786Z",
-      "123456787Z",
-      "123456788Z",
-      "123456789Z",
+   public static TheoryData<String, Int32> InvalidSeparatorValues = new()
+   {
+      // Digit separator in DNI separator location
+      { "123456780Z", 8 },
+      { "123456781Z", 8 },
+      { "123456782Z", 8 },
+      { "123456783Z", 8 },
+      { "123456784Z", 8 },
+      { "123456785Z", 8 },
+      { "123456786Z", 8 },
+      { "123456787Z", 8 },
+      { "123456788Z", 8 },
+      { "123456789Z", 8 },
 
-      "X01234567-L",
-      "X11234567-L",
-      "X21234567-L",
-      "X31234567-L",
-      "X41234567-L",
-      "X51234567-L",
-      "X61234567-L",
-      "X71234567-L",
-      "X81234567-L",
-      "X91234567-L",
+      // Digit separator in first NIE separator location
+      { "X01234567-L", 1 },
+      { "X11234567-L", 1 },
+      { "X21234567-L", 1 },
+      { "X31234567-L", 1 },
+      { "X41234567-L", 1 },
+      { "X51234567-L", 1 },
+      { "X61234567-L", 1 },
+      { "X71234567-L", 1 },
+      { "X81234567-L", 1 },
+      { "X91234567-L", 1 },
 
-      "X-12345670L",
-      "X-12345671L",
-      "X-12345672L",
-      "X-12345673L",
-      "X-12345674L",
-      "X-12345675L",
-      "X-12345676L",
-      "X-12345677L",
-      "X-12345678L",
-      "X-12345679L",
+      // Digit separator in second NIE separator location
+      { "X-12345670L", 9 },
+      { "X-12345671L", 9 },
+      { "X-12345672L", 9 },
+      { "X-12345673L", 9 },
+      { "X-12345674L", 9 },
+      { "X-12345675L", 9 },
+      { "X-12345676L", 9 },
+      { "X-12345677L", 9 },
+      { "X-12345678L", 9 },
+      { "X-12345679L", 9 },
 
-      "X-1234567 L",       // Different separator
-      "X 1234567-L",
-   ];
+      // Mixed separators in NIE
+      { "X-1234567 L", 9 },
+      { "X 1234567-L", 9 },
+   };
+
+   private static InvalidLength GetInvalidLengthResult(String value)
+      => new(
+         Messages.EsNifInvalidLength,
+         value.Length,
+         EsNif.GetValidLengthDefinitions());
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.EsNifInvalidCharacter,
+         value[position],
+         position);
+
+   private static InvalidChecksum GetInvalidChecksumResult()
+      => new(
+         Messages.EsNifInvalidCheckDigit,
+         EsNif.CheckDigitAlgorithmName);
+
+   private static InvalidSeparator GetInvalidSeparatorResult(
+      String value,
+      Int32 position)
+      => new(Messages.EsNifInvalidSeparator, value[position], position);
 
    #region Check Digit Algorithm Tests
    // ==========================================================================
@@ -229,7 +267,16 @@ public class EsNifTests
    [InlineData("X-0000021-K")]
    [InlineData("X-0000022-E")]
    public void EsNif_CheckDigitAlgorithm_ShouldGenerateAllPossibleCharacters(String value)
-      => EsNif.Validate(value).Should().Be(EsNifValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = EsNif.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [InlineData("00000000T")]     // Minimum DNI
@@ -241,7 +288,26 @@ public class EsNifTests
    [InlineData("Z0000000M")]     // Minimum Z NIE
    [InlineData("Z9999999H")]     // Maximum Z NIE
    public void EsNif_CheckDigitAlgorithm_ShouldHandleBoundaryValues(String value)
-      => EsNif.Validate(value).Should().Be(EsNifValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = EsNif.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Constants Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void EsNif_CheckDigitAlgorithmName_ShouldHaveExpectedValue()
+      => EsNif.CheckDigitAlgorithmName.Should().Be("Modulus 23");
 
    #endregion
 
@@ -267,47 +333,79 @@ public class EsNifTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new EsNif(value))
-         .Should().Throw<KfValidationException<EsNifValidationResult>>()
-         .WithMessage(Messages.EsNifEmpty + "*")
-         .And.ValidationResult.Should().Be(EsNifValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new EsNif(value))
-         .Should().Throw<KfValidationException<EsNifValidationResult>>()
-         .WithMessage(Messages.EsNifInvalidLength + "*")
-         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCharacter(String value)
-      => FluentActions
+   public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new EsNif(value))
-         .Should().Throw<KfValidationException<EsNifValidationResult>>()
-         .WithMessage(Messages.EsNifInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new EsNif(value))
-         .Should().Throw<KfValidationException<EsNifValidationResult>>()
-         .WithMessage(Messages.EsNifInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidCheckDigit);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
-      => FluentActions
+   public void EsNif_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new EsNif(value))
-         .Should().Throw<KfValidationException<EsNifValidationResult>>()
-         .WithMessage(Messages.EsNifInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -370,8 +468,7 @@ public class EsNifTests
       String str = sut;
 
       // Assert.
-      str.Should().NotBeNullOrEmpty();
-      str.Should().Be(value);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
@@ -380,14 +477,12 @@ public class EsNifTests
       // Arrange.
       var value = Valid11CharacterNie;
       var sut = new EsNif(value);
-      var expected = GetRawNif(value);
 
       // Act.
       var str = (String)sut;
 
       // Assert.
-      str.Should().NotBeNullOrEmpty();
-      str.Should().Be(expected);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
@@ -423,60 +518,91 @@ public class EsNifTests
    public void EsNif_ExplicitCastToEsNif_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expected = GetRawNif(value);
+      var expected = new EsNif(value);
 
       // Act.
       var sut = (EsNif)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void EsNif_ExplicitCastToEsNif_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (EsNif)value)
-         .Should().Throw<KfValidationException<EsNifValidationResult>>()
-         .WithMessage(Messages.EsNifEmpty + "*")
-         .And.ValidationResult.Should().Be(EsNifValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void EsNif_ExplicitCastToEsNif_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (EsNif)value)
-         .Should().Throw<KfValidationException<EsNifValidationResult>>()
-         .WithMessage(Messages.EsNifInvalidLength + "*")
-         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void EsNif_ExplicitCastToEsNif_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
-      => FluentActions
+   public void EsNif_ExplicitCastToEsNif_ShouldThrowKfValidationException_WhenValueHasInvalidCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (EsNif)value)
-         .Should().Throw<KfValidationException<EsNifValidationResult>>()
-         .WithMessage(Messages.EsNifInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void EsNif_ExplicitCastToEsNif_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
-      => FluentActions
+   public void EsNif_ExplicitCastToEsNif_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (EsNif)value)
-         .Should().Throw<KfValidationException<EsNifValidationResult>>()
-         .WithMessage(Messages.EsNifInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidCheckDigit);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void EsNif_ExplicitCastToEsNif_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
-      => FluentActions
+   public void EsNif_ExplicitCastToEsNif_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (EsNif)value)
-         .Should().Throw<KfValidationException<EsNifValidationResult>>()
-         .WithMessage(Messages.EsNifInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -567,86 +693,91 @@ public class EsNifTests
    public void EsNif_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expectedValue = new EsNif(value);
+      LocalCreateResult expected = new EsNif(value);
 
       // Act.
       var result = EsNif.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void EsNif_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
+
       // Act.
       var result = EsNif.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(EsNifValidationResult.Empty);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void EsNif_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
+
       // Act.
       var result = EsNif.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(EsNifValidationResult.InvalidLength);
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<LocalValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void EsNif_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidCharacter(String value)
+   public void EsNif_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidCharacter(
+      String value,
+      Int32 position)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
+
       // Act.
       var result = EsNif.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(EsNifValidationResult.InvalidCharacter);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void EsNif_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigits(String value)
+   public void EsNif_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigit(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
+
       // Act.
       var result = EsNif.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(EsNifValidationResult.InvalidCheckDigit);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void EsNif_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(String value)
+   public void EsNif_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value, position);
+
       // Act.
       var result = EsNif.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(EsNifValidationResult.InvalidSeparator);
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -842,32 +973,93 @@ public class EsNifTests
    [Theory]
    [MemberData(nameof(ValidNifValues))]
    public void EsNif_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
-      => EsNif.Validate(value).Should().Be(EsNifValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = EsNif.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void EsNif_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String value)
-      => EsNif.Validate(value).Should().Be(EsNifValidationResult.Empty);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(EmptyValue);
+
+      // Act.
+      var result = EsNif.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void EsNif_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
-      => EsNif.Validate(value).Should().Be(EsNifValidationResult.InvalidLength);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidLengthResult(value);
+
+      // Act.
+      var result = EsNif.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void EsNif_Validate_ShouldReturnInvalidCharacter_WhenValueHasInvalidCharacter(String value)
-      => EsNif.Validate(value).Should().Be(EsNifValidationResult.InvalidCharacter);
+   public void EsNif_Validate_ShouldReturnInvalidCharacter_WhenValueHasInvalidCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
+
+      // Act.
+      var result = EsNif.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void EsNif_Validate_ShouldReturnInvalidCheckDigit_WhenValueHasInvalidCheckDigit(String value)
-      => EsNif.Validate(value).Should().Be(EsNifValidationResult.InvalidCheckDigit);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidChecksumResult();
+
+      // Act.
+      var result = EsNif.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void EsNif_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(String value)
-      => EsNif.Validate(value).Should().Be(EsNifValidationResult.InvalidSeparator);
+   public void EsNif_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidSeparatorResult(value, position);
+
+      // Act.
+      var result = EsNif.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -956,15 +1148,14 @@ public class EsNifTests
    public void EsNif_JsonDeserialization_ShouldThrowKfValidationException_WhenNifIsInvalid()
    {
       // Arrange.
-      var json = "{\"Nif\":\"012345678-Z\"}";  // Invalid length
+      var json = "{\"Nif\":\"12245678Z\"}";  // Invalid check digit
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should()
-         .ThrowExactly<KfValidationException<EsNifValidationResult>>()
-         .WithMessage(Messages.EsNifInvalidLength + "*")
-         .And.ValidationResult.Should().Be(EsNifValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
