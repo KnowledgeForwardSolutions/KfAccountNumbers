@@ -16,34 +16,42 @@ namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class EsNifTests
 {
-   private const String Valid9CharacterDni = "12345678Z";
-   private const String AltValid9CharacterDni = "50487563X";
-   private const String Valid10CharacterDni = "12345678-Z";
-   private const String AltValid10CharacterDni = "50487563 X";
-   private const String Valid9CharacterNie = "X1234567L";
-   private const String AltValid9CharacterNie = "Y7654321G";
-   private const String Valid11CharacterNie = "X-1234567-L";
-   private const String AltValid11CharacterNie = "Y 7654321 G";
+   private const String ValidUnformattedDni = "12345678Z";
+   private const String ValidUnformattedLowercaseDni = "12345678z";
+   private const String AltValidUnformattedDni = "50487563X";
+   private const String ValidFormattedDni = "12345678-Z";
+   private const String ValidFormattedLowercaseDni = "12345678-z";
+   private const String AltValidFormattedDni = "50487563 X";
+   private const String ValidUnformattedNie = "X1234567L";
+   private const String ValidUnformattedLowercaseNie = "x1234567l";
+   private const String AltValidUnformattedNie = "Y7654321G";
+   private const String ValidFormattedNie = "X-1234567-L";
+   private const String ValidFormattedLowercaseNie = "x-1234567-l";
+   private const String AltValidFormattedNie = "Y 7654321 G";
 
    private static String GetRawNif(String nif)
       => nif.Length switch
       {
-         9 => nif,
-         10 => nif[..8] + nif[^1],
-         11 => nif[0] + nif[2..9] + nif[^1],
+         9 => nif.ToUpperInvariant(),
+         10 => (nif[..8] + nif[^1]).ToUpperInvariant(),
+         11 => (nif[0] + nif[2..9] + nif[^1]).ToUpperInvariant(),
          _ => throw new InvalidOperationException(),
       };
 
    public static TheoryData<String> ValidNifValues =>
    [
-      Valid9CharacterDni,
-      AltValid9CharacterDni,
-      Valid10CharacterDni,
-      AltValid10CharacterDni,
-      Valid9CharacterNie,
-      AltValid9CharacterNie,
-      Valid11CharacterNie,
-      AltValid11CharacterNie,
+      ValidUnformattedDni,
+      ValidUnformattedLowercaseDni,
+      AltValidUnformattedDni,
+      ValidFormattedDni,
+      ValidFormattedLowercaseDni,
+      AltValidFormattedDni,
+      ValidUnformattedNie,
+      ValidUnformattedLowercaseNie,
+      AltValidUnformattedNie,
+      ValidFormattedNie,
+      ValidFormattedLowercaseNie,
+      AltValidFormattedNie,
    ];
 
    public static TheoryData<String> InvalidLengthValues =>
@@ -63,73 +71,65 @@ public class EsNifTests
    public static TheoryData<String, Int32> InvalidCharacterValues = new()
    {
       // Unformatted DNI
-      { " 2345678Z", 0 },          // Unformatted DNI, non-digit character ' '
-      { "1-345678Z", 1 },          // Unformatted DNI, non-digit character '-'
-      { "12=45678Z", 2 },          // Unformatted DNI, non-digit character '='
-      { "123A5678Z", 3 },          // Unformatted DNI, non-digit character 'A'
-      { "1234B678Z", 4 },          // Unformatted DNI, non-digit character 'B'
-      { "12345C78Z", 5 },          // Unformatted DNI, non-digit character 'C'
-      { "123456a8Z", 6 },          // Unformatted DNI, non-digit character 'a'
-      { "1234567bZ", 7 },          // Unformatted DNI, non-digit character 'b'
-      { "12345678~", 8 },          // Unformatted DNI, non-digit character '~'
+      { ".2345678Z", 0 },          // Unformatted DNI, non-digit character '.'
+      { "1 345678Z", 1 },          // Unformatted DNI, non-digit character ' '
+      { "12A45678Z", 2 },          // Unformatted DNI, non-digit character 'A'
+      { "123Z5678Z", 3 },          // Unformatted DNI, non-digit character 'Z'
+      { "1234^678Z", 4 },          // Unformatted DNI, non-digit character '^'
+      { "12345a78Z", 5 },          // Unformatted DNI, non-digit character 'a'
+      { "123456z8Z", 6 },          // Unformatted DNI, non-digit character 'z'
+      { "1234567~Z", 7 },          // Unformatted DNI, non-digit character '~'
+      { "12345678\u0BE6", 8 },     // Unformatted DNI, invalid character unicode Tamil digit 0
       { "12345678U", 8 },          // Unformatted DNI, invalid trailing character 'U'
-      { "12345678t", 8 },          // Unformatted DNI, invalid trailing character 't'
       { "123456782", 8 },          // Unformatted DNI, invalid trailing character '2'
       { "\u21532345678Z", 0 },     // Unformatted DNI, non-digit character Unicode fraction 1/3
       { "1\u00D6345678Z", 1 },     // Unformatted DNI, invalid character unicode O with umlaut
 
       // Formatted DNI
-      { " 2345678-Z", 0 },         // Formatted DNI, non-digit character ' '
-      { "1-345678-Z", 1 },         // Formatted DNI, non-digit character '-'
-      { "12=45678-Z", 2 },         // Formatted DNI, non-digit character '='
-      { "123A5678-Z", 3 },         // Formatted DNI, non-digit character 'A'
-      { "1234B678-Z", 4 },         // Formatted DNI, non-digit character 'B'
-      { "12345C78-Z", 5 },         // Formatted DNI, non-digit character 'C'
-      { "123456a8-Z", 6 },         // Formatted DNI, non-digit character 'a'
-      { "1234567b Z", 7 },         // Formatted DNI, non-digit character 'b'
-      { "12345678 ~", 9 },         // Formatted DNI, non-digit character '~'
+      { ".2345678-Z", 0 },         // Formatted DNI, non-digit character '.'
+      { "1 345678-Z", 1 },         // Formatted DNI, non-digit character ' '
+      { "12A45678-Z", 2 },         // Formatted DNI, non-digit character 'A'
+      { "123Z5678-Z", 3 },         // Formatted DNI, non-digit character 'Z'
+      { "1234^678-Z", 4 },         // Formatted DNI, non-digit character '^'
+      { "12345a78-Z", 5 },         // Formatted DNI, non-digit character 'a'
+      { "123456z8-Z", 6 },         // Formatted DNI, non-digit character 'z'
+      { "1234567~ Z", 7 },         // Formatted DNI, non-digit character '~'
+      { "12345678 \u0BE6", 9 },    // Formatted DNI, invalid character unicode Tamil digit 0
       { "12345678 U", 9 },         // Formatted DNI, invalid trailing character 'U'
-      { "12345678 t", 9 },         // Formatted DNI, invalid trailing character 't'
       { "12345678 2", 9 },         // Formatted DNI, invalid trailing character '2'
       { "1\u2153345678 Z", 1 },    // Formatted DNI, non-digit character Unicode fraction 1/3
       { "1\u00D6345678 Z", 1 },    // Formatted DNI, invalid character unicode O with umlaut
 
       // Unformatted NIE
       { "A1234567L", 0 },          // Unformatted NIE, invalid leading character 'A'
-      { "W1234567L", 0 },          // Unformatted NIE, invalid leading character 'B'
-      { "x1234567L", 0 },          // Unformatted NIE, invalid leading character 'x'
-      { "y1234567L", 0 },          // Unformatted NIE, invalid leading character 'y'
-      { "z1234567L", 0 },          // Unformatted NIE, invalid leading character 'z'
-      { "X-234567L", 1 },          // Unformatted NIE, non-digit character '-'
-      { "X1=34567L", 2 },          // Unformatted NIE, non-digit character '='
-      { "X12A4567L", 3 },          // Unformatted NIE, non-digit character 'A'
-      { "X123B567L", 4 },          // Unformatted NIE, non-digit character 'B'
-      { "X1234C67L", 5 },          // Unformatted NIE, non-digit character 'C'
-      { "X12345a7L", 6 },          // Unformatted NIE, non-digit character 'a'
-      { "X123456bL", 7 },          // Unformatted NIE, non-digit character 'b'
-      { "X1234567~", 8 },          // Unformatted NIE, non-digit character '~'
+      { "w1234567L", 0 },          // Unformatted NIE, invalid leading character 'w'
+      { "a1234567L", 0 },          // Unformatted NIE, non-digit character '.'
+      { "X 234567L", 1 },          // Unformatted NIE, non-digit character ' '
+      { "X1A34567L", 2 },          // Unformatted NIE, non-digit character 'A'
+      { "X12Z4567L", 3 },          // Unformatted NIE, non-digit character 'Z'
+      { "X123^567L", 4 },          // Unformatted NIE, non-digit character '^'
+      { "X1234a67L", 5 },          // Unformatted NIE, non-digit character 'a'
+      { "X12345z7L", 6 },          // Unformatted NIE, non-digit character 'z'
+      { "X123456~L", 7 },          // Unformatted NIE, non-digit character '~'
+      { "X1234567\u0BE6", 8 },     // Unformatted NIE, nvalid character unicode Tamil digit 0
       { "X1234567U", 8 },          // Unformatted NIE, invalid trailing character 'U'
-      { "X1234567t", 8 },          // Unformatted NIE, invalid trailing character 't'
       { "X12345672", 8 },          // Unformatted NIE, invalid trailing character '2'
       { "\u21531234567L", 0 },     // Unformatted NIE, non-digit character Unicode fraction 1/3
       { "X\u00D6234567L", 1 },     // Unformatted NIE, invalid character unicode O with umlaut
 
       // Formatted NIE
       { "A-1234567 L", 0 },         // Formatted NIE, invalid leading character 'A'
-      { "W-1234567 L", 0 },         // Formatted NIE, invalid leading character 'B'
-      { "x-1234567 L", 0 },         // Formatted NIE, invalid leading character 'x'
-      { "y-1234567 L", 0 },         // Formatted NIE, invalid leading character 'y'
-      { "z-1234567 L", 0 },         // Formatted NIE, invalid leading character 'z'
-      { "X--234567 L", 2 },         // Formatted NIE, non-digit character '-'
-      { "X-1=34567 L", 3 },         // Formatted NIE, non-digit character '='
-      { "X-12A4567 L", 4 },         // Formatted NIE, non-digit character 'A'
-      { "X 123B567 L", 5 },         // Formatted NIE, non-digit character 'B'
-      { "X 1234C67 L", 6 },         // Formatted NIE, non-digit character 'C'
-      { "X 12345a7 L", 7 },         // Formatted NIE, non-digit character 'a'
-      { "X 123456b L", 8 },         // Formatted NIE, non-digit character 'b'
-      { "X 1234567 ~", 10 },        // Formatted NIE, non-digit character '~'
+      { "w-1234567 L", 0 },         // Formatted NIE, invalid leading character 'W'
+      { ".-1234567 L", 0 },         // Formatted NIE, non-digit character '.'
+      { "X- 234567 L", 2 },         // Formatted NIE, non-digit character ' '
+      { "X-1A34567 L", 3 },         // Formatted NIE, non-digit character 'A'
+      { "X-12Z4567 L", 4 },         // Formatted NIE, non-digit character 'Z'
+      { "X 123^567 L", 5 },         // Formatted NIE, non-digit character '^'
+      { "X 1234a67 L", 6 },         // Formatted NIE, non-digit character 'a'
+      { "X 12345z7 L", 7 },         // Formatted NIE, non-digit character 'z'
+      { "X 123456~ L", 8 },         // Formatted NIE, non-digit character '~'
+      { "X 1234567 \u0BE6", 10 },   // Formatted NIE, nvalid character unicode Tamil digit 0
       { "X 1234567 U", 10 },        // Formatted NIE, invalid trailing character 'U'
-      { "X 1234567 t", 10 },        // Formatted NIE, invalid trailing character 't'
       { "X 1234567 2", 10 },        // Formatted NIE, invalid trailing character '2'
       { "\u2153 1234567 L", 0 },    // Formatted NIE, non-digit character Unicode fraction 1/3
       { "X \u00D6234567 L", 2 },    // Formatted NIE, invalid character unicode O with umlaut
@@ -274,6 +274,31 @@ public class EsNifTests
    [InlineData("X-0000020-C")]
    [InlineData("X-0000021-K")]
    [InlineData("X-0000022-E")]
+
+   // Lowercase.
+   [InlineData("00000023t")]
+   [InlineData("00000001r")]
+   [InlineData("00000002w")]
+   [InlineData("00000003a")]
+   [InlineData("00000004g")]
+   [InlineData("00000005-m")]
+   [InlineData("00000006-y")]
+   [InlineData("00000007-f")]
+   [InlineData("00000008-p")]
+   [InlineData("00000009-d")]
+   [InlineData("00000010-x")]
+   [InlineData("X0000011b")]
+   [InlineData("X0000012n")]
+   [InlineData("X0000013j")]
+   [InlineData("X0000014z")]
+   [InlineData("X0000015s")]
+   [InlineData("X0000016q")]
+   [InlineData("x-0000017-v")]
+   [InlineData("x-0000018-h")]
+   [InlineData("x-0000019-l")]
+   [InlineData("x-0000020-c")]
+   [InlineData("x-0000021-k")]
+   [InlineData("x-0000022-e")]
    public void EsNif_CheckDigitAlgorithm_ShouldGenerateAllPossibleCharacters(String value)
    {
       // Arrange.
@@ -295,6 +320,14 @@ public class EsNifTests
    [InlineData("Y9999999G")]     // Maximum Y NIE
    [InlineData("Z0000000M")]     // Minimum Z NIE
    [InlineData("Z9999999H")]     // Maximum Z NIE
+   [InlineData("00000000t")]     // Minimum DNI
+   [InlineData("99999999r")]     // Maximum DNI
+   [InlineData("x0000000t")]     // Minimum X NIE
+   [InlineData("x9999999j")]     // Maximum X NIE
+   [InlineData("y0000000z")]     // Minimum Y NIE
+   [InlineData("y9999999g")]     // Maximum Y NIE
+   [InlineData("z0000000m")]     // Minimum Z NIE
+   [InlineData("z9999999h")]     // Maximum Z NIE
    public void EsNif_CheckDigitAlgorithm_ShouldHandleBoundaryValues(String value)
    {
       // Arrange.
@@ -441,8 +474,8 @@ public class EsNifTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(Valid9CharacterDni)]
-   [InlineData(Valid10CharacterDni)]
+   [InlineData(ValidUnformattedDni)]
+   [InlineData(ValidFormattedDni)]
    public void EsNif_IdentifierType_ShouldReturnExpectedValue_WhenValueIsDni(String value)
    {
       // Arrange.
@@ -454,8 +487,8 @@ public class EsNifTests
    }
 
    [Theory]
-   [InlineData(Valid9CharacterNie)]
-   [InlineData(Valid11CharacterNie)]
+   [InlineData(ValidUnformattedNie)]
+   [InlineData(ValidFormattedNie)]
    public void EsNif_IdentifierType_ShouldReturnExpectedValue(String value)
    {
       // Arrange.
@@ -473,16 +506,27 @@ public class EsNifTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(Valid9CharacterDni, Valid9CharacterDni)]
-   [InlineData(Valid10CharacterDni, Valid9CharacterDni)]
-   [InlineData(Valid9CharacterNie, Valid9CharacterNie)]
-   [InlineData(Valid11CharacterNie, Valid9CharacterNie)]
-   public void EsNif_Value_ShouldReturnValidatedNif(
-      String value,
-      String expected)
+   [MemberData(nameof(ValidNifValues))]
+   public void EsNif_Value_ShouldReturnValidatedNif(String value)
    {
       // Arrange.
       var sut = new EsNif(value);
+      var expected = GetRawNif(value);
+
+      // Act/assert.
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData(ValidUnformattedLowercaseDni)]
+   [InlineData(ValidUnformattedLowercaseNie)]
+   [InlineData(ValidFormattedLowercaseDni)]
+   [InlineData(ValidFormattedLowercaseNie)]
+   public void EsNif_Value_ShouldReturnNormalizedUppercaseNif(String value)
+   {
+      // Arrange.
+      var sut = new EsNif(value);
+      var expected = GetRawNif(value).ToUpperInvariant();
 
       // Act/assert.
       sut.Value.Should().Be(expected);
@@ -498,7 +542,7 @@ public class EsNifTests
    public void EsNif_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid9CharacterDni;
+      var value = ValidUnformattedDni;
       var sut = new EsNif(value);
 
       // Act.
@@ -512,7 +556,7 @@ public class EsNifTests
    public void EsNif_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid11CharacterNie;
+      var value = ValidFormattedNie;
       var sut = new EsNif(value);
 
       // Act.
@@ -651,8 +695,8 @@ public class EsNifTests
    public void EsNif_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new EsNif(Valid9CharacterDni);
-      var sut2 = new EsNif(Valid9CharacterDni);
+      var sut1 = new EsNif(ValidUnformattedDni);
+      var sut2 = new EsNif(ValidUnformattedDni);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -662,8 +706,8 @@ public class EsNifTests
    public void EsNif_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new EsNif(Valid9CharacterDni);
-      var sut2 = new EsNif(AltValid9CharacterDni);
+      var sut1 = new EsNif(ValidUnformattedDni);
+      var sut2 = new EsNif(AltValidUnformattedDni);
 
       // Act/assert.
       (sut1 == sut2).Should().BeFalse();
@@ -673,8 +717,8 @@ public class EsNifTests
    public void EsNif_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. formatted and unformatted versions for same person should still be equal.
-      var sut1 = new EsNif(Valid9CharacterDni);
-      var sut2 = new EsNif(Valid10CharacterDni);
+      var sut1 = new EsNif(ValidUnformattedDni);
+      var sut2 = new EsNif(ValidFormattedDni);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -690,8 +734,8 @@ public class EsNifTests
    public void EsNif_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new EsNif(Valid9CharacterNie);
-      var sut2 = new EsNif(AltValid9CharacterNie);
+      var sut1 = new EsNif(ValidUnformattedNie);
+      var sut2 = new EsNif(AltValidUnformattedNie);
 
       // Act/assert.
       (sut1 != sut2).Should().BeTrue();
@@ -701,8 +745,8 @@ public class EsNifTests
    public void EsNif_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
    {
       // Arrange. formatted and unformatted versions for same person should still be equal.
-      var sut1 = new EsNif(Valid9CharacterNie);
-      var sut2 = new EsNif(Valid11CharacterNie);
+      var sut1 = new EsNif(ValidUnformattedNie);
+      var sut2 = new EsNif(ValidFormattedNie);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -712,8 +756,8 @@ public class EsNifTests
    public void EsNif_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new EsNif(Valid9CharacterNie);
-      var sut2 = new EsNif(Valid9CharacterNie);
+      var sut1 = new EsNif(ValidUnformattedNie);
+      var sut2 = new EsNif(ValidUnformattedNie);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -827,8 +871,8 @@ public class EsNifTests
    public void EsNif_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new EsNif(Valid9CharacterDni);
-      var sut2 = new EsNif(Valid9CharacterDni);
+      var sut1 = new EsNif(ValidUnformattedDni);
+      var sut2 = new EsNif(ValidUnformattedDni);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -838,8 +882,8 @@ public class EsNifTests
    public void EsNif_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new EsNif(Valid9CharacterNie);
-      var sut2 = new EsNif(AltValid9CharacterNie);
+      var sut1 = new EsNif(ValidUnformattedNie);
+      var sut2 = new EsNif(AltValidUnformattedNie);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeFalse();
@@ -849,8 +893,8 @@ public class EsNifTests
    public void EsNif_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. formatted and unformatted versions for same person should still be equal.
-      var sut1 = new EsNif(Valid9CharacterDni);
-      var sut2 = new EsNif(Valid10CharacterDni);
+      var sut1 = new EsNif(ValidUnformattedDni);
+      var sut2 = new EsNif(ValidFormattedDni);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -863,8 +907,8 @@ public class EsNifTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(Valid9CharacterDni, Valid10CharacterDni)]
-   [InlineData(Valid9CharacterNie, Valid11CharacterNie)]
+   [InlineData(ValidUnformattedDni, ValidFormattedDni)]
+   [InlineData(ValidUnformattedNie, ValidFormattedNie)]
    public void EsNif_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed(
       String value,
       String expected)
@@ -883,9 +927,9 @@ public class EsNifTests
    public void EsNif_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
    {
       // Arrange.
-      var sut = new EsNif(Valid11CharacterNie);
+      var sut = new EsNif(ValidFormattedNie);
       var mask = "_________";
-      var expected = Valid9CharacterNie;
+      var expected = ValidUnformattedNie;
 
       // Act.
       var str = sut.Format(mask);
@@ -900,7 +944,7 @@ public class EsNifTests
    public void EsNif_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
    {
       // Arrange.
-      var sut = new EsNif(Valid11CharacterNie);
+      var sut = new EsNif(ValidFormattedNie);
       var expectedMessage = Messages.FormatMaskEmpty + "*";
       var act = () => _ = sut.Format(mask);
 
@@ -920,8 +964,8 @@ public class EsNifTests
    public void EsNif_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new EsNif(Valid9CharacterNie);
-      var sut2 = new EsNif(Valid9CharacterNie);
+      var sut1 = new EsNif(ValidUnformattedNie);
+      var sut2 = new EsNif(ValidUnformattedNie);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -935,8 +979,8 @@ public class EsNifTests
    public void EsNif_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var sut1 = new EsNif(Valid9CharacterDni);
-      var sut2 = new EsNif(AltValid9CharacterDni);
+      var sut1 = new EsNif(ValidUnformattedDni);
+      var sut2 = new EsNif(AltValidUnformattedDni);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -950,8 +994,8 @@ public class EsNifTests
    public void EsNif_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
    {
       // Arrange. formatted and unformatted versions for same person should still be equal.
-      var sut1 = new EsNif(Valid9CharacterDni);
-      var sut2 = new EsNif(Valid10CharacterDni);
+      var sut1 = new EsNif(ValidUnformattedDni);
+      var sut2 = new EsNif(ValidFormattedDni);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -975,8 +1019,8 @@ public class EsNifTests
    public void EsNif_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var sut1 = new EsNif(Valid9CharacterDni);
-      var sut2 = new EsNif(Valid9CharacterDni);
+      var sut1 = new EsNif(ValidUnformattedDni);
+      var sut2 = new EsNif(ValidUnformattedDni);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
@@ -1108,7 +1152,7 @@ public class EsNifTests
    public void EsNif_JsonSerialization_ShouldRoundTripSuccessfully()
    {
       // Arrange.
-      var sut = new EsNif(Valid9CharacterDni);
+      var sut = new EsNif(ValidUnformattedDni);
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
@@ -1123,7 +1167,7 @@ public class EsNifTests
    public void EsNif_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
    {
       // Arrange.
-      var sut = new EsNif(AltValid11CharacterNie);
+      var sut = new EsNif(AltValidFormattedNie);
       var expected = sut.Value;
 
       // Act.
@@ -1142,7 +1186,7 @@ public class EsNifTests
    public void EsNif_JsonSerialization_ShouldDeserializeComplexObject()
    {
       // Arrange.
-      var foo = new Foo { Nif = new EsNif(Valid9CharacterNie) };
+      var foo = new Foo { Nif = new EsNif(ValidUnformattedNie) };
       var json = JsonSerializer.Serialize(foo);
 
       // Act.

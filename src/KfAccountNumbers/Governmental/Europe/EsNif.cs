@@ -423,7 +423,8 @@ public record EsNif
          position);
 
    private static String GetRawValue(String value)
-      => value.Length switch
+   {
+      var rawValue = value.Length switch
       {
          UnformattedLength => value,
          DniFormattedLength => String.Concat(value.AsSpan(..8), value.AsSpan(^1..)),
@@ -431,10 +432,13 @@ public record EsNif
          _ => throw new UnreachableException("This branch should never be reached"),
       };
 
+      return rawValue.ToUpperInvariant();
+   }
+
    private static ValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
    {
       // Process leading character outside main loop.
-      var leadingCharacter = value[0];
+      var leadingCharacter = Char.ToUpperInvariant(value[0]);
       var num = leadingCharacter.ToSingleDigit();
       if (!num.IsValidDigit())
       {
@@ -473,7 +477,7 @@ public record EsNif
 
       // If check character doesn't match, check for character not in
       // set of valid check characters.
-      return _validCheckCharacters.Contains(trailingCharacter)
+      return _validCheckCharacters.Contains(Char.ToUpperInvariant(trailingCharacter))
          ? new InvalidChecksum(
             Messages.EsNifInvalidCheckDigit,
             CheckDigitAlgorithmName)
