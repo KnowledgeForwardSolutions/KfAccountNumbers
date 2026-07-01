@@ -165,7 +165,7 @@ public record EsNif
    }
 
    /// <summary>
-   ///   The name of the check digit algorithm used by INSEE numbers.
+   ///   The name of the check digit algorithm used by NIF numbers.
    /// </summary>
    public const String CheckDigitAlgorithmName = "Modulus 23";
 
@@ -338,7 +338,7 @@ public record EsNif
    ///   Get a string representation of the NIF.
    /// </summary>
    /// <returns>
-   ///   The raw NIF, without  separator characters.
+   ///   The raw NIF, without separator characters.
    /// </returns>
    public override String ToString() => Value;
 

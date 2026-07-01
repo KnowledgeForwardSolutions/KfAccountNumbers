@@ -103,7 +103,7 @@ public class EsNifTests
       // Unformatted NIE
       { "A1234567L", 0 },          // Unformatted NIE, invalid leading character 'A'
       { "w1234567L", 0 },          // Unformatted NIE, invalid leading character 'w'
-      { "a1234567L", 0 },          // Unformatted NIE, non-digit character '.'
+      { "a1234567L", 0 },          // Unformatted NIE, invalid leading character 'a'
       { "X 234567L", 1 },          // Unformatted NIE, non-digit character ' '
       { "X1A34567L", 2 },          // Unformatted NIE, non-digit character 'A'
       { "X12Z4567L", 3 },          // Unformatted NIE, non-digit character 'Z'
@@ -111,7 +111,7 @@ public class EsNifTests
       { "X1234a67L", 5 },          // Unformatted NIE, non-digit character 'a'
       { "X12345z7L", 6 },          // Unformatted NIE, non-digit character 'z'
       { "X123456~L", 7 },          // Unformatted NIE, non-digit character '~'
-      { "X1234567\u0BE6", 8 },     // Unformatted NIE, nvalid character unicode Tamil digit 0
+      { "X1234567\u0BE6", 8 },     // Unformatted NIE, invalid character unicode Tamil digit 0
       { "X1234567U", 8 },          // Unformatted NIE, invalid trailing character 'U'
       { "X12345672", 8 },          // Unformatted NIE, invalid trailing character '2'
       { "\u21531234567L", 0 },     // Unformatted NIE, non-digit character Unicode fraction 1/3
@@ -120,6 +120,7 @@ public class EsNifTests
       // Formatted NIE
       { "A-1234567 L", 0 },         // Formatted NIE, invalid leading character 'A'
       { "w-1234567 L", 0 },         // Formatted NIE, invalid leading character 'W'
+      { "a-1234567 L", 0 },         // Formatted NIE, invalid leading character 'a'
       { ".-1234567 L", 0 },         // Formatted NIE, non-digit character '.'
       { "X- 234567 L", 2 },         // Formatted NIE, non-digit character ' '
       { "X-1A34567 L", 3 },         // Formatted NIE, non-digit character 'A'
@@ -128,7 +129,7 @@ public class EsNifTests
       { "X 1234a67 L", 6 },         // Formatted NIE, non-digit character 'a'
       { "X 12345z7 L", 7 },         // Formatted NIE, non-digit character 'z'
       { "X 123456~ L", 8 },         // Formatted NIE, non-digit character '~'
-      { "X 1234567 \u0BE6", 10 },   // Formatted NIE, nvalid character unicode Tamil digit 0
+      { "X 1234567 \u0BE6", 10 },   // Formatted NIE, invalid character unicode Tamil digit 0
       { "X 1234567 U", 10 },        // Formatted NIE, invalid trailing character 'U'
       { "X 1234567 2", 10 },        // Formatted NIE, invalid trailing character '2'
       { "\u2153 1234567 L", 0 },    // Formatted NIE, non-digit character Unicode fraction 1/3
@@ -489,7 +490,7 @@ public class EsNifTests
    [Theory]
    [InlineData(ValidUnformattedNie)]
    [InlineData(ValidFormattedNie)]
-   public void EsNif_IdentifierType_ShouldReturnExpectedValue(String value)
+   public void EsNif_IdentifierType_ShouldReturnExpectedValue_WhenValueIsNie(String value)
    {
       // Arrange.
       var sut = new EsNif(value);
@@ -575,7 +576,7 @@ public class EsNifTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -589,7 +590,7 @@ public class EsNifTests
       // Act.
       var str = (String)sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
