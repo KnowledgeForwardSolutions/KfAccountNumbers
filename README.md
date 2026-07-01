@@ -220,7 +220,8 @@ the trailing alphabetic character.
 A NIF must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
 * The value must be 9 characters in length (without separators) or 10 characters (DNI with one separator) or
-  11 characters (NIE with two separators).
+  11 characters (NIE with two separators). Additionally, if a value has length 10, it must be a DNI (starts with
+  a digit) and if a value has length 11, it must be a NIE (starts with X, Y or Z).
 * All characters other than the leading and trailing characters (and the optional separators) must be ASCII digits
   ('0'-'9'). The leading character must be either an ASCII digit or X, Y, or Z.
 * The trailing character must be a valid modulus 23 check character. Valid characters are "TRWAGMYFPDXBNJZSQVHLCKE"
@@ -229,8 +230,10 @@ A NIF must meet all of the following rules:
   For a DNI, the separator must be in character position 8 (zero-based). For a NIE, the separators must be in character
   positions 1 and 9 (zero-based) and both separator characters must be the same.
 
-Note that the `EsNif` constructor and Create/Validate methods are case-sensitive and require that alphabetic characters
-be upper-case.
+EsNif is case-insensitive for validation and parsing purposes. The EsNif constructor, Create
+method and explicit string to EsNif operator will normalize any lowercase letters to uppercase.
+Equality and inequality comparisons between instances of EsNif will compare the normalized
+uppercase versions of the value.
 
 Example values:
 * 12345678Z - DNI

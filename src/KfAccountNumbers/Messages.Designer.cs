@@ -349,6 +349,24 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ES DNI formatted as DDDDDDDD-C.
+        /// </summary>
+        internal static string EsDniFormattedLength {
+            get {
+                return ResourceManager.GetString("EsDniFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES NIE formatted as P-DDDDDDD-C.
+        /// </summary>
+        internal static string EsNieFormattedLength {
+            get {
+                return ResourceManager.GetString("EsNieFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ES NIF may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string EsNifEmpty {
@@ -385,11 +403,29 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ES NIF with length 10 must be a DNI (starts with digit) and ES NIF with length 11 must be a NIE (starts with X, Y or Z).
+        /// </summary>
+        internal static string EsNifInvalidLengthForType {
+            get {
+                return ResourceManager.GetString("EsNifInvalidLengthForType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ES NIF separator character may not be an ASCII digit (&apos;0&apos;-&apos;9&apos;). For NIE both separator characters must be the same.
         /// </summary>
         internal static string EsNifInvalidSeparator {
             get {
                 return ResourceManager.GetString("EsNifInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES NIF without separator characters.
+        /// </summary>
+        internal static string EsNifUnformattedLength {
+            get {
+                return ResourceManager.GetString("EsNifUnformattedLength", resourceCulture);
             }
         }
         

@@ -335,16 +335,14 @@ public record GbHcNumber : GbPatientNumberBase
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="value"/> to determine if it contains a valid
-   ///   H&amp;C number.
+   ///   Check the <paramref name="value"/> to determine if it contains a valid H&amp;C number.
    /// </summary>
    /// <param name="value">
    ///   String representation of a H&amp;C number.
    /// </param>
    /// <returns>
-   ///   A <see cref="ValidationResult"/> union that indicates if the
-   ///   <paramref name="value"/> passed validation or what validation error was
-   ///   encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the <paramref name="value"/> passed validation or what
+   ///   validation error was encountered.
    /// </returns>
 #pragma warning disable IDE0046 // Convert to conditional expression
    public static ValidationResult Validate(String? value)
