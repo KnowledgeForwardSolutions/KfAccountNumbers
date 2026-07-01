@@ -1,5 +1,13 @@
 // Ignore Spelling: Deserialize Deserialization Json Kf
 
+using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+   KfAccountNumbers.Governmental.Europe.IePpsNumber,
+   KfAccountNumbers.Governmental.Europe.IePpsNumber.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.Europe.IePpsNumber.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.Europe.IePpsNumber.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.Europe.IePpsNumber.ValidationResult;
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 #pragma warning disable IDE0008 // Use explicit type
@@ -108,36 +116,44 @@ public class IePpsNumberTests
       new String('1', 100)    // Very long string
    ];
 
-   public static TheoryData<String> InvalidCharacterValues =>
-   [
-      " 234567T",                // non-digit character ' '
-      "1-34567T",                // non-digit character '-'
-      "12=4567T",                // non-digit character '='
-      "123A567T",                // non-digit character 'A'
-      "1234B67T",                // non-digit character 'B'
-      "12345C7T",                // non-digit character 'C'
-      "12345a7T",                // non-digit character 'a'
-      "12345b7T",                // non-digit character 'b'
-      "123456~T",                // non-digit character '~'
-      "123456\u2153T",           // non-digit character Unicode fraction 1/3
-      "123456\u00D6T",           // non-digit character unicode O with umlaut
-      "1234567 ",                // non-letter check character ' '
-      "1234567-",                // non-letter check character '-'
-      "1234567~",                // non-letter check character '~'
-      "1234567\u2153",           // non-letter check character Unicode fraction 1/3
-      "1234567\u00D6",           // non-letter check character unicode O with umlaut
-      "1234567F ",               // non-letter trailing character ' '
-      "1234567F-",               // non-letter trailing character '-'
-      "1234567F~",               // non-letter trailing character '~'
-      "1234567F\u2153",          // non-letter trailing character Unicode fraction 1/3
-      "1234567F\u00D6",          // non-letter trailing character unicode O with umlaut
-      "1234567FJ",               // invalid letter trailing character 'J'
-      "1234567Fj",               // invalid letter trailing character 'j'
-      "1234567FV",               // invalid letter trailing character 'V'
-      "1234567Fv",               // invalid letter trailing character 'v'
-      "1234567FX",               // invalid letter trailing character 'X'
-      "1234567Fx",               // invalid letter trailing character 'x'
-   ];
+   public static TheoryData<String, Int32> InvalidCharacterValues = new()
+   {
+      { " 234567T", 0 },           // non-digit character ' '
+      { "1-34567T", 1 },           // non-digit character '-'
+      { "12=4567T", 2 },           // non-digit character '='
+      { "123A567T", 3 },           // non-digit character 'A'
+      { "1234B67T", 4 },           // non-digit character 'B'
+      { "12345C7T", 5 },           // non-digit character 'C'
+      { "12345a7T", 5 },           // non-digit character 'a'
+      { "12345b7T", 5 },           // non-digit character 'b'
+      { "123456~T", 6 },           // non-digit character '~'
+      { "123456\u2153T", 6 },      // non-digit character Unicode fraction 1/3
+      { "123456\u00D6T", 6 },      // non-digit character unicode O with umlaut
+      { "1234567 ", 7 },           // non-letter check character ' '
+      { "12345678", 7 },           // non-letter check character '8'
+      { "1234567-", 7 },           // non-letter check character '-'
+      { "1234567~", 7 },           // non-letter check character '~'
+      { "1234567\u2153", 7 },      // non-letter check character Unicode fraction 1/3
+      { "1234567\u00D6", 7 },      // non-letter check character unicode O with umlaut
+      { "1234567 W", 7 },          // non-letter check character ' '
+      { "12345678W", 7 },          // non-letter check character '8'
+      { "1234567-w", 7 },          // non-letter check character '-'
+      { "1234567~w", 7 },          // non-letter check character '~'
+      { "1234567\u2153W", 7 },     // non-letter check character Unicode fraction 1/3
+      { "1234567\u00D6w", 7 },     // non-letter check character unicode O with umlaut
+      { "1234567F ", 8 },          // non-letter trailing character ' '
+      { "1234567F8", 8 },          // non-letter trailing character '8'
+      { "1234567F-", 8 },          // non-letter trailing character '-'
+      { "1234567F~", 8 },          // non-letter trailing character '~'
+      { "1234567F\u2153", 8 },     // non-letter trailing character Unicode fraction 1/3
+      { "1234567F\u00D6", 8 },     // non-letter trailing character unicode O with umlaut
+      { "1234567FJ", 8 },          // invalid letter trailing character 'J'
+      { "1234567Fj", 8 },          // invalid letter trailing character 'j'
+      { "1234567FV", 8 },          // invalid letter trailing character 'V'
+      { "1234567Fv", 8 },          // invalid letter trailing character 'v'
+      { "1234567FX", 8 },          // invalid letter trailing character 'X'
+      { "1234567Fx", 8 },          // invalid letter trailing character 'x'
+   };
 
    public static TheoryData<String> InvalidCheckDigitValues =>
    [
@@ -152,6 +168,27 @@ public class IePpsNumberTests
       "1122444OB",               // 1122334OB with two digit twin error, 33 -> 44
       "2222334T",                // 1122334T with two digit twin error, 11 -> 22
    ];
+
+   private static InvalidLength GetInvalidLengthResult(
+      String value,
+      String? message = null)
+      => new(
+         message ?? Messages.IePpsNumberInvalidLength,
+         value.Length,
+         IePpsNumber.GetValidLengthDefinitions());
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.IePpsNumberInvalidCharacter,
+         value[position],
+         position);
+
+   private static InvalidChecksum GetInvalidChecksumResult()
+      => new(
+         Messages.IePpsNumberInvalidCheckDigit,
+         IePpsNumber.CheckDigitAlgorithmName);
 
    #region Check Digit Algorithm Tests
    // ==========================================================================
@@ -183,8 +220,46 @@ public class IePpsNumberTests
    [InlineData("0000098TW")]        // Remainder = 20
    [InlineData("0000904UW")]        // Remainder = 21
    [InlineData("0000099VW")]        // Remainder = 22
+
+   // Lowercase values
+   [InlineData("0000054w")]         // Remainder = 0
+   [InlineData("0000046a")]         // Remainder = 1
+   [InlineData("0000055b")]         // Remainder = 2
+   [InlineData("0000047c")]         // Remainder = 3
+   [InlineData("0000056d")]         // Remainder = 4
+   [InlineData("0000048e")]         // Remainder = 5
+   [InlineData("0000057f")]         // Remainder = 6
+   [InlineData("0000049g")]         // Remainder = 7
+   [InlineData("0000058h")]         // Remainder = 8
+   [InlineData("0000067i")]         // Remainder = 9
+   [InlineData("0000059j")]         // Remainder = 10
+   [InlineData("0000085k")]         // Remainder = 11
+   [InlineData("0000094lw")]        // Remainder = 12
+   [InlineData("0000086mw")]        // Remainder = 13
+   [InlineData("0000095nw")]        // Remainder = 14
+   [InlineData("0000087ow")]        // Remainder = 15
+   [InlineData("0000096pw")]        // Remainder = 16
+   [InlineData("0000088qw")]        // Remainder = 17
+   [InlineData("0000097rw")]        // Remainder = 18
+   [InlineData("0000089sw")]        // Remainder = 19
+   [InlineData("0000098tw")]        // Remainder = 20
+   [InlineData("0000904uw")]        // Remainder = 21
+   [InlineData("0000099vw")]        // Remainder = 22
+
+   // Mixed cases.
+   [InlineData("0000094Lw")]        // Remainder = 12
+   [InlineData("0000086mW")]        // Remainder = 13
    public void IePpsNumber_CheckDigitAlgorithm_ShouldGenerateAllPossibleCharacters(String value)
-      => IePpsNumber.Validate(value).Should().Be(IePpsNumberValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = IePpsNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -226,38 +301,63 @@ public class IePpsNumberTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void IePpsNumber_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new IePpsNumber(value))
-         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
-         .WithMessage(Messages.IePpsNumberEmpty + "*")
-         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void IePpsNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new IePpsNumber(value))
-         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
-         .WithMessage(Messages.IePpsNumberInvalidLength + "*")
-         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void IePpsNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCharacter(String value)
-      => FluentActions
+   public void IePpsNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new IePpsNumber(value))
-         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
-         .WithMessage(Messages.IePpsNumberInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void IePpsNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new IePpsNumber(value))
-         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
-         .WithMessage(Messages.IePpsNumberInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.InvalidCheckDigit);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -294,8 +394,7 @@ public class IePpsNumberTests
       String str = sut;
 
       // Assert.
-      str.Should().NotBeNullOrEmpty();
-      str.Should().Be(value);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
@@ -304,14 +403,12 @@ public class IePpsNumberTests
       // Arrange.
       var value = MixedCaseAltValid9CharacterPpsNumber;
       var sut = new IePpsNumber(value);
-      var expected = value.ToUpperInvariant();
 
       // Act.
       var str = (String)sut;
 
       // Assert.
-      str.Should().NotBeNullOrEmpty();
-      str.Should().Be(expected);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
@@ -347,14 +444,13 @@ public class IePpsNumberTests
    public void IePpsNumber_ExplicitCastToIePpsNumber_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expected = value.ToUpperInvariant();
+      var expected = new IePpsNumber(value);
 
       // Act.
       var sut = (IePpsNumber)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -363,51 +459,75 @@ public class IePpsNumberTests
    {
       // Arrange.
       var value = GetPpsNumberWithValidCheckDigit(trailingCharacter: trailingCharacter);
-      var expected = value.ToUpperInvariant();
+      var expected = new IePpsNumber(value);
 
       // Act.
       var sut = (IePpsNumber)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void IePpsNumber_ExplicitCastToIePpsNumber_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (IePpsNumber)value)
-         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
-         .WithMessage(Messages.IePpsNumberEmpty + "*")
-         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void IePpsNumber_ExplicitCastToIePpsNumber_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (IePpsNumber)value)
-         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
-         .WithMessage(Messages.IePpsNumberInvalidLength + "*")
-         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void IePpsNumber_ExplicitCastToIePpsNumber_ShouldThrowKfValidationException_WhenValueHasInvalidCharacter(String value)
-      => FluentActions
+   public void IePpsNumber_ExplicitCastToIePpsNumber_ShouldThrowKfValidationException_WhenValueHasInvalidCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (IePpsNumber)value)
-         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
-         .WithMessage(Messages.IePpsNumberInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void IePpsNumber_ExplicitCastToIePpsNumber_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (IePpsNumber)value)
-         .Should().Throw<KfValidationException<IePpsNumberValidationResult>>()
-         .WithMessage(Messages.IePpsNumberInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.InvalidCheckDigit);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -498,16 +618,13 @@ public class IePpsNumberTests
    public void IePpsNumber_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expectedValue = new IePpsNumber(value);
+      LocalCreateResult expected = new IePpsNumber(value);
 
       // Act.
       var result = IePpsNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -516,72 +633,75 @@ public class IePpsNumberTests
    {
       // Arrange.
       var value = GetPpsNumberWithValidCheckDigit(trailingCharacter: trailingCharacter);
-      var expectedValue = new IePpsNumber(value);
+      LocalCreateResult expected = new IePpsNumber(value);
 
       // Act.
       var result = IePpsNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void IePpsNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
+
       // Act.
       var result = IePpsNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(IePpsNumberValidationResult.Empty);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void IePpsNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
+
       // Act.
       var result = IePpsNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(IePpsNumberValidationResult.InvalidLength);
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<LocalValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void IePpsNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidCharacter(String value)
+   public void IePpsNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidCharacter(
+      String value,
+      Int32 position)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
+
       // Act.
       var result = IePpsNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(IePpsNumberValidationResult.InvalidCharacter);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void IePpsNumber_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigit(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
+
       // Act.
       var result = IePpsNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(IePpsNumberValidationResult.InvalidCheckDigit);
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -723,7 +843,16 @@ public class IePpsNumberTests
    [Theory]
    [MemberData(nameof(ValidPpsNumberValues))]
    public void IePpsNumber_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
-      => IePpsNumber.Validate(value).Should().Be(IePpsNumberValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = IePpsNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(ValidTrailingCharacters))]
@@ -731,30 +860,75 @@ public class IePpsNumberTests
    {
       // Arrange.
       var value = GetPpsNumberWithValidCheckDigit(trailingCharacter: trailingCharacter);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      IePpsNumber.Validate(value).Should().Be(IePpsNumberValidationResult.ValidationPassed);
+      // Act.
+      var result = IePpsNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void IePpsNumber_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String value)
-      => IePpsNumber.Validate(value).Should().Be(IePpsNumberValidationResult.Empty);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(EmptyValue);
+
+      // Act.
+      var result = IePpsNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void IePpsNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
-      => IePpsNumber.Validate(value).Should().Be(IePpsNumberValidationResult.InvalidLength);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidLengthResult(value);
+
+      // Act.
+      var result = IePpsNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void IePpsNumber_Validate_ShouldReturnInvalidCharacter_WhenValueHasInvalidCharacter(String value)
-      => IePpsNumber.Validate(value).Should().Be(IePpsNumberValidationResult.InvalidCharacter);
+   public void IePpsNumber_Validate_ShouldReturnInvalidCharacter_WhenValueHasInvalidCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
+
+      // Act.
+      var result = IePpsNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void IePpsNumber_Validate_ShouldReturnInvalidCheckDigit_WhenValueHasInvalidCheckDigit(String value)
-      => IePpsNumber.Validate(value).Should().Be(IePpsNumberValidationResult.InvalidCheckDigit);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidChecksumResult();
+
+      // Act.
+      var result = IePpsNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -843,15 +1017,14 @@ public class IePpsNumberTests
    public void IePpsNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenPpsNumberIsInvalid()
    {
       // Arrange.
-      var json = "{\"PpsNumber\":\"12345678FA\"}";  // Invalid length
+      var json = "{\"PpsNumber\":\"1224567T\"}";  // Invalid check character
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should()
-         .ThrowExactly<KfValidationException<IePpsNumberValidationResult>>()
-         .WithMessage(Messages.IePpsNumberInvalidLength + "*")
-         .And.ValidationResult.Should().Be(IePpsNumberValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
