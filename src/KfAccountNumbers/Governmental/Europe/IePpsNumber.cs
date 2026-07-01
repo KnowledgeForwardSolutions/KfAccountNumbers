@@ -10,10 +10,10 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// <remarks>
 ///   <para>
 ///      An Irish PPS Number consists of seven digits followed by an alphabetic
-///      check character and sometimes one additional letter. The optional second
-///      letter was made permanent in 2013 to allow for expansion of the number of
-///      PPS numbers issued. A PPS Number is structured as DDDDDDDC or DDDDDDDCE
-///      where:
+///      check character and sometimes one additional letter. The optional
+///      second letter was made permanent in 2013 to allow for expansion of the
+///      number of PPS numbers issued. A PPS Number is structured as DDDDDDDC or
+///      DDDDDDDCE where:
 ///      <list type="bullet">
 ///         <item>
 ///            <term>D</term>
@@ -24,23 +24,24 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <term>C</term>
 ///            <description>
-///               is an alphabetic character representing the weighted modulus 23
-///               check character calculated from the previous seven digits and
-///               the second letter, if present.
+///               is an alphabetic character representing the weighted modulus
+///               23 check character calculated from the previous seven digits
+///               and the second letter, if present.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>E</term>
 ///            <description>
 ///               An optional letter in the range of A-I or W, made permanent in
-///               2013 to expand the available number space for PPS number issuance.
+///               2013 to expand the available number space for PPS number
+///               issuance.
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
-///      An Irish PPS Number is typically displayed as a single string of eight or
-///      nine characters, without any separator characters.
+///      An Irish PPS Number is typically displayed as a single string of eight
+///      or nine characters, without any separator characters.
 ///   </para>
 ///   <para>
 ///      When creating a new <see cref="IePpsNumber"/>, the following
@@ -58,27 +59,28 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The characters in positions 0-6 (zero-based) must be ASCII digits ('0'-'9').
+///               The characters in positions 0-6 (zero-based) must be ASCII
+///               digits ('0'-'9').
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               The character in position 7 (zero-based) must be a valid weighted modulus 23
-///               check character in the range of A-W.
+///               The character in position 7 (zero-based) must be a valid
+///               weighted-modulus 23 check character in the range of A-W.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               The character in position 8 (zero-based), if present, must be a letter in
-///               the range of A-I or W.
+///               The character in position 8 (zero-based), if present, must be
+///               a letter in the range of A-I or W.
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
-///      <see cref="IePpsNumber"/> is case-insensitive and will accept both upper-case and
-///      lower-case letters in the two trailing positions however the value will be
-///      normalized to upper-case internally.
+///      <see cref="IePpsNumber"/> is case-insensitive and will accept both
+///      upper-case and lower-case letters in the two trailing positions however
+///      the value will be normalized to upper-case internally.
 ///   </para>
 ///   <para>
 ///      Example values:
@@ -117,110 +119,128 @@ public record IePpsNumber
    private const String CheckCharacters = "WABCDEFGHIJKLMNOPQRSTUV";    // Note leading W because W = 0 and A = 1, B = 2, ...
 
    /// <summary>
-   ///   Initialize a new instance of the <see cref="IePpsNumber"/> class.
+   ///   Initializes a new instance of the <see cref="IePpsNumber"/> class.
    /// </summary>
-   /// <param name="ppsNumber">
+   /// <param name="value">
    ///   String representation of an Irish Personal Public Service Number.
    /// </param>
    /// <exception cref="KfValidationException{IePpsNumberValidationResult}">
-   ///   <paramref name="ppsNumber"/> is <see langword="null"/>, empty or all 
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
-   ///   <paramref name="ppsNumber"/> is not length 8 or length 9.
+   ///   <paramref name="value"/> is not length 8 or length 9.
    ///   - or -
-   ///   <paramref name="ppsNumber"/> contains an invalid character. The characters
-   ///   in positions 0-6 (zero-based) must be ASCII digits ('0'-'9'). The character
-   ///   in position 7 (zero-based) must be an uppercase or lowercase letter in the
-   ///   range A-W. The character in position 8 (zero-based), if present, must be a
-   ///   letter in the range of A-I or W.
+   ///   <paramref name="value"/> contains an invalid character. The
+   ///   characters in positions 0-6 (zero-based) must be ASCII digits ('0'-'9').
+   ///   The character in position 7 (zero-based) must be an uppercase or
+   ///   lowercase letter in the range A-W. The character in position 8
+   ///   (zero-based), if present, must be a letter in the range of A-I or W.
    ///   - or -
-   ///   <paramref name="ppsNumber"/> has invalid modulus 23 check character
-   ///   in the character position 7 (zero-based). Valid characters are 
+   ///   <paramref name="value"/> has invalid modulus 23 check character
+   ///   in the character position 7 (zero-based). Valid characters are
    ///   uppercase or lowercase letters in the range A-W.  (where W represents a
-   ///   remainder of 0, A = remainder of 1, B = remainder of 2,...). 
+   ///   remainder of 0, A = remainder of 1, B = remainder of 2,...).
    /// </exception>
-   public IePpsNumber(String? ppsNumber)
-      : this(ppsNumber, ValidationMode.ValidationRequired) { }
+   public IePpsNumber(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports bypassing
-   ///   validation when creating a new instance from a value that has already
-   ///   been validated.
+   ///   Initializes a new instance of the <see cref="IePpsNumber"/> class.
    /// </summary>
-   private IePpsNumber(String? ppsNumber, ValidationMode validationMode)
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private IePpsNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         IePpsNumberValidationResult validationResult = Validate(ppsNumber);
+         IePpsNumberValidationResult validationResult = Validate(value);
          if (validationResult != IePpsNumberValidationResult.ValidationPassed)
          {
             throw validationResult.ToValidationException();
          }
       }
 
-      Value = GetRawValue(ppsNumber!);
+      Value = GetRawValue(value!);
    }
 
    /// <summary>
-   ///   The raw PPS Number value, normalized to upper-case.
+   ///   Gets the raw PPS Number value, normalized to upper-case.
    /// </summary>
    public String Value { get; private init; }
 
-   public static implicit operator String(IePpsNumber ppsNumber)
-      => ppsNumber?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+   /// <summary>
+   ///   Implicitly converts a <see cref="IePpsNumber"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="IePpsNumber"/> to convert.
+   /// </param>
+   public static implicit operator String(IePpsNumber source)
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
 
-   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
-   public static explicit operator IePpsNumber(String? ppsNumber) => new(ppsNumber);
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="IePpsNumber"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of an Irish Personal Public Service Number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid PPS number.
+   /// </exception>
+   public static explicit operator IePpsNumber(String? value) => new(value);
 
    /// <summary>
    ///   Create a new <see cref="IePpsNumber"/> using the Result pattern.
    /// </summary>
-   /// <param name="ppsNumber">
+   /// <param name="value">
    ///   String representation of an Irish Personal Public Service Number.
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{IePpsNumber, IePpsNumberValidationResult}"/>.
-   ///   Will contain the new <see cref="IePpsNumber"/> if 
-   ///   <paramref name="ppsNumber"/> is valid or an
+   ///   Will contain the new <see cref="IePpsNumber"/> if
+   ///   <paramref name="value"/> is valid or an
    ///   <see cref="IePpsNumberValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="ppsNumber"/> is 
+   ///   the validation rule that was failed if <paramref name="value"/> is
    ///   invalid.
    /// </returns>
-   public static CreateResult<IePpsNumber, IePpsNumberValidationResult> Create(String? ppsNumber)
+   public static CreateResult<IePpsNumber, IePpsNumberValidationResult> Create(String? value)
    {
-      IePpsNumberValidationResult validationResult = Validate(ppsNumber);
+      IePpsNumberValidationResult validationResult = Validate(value);
       return validationResult == IePpsNumberValidationResult.ValidationPassed
-         ? new IePpsNumber(ppsNumber, validationMode: ValidationMode.BypassValidation)
+         ? new IePpsNumber(value, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
    /// <summary>
    ///   Get a string representation of the PPS number.
    /// </summary>
-   /// <remarks>
-   ///   Will return the raw PPS number, normalized to upper-case.
-   /// </remarks>
+   /// <returns>
+   ///   The raw PPS number, normalized to upper-case.
+   /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="ppsNumber"/> to determine if it contains a
+   ///   Check the <paramref name="value"/> to determine if it contains a
    ///   valid Irish Personal Public Service Number.
    /// </summary>
-   /// <param name="ppsNumber">
+   /// <param name="value">
    ///   String representation of an Irish Personal Public Service Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="IePpsNumberValidationResult"/> enumeration 
-   ///   value that indicates if the <paramref name="ppsNumber"/> passed
+   ///   A <see cref="IePpsNumberValidationResult"/> enumeration
+   ///   value that indicates if the <paramref name="value"/> passed
    ///   validation or what validation error was encountered.
    /// </returns>
-   public static IePpsNumberValidationResult Validate(String? ppsNumber)
+   public static IePpsNumberValidationResult Validate(String? value)
    {
-      if (String.IsNullOrWhiteSpace(ppsNumber))
+      if (String.IsNullOrWhiteSpace(value))
       {
          return IePpsNumberValidationResult.Empty;
       }
-      else if (ppsNumber.Length != OriginalLength && ppsNumber.Length != ExtendedLength)
+      else if (value.Length is not OriginalLength and not ExtendedLength)
       {
          return IePpsNumberValidationResult.InvalidLength;
       }
@@ -228,43 +248,43 @@ public record IePpsNumber
       // Validate check digit will validate for invalid characters during the
       // process of calculating the check digit. No further checks so simply
       // return the result of ValidateCheckDigit.
-      return ValidateCheckDigit(ppsNumber);
+      return ValidateCheckDigit(value);
    }
 
    // If already uppercase then return original value, otherwise normalize to uppercase.
-   private static String GetRawValue(String ppsNumber)
-      => Char.IsLower(ppsNumber[CheckCharacterOffset])
-         || (ppsNumber.Length == ExtendedLength && Char.IsLower(ppsNumber[TrailingCharacterOffset]))
-         ? ppsNumber.ToUpperInvariant()
-         : ppsNumber;
+   private static String GetRawValue(String value)
+      => Char.IsLower(value[CheckCharacterOffset])
+         || (value.Length == ExtendedLength && Char.IsLower(value[TrailingCharacterOffset]))
+         ? value.ToUpperInvariant()
+         : value;
 
-   private static IePpsNumberValidationResult ValidateCheckDigit(ReadOnlySpan<Char> ppsNumber)
+   private static IePpsNumberValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
    {
       var sum = 0;
       var weight = 8;
 
       // Process leading seven digits.
-      for (var index = 0; index < CheckCharacterOffset; index ++)
+      for (var index = 0; index < CheckCharacterOffset; index++)
       {
-         var num = ppsNumber[index].ToSingleDigit();
+         var num = value[index].ToSingleDigit();
          if (!num.IsValidDigit())
          {
             return IePpsNumberValidationResult.InvalidCharacter;
          }
 
-         sum += (num * weight);
+         sum += num * weight;
          weight--;
       }
 
       // Handle optional trailing character.
-      if (ppsNumber.Length == ExtendedLength)
+      if (value.Length == ExtendedLength)
       {
-         var trailingCharacter = Char.ToUpper(ppsNumber[TrailingCharacterOffset], CultureInfo.InvariantCulture);
+         var trailingCharacter = Char.ToUpper(value[TrailingCharacterOffset], CultureInfo.InvariantCulture);
          var trailingCharacterValue = trailingCharacter switch
          {
-            >= Chars.UpperCaseA and <= Chars.UpperCaseI => (trailingCharacter - Chars.UpperCaseA) + 1,
+            >= Chars.UpperCaseA and <= Chars.UpperCaseI => trailingCharacter - Chars.UpperCaseA + 1,
             Chars.UpperCaseW => 0,
-            _ => -1
+            _ => -1,
          };
          if (trailingCharacterValue < 0)
          {
@@ -275,7 +295,7 @@ public record IePpsNumber
       }
 
       // Handle possible invalid check character.
-      var checkCharacter = Char.ToUpper(ppsNumber[CheckCharacterOffset], CultureInfo.InvariantCulture);
+      var checkCharacter = Char.ToUpper(value[CheckCharacterOffset], CultureInfo.InvariantCulture);
       if (checkCharacter is < Chars.UpperCaseA or > Chars.UpperCaseW)
       {
          return IePpsNumberValidationResult.InvalidCharacter;
@@ -288,6 +308,8 @@ public record IePpsNumber
    }
 }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class IePpsNumberJsonConverter : JsonConverter<IePpsNumber>
 {
    public override IePpsNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

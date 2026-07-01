@@ -47,7 +47,7 @@ public class IePpsNumberTests
          var trailingChar = Char.ToUpper(ppsNumber[8], CultureInfo.InvariantCulture);
          var trailingCharValue = trailingChar switch
          {
-            >= Chars.UpperCaseA and <= Chars.UpperCaseI => (trailingChar - Chars.UpperCaseA) + 1,
+            >= Chars.UpperCaseA and <= Chars.UpperCaseI => trailingChar - Chars.UpperCaseA + 1,
             Chars.UpperCaseW => 0,
             _ => throw new InvalidOperationException(),
          };
