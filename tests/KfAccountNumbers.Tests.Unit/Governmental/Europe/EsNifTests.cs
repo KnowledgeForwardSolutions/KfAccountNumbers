@@ -724,6 +724,39 @@ public class EsNifTests
       (sut1 == sut2).Should().BeTrue();
    }
 
+   [Fact]
+   public void EsNif_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new EsNif(ValidFormattedDni);
+      var sut2 = new EsNif(ValidFormattedDni.Replace('-', '.'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void EsNif_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new EsNif(ValidFormattedDni.Replace('-', 'A'));
+      var sut2 = new EsNif(ValidFormattedDni.Replace('-', 'a'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void EsNif_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyByCase()
+   {
+      // Arrange.
+      var sut1 = new EsNif(ValidFormattedDni);
+      var sut2 = new EsNif(ValidFormattedLowercaseDni);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
    #endregion
 
    #region Inequality Operator Tests
@@ -758,6 +791,39 @@ public class EsNifTests
       // Arrange.
       var sut1 = new EsNif(ValidUnformattedNie);
       var sut2 = new EsNif(ValidUnformattedNie);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void EsNif_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new EsNif(ValidFormattedDni);
+      var sut2 = new EsNif(ValidFormattedDni.Replace('-', '.'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void EsNif_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new EsNif(ValidFormattedDni.Replace('-', 'A'));
+      var sut2 = new EsNif(ValidFormattedDni.Replace('-', 'a'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void EsNif_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyByCase()
+   {
+      // Arrange.
+      var sut1 = new EsNif(ValidFormattedDni);
+      var sut2 = new EsNif(ValidFormattedLowercaseDni);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -900,6 +966,39 @@ public class EsNifTests
       sut1.Equals(sut2).Should().BeTrue();
    }
 
+   [Fact]
+   public void EsNif_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new EsNif(ValidFormattedDni);
+      var sut2 = new EsNif(ValidFormattedDni.Replace('-', '.'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void EsNif_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new EsNif(ValidFormattedDni.Replace('-', 'A'));
+      var sut2 = new EsNif(ValidFormattedDni.Replace('-', 'a'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void EsNif_Equals_ShouldReturnTrue_WhenValuesDifferOnlyByCase()
+   {
+      // Arrange.
+      var sut1 = new EsNif(ValidFormattedDni);
+      var sut2 = new EsNif(ValidFormattedLowercaseDni);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
    #endregion
 
    #region Format Method Tests
@@ -996,6 +1095,51 @@ public class EsNifTests
       // Arrange. formatted and unformatted versions for same person should still be equal.
       var sut1 = new EsNif(ValidUnformattedDni);
       var sut2 = new EsNif(ValidFormattedDni);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void EsNif_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new EsNif(ValidFormattedDni);
+      var sut2 = new EsNif(ValidFormattedDni.Replace('-', '.'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void EsNif_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new EsNif(ValidFormattedDni.Replace('-', 'A'));
+      var sut2 = new EsNif(ValidFormattedDni.Replace('-', 'a'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void EsNif_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyByCase()
+   {
+      // Arrange.
+      var sut1 = new EsNif(ValidFormattedDni);
+      var sut2 = new EsNif(ValidFormattedLowercaseDni);
 
       // Act.
       var hash1 = sut1.GetHashCode();

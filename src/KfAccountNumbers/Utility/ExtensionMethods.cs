@@ -1,7 +1,13 @@
 // Ignore Spelling: validator
 
+#pragma warning disable SA1513 // Closing brace should be followed by blank line
+#pragma warning disable SA1629 // Documentation text should end with a period
+
 namespace KfAccountNumbers.Utility;
 
+/// <summary>
+///   General extension to existing classes.
+/// </summary>
 public static class ExtensionMethods
 {
    /// <summary>
@@ -29,26 +35,26 @@ public static class ExtensionMethods
    /// <remarks>
    ///   <para>
    ///      The <paramref name="mask"/> is applied one character at a time,
-   ///      moving from left to right. If the character in the mask is an 
-   ///      underscore ('_') then the next available character from the 
-   ///      <paramref name="str"/> is added to the output. Otherwise, the mask 
+   ///      moving from left to right. If the character in the mask is an
+   ///      underscore ('_') then the next available character from the
+   ///      <paramref name="str"/> is added to the output. Otherwise, the mask
    ///      character is considered a literal character, and it is added to the
    ///      output instead. If there are no remaining <paramref name="str"/>
    ///      characters then additional mask underscore characters are ignored.
    ///   </para>
    ///   <para>
-   ///      The backslash character ('\') is used as an escape character. Use 
+   ///      The backslash character ('\') is used as an escape character. Use
    ///      the sequence "\_" to add a literal underscore to the output and use
    ///      the sequence "\\" to add a literal backslash to the output.
    ///   </para>
    /// </remarks>
    /// <example>
    ///   str = "012345678", mask = "___-__-____" => "012-34-5678"
-   ///   
+   ///
    ///   str = "8005551212", mask = "(___) ___-____" => "(800) 555-1212"
-   ///   
+   ///
    ///   str = "abcdef", mask = "___ \_ ___" => "abc _ def"
-   ///   
+   ///
    ///   str = "abc", mask = "__.__.__" => "ab.c."
    /// </example>
    public static String FormatWithMask(this String str, String mask)
@@ -98,17 +104,17 @@ public static class ExtensionMethods
    ///   The Unicode character to evaluate.
    /// </param>
    /// <returns>
-   ///   <see langword="true"/> if <paramref name="ch"/> an ASCII digit; 
+   ///   <see langword="true"/> if <paramref name="ch"/> an ASCII digit;
    ///   otherwise <see langword="false"/>.
    /// </returns>
    /// <remarks>
    ///   <para>
-   ///      This method determines whether the character is in the range '0' 
+   ///      This method determines whether the character is in the range '0'
    ///      through '9', inclusive.
    ///   </para>
    ///   <para>
    ///      Use this method instead of <see cref="Char.IsDigit(Char)"/> because
-   ///      IsDigit has some edge cases where Unicode characters for decimal 
+   ///      IsDigit has some edge cases where Unicode characters for decimal
    ///      digits in other writing systems (ex. Tamil digit 9, '\u2083') would
    ///      also evaluate as <see langword="true"/>.
    ///   </para>
@@ -138,17 +144,17 @@ public static class ExtensionMethods
    public static Boolean IsValidDigit(this Int32 num) => num is >= 0 and <= 9;
 
    /// <summary>
-   ///   Parses a three-digit integer value from the specified read-only character
-   ///   span.
+   ///   Parses a three-digit integer value from the specified read-only
+   ///   character span.
    /// </summary>
    /// <remarks>
    ///   The method does not perform validation on the input span. Supplying a
-   ///   span that does not contain at least three valid digit characters results
-   ///   in undefined behavior.
+   ///   span that does not contain at least three valid digit characters
+   ///   results in undefined behavior.
    /// </remarks>
    /// <param name="span">
-   ///   A read-only span of characters that must contain at least three consecutive
-   ///   ASCII digit characters representing the number to parse.
+   ///   A read-only span of characters that must contain at least three
+   ///   consecutive ASCII digit characters representing the number to parse.
    /// </param>
    /// <returns>
    ///   An integer value in the range 0 to 999 corresponding to the three-digit
@@ -168,8 +174,8 @@ public static class ExtensionMethods
    ///   in undefined behavior.
    /// </remarks>
    /// <param name="span">
-   ///   A read-only span of characters that must contain at least two consecutive
-   ///   ASCII digit characters representing the number to parse.
+   ///   A read-only span of characters that must contain at least two
+   ///   consecutive ASCII digit characters representing the number to parse.
    /// </param>
    /// <returns>
    ///   An integer value in the range 0 to 99 corresponding to the two-digit
@@ -189,13 +195,13 @@ public static class ExtensionMethods
    ///   The integer equivalent of the ASCII character.
    /// </returns>
    /// <remarks>
-   ///   If <paramref name="ch"/> is not an ASCII digit char (0-9) then this 
+   ///   If <paramref name="ch"/> is not an ASCII digit char (0-9) then this
    ///   method will return a value that is not between 0-9.
    /// </remarks>
    public static Int32 ToSingleDigit(this Char ch) => ch - Chars.DigitZero;
 
    /// <summary>
-   ///   Guard against a String value that is <see langword="null"/>, 
+   ///   Guard against a String value that is <see langword="null"/>,
    ///   <see cref="String.Empty"/> or all whitespace characters.
    /// </summary>
    /// <param name="str">
@@ -204,9 +210,12 @@ public static class ExtensionMethods
    /// <param name="message">
    ///   The message to include if an exception is thrown.
    /// </param>
+   /// <param name="callerArgumentName">
+   ///   The name in the calling method of the value being tested.
+   /// </param>
    /// <returns>
-   ///   The <paramref name="str"/> that is verified to not be 
-   ///   <see langword="null"/>, <see cref="String.Empty"/> or all whitespace 
+   ///   The <paramref name="str"/> that is verified to not be
+   ///   <see langword="null"/>, <see cref="String.Empty"/> or all whitespace
    ///   characters.
    /// </returns>
    /// <exception cref="ArgumentNullException">
@@ -214,7 +223,7 @@ public static class ExtensionMethods
    /// </exception>
    /// <exception cref="ArgumentException">
    ///   <paramref name="str"/> is <see cref="String.Empty"/> or all whitespace
-   ///   characters
+   ///   characters.
    /// </exception>
    public static String RequiresNotNullOrWhiteSpace(
       this String str,
@@ -227,7 +236,7 @@ public static class ExtensionMethods
             : str;
 
    /// <summary>
-   ///   Validate that String value is not <see langword="null"/>, 
+   ///   Validate that String value is not <see langword="null"/>,
    ///   <see cref="String.Empty"/> or all whitespace characters.
    /// </summary>
    /// <param name="str">
@@ -236,12 +245,15 @@ public static class ExtensionMethods
    /// <param name="message">
    ///   The message to include if an exception is thrown.
    /// </param>
+   /// <param name="callerArgumentName">
+   ///   The name in the calling method of the value being tested.
+   /// </param>
    /// <exception cref="ArgumentNullException">
    ///   <paramref name="str"/> is <see langword="null"/>.
    /// </exception>
    /// <exception cref="ArgumentException">
    ///   <paramref name="str"/> is <see cref="String.Empty"/> or all whitespace
-   ///   characters
+   ///   characters.
    /// </exception>
    public static void ValidateNotNullOrWhiteSpace(
       this String str,
