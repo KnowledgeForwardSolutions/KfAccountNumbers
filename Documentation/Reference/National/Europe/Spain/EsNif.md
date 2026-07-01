@@ -19,10 +19,10 @@ Spanish tax identifier, Número de Identificación Fiscal (NIF).
 | Rule | Description | Error Result Type |
 | :--- | :---------- | :---------------- |
 | 1. | The string value may not be null, String.Empty or all whitespace characters. | EmptyValue |
-| 2. | The string length must be the unformatted length (9 characters) or formatted lengh (10 characters). | InvalidLength |
+| 2. | The string length must be the unformatted length (9 characters) or formatted length (10 characters). | InvalidLength |
 | 3. | The leading eight characters must all be ASCII digits ('0'-'9') and the trailing character must be an alphabetic character from the subset allowed by the Modulus 23 algorithm (TRWAGMYFPDXBNJZSQVHLCKE). | InvalidCharacter |
 | 4. | The trailing character must be a valid Modulus 23 check character. | InvalidChecksum |
-| 5. | If the string length equals the formatted length (10 characters), the eigth character (zero-based) is considered a separator character and may not be an ASCII digit ('0'-'9') | InvalidSeparator |
+| 5. | If the string length equals the formatted length (10 characters), the eighth character (zero-based) is considered a separator character and may not be an ASCII digit ('0'-'9') | InvalidSeparator |
 
 ### Notes:
 

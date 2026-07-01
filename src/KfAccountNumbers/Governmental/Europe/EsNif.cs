@@ -98,8 +98,12 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      </list>
 ///   </para>
 ///   <para>
-///      Note that the `EsNif` constructor and Create/Validate methods are
-///      case-sensitive and require that alphabetic characters be upper-case.
+///      <see cref="EsNif"/> is case-insensitive for validation and
+///      parsing purposes. The EsNif constructor, Create method and
+///      explicit string to EsNif operator will normalize any
+///      lowercase letters to uppercase. Equality and inequality comparisons
+///      between instances of EsNif will compare the normalized
+///      uppercase versions of the value.
 ///   </para>
 ///   <para>
 ///      Example values:
