@@ -51,12 +51,12 @@ public class GbNationalInsuranceNumberTests
       => GetNationalInsuranceNumber($"{prefix1}{prefix2}", digits, suffix, formatted);
 
    public static String GetRawNationalInsuranceNumber(String str)
-      => str.Length switch
+      => (str.Length switch
       {
          11 => $"{str[..2]}{str[3..5]}{str[6..8]}{str[9..]}",
          13 => $"{str[..2]}{str[3..5]}{str[6..8]}{str[9..11]}{str[12]}",
          _ => str,
-      };
+      }).ToUpperInvariant();
 
    public static TheoryData<String> ValidNationalInsuranceNumberValues =>
    [
@@ -312,6 +312,7 @@ public class GbNationalInsuranceNumberTests
    {
       { "E", false },
       { "X", false },
+      { "Z", false },
       { " ", false },
       { "=", false },
       { "1", false },
@@ -320,6 +321,7 @@ public class GbNationalInsuranceNumberTests
       { "\u00D6", false },       // unicode O with umlaut
       { "e", true },
       { "x", true },
+      { "z", true },
       { " ", true },
       { "=", true },
       { "1", true },

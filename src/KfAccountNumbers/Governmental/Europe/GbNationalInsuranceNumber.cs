@@ -430,7 +430,7 @@ public record GbNationalInsuranceNumber
       {
          return new InvalidGbNationalInsuranceNumberPrefix(
             Messages.GbNationalInsuranceNumberInvalidPrefix,
-            value[..2]);
+            value[..Separator1Offset]);
       }
 
       if (!ValidatePrefixFirstCharacter(value))
@@ -493,7 +493,7 @@ public record GbNationalInsuranceNumber
       var isFormatted = IsFormatted(value);
       if (!isFormatted)
       {
-         return value;
+         return value.ToUpperInvariant();
       }
 
       var hasSuffix = HasSuffix(value);
@@ -516,7 +516,7 @@ public record GbNationalInsuranceNumber
             ReadOnlySpan<Char> sourceSpan = source[sourceOffset..(sourceOffset + length)];
             Span<Char> targetSpan = span[targetOffset..(targetOffset + length)];
 
-            sourceSpan.CopyTo(targetSpan);
+            _ = sourceSpan.ToUpperInvariant(targetSpan);
 
             sourceOffset += length + 1;
             targetOffset += length;
