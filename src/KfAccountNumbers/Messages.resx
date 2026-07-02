@@ -570,4 +570,10 @@
   <data name="EsNifInvalidLengthForType" xml:space="preserve">
     <value>ES NIF with length 10 must be a DNI (starts with digit) and ES NIF with length 11 must be a NIE (starts with X, Y or Z)</value>
   </data>
+  <data name="IePpsNumberWithoutSuffixLength" xml:space="preserve">
+    <value>IE PPS Number without optional suffix</value>
+  </data>
+  <data name="IePpsNumberWithSuffixLength" xml:space="preserve">
+    <value>IE PPS Number with suffix character (optional, made permanent in 2013)</value>
+  </data>
 </root>

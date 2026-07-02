@@ -799,6 +799,24 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to IE PPS Number without optional suffix.
+        /// </summary>
+        internal static string IePpsNumberWithoutSuffixLength {
+            get {
+                return ResourceManager.GetString("IePpsNumberWithoutSuffixLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IE PPS Number with suffix character (optional, made permanent in 2013).
+        /// </summary>
+        internal static string IePpsNumberWithSuffixLength {
+            get {
+                return ResourceManager.GetString("IePpsNumberWithSuffixLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Century cutoff must be an integer between 1 and 100 (inclusive).
         /// </summary>
         internal static string InvalidCenturyCutoff {

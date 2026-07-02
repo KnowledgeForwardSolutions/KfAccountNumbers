@@ -1,5 +1,7 @@
 // Ignore Spelling: Json
 
+#pragma warning disable IDE0250 // Make struct 'readonly'
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -110,6 +112,36 @@ namespace KfAccountNumbers.Governmental.Europe;
 [JsonConverter(typeof(IePpsNumberJsonConverter))]
 public record IePpsNumber
 {
+   /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="IePpsNumber"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="IePpsNumber"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum)
+   {
+   }
+
+   /// <summary>
+   ///   The name of the check digit algorithm used by PPS numbers.
+   /// </summary>
+   public const String CheckDigitAlgorithmName = "Weighted Modulus 23";
+
    private const Int32 OriginalLength = 8;
    private const Int32 ExtendedLength = 9;
 
@@ -124,7 +156,7 @@ public record IePpsNumber
    /// <param name="value">
    ///   String representation of an Irish Personal Public Service Number.
    /// </param>
-   /// <exception cref="KfValidationException{IePpsNumberValidationResult}">
+   /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
@@ -156,10 +188,17 @@ public record IePpsNumber
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         IePpsNumberValidationResult validationResult = Validate(value);
-         if (validationResult != IePpsNumberValidationResult.ValidationPassed)
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            throw validationResult.ToValidationException();
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
          }
       }
 
@@ -199,20 +238,21 @@ public record IePpsNumber
    ///   String representation of an Irish Personal Public Service Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{IePpsNumber, IePpsNumberValidationResult}"/>.
-   ///   Will contain the new <see cref="IePpsNumber"/> if
-   ///   <paramref name="value"/> is valid or an
-   ///   <see cref="IePpsNumberValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="value"/> is
-   ///   invalid.
+   ///   A <see cref="UCreateResult{IePpsNumber, ValidationError}"/>. Will
+   ///   contain the new <see cref="IePpsNumber"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<IePpsNumber, IePpsNumberValidationResult> Create(String? value)
-   {
-      IePpsNumberValidationResult validationResult = Validate(value);
-      return validationResult == IePpsNumberValidationResult.ValidationPassed
-         ? new IePpsNumber(value, validationMode: ValidationMode.BypassValidation)
-         : validationResult;
-   }
+   public static UCreateResult<IePpsNumber, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new IePpsNumber(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
 
    /// <summary>
    ///   Get a string representation of the PPS number.
@@ -230,19 +270,22 @@ public record IePpsNumber
    ///   String representation of an Irish Personal Public Service Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="IePpsNumberValidationResult"/> enumeration
-   ///   value that indicates if the <paramref name="value"/> passed
-   ///   validation or what validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
-   public static IePpsNumberValidationResult Validate(String? value)
+   public static ValidationResult Validate(String? value)
    {
       if (String.IsNullOrWhiteSpace(value))
       {
-         return IePpsNumberValidationResult.Empty;
+         return default(EmptyValue);
       }
       else if (value.Length is not OriginalLength and not ExtendedLength)
       {
-         return IePpsNumberValidationResult.InvalidLength;
+         return new InvalidLength(
+            Messages.IePpsNumberInvalidLength,
+            value.Length,
+            GetValidLengthDefinitions());
       }
 
       // Validate check digit will validate for invalid characters during the
@@ -251,6 +294,27 @@ public record IePpsNumber
       return ValidateCheckDigit(value);
    }
 
+   /// <summary>
+   ///   Gets an array of details about valid lengths accepted for a PPS number.
+   /// </summary>
+   /// <returns>
+   ///   An array of <see cref="ValidLengthDefinition"/>s.
+   /// </returns>
+   internal static ValidLengthDefinition[] GetValidLengthDefinitions()
+      =>
+      [
+         new ValidLengthDefinition(OriginalLength, Messages.IePpsNumberWithoutSuffixLength),
+         new ValidLengthDefinition(ExtendedLength, Messages.IePpsNumberWithSuffixLength),
+      ];
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      ReadOnlySpan<Char> value,
+      Int32 position)
+      => new(
+         Messages.IePpsNumberInvalidCharacter,
+         value[position],
+         position);
+
    // If already uppercase then return original value, otherwise normalize to uppercase.
    private static String GetRawValue(String value)
       => Char.IsLower(value[CheckCharacterOffset])
@@ -258,7 +322,7 @@ public record IePpsNumber
          ? value.ToUpperInvariant()
          : value;
 
-   private static IePpsNumberValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
+   private static ValidationResult ValidateCheckDigit(ReadOnlySpan<Char> value)
    {
       var sum = 0;
       var weight = 8;
@@ -269,7 +333,7 @@ public record IePpsNumber
          var num = value[index].ToSingleDigit();
          if (!num.IsValidDigit())
          {
-            return IePpsNumberValidationResult.InvalidCharacter;
+            return GetInvalidCharacterResult(value, index);
          }
 
          sum += num * weight;
@@ -288,7 +352,7 @@ public record IePpsNumber
          };
          if (trailingCharacterValue < 0)
          {
-            return IePpsNumberValidationResult.InvalidCharacter;
+            return GetInvalidCharacterResult(value, TrailingCharacterOffset);
          }
 
          sum += trailingCharacterValue * 9;        // Trailing character has fixed weight = 9
@@ -298,13 +362,15 @@ public record IePpsNumber
       var checkCharacter = Char.ToUpper(value[CheckCharacterOffset], CultureInfo.InvariantCulture);
       if (checkCharacter is < Chars.UpperCaseA or > Chars.UpperCaseW)
       {
-         return IePpsNumberValidationResult.InvalidCharacter;
+         return GetInvalidCharacterResult(value, CheckCharacterOffset);
       }
 
       var remainder = sum % 23;
       return checkCharacter == CheckCharacters[remainder]
-         ? IePpsNumberValidationResult.ValidationPassed
-         : IePpsNumberValidationResult.InvalidCheckDigit;
+         ? default(ValidValue)
+         : new InvalidChecksum(
+            Messages.IePpsNumberInvalidCheckDigit,
+            CheckDigitAlgorithmName);
    }
 }
 
