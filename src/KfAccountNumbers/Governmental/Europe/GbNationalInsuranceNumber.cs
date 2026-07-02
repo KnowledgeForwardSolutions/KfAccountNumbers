@@ -1,5 +1,7 @@
 // Ignore Spelling: Json
 
+#pragma warning disable SA1516 // Elements should be separated by blank line
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -28,22 +30,23 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            <term>S</term>
 ///            <description>
 ///               is a single suffix letter, either A, B, C, or D. The suffix
-///               can be omitted if it is unknown as the suffix does not contribute
-///               to the uniqueness of the value.
+///               can be omitted if it is unknown as the suffix does not
+///               contribute to the uniqueness of the value.
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
 ///      A National Insurance Number is typically displayed as a single string
-///      of nine characters but can be formatted for readability as groups of two
-///      characters with a separator character, typically a space (i.e. PP DD DD DD S).
-///      <see cref="GbNationalInsuranceNumber"/> is case-sensitive and requires
-///      the prefix and suffix characters to be uppercase letters.
+///      of nine characters but can be formatted for readability as groups of
+///      two characters with a separator character, typically a space
+///      (i.e. PP DD DD DD S). <see cref="GbNationalInsuranceNumber"/> is
+///      case-sensitive and requires the prefix and suffix characters to be
+///      uppercase letters.
 ///   </para>
 ///   <para>
-///      When creating a new <see cref="GbNationalInsuranceNumber"/>, the following
-///      validation rules are applied:
+///      When creating a new <see cref="GbNationalInsuranceNumber"/>, the
+///      following validation rules are applied:
 ///      <list type="bullet">
 ///         <item>
 ///            <description>
@@ -52,42 +55,50 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The value must have length 8, 9, 11 or 13 characters. (8 characters =
-///               unformatted, without suffix character, 9 characters = unformatted,
-///               with suffix character, 11 characters = formatted, without suffix character,
+///               The value must have length 8, 9, 11 or 13 characters.
+///               (8 characters = unformatted, without suffix character,
+///               9 characters = unformatted, with suffix character,
+///               11 characters = formatted, without suffix character,
 ///               13 characters = formatted, with suffix character)
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               The leading (left-most) two characters may not be BG, GB, NK, KN, TN, NT, or ZZ.
+///               The leading (left-most) two characters may not be BG, GB, NK,
+///               KN, TN, NT, or ZZ.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               Character position 0 (zero-based) must be an uppercase letter, A-C, E, G, H, J-P, R-T, W-Z.
-///               The letters D, F, I, Q, U and V are not allowed.
+///               Character position 0 (zero-based) must be an uppercase letter,
+///               A-C, E, G, H, J-P, R-T, W-Z. The letters D, F, I, Q, U and V
+///               are not allowed.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               Character position 1 (zero-based) must be an uppercase letter, A-C, E, G, H, J-N, P, R-T, W-Z.
-///               The letters D, F, I, O, Q, U and V are not allowed. (Note O is the only additional excluded character.)
+///               Character position 1 (zero-based) must be an uppercase letter,
+///               A-C, E, G, H, J-N, P, R-T, W-Z. The letters D, F, I, O, Q, U
+///               and V are not allowed. (Note O allowed in character position 0
+///               but not in character position 1).
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               Character positions 2-7 (zero-based) must be ASCII digits ('0'-'9').
+///               Character positions 2-7 (zero-based) must be ASCII digits
+///               ('0'-'9').
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               Character position 8 (zero-based), if present, must be an uppercase letter, A-D.
+///               Character position 8 (zero-based), if present, must be an
+///               uppercase letter, A-D.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               Separator characters, if present, may not be ASCII digits ('0'-'9') or uppercase or lowercase letters (A-Z, a-z).
+///               Separator characters, if present, may not be ASCII digits
+///               ('0'-'9') or uppercase or lowercase letters (A-Z, a-z).
 ///            </description>
 ///         </item>
 ///         <item>
@@ -101,15 +112,21 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      Note that National Insurance Numbers do not include a check digit.
 ///   </para>
 ///   <para>
-///      Also note that since suffix characters do not contribute to the uniqueness of National Insurance numbers, then
-///      it is technically accurate to say that two values that differ only by one having a suffix character and the
-///      other not should be considered equal. However, if <see cref="GbNationalInsuranceNumber"/> were to override the
-///      normal record equality to support this case there would be other implications, such as hashing or equality where
-///      two values have suffix character but only differ by suffix character. In the end, <see cref="GbNationalInsuranceNumber"/>
-///      uses normal record equality and two values that differ only by the presence or absence of a suffix character
-///      will still not be considered equal. But <see cref="GbNationalInsuranceNumber"/> does attempt to support this case by
-///      including an `EqualsNonSuffix` method that performs an equality check only on the first eight characters (two
-///      prefix characters and six digits) of both values.
+///      Also note that since suffix characters do not contribute to the
+///      uniqueness of National Insurance numbers, then it is technically
+///      accurate to say that two values that differ only by one having a suffix
+///      character and the other not should be considered equal. However, if
+///      <see cref="GbNationalInsuranceNumber"/> were to override the normal
+///      record equality to support this case there would be other implications,
+///      such as hashing or equality where two values have suffix character but
+///      only differ by suffix character. In the end,
+///      <see cref="GbNationalInsuranceNumber"/> uses normal record equality and
+///      two values that differ only by the presence or absence of a suffix
+///      character will still not be considered equal. But
+///      <see cref="GbNationalInsuranceNumber"/> does attempt to support this
+///      case by including an `EqualsNonSuffix` method that performs an equality
+///      check only on the first eight characters (two prefix characters and six
+///      digits) of both values.
 ///   </para>
 ///   <para>
 ///      Example values:
@@ -149,92 +166,116 @@ public record GbNationalInsuranceNumber
    private const Int32 Separator3Offset = 8;
    private const Int32 Separator4Offset = 11;
 
-   private static readonly HashSet<String>.AlternateLookup<ReadOnlySpan<Char>> InvalidPrefixes =
+   private static readonly HashSet<String>.AlternateLookup<ReadOnlySpan<Char>> _invalidPrefixes =
       new HashSet<String>() { "BG", "GB", "NK", "KN", "TN", "NT", "ZZ" }.GetAlternateLookup<ReadOnlySpan<Char>>();
-   private static readonly HashSet<Char> AllowedPrefixFirstCharacters = "ABCEGHJKLMNOPRSTWXYZ".ToHashSet();
-   private static readonly HashSet<Char> AllowedPrefixSecondCharacters = "ABCEGHJKLMNPRSTWXYZ".ToHashSet();
+   private static readonly HashSet<Char> _allowedPrefixFirstCharacters = [.. "ABCEGHJKLMNOPRSTWXYZ"];
+   private static readonly HashSet<Char> _allowedPrefixSecondCharacters = [.. "ABCEGHJKLMNPRSTWXYZ"];
 
    /// <summary>
-   ///   Initialize a new instance of the <see cref="GbNationalInsuranceNumber"/> class.
+   ///   Initializes a new instance of the
+   ///   <see cref="GbNationalInsuranceNumber"/> class.
    /// </summary>
-   /// <param name="nationalInsuranceNumber">
+   /// <param name="value">
    ///   String representation of UK National Insurance Number.
    /// </param>
    /// <exception cref="KfValidationException{GbNationalInsuranceNumberValidationResult}">
-   ///   <paramref name="nationalInsuranceNumber"/> is <see langword="null"/>, empty or all 
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
-   ///   <paramref name="nationalInsuranceNumber"/> is not length 8/9 (unformatted,
-   ///   without/with suffix) or length 11/13 (formatted, without/with suffix).
+   ///   <paramref name="value"/> is not length 8/9 (unformatted, without/with
+   ///   suffix) or length 11/13 (formatted, without/with suffix).
    ///   - or -
-   ///   <paramref name="nationalInsuranceNumber"/> contains an invalid two-character
-   ///   prefix. BG, GB, NK, KN, TN, NT, or ZZ are not allowed prefixes.
+   ///   <paramref name="value"/> contains an invalid two-character prefix. BG,
+   ///   GB, NK, KN, TN, NT, or ZZ are not allowed prefixes.
    ///   - or -
-   ///   <paramref name="nationalInsuranceNumber"/> has an invalid initial character.
-   ///   Only A-C, E, G, H, J-P, R-T, W-Z are allowed as the first character.
+   ///   <paramref name="value"/> has an invalid initial character. Only A-C, E,
+   ///   G, H, J-P, R-T, W-Z are allowed as the first character.
    ///   - or -
-   ///   <paramref name="nationalInsuranceNumber"/> has an invalid second character.
-   ///   Only A-C, E, G, H, J-N, P, R-T, W-Z are allowed as the second character.
+   ///   <paramref name="value"/> has an invalid second character. Only A-C, E,
+   ///   G, H, J-N, P, R-T, W-Z are allowed as the second character.
    ///   - or -
-   ///   <paramref name="nationalInsuranceNumber"/> contains a character other than
-   ///   an ASCII digit ('0'-'9') in character positions 2-7 (zero-based).
+   ///   <paramref name="value"/> contains a character other than an ASCII digit
+   ///   ('0'-'9') in character positions 2-7 (zero-based).
    ///   - or -
-   ///   <paramref name="nationalInsuranceNumber"/> contains an invalid trailing
-   ///   alphabetic character. If present, the trailing alphabetic character must
-   ///   be A-D.
+   ///   <paramref name="value"/> contains an invalid trailing alphabetic
+   ///   character. If present, the trailing alphabetic character must be A-D.
+   ///   - or -
+   ///   <paramref name="value"/> is formatted (has length 11 or 13) and has an
+   ///   ASCII digit ('0'-'9') or an alphabetic character (A-Z) in a separator
+   ///   location (character positions 2, 5, 8 and 11, zero-based). In addition,
+   ///   each separator location must contain the same character.
    /// </exception>
-   public GbNationalInsuranceNumber(String? nationalInsuranceNumber)
-      : this(nationalInsuranceNumber, ValidationMode.ValidationRequired) { }
+   public GbNationalInsuranceNumber(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports bypassing
-   ///   validation when creating a new instance from a value that has already
-   ///   been validated.
+   ///   Initializes a new instance of the
+   ///   <see cref="GbNationalInsuranceNumber"/> class.
    /// </summary>
-   private GbNationalInsuranceNumber(String? nationalInsuranceNumber, ValidationMode validationMode)
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private GbNationalInsuranceNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         GbNationalInsuranceNumberValidationResult validationResult = Validate(nationalInsuranceNumber);
+         GbNationalInsuranceNumberValidationResult validationResult = Validate(value);
          if (validationResult != GbNationalInsuranceNumberValidationResult.ValidationPassed)
          {
             throw validationResult.ToValidationException();
          }
       }
 
-      Value = GetRawValue(nationalInsuranceNumber!);
+      Value = GetRawValue(value!);
    }
 
    /// <summary>
-   ///   The raw National Insurance Number value.
+   ///   Gets the raw National Insurance Number value.
    /// </summary>
    public String Value { get; private init; }
 
-   public static implicit operator String(GbNationalInsuranceNumber nationalInsuranceNumber)
-      => nationalInsuranceNumber?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+   /// <summary>
+   ///   Implicitly converts a <see cref="GbNationalInsuranceNumber"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="GbNationalInsuranceNumber"/> to convert.
+   /// </param>
+   public static implicit operator String(GbNationalInsuranceNumber source)
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
 
-   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
-   public static explicit operator GbNationalInsuranceNumber(String? nationalInsuranceNumber) => new(nationalInsuranceNumber);
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="GbNationalInsuranceNumber"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a UK National Insurance Number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid PPS number.
+   /// </exception>
+   public static explicit operator GbNationalInsuranceNumber(String? value) => new(value);
 
    /// <summary>
    ///   Create a new <see cref="GbNationalInsuranceNumber"/> using the Result pattern.
    /// </summary>
-   /// <param name="nationalInsuranceNumber">
+   /// <param name="value">
    ///   String representation of a UK National Insurance Number.
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{GbNationalInsuranceNumber, GbNationalInsuranceNumberValidationResult}"/>.
-   ///   Will contain the new <see cref="GbNationalInsuranceNumber"/> if 
-   ///   <paramref name="nationalInsuranceNumber"/> is valid or an
+   ///   Will contain the new <see cref="GbNationalInsuranceNumber"/> if
+   ///   <paramref name="value"/> is valid or an
    ///   <see cref="GbNationalInsuranceNumberValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="nationalInsuranceNumber"/> is 
+   ///   the validation rule that was failed if <paramref name="value"/> is
    ///   invalid.
    /// </returns>
-   public static CreateResult<GbNationalInsuranceNumber, GbNationalInsuranceNumberValidationResult> Create(String? nationalInsuranceNumber)
+   public static CreateResult<GbNationalInsuranceNumber, GbNationalInsuranceNumberValidationResult> Create(String? value)
    {
-      GbNationalInsuranceNumberValidationResult validationResult = Validate(nationalInsuranceNumber);
+      GbNationalInsuranceNumberValidationResult validationResult = Validate(value);
       return validationResult == GbNationalInsuranceNumberValidationResult.ValidationPassed
-         ? new GbNationalInsuranceNumber(nationalInsuranceNumber, validationMode: ValidationMode.BypassValidation)
+         ? new GbNationalInsuranceNumber(value, validationMode: ValidationMode.BypassValidation)
          : validationResult;
    }
 
@@ -271,12 +312,13 @@ public record GbNationalInsuranceNumber
       {
          return false;
       }
+
       if (ReferenceEquals(this, other))
       {
          return true;
       }
 
-      ReadOnlySpan<Char> span1 = this.Value.AsSpan(..UnformattedWithoutSuffixLength);
+      ReadOnlySpan<Char> span1 = Value.AsSpan(..UnformattedWithoutSuffixLength);
       ReadOnlySpan<Char> span2 = other.Value.AsSpan(..UnformattedWithoutSuffixLength);
 
       return span1.Equals(span2, StringComparison.Ordinal);
@@ -313,45 +355,45 @@ public record GbNationalInsuranceNumber
    /// <summary>
    ///   Get a string representation of the National Insurance Number.
    /// </summary>
-   /// <remarks>
-   ///   Will return the raw National Insurance Number.
-   /// </remarks>
+   /// <returns>
+   ///   The raw National Insurance Number, normalized to upper-case.
+   /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
-   ///   Check the <paramref name="nationalInsuranceNumber"/> to determine if it contains a
+   ///   Check the <paramref name="value"/> to determine if it contains a
    ///   valid UK National Insurance Number.
    /// </summary>
-   /// <param name="nationalInsuranceNumber">
+   /// <param name="value">
    ///   String representation of a UK National Insurance Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="GbNationalInsuranceNumberValidationResult"/> enumeration 
-   ///   value that indicates if the <paramref name="nationalInsuranceNumber"/> passed
+   ///   A <see cref="GbNationalInsuranceNumberValidationResult"/> enumeration
+   ///   value that indicates if the <paramref name="value"/> passed
    ///   validation or what validation error was encountered.
    /// </returns>
-   public static GbNationalInsuranceNumberValidationResult Validate(String? nationalInsuranceNumber)
+   public static GbNationalInsuranceNumberValidationResult Validate(String? value)
    {
-      if (String.IsNullOrWhiteSpace(nationalInsuranceNumber))
+      if (String.IsNullOrWhiteSpace(value))
       {
          return GbNationalInsuranceNumberValidationResult.Empty;
       }
-      else if (!ValidateLength(nationalInsuranceNumber))
+      else if (!ValidateLength(value))
       {
          return GbNationalInsuranceNumberValidationResult.InvalidLength;
       }
-      else if (!ValidatePrefix(nationalInsuranceNumber))
+      else if (!ValidatePrefix(value))
       {
          return GbNationalInsuranceNumberValidationResult.InvalidPrefix;
       }
-      else if (!ValidatePrefixFirstCharacter(nationalInsuranceNumber)
-         || !ValidatePrefixSecondCharacter(nationalInsuranceNumber)
-         || !ValidateDigits(nationalInsuranceNumber)
-         || !ValidateSuffixCharacter(nationalInsuranceNumber))
+      else if (!ValidatePrefixFirstCharacter(value)
+         || !ValidatePrefixSecondCharacter(value)
+         || !ValidateDigits(value)
+         || !ValidateSuffixCharacter(value))
       {
          return GbNationalInsuranceNumberValidationResult.InvalidCharacter;
       }
-      else if (!ValidateSeparators(nationalInsuranceNumber))
+      else if (!ValidateSeparators(value))
       {
          return GbNationalInsuranceNumberValidationResult.InvalidSeparator;
       }
@@ -359,22 +401,22 @@ public record GbNationalInsuranceNumber
       return GbNationalInsuranceNumberValidationResult.ValidationPassed;
    }
 
-   private static String GetRawValue(String nationalInsuranceNumber)
+   private static String GetRawValue(String value)
    {
-      var isFormatted = IsFormatted(nationalInsuranceNumber);
+      var isFormatted = IsFormatted(value);
       if (!isFormatted)
       {
-         return nationalInsuranceNumber;
+         return value;
       }
 
-      var hasSuffix = HasSuffix(nationalInsuranceNumber);
+      var hasSuffix = HasSuffix(value);
       var finalLength = hasSuffix
          ? UnformattedWithSuffixLength
          : UnformattedWithoutSuffixLength;
       var buffer = ArrayPool<Char>.Shared.Rent(finalLength);
       try
       {
-         ReadOnlySpan<Char> source = nationalInsuranceNumber.AsSpan();
+         ReadOnlySpan<Char> source = value.AsSpan();
          var span = new Span<Char>(buffer);
 
          ReadOnlySpan<Int32> segmentLengths = hasSuffix
@@ -402,22 +444,22 @@ public record GbNationalInsuranceNumber
    }
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static Boolean HasSuffix(ReadOnlySpan<Char> nationalInsuranceNumber)
-      => nationalInsuranceNumber.Length is UnformattedWithSuffixLength or FormattedWithSuffixLength;
+   private static Boolean HasSuffix(ReadOnlySpan<Char> value)
+      => value.Length is UnformattedWithSuffixLength or FormattedWithSuffixLength;
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static Boolean IsFormatted(ReadOnlySpan<Char> nationalInsuranceNumber)
-      => nationalInsuranceNumber.Length > UnformattedWithSuffixLength;
+   private static Boolean IsFormatted(ReadOnlySpan<Char> value)
+      => value.Length > UnformattedWithSuffixLength;
 
-   private static Boolean ValidateDigits(ReadOnlySpan<Char> nationalInsuranceNumber)
+   private static Boolean ValidateDigits(ReadOnlySpan<Char> value)
    {
-      var isFormatted = IsFormatted(nationalInsuranceNumber);
+      var isFormatted = IsFormatted(value);
       var start = isFormatted ? 3 : 2;
-      var end = nationalInsuranceNumber.Length switch
+      var end = value.Length switch
       {
-         UnformattedWithSuffixLength => nationalInsuranceNumber.Length - 1,
-         FormattedWithSuffixLength => nationalInsuranceNumber.Length - 2,
-         _ => nationalInsuranceNumber.Length
+         UnformattedWithSuffixLength => value.Length - 1,
+         FormattedWithSuffixLength => value.Length - 2,
+         _ => value.Length,
       };
 
       for (var index = start; index < end; index++)
@@ -428,7 +470,7 @@ public record GbNationalInsuranceNumber
             continue;
          }
 
-         if (!nationalInsuranceNumber[index].IsAsciiDigit())
+         if (!value[index].IsAsciiDigit())
          {
             return false;
          }
@@ -437,51 +479,53 @@ public record GbNationalInsuranceNumber
       return true;
    }
 
-   private static Boolean ValidateLength(ReadOnlySpan<Char> nationalInsuranceNumber)
-      => nationalInsuranceNumber.Length is UnformattedWithoutSuffixLength
+   private static Boolean ValidateLength(ReadOnlySpan<Char> value)
+      => value.Length is UnformattedWithoutSuffixLength
          or UnformattedWithSuffixLength
          or FormattedWithoutSuffixLength
          or FormattedWithSuffixLength;
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static Boolean ValidatePrefix(ReadOnlySpan<Char> nationalInsuranceNumber)
-      => !InvalidPrefixes.Contains(nationalInsuranceNumber[..2]);
+   private static Boolean ValidatePrefix(ReadOnlySpan<Char> value)
+      => !_invalidPrefixes.Contains(value[..2]);
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static Boolean ValidatePrefixFirstCharacter(ReadOnlySpan<Char> nationalInsuranceNumber)
-      => AllowedPrefixFirstCharacters.Contains(nationalInsuranceNumber[0]);
+   private static Boolean ValidatePrefixFirstCharacter(ReadOnlySpan<Char> value)
+      => _allowedPrefixFirstCharacters.Contains(value[0]);
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static Boolean ValidatePrefixSecondCharacter(ReadOnlySpan<Char> nationalInsuranceNumber)
-      => AllowedPrefixSecondCharacters.Contains(nationalInsuranceNumber[1]);
+   private static Boolean ValidatePrefixSecondCharacter(ReadOnlySpan<Char> value)
+      => _allowedPrefixSecondCharacters.Contains(value[1]);
 
-   private static Boolean ValidateSeparators(ReadOnlySpan<Char> nationalInsuranceNumber)
+   private static Boolean ValidateSeparators(ReadOnlySpan<Char> value)
    {
-      if (nationalInsuranceNumber.Length < FormattedWithoutSuffixLength)
+      if (value.Length < FormattedWithoutSuffixLength)
       {
          return true;
       }
 
-      var ch = nationalInsuranceNumber[Separator1Offset];
-      if (ch is >= Chars.DigitZero and Chars.DigitNine
-         or >= Chars.UpperCaseA and Chars.UpperCaseZ
-         or >= Chars.LowerCaseA and Chars.LowerCaseZ)
+      var ch = value[Separator1Offset];
+      if (ch is (>= Chars.DigitZero and Chars.DigitNine)
+         or (>= Chars.UpperCaseA and Chars.UpperCaseZ)
+         or (>= Chars.LowerCaseA and Chars.LowerCaseZ))
       {
          return false;
       }
 
-      return ch == nationalInsuranceNumber[Separator2Offset]
-         && ch == nationalInsuranceNumber[Separator3Offset]
-         && (nationalInsuranceNumber.Length == FormattedWithoutSuffixLength
-            || ch == nationalInsuranceNumber[Separator4Offset]);
+      return ch == value[Separator2Offset]
+         && ch == value[Separator3Offset]
+         && (value.Length == FormattedWithoutSuffixLength
+            || ch == value[Separator4Offset]);
    }
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static Boolean ValidateSuffixCharacter(ReadOnlySpan<Char> nationalInsuranceNumber)
-      => nationalInsuranceNumber.Length is UnformattedWithoutSuffixLength or FormattedWithoutSuffixLength
-         || nationalInsuranceNumber[^1] is >= Chars.UpperCaseA and <= Chars.UpperCaseD;
+   private static Boolean ValidateSuffixCharacter(ReadOnlySpan<Char> value)
+      => value.Length is UnformattedWithoutSuffixLength or FormattedWithoutSuffixLength
+         || value[^1] is >= Chars.UpperCaseA and <= Chars.UpperCaseD;
 }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class GbNationalInsuranceNumberJsonConverter : JsonConverter<GbNationalInsuranceNumber>
 {
    public override GbNationalInsuranceNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
