@@ -16,24 +16,24 @@ namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class IePpsNumberTests
 {
-   private const String Valid8CharacterPpsNumber = "1234567T";
-   private const String AltValid8CharacterPpsNumber = "7654321G";
-   private const String Valid9CharacterPpsNumber = "1234567FA";
-   private const String AltValid9CharacterPpsNumber = "7654321PA";
-   private const String Valid8CharacterPpsNumberWithWSuffix = "1234567TW";
-   private const String LowerCaseValid8CharacterPpsNumber = "1234567t";
-   private const String LowerCaseAltValid8CharacterPpsNumber = "7654321g";
-   private const String LowerCaseValid9CharacterPpsNumber = "1234567fa";
-   private const String LowerCaseAltValid9CharacterPpsNumber = "7654321pa";
-   private const String LowerCaseValid8CharacterPpsNumberWithWSuffix = "1234567tw";
-   private const String MixedCaseValid9CharacterPpsNumber = "1234567Fa";
-   private const String MixedCaseAltValid9CharacterPpsNumber = "7654321pA";
+   private const String ValidOriginalLengthPpsNumber = "1234567T";
+   private const String AltValidOriginalLengthPpsNumber = "7654321G";
+   private const String ValidExtendedLengthPpsNumber = "1234567FA";
+   private const String AltValidExtendedLengthPpsNumber = "7654321PA";
+   private const String ValidOriginalLengthPpsNumberWithWSuffix = "1234567TW";
+   private const String LowerCaseValidOriginalLengthPpsNumber = "1234567t";
+   private const String LowerCaseAltValidOriginalLengthPpsNumber = "7654321g";
+   private const String LowerCaseValidExtendedLengthPpsNumber = "1234567fa";
+   private const String LowerCaseAltValidExtendedLengthPpsNumber = "7654321pa";
+   private const String LowerCaseValidOriginalLengthPpsNumberWithWSuffix = "1234567tw";
+   private const String MixedCaseValidExtendedLengthPpsNumber = "1234567Fa";
+   private const String MixedCaseAltValidExtendedLengthPpsNumber = "7654321pA";
 
    private static String GetPpsNumberWithValidCheckDigit(
       String digits = "1234567",
       String trailingCharacter = "")
    {
-      var temp = $"{digits}_{trailingCharacter}";
+      var temp = $"{digits}_{trailingCharacter}";     // Underscore correctly pads length to support optional trailing character when calculating check digit
       var checkCharacter = GetCheckDigit(temp);
 
       return $"{digits}{checkCharacter}{trailingCharacter}";
@@ -70,18 +70,18 @@ public class IePpsNumberTests
 
    public static TheoryData<String> ValidPpsNumberValues =>
    [
-      Valid8CharacterPpsNumber,
-      AltValid8CharacterPpsNumber,
-      Valid9CharacterPpsNumber,
-      AltValid9CharacterPpsNumber,
-      Valid8CharacterPpsNumberWithWSuffix,
-      LowerCaseValid8CharacterPpsNumber,
-      LowerCaseAltValid8CharacterPpsNumber,
-      LowerCaseValid9CharacterPpsNumber,
-      LowerCaseAltValid9CharacterPpsNumber,
-      LowerCaseValid8CharacterPpsNumberWithWSuffix,
-      MixedCaseValid9CharacterPpsNumber,
-      MixedCaseAltValid9CharacterPpsNumber,
+      ValidOriginalLengthPpsNumber,
+      AltValidOriginalLengthPpsNumber,
+      ValidExtendedLengthPpsNumber,
+      AltValidExtendedLengthPpsNumber,
+      ValidOriginalLengthPpsNumberWithWSuffix,
+      LowerCaseValidOriginalLengthPpsNumber,
+      LowerCaseAltValidOriginalLengthPpsNumber,
+      LowerCaseValidExtendedLengthPpsNumber,
+      LowerCaseAltValidExtendedLengthPpsNumber,
+      LowerCaseValidOriginalLengthPpsNumberWithWSuffix,
+      MixedCaseValidExtendedLengthPpsNumber,
+      MixedCaseAltValidExtendedLengthPpsNumber,
    ];
 
    public static TheoryData<String> ValidTrailingCharacters =>
@@ -387,7 +387,7 @@ public class IePpsNumberTests
    public void IePpsNumber_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid9CharacterPpsNumber;
+      var value = ValidExtendedLengthPpsNumber;
       var sut = new IePpsNumber(value);
 
       // Act.
@@ -401,7 +401,7 @@ public class IePpsNumberTests
    public void IePpsNumber_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = MixedCaseAltValid9CharacterPpsNumber;
+      var value = MixedCaseAltValidExtendedLengthPpsNumber;
       var sut = new IePpsNumber(value);
 
       // Act.
@@ -539,8 +539,8 @@ public class IePpsNumberTests
    public void IePpsNumber_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new IePpsNumber(Valid8CharacterPpsNumber);
-      var sut2 = new IePpsNumber(Valid8CharacterPpsNumber);
+      var sut1 = new IePpsNumber(ValidOriginalLengthPpsNumber);
+      var sut2 = new IePpsNumber(ValidOriginalLengthPpsNumber);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -550,8 +550,8 @@ public class IePpsNumberTests
    public void IePpsNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
-      var sut2 = new IePpsNumber(AltValid8CharacterPpsNumber);
+      var sut1 = new IePpsNumber(ValidExtendedLengthPpsNumber);
+      var sut2 = new IePpsNumber(AltValidOriginalLengthPpsNumber);
 
       // Act/assert.
       (sut1 == sut2).Should().BeFalse();
@@ -561,8 +561,8 @@ public class IePpsNumberTests
    public void IePpsNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentCase()
    {
       // Arrange. different case versions for same person should still be equal.
-      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
-      var sut2 = new IePpsNumber(MixedCaseValid9CharacterPpsNumber);
+      var sut1 = new IePpsNumber(ValidExtendedLengthPpsNumber);
+      var sut2 = new IePpsNumber(MixedCaseValidExtendedLengthPpsNumber);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -578,8 +578,8 @@ public class IePpsNumberTests
    public void IePpsNumber_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
-      var sut2 = new IePpsNumber(AltValid8CharacterPpsNumber);
+      var sut1 = new IePpsNumber(ValidExtendedLengthPpsNumber);
+      var sut2 = new IePpsNumber(AltValidOriginalLengthPpsNumber);
 
       // Act/assert.
       (sut1 != sut2).Should().BeTrue();
@@ -589,8 +589,8 @@ public class IePpsNumberTests
    public void IePpsNumber_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentCase()
    {
       // Arrange. different case versions for same person should still be equal.
-      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
-      var sut2 = new IePpsNumber(MixedCaseValid9CharacterPpsNumber);
+      var sut1 = new IePpsNumber(ValidExtendedLengthPpsNumber);
+      var sut2 = new IePpsNumber(MixedCaseValidExtendedLengthPpsNumber);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -600,8 +600,8 @@ public class IePpsNumberTests
    public void IePpsNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new IePpsNumber(Valid8CharacterPpsNumber);
-      var sut2 = new IePpsNumber(Valid8CharacterPpsNumber);
+      var sut1 = new IePpsNumber(ValidOriginalLengthPpsNumber);
+      var sut2 = new IePpsNumber(ValidOriginalLengthPpsNumber);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -714,8 +714,8 @@ public class IePpsNumberTests
    public void IePpsNumber_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new IePpsNumber(Valid8CharacterPpsNumber);
-      var sut2 = new IePpsNumber(Valid8CharacterPpsNumber);
+      var sut1 = new IePpsNumber(ValidOriginalLengthPpsNumber);
+      var sut2 = new IePpsNumber(ValidOriginalLengthPpsNumber);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -725,8 +725,8 @@ public class IePpsNumberTests
    public void IePpsNumber_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
-      var sut2 = new IePpsNumber(AltValid8CharacterPpsNumber);
+      var sut1 = new IePpsNumber(ValidExtendedLengthPpsNumber);
+      var sut2 = new IePpsNumber(AltValidOriginalLengthPpsNumber);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeFalse();
@@ -736,11 +736,31 @@ public class IePpsNumberTests
    public void IePpsNumber_Equals_ShouldReturnTrue_WhenValuesHaveDifferentCase()
    {
       // Arrange. different case versions for same person should still be equal.
-      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
-      var sut2 = new IePpsNumber(MixedCaseValid9CharacterPpsNumber);
+      var sut1 = new IePpsNumber(ValidExtendedLengthPpsNumber);
+      var sut2 = new IePpsNumber(MixedCaseValidExtendedLengthPpsNumber);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IePpsNumber_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new IePpsNumber(ValidExtendedLengthPpsNumber);
+
+      // Act/assert.
+      sut.Equals(ValidExtendedLengthPpsNumber).Should().BeFalse();
+   }
+
+   [Fact]
+   public void IePpsNumber_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new IePpsNumber(ValidExtendedLengthPpsNumber);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
    }
 
    #endregion
@@ -753,8 +773,8 @@ public class IePpsNumberTests
    public void IePpsNumber_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new IePpsNumber(Valid8CharacterPpsNumber);
-      var sut2 = new IePpsNumber(Valid8CharacterPpsNumber);
+      var sut1 = new IePpsNumber(ValidOriginalLengthPpsNumber);
+      var sut2 = new IePpsNumber(ValidOriginalLengthPpsNumber);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -768,8 +788,8 @@ public class IePpsNumberTests
    public void IePpsNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
-      var sut2 = new IePpsNumber(AltValid8CharacterPpsNumber);
+      var sut1 = new IePpsNumber(ValidExtendedLengthPpsNumber);
+      var sut2 = new IePpsNumber(AltValidOriginalLengthPpsNumber);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -783,8 +803,8 @@ public class IePpsNumberTests
    public void IePpsNumber_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentCase()
    {
       // Arrange. different case versions for same person should still be equal.
-      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
-      var sut2 = new IePpsNumber(MixedCaseValid9CharacterPpsNumber);
+      var sut1 = new IePpsNumber(ValidExtendedLengthPpsNumber);
+      var sut2 = new IePpsNumber(MixedCaseValidExtendedLengthPpsNumber);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -808,8 +828,8 @@ public class IePpsNumberTests
    public void IePpsNumber_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var sut1 = new IePpsNumber(Valid9CharacterPpsNumber);
-      var sut2 = new IePpsNumber(Valid9CharacterPpsNumber);
+      var sut1 = new IePpsNumber(ValidExtendedLengthPpsNumber);
+      var sut2 = new IePpsNumber(ValidExtendedLengthPpsNumber);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
@@ -940,7 +960,7 @@ public class IePpsNumberTests
    public void IePpsNumber_JsonSerialization_ShouldRoundTripSuccessfully()
    {
       // Arrange.
-      var sut = new IePpsNumber(Valid8CharacterPpsNumber);
+      var sut = new IePpsNumber(ValidOriginalLengthPpsNumber);
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
@@ -955,7 +975,7 @@ public class IePpsNumberTests
    public void IePpsNumber_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
    {
       // Arrange.
-      var sut = new IePpsNumber(Valid9CharacterPpsNumber);
+      var sut = new IePpsNumber(ValidExtendedLengthPpsNumber);
       var expected = sut.Value;
 
       // Act.
@@ -974,7 +994,7 @@ public class IePpsNumberTests
    public void IePpsNumber_JsonSerialization_ShouldDeserializeComplexObject()
    {
       // Arrange.
-      var foo = new Foo { PpsNumber = new IePpsNumber(AltValid8CharacterPpsNumber) };
+      var foo = new Foo { PpsNumber = new IePpsNumber(AltValidOriginalLengthPpsNumber) };
       var json = JsonSerializer.Serialize(foo);
 
       // Act.

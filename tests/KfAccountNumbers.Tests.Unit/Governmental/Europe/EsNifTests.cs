@@ -1000,6 +1000,26 @@ public class EsNifTests
       sut1.Equals(sut2).Should().BeTrue();
    }
 
+   [Fact]
+   public void EsNif_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new EsNif(ValidFormattedDni);
+
+      // Act/assert.
+      sut.Equals(ValidFormattedDni).Should().BeFalse();
+   }
+
+   [Fact]
+   public void EsNif_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new EsNif(ValidFormattedDni);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
+   }
+
    #endregion
 
    #region Format Method Tests
