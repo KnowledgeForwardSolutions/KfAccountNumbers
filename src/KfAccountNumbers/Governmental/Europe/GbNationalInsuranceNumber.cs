@@ -42,9 +42,16 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      A National Insurance Number is typically displayed as a single string
 ///      of nine characters but can be formatted for readability as groups of
 ///      two characters with a separator character, typically a space
-///      (i.e. PP DD DD DD S). <see cref="GbNationalInsuranceNumber"/> is
-///      case-sensitive and requires the prefix and suffix characters to be
-///      uppercase letters.
+///      (i.e. PP DD DD DD S).
+///   </para>
+///   <para>
+///      <see cref="GbNationalInsuranceNumber"/> is case-insensitive for
+///      validation and parsing purposes. The GbNationalInsuranceNumber
+///      constructor, Create method and explicit string to
+///      GbNationalInsuranceNumber operator will normalize any lowercase letters
+///      to uppercase. Equality and inequality comparisons between instances of
+///      GbNationalInsuranceNumber will compare the normalized uppercase
+///      versions of the value.
 ///   </para>
 ///   <para>
 ///      When creating a new <see cref="GbNationalInsuranceNumber"/>, the
@@ -72,17 +79,19 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               Character position 0 (zero-based) must be an uppercase letter,
-///               A-C, E, G, H, J-P, R-T, W-Z. The letters D, F, I, Q, U and V
-///               are not allowed.
+///               Character position 0 (zero-based) must be an uppercase or
+///               lowercase letter, A-C, E, G, H, J-P, R-T, W-Z. The letters D,
+///               F, I, Q, U and V (and their lowercase equivalents) are not
+///               allowed.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               Character position 1 (zero-based) must be an uppercase letter,
-///               A-C, E, G, H, J-N, P, R-T, W-Z. The letters D, F, I, O, Q, U
-///               and V are not allowed. (Note O allowed in character position 0
-///               but not in character position 1).
+///               Character position 1 (zero-based) must be an uppercase letter
+///               or lowercase letter, A-C, E, G, H, J-N, P, R-T, W-Z. The
+///               letters D, F, I, O, Q, U and V (and their lowercase
+///               equivalents) are not allowed. (Note O allowed in character
+///               position 0 but not in character position 1).
 ///            </description>
 ///         </item>
 ///         <item>
@@ -94,7 +103,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <description>
 ///               Character position 8 (zero-based), if present, must be an
-///               uppercase letter, A-D.
+///               uppercase or lowercase letter, A-D.
 ///            </description>
 ///         </item>
 ///         <item>

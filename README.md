@@ -453,8 +453,12 @@ A National Insurance Number consists of nine characters structured as PPDDDDDDS,
   to the uniqueness of the value.
 
 A National Insurance Number is typically displayed as a single string of nine characters but can be formatted for readability
-as groups of two characters with a separator character, typically a space (i.e. PP DD DD DD S). `GbNationalInsuranceNumber`
-is case-sensitive and requires the prefix and suffix characters to be uppercase letters.
+as groups of two characters with a separator character, typically a space (i.e. PP DD DD DD S).
+
+`GbNationalInsuranceNumber` is case-insensitive for validation and parsing purposes. The `GbNationalInsuranceNumber` constructor, Create
+method and explicit string to `GbNationalInsuranceNumber` operator will normalize any lowercase letters to uppercase.
+Equality and inequality comparisons between instances of `GbNationalInsuranceNumber` will compare the normalized
+uppercase versions of the value.
 
 A valid National Insurance Number must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
@@ -464,10 +468,10 @@ A valid National Insurance Number must meet all of the following rules:
   * 11 characters (formatted, without suffix character)
   * 13 characters (formatted, with suffix character)
 * The leading (left-most) two characters may not be BG, GB, NK, KN, TN, NT, or ZZ.
-* Character position 0 (zero-based) must be an uppercase letter, A-C, E, G, H, J-P, R-T, W-Z. The letters D, F, I, Q, U and V are not allowed.
-* Character position 1 (zero-based) must be an uppercase letter, A-C, E, G, H, J-N, P, R-T, W-Z. The letters D, F, I, O, Q, U and V are not allowed. (Note O is the only additional excluded character.)
+* Character position 0 (zero-based) must be an uppercase or lowercase letter, A-C, E, G, H, J-P, R-T, W-Z. The letters D, F, I, Q, U and V (and their lowercase equivalents) are not allowed.
+* Character position 1 (zero-based) must be an uppercase or lowercase letter, A-C, E, G, H, J-N, P, R-T, W-Z. The letters D, F, I, O, Q, U and V (and their lowercase equivalents) are not allowed. (Note O is the only additional excluded character.)
 * Character positions 2-7 (zero-based) must be ASCII digits ('0'-'9').
-* Character position 8 (zero-based), if present, must be an uppercase letter, A-D.
+* Character position 8 (zero-based), if present, must be an uppercase letter or lowercase, A-D.
 * Separator characters, if present, may not be ASCII digits ('0'-'9') or uppercase or lowercase letters (A-Z, a-z).
 * The same character must be used in every separator position.
 
