@@ -808,7 +808,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IE PPS Number with suffix character (optional made permanent in 2013).
+        ///   Looks up a localized string similar to IE PPS Number with suffix character (optional, made permanent in 2013).
         /// </summary>
         internal static string IePpsNumberWithSuffixLength {
             get {

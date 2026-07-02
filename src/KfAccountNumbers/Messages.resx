@@ -574,6 +574,6 @@
     <value>IE PPS Number without optional suffix</value>
   </data>
   <data name="IePpsNumberWithSuffixLength" xml:space="preserve">
-    <value>IE PPS Number with suffix character (optional made permanent in 2013)</value>
+    <value>IE PPS Number with suffix character (optional, made permanent in 2013)</value>
   </data>
 </root>
