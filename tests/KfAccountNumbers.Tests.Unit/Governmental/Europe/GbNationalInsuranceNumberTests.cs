@@ -16,14 +16,22 @@ namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class GbNationalInsuranceNumberTests
 {
-   private const String Valid8CharacterValue = "AB123456";
-   private const String Valid9CharacterValue = "AB123456C";
-   private const String Valid11CharacterValue = "AB 12 34 56";
-   private const String Valid13CharacterValue = "AB 12 34 56 C";
-   private const String AltValid8CharacterValue = "GG000123";
-   private const String AltValid9CharacterValue = "GG000123B";
-   private const String AltValid11CharacterValue = "GG 00 01 23";
-   private const String AltValid13CharacterValue = "GG 00 01 23 B";
+   private const String ValidUnformattedValueWithoutSuffix = "AB123456";
+   private const String ValidUnformattedValueWithSuffix = "AB123456C";
+   private const String ValidFormattedValueWithoutSuffix = "AB 12 34 56";
+   private const String ValidFormattedValueWithSuffix = "AB 12 34 56 C";
+   private const String AltValidUnformattedValueWithoutSuffix = "GG000123";
+   private const String AltValidUnformattedValueWithSuffix = "GG000123B";
+   private const String AltValidFormattedValueWithoutSuffix = "GG 00 01 23";
+   private const String AltValidFormattedValueWithSuffix = "GG 00 01 23 B";
+   private const String ValidLowercaseUnformattedValueWithoutSuffix = "ab123456";
+   private const String ValidLowercaseUnformattedValueWithSuffix = "ab123456c";
+   private const String ValidLowercaseFormattedValueWithoutSuffix = "ab 12 34 56";
+   private const String ValidLowercaseFormattedValueWithSuffix = "ab 12 34 56 c";
+   private const String ValidMixedCaseUnformattedValueWithoutSuffix = "aB123456";
+   private const String ValidMixedCaseUnformattedValueWithSuffix = "Ab123456c";
+   private const String ValidMixedCaseFormattedValueWithoutSuffix = "aB 12 34 56";
+   private const String ValidMixedCaseFormattedValueWithSuffix = "Ab 12 34 56 C";
 
    public static String GetNationalInsuranceNumber(
       String prefix = "AB",
@@ -52,100 +60,108 @@ public class GbNationalInsuranceNumberTests
 
    public static TheoryData<String> ValidNationalInsuranceNumberValues =>
    [
-      Valid8CharacterValue,
-      Valid9CharacterValue,
-      Valid11CharacterValue,
-      Valid13CharacterValue,
-      AltValid8CharacterValue,
-      AltValid9CharacterValue,
-      AltValid11CharacterValue,
-      AltValid13CharacterValue,
+      ValidUnformattedValueWithoutSuffix,
+      ValidUnformattedValueWithSuffix,
+      ValidFormattedValueWithoutSuffix,
+      ValidFormattedValueWithSuffix,
+      AltValidUnformattedValueWithoutSuffix,
+      AltValidUnformattedValueWithSuffix,
+      AltValidFormattedValueWithoutSuffix,
+      AltValidFormattedValueWithSuffix,
+      ValidLowercaseUnformattedValueWithoutSuffix,
+      ValidLowercaseUnformattedValueWithSuffix,
+      ValidLowercaseFormattedValueWithoutSuffix,
+      ValidLowercaseFormattedValueWithSuffix,
+      ValidMixedCaseUnformattedValueWithoutSuffix,
+      ValidMixedCaseUnformattedValueWithSuffix,
+      ValidMixedCaseFormattedValueWithoutSuffix,
+      ValidMixedCaseFormattedValueWithSuffix,
    ];
 
    public static TheoryData<Char, Boolean> ValidPrefixFirstCharacters = new()
    {
-      { 'A', false },
-      { 'B', false },
-      { 'C', false },
-      { 'E', false },
-      { 'G', false },
-      { 'H', false },
-      { 'J', false },
-      { 'K', false },
-      { 'L', false },
-      { 'M', false },
-      { 'N', false },
-      { 'O', false },
-      { 'P', false },
-      { 'R', false },
-      { 'S', false },
-      { 'T', false },
-      { 'W', false },
-      { 'X', false },
-      { 'Y', false },
-      { 'Z', false },
-      { 'A', true },
-      { 'B', true },
-      { 'C', true },
-      { 'E', true },
-      { 'G', true },
-      { 'H', true },
-      { 'J', true },
-      { 'K', true },
-      { 'L', true },
-      { 'M', true },
-      { 'N', true },
-      { 'O', true },
-      { 'P', true },
-      { 'R', true },
-      { 'S', true },
-      { 'T', true },
-      { 'W', true },
-      { 'X', true },
-      { 'Y', true },
-      { 'Z', true },
+      { 'A', false }, { 'a', false },
+      { 'B', false }, { 'b', false },
+      { 'C', false }, { 'c', false },
+      { 'E', false }, { 'e', false },
+      { 'G', false }, { 'g', false },
+      { 'H', false }, { 'h', false },
+      { 'J', false }, { 'j', false },
+      { 'K', false }, { 'k', false },
+      { 'L', false }, { 'l', false },
+      { 'M', false }, { 'm', false },
+      { 'N', false }, { 'n', false },
+      { 'O', false }, { 'o', false },
+      { 'P', false }, { 'p', false },
+      { 'R', false }, { 'r', false },
+      { 'S', false }, { 's', false },
+      { 'T', false }, { 't', false },
+      { 'W', false }, { 'w', false },
+      { 'X', false }, { 'x', false },
+      { 'Y', false }, { 'y', false },
+      { 'Z', false }, { 'z', false },
+      { 'A', true },  { 'a', true },
+      { 'B', true },  { 'b', true },
+      { 'C', true },  { 'c', true },
+      { 'E', true },  { 'e', true },
+      { 'G', true },  { 'g', true },
+      { 'H', true },  { 'h', true },
+      { 'J', true },  { 'j', true },
+      { 'K', true },  { 'k', true },
+      { 'L', true },  { 'l', true },
+      { 'M', true },  { 'm', true },
+      { 'N', true },  { 'n', true },
+      { 'O', true },  { 'o', true },
+      { 'P', true },  { 'p', true },
+      { 'R', true },  { 'r', true },
+      { 'S', true },  { 's', true },
+      { 'T', true },  { 't', true },
+      { 'W', true },  { 'w', true },
+      { 'X', true },  { 'x', true },
+      { 'Y', true },  { 'y', true },
+      { 'Z', true },  { 'z', true },
    };
 
    public static TheoryData<Char, Boolean> ValidPrefixSecondCharacters = new()
    {
-      { 'A', false },
-      { 'B', false },
-      { 'C', false },
-      { 'E', false },
-      { 'G', false },
-      { 'H', false },
-      { 'J', false },
-      { 'K', false },
-      { 'L', false },
-      { 'M', false },
-      { 'N', false },
-      { 'P', false },
-      { 'R', false },
-      { 'S', false },
-      { 'T', false },
-      { 'W', false },
-      { 'X', false },
-      { 'Y', false },
-      { 'Z', false },
-      { 'A', true },
-      { 'B', true },
-      { 'C', true },
-      { 'E', true },
-      { 'G', true },
-      { 'H', true },
-      { 'J', true },
-      { 'K', true },
-      { 'L', true },
-      { 'M', true },
-      { 'N', true },
-      { 'P', true },
-      { 'R', true },
-      { 'S', true },
-      { 'T', true },
-      { 'W', true },
-      { 'X', true },
-      { 'Y', true },
-      { 'Z', true },
+      { 'A', false }, { 'a', false },
+      { 'B', false }, { 'b', false },
+      { 'C', false }, { 'c', false },
+      { 'E', false }, { 'e', false },
+      { 'G', false }, { 'g', false },
+      { 'H', false }, { 'h', false },
+      { 'J', false }, { 'j', false },
+      { 'K', false }, { 'k', false },
+      { 'L', false }, { 'l', false },
+      { 'M', false }, { 'm', false },
+      { 'N', false }, { 'n', false },
+      { 'P', false }, { 'p', false },
+      { 'R', false }, { 'r', false },
+      { 'S', false }, { 's', false },
+      { 'T', false }, { 't', false },
+      { 'W', false }, { 'w', false },
+      { 'X', false }, { 'x', false },
+      { 'Y', false }, { 'y', false },
+      { 'Z', false }, { 'z', false },
+      { 'A', true },  { 'a', true },
+      { 'B', true },  { 'b', true },
+      { 'C', true },  { 'c', true },
+      { 'E', true },  { 'e', true },
+      { 'G', true },  { 'g', true },
+      { 'H', true },  { 'h', true },
+      { 'J', true },  { 'j', true },
+      { 'K', true },  { 'k', true },
+      { 'L', true },  { 'l', true },
+      { 'M', true },  { 'm', true },
+      { 'N', true },  { 'n', true },
+      { 'P', true },  { 'p', true },
+      { 'R', true },  { 'r', true },
+      { 'S', true },  { 's', true },
+      { 'T', true },  { 't', true },
+      { 'W', true },  { 'w', true },
+      { 'X', true },  { 'x', true },
+      { 'Y', true },  { 'y', true },
+      { 'Z', true },  { 'z', true },
    };
 
    public static TheoryData<String, Boolean> ValidSuffixCharacters = new()
@@ -160,6 +176,14 @@ public class GbNationalInsuranceNumberTests
       { "B", true },
       { "C", true },
       { "D", true },
+      { "a", false },
+      { "b", false },
+      { "c", false },
+      { "d", false },
+      { "a", true },
+      { "b", true },
+      { "c", true },
+      { "d", true },
    };
 
    public static TheoryData<String> InvalidLengthValues =>
@@ -188,6 +212,20 @@ public class GbNationalInsuranceNumberTests
       { "TN", true },
       { "NT", true },
       { "ZZ", true },
+      { "bg", false },
+      { "gb", false },
+      { "nk", false },
+      { "kn", false },
+      { "tn", false },
+      { "nt", false },
+      { "zz", false },
+      { "bg", true },
+      { "gb", true },
+      { "nk", true },
+      { "kn", true },
+      { "tn", true },
+      { "nt", true },
+      { "zz", true },
    };
 
    public static TheoryData<Char, Boolean> InvalidPrefixFirstCharacters = new()
@@ -204,6 +242,18 @@ public class GbNationalInsuranceNumberTests
       { 'Q', true },
       { 'U', true },
       { 'V', true },
+      { 'd', false },
+      { 'f', false },
+      { 'i', false },
+      { 'q', false },
+      { 'u', false },
+      { 'v', false },
+      { 'd', true },
+      { 'f', true },
+      { 'i', true },
+      { 'q', true },
+      { 'u', true },
+      { 'v', true },
    };
 
    public static TheoryData<Char, Boolean> InvalidPrefixSecondCharacters = new()
@@ -222,6 +272,20 @@ public class GbNationalInsuranceNumberTests
       { 'Q', true },
       { 'U', true },
       { 'V', true },
+      { 'd', false },
+      { 'f', false },
+      { 'i', false },
+      { 'o', false },
+      { 'q', false },
+      { 'u', false },
+      { 'v', false },
+      { 'd', true },
+      { 'f', true },
+      { 'i', true },
+      { 'o', true },
+      { 'q', true },
+      { 'u', true },
+      { 'v', true },
    };
 
    public static TheoryData<String, Int32, Boolean> InvalidDigits = new()
@@ -246,20 +310,16 @@ public class GbNationalInsuranceNumberTests
 
    public static TheoryData<String, Boolean> InvalidSuffixCharacters = new()
    {
-      { "a", false },
-      { "b", false },
-      { "c", false },
-      { "d", false },
+      { "E", false },
+      { "X", false },
       { " ", false },
       { "=", false },
       { "1", false },
       { "0", false },
       { "\u2153", false },       // Unicode fraction 1/3
       { "\u00D6", false },       // unicode O with umlaut
-      { "a", true },
-      { "b", true },
-      { "c", true },
-      { "d", true },
+      { "e", true },
+      { "x", true },
       { " ", true },
       { "=", true },
       { "1", true },
@@ -270,6 +330,7 @@ public class GbNationalInsuranceNumberTests
 
    public static TheoryData<String, Int32> InvalidSeparatorValues = new()
    {
+      // First separator
       { "AB012 34 56 A", 2 },
       { "AB912 34 56 A", 2 },
       { "ABA12 34 56 A", 2 },
@@ -277,6 +338,7 @@ public class GbNationalInsuranceNumberTests
       { "ABa12 34 56 A", 2 },
       { "ABz12 34 56 A", 2 },
 
+      // Second separator
       { "AB 12034 56 A", 5 },
       { "AB 12934 56 A", 5 },
       { "AB 12A34 56 A", 5 },
@@ -284,6 +346,7 @@ public class GbNationalInsuranceNumberTests
       { "AB 12a34 56 A", 5 },
       { "AB 12z34 56 A", 5 },
 
+      // Third separator
       { "AB 12 34056 A", 8 },
       { "AB 12 34956 A", 8 },
       { "AB 12 34A56 A", 8 },
@@ -291,6 +354,7 @@ public class GbNationalInsuranceNumberTests
       { "AB 12 34a56 A", 8 },
       { "AB 12 34z56 A", 8 },
 
+      // Fourth separator
       { "AB 12 34 560A", 11 },
       { "AB 12 34 569A", 11 },
       { "AB 12 34 56AA", 11 },
@@ -298,6 +362,7 @@ public class GbNationalInsuranceNumberTests
       { "AB 12 34 56aA", 11 },
       { "AB 12 34 56zA", 11 },
 
+      // First separator
       { "AB012 34 56", 2 },
       { "AB912 34 56", 2 },
       { "ABA12 34 56", 2 },
@@ -305,6 +370,7 @@ public class GbNationalInsuranceNumberTests
       { "ABa12 34 56", 2 },
       { "ABz12 34 56", 2 },
 
+      // Second separator
       { "AB 12034 56", 5 },
       { "AB 12934 56", 5 },
       { "AB 12A34 56", 5 },
@@ -312,6 +378,7 @@ public class GbNationalInsuranceNumberTests
       { "AB 12a34 56", 5 },
       { "AB 12z34 56", 5 },
 
+      // Third separator
       { "AB 12 34056", 8 },
       { "AB 12 34956", 8 },
       { "AB 12 34A56", 8 },
@@ -583,7 +650,7 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid9CharacterValue;
+      var value = ValidUnformattedValueWithSuffix;
       var sut = new GbNationalInsuranceNumber(value);
 
       // Act.
@@ -597,7 +664,7 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid11CharacterValue;
+      var value = ValidFormattedValueWithoutSuffix;
       var sut = new GbNationalInsuranceNumber(value);
 
       // Act.
@@ -843,8 +910,8 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
+      var sut2 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -854,16 +921,16 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(AltValid9CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
+      var sut2 = new GbNationalInsuranceNumber(AltValidUnformattedValueWithSuffix);
 
       // Act/assert.
       (sut1 == sut2).Should().BeFalse();
    }
 
    [Theory]
-   [InlineData(Valid8CharacterValue, Valid11CharacterValue)]
-   [InlineData(Valid9CharacterValue, Valid13CharacterValue)]
+   [InlineData(ValidUnformattedValueWithoutSuffix, ValidFormattedValueWithoutSuffix)]
+   [InlineData(ValidUnformattedValueWithSuffix, ValidFormattedValueWithSuffix)]
    public void GbNationalInsuranceNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentFormats(
       String value1,
       String value2)
@@ -880,8 +947,8 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_EqualityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 8 and 9 characters versions for same person are not considered equal.
-      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithoutSuffix);
+      var sut2 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
 
       // Act/assert.
       (sut1 == sut2).Should().BeFalse();
@@ -897,8 +964,8 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(AltValid8CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithoutSuffix);
+      var sut2 = new GbNationalInsuranceNumber(AltValidUnformattedValueWithoutSuffix);
 
       // Act/assert.
       (sut1 != sut2).Should().BeTrue();
@@ -908,16 +975,16 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithoutSuffix);
+      var sut2 = new GbNationalInsuranceNumber(ValidUnformattedValueWithoutSuffix);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
    }
 
    [Theory]
-   [InlineData(Valid8CharacterValue, Valid11CharacterValue)]
-   [InlineData(Valid9CharacterValue, Valid13CharacterValue)]
+   [InlineData(ValidUnformattedValueWithoutSuffix, ValidFormattedValueWithoutSuffix)]
+   [InlineData(ValidUnformattedValueWithSuffix, ValidFormattedValueWithSuffix)]
    public void GbNationalInsuranceNumber_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentFormats(
       String value1,
       String value2)
@@ -934,8 +1001,8 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_InequalityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 8 and 9 characters versions for same person are not considered equal.
-      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithoutSuffix);
+      var sut2 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
 
       // Act/assert.
       (sut1 != sut2).Should().BeTrue();
@@ -1155,8 +1222,8 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
+      var sut2 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -1166,16 +1233,16 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(AltValid9CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
+      var sut2 = new GbNationalInsuranceNumber(AltValidUnformattedValueWithSuffix);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeFalse();
    }
 
    [Theory]
-   [InlineData(Valid8CharacterValue, Valid11CharacterValue)]
-   [InlineData(Valid9CharacterValue, Valid13CharacterValue)]
+   [InlineData(ValidUnformattedValueWithoutSuffix, ValidFormattedValueWithoutSuffix)]
+   [InlineData(ValidUnformattedValueWithSuffix, ValidFormattedValueWithSuffix)]
    public void GbNationalInsuranceNumber_Equals_ShouldReturnTrue_WhenValuesHaveDifferentFormats(
       String value1,
       String value2)
@@ -1192,8 +1259,8 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_Equals_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 8 and 9 characters versions for same person are not considered equal.
-      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithoutSuffix);
+      var sut2 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeFalse();
@@ -1209,8 +1276,8 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnTrue_WhenValuesWithSuffixesAreEqual()
    {
       // Arrange.
-      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
+      var sut2 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
 
       // Act/assert.
       sut1.EqualsNonSuffix(sut2).Should().BeTrue();
@@ -1220,16 +1287,16 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnTrue_WhenValuesWithoutSuffixesAreEqual()
    {
       // Arrange.
-      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithoutSuffix);
+      var sut2 = new GbNationalInsuranceNumber(ValidUnformattedValueWithoutSuffix);
 
       // Act/assert.
       sut1.EqualsNonSuffix(sut2).Should().BeTrue();
    }
 
    [Theory]
-   [InlineData(Valid9CharacterValue, Valid8CharacterValue)]
-   [InlineData(Valid8CharacterValue, Valid9CharacterValue)]
+   [InlineData(ValidUnformattedValueWithSuffix, ValidUnformattedValueWithoutSuffix)]
+   [InlineData(ValidUnformattedValueWithoutSuffix, ValidUnformattedValueWithSuffix)]
    public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnTrue_WhenValuesWithAndWithoutSuffixesAreEqual(
       String value1,
       String value2)
@@ -1254,8 +1321,8 @@ public class GbNationalInsuranceNumberTests
    }
 
    [Theory]
-   [InlineData(Valid9CharacterValue)]
-   [InlineData(Valid8CharacterValue)]
+   [InlineData(ValidUnformattedValueWithSuffix)]
+   [InlineData(ValidUnformattedValueWithoutSuffix)]
    public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnTrue_WhenValuesAreReferenceEqual(String value)
    {
       // Arrange.
@@ -1269,8 +1336,8 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnFalse_WhenValuesWithSuffixesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(AltValid9CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
+      var sut2 = new GbNationalInsuranceNumber(AltValidUnformattedValueWithSuffix);
 
       // Act/assert.
       sut1.EqualsNonSuffix(sut2).Should().BeFalse();
@@ -1280,16 +1347,16 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnFalse_WhenValuesWithoutSuffixesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(AltValid8CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithoutSuffix);
+      var sut2 = new GbNationalInsuranceNumber(AltValidUnformattedValueWithoutSuffix);
 
       // Act/assert.
       sut1.EqualsNonSuffix(sut2).Should().BeFalse();
    }
 
    [Theory]
-   [InlineData(Valid9CharacterValue, AltValid8CharacterValue)]
-   [InlineData(Valid8CharacterValue, AltValid9CharacterValue)]
+   [InlineData(ValidUnformattedValueWithSuffix, AltValidUnformattedValueWithoutSuffix)]
+   [InlineData(ValidUnformattedValueWithoutSuffix, AltValidUnformattedValueWithSuffix)]
    public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnFalse_WhenValuesWithAndWithoutSuffixesAreNotEqual(
       String value1,
       String value2)
@@ -1306,7 +1373,7 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_EqualsNonSuffix_ShouldReturnFalse_WhenComparedToNull()
    {
       // Arrange.
-      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithoutSuffix);
       GbNationalInsuranceNumber? sut2 = null;
 
       // Act/assert.
@@ -1320,10 +1387,10 @@ public class GbNationalInsuranceNumberTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(Valid8CharacterValue, Valid11CharacterValue)]
-   [InlineData(Valid9CharacterValue, Valid13CharacterValue)]
-   [InlineData(Valid11CharacterValue, Valid11CharacterValue)]
-   [InlineData(Valid13CharacterValue, Valid13CharacterValue)]
+   [InlineData(ValidUnformattedValueWithoutSuffix, ValidFormattedValueWithoutSuffix)]
+   [InlineData(ValidUnformattedValueWithSuffix, ValidFormattedValueWithSuffix)]
+   [InlineData(ValidFormattedValueWithoutSuffix, ValidFormattedValueWithoutSuffix)]
+   [InlineData(ValidFormattedValueWithSuffix, ValidFormattedValueWithSuffix)]
    public void GbNationalInsuranceNumber_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed(
       String value,
       String expected)
@@ -1339,10 +1406,10 @@ public class GbNationalInsuranceNumberTests
    }
 
    [Theory]
-   [InlineData(Valid8CharacterValue, Valid8CharacterValue)]
-   [InlineData(Valid9CharacterValue, Valid9CharacterValue)]
-   [InlineData(Valid11CharacterValue, Valid8CharacterValue)]
-   [InlineData(Valid13CharacterValue, Valid9CharacterValue)]
+   [InlineData(ValidUnformattedValueWithoutSuffix, ValidUnformattedValueWithoutSuffix)]
+   [InlineData(ValidUnformattedValueWithSuffix, ValidUnformattedValueWithSuffix)]
+   [InlineData(ValidFormattedValueWithoutSuffix, ValidUnformattedValueWithoutSuffix)]
+   [InlineData(ValidFormattedValueWithSuffix, ValidUnformattedValueWithSuffix)]
    public void GbNationalInsuranceNumber_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed(
       String value,
       String expected)
@@ -1364,7 +1431,7 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
    {
       // Arrange.
-      var sut = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut = new GbNationalInsuranceNumber(ValidUnformattedValueWithoutSuffix);
       var expectedMessage = Messages.FormatMaskEmpty + "*";
       var act = () => _ = sut.Format(mask);
 
@@ -1384,8 +1451,8 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(Valid8CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithoutSuffix);
+      var sut2 = new GbNationalInsuranceNumber(ValidUnformattedValueWithoutSuffix);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1399,8 +1466,8 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(AltValid9CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
+      var sut2 = new GbNationalInsuranceNumber(AltValidUnformattedValueWithSuffix);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1411,8 +1478,8 @@ public class GbNationalInsuranceNumberTests
    }
 
    [Theory]
-   [InlineData(Valid8CharacterValue, Valid11CharacterValue)]
-   [InlineData(Valid9CharacterValue, Valid13CharacterValue)]
+   [InlineData(ValidUnformattedValueWithoutSuffix, ValidFormattedValueWithoutSuffix)]
+   [InlineData(ValidUnformattedValueWithSuffix, ValidFormattedValueWithSuffix)]
    public void GbNationalInsuranceNumber_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentFormats(
       String value1,
       String value2)
@@ -1433,8 +1500,8 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 8 and 9 characters versions for same person are not considered equal.
-      var sut1 = new GbNationalInsuranceNumber(Valid8CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithoutSuffix);
+      var sut2 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1458,8 +1525,8 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var sut1 = new GbNationalInsuranceNumber(Valid9CharacterValue);
-      var sut2 = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut1 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
+      var sut2 = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
@@ -1698,7 +1765,7 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_JsonSerialization_ShouldRoundTripSuccessfully()
    {
       // Arrange.
-      var sut = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
@@ -1713,7 +1780,7 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
    {
       // Arrange.
-      var sut = new GbNationalInsuranceNumber(Valid9CharacterValue);
+      var sut = new GbNationalInsuranceNumber(ValidUnformattedValueWithSuffix);
       var expected = sut.Value;
 
       // Act.
@@ -1732,7 +1799,7 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_JsonSerialization_ShouldDeserializeComplexObject()
    {
       // Arrange.
-      var foo = new Foo { NationalInsuranceNumber = new GbNationalInsuranceNumber(AltValid9CharacterValue) };
+      var foo = new Foo { NationalInsuranceNumber = new GbNationalInsuranceNumber(AltValidUnformattedValueWithSuffix) };
       var json = JsonSerializer.Serialize(foo);
 
       // Act.

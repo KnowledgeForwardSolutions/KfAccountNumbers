@@ -582,11 +582,11 @@ public record GbNationalInsuranceNumber
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean ValidatePrefixFirstCharacter(ReadOnlySpan<Char> value)
-      => _allowedPrefixFirstCharacters.Contains(value[0]);
+      => _allowedPrefixFirstCharacters.Contains(Char.ToUpperInvariant(value[0]));
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean ValidatePrefixSecondCharacter(ReadOnlySpan<Char> value)
-      => _allowedPrefixSecondCharacters.Contains(value[1]);
+      => _allowedPrefixSecondCharacters.Contains(Char.ToUpperInvariant(value[1]));
 
    private static Boolean ValidateSeparators(
       ReadOnlySpan<Char> value,
@@ -632,7 +632,7 @@ public record GbNationalInsuranceNumber
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean ValidateSuffixCharacter(ReadOnlySpan<Char> value)
       => value.Length is UnformattedWithoutSuffixLength or FormattedWithoutSuffixLength
-         || value[^1] is >= Chars.UpperCaseA and <= Chars.UpperCaseD;
+         || Char.ToUpperInvariant(value[^1]) is >= Chars.UpperCaseA and <= Chars.UpperCaseD;
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
