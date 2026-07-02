@@ -1,5 +1,7 @@
 // Ignore Spelling: Json
 
+#pragma warning disable IDE0250 // Make struct 'readonly'
+#pragma warning disable IDE0046 // Convert to conditional expression
 #pragma warning disable SA1516 // Elements should be separated by blank line
 
 namespace KfAccountNumbers.Governmental.Europe;
@@ -156,6 +158,33 @@ namespace KfAccountNumbers.Governmental.Europe;
 [JsonConverter(typeof(GbNationalInsuranceNumberJsonConverter))]
 public record GbNationalInsuranceNumber
 {
+   /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="GbNationalInsuranceNumber"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidGbNationalInsuranceNumberPrefix,
+      InvalidCharacter,
+      InvalidSeparator)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="GbNationalInsuranceNumber"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidGbNationalInsuranceNumberPrefix,
+      InvalidCharacter,
+      InvalidSeparator)
+   {
+   }
+
    private const Int32 UnformattedWithoutSuffixLength = 8;
    private const Int32 UnformattedWithSuffixLength = 9;
    private const Int32 FormattedWithoutSuffixLength = 11;
@@ -167,7 +196,7 @@ public record GbNationalInsuranceNumber
    private const Int32 Separator4Offset = 11;
 
    private static readonly HashSet<String>.AlternateLookup<ReadOnlySpan<Char>> _invalidPrefixes =
-      new HashSet<String>() { "BG", "GB", "NK", "KN", "TN", "NT", "ZZ" }.GetAlternateLookup<ReadOnlySpan<Char>>();
+      new HashSet<String>(new CaseInsensitiveSpanComparer()) { "BG", "GB", "NK", "KN", "TN", "NT", "ZZ" }.GetAlternateLookup<ReadOnlySpan<Char>>();
    private static readonly HashSet<Char> _allowedPrefixFirstCharacters = [.. "ABCEGHJKLMNOPRSTWXYZ"];
    private static readonly HashSet<Char> _allowedPrefixSecondCharacters = [.. "ABCEGHJKLMNPRSTWXYZ"];
 
@@ -178,7 +207,7 @@ public record GbNationalInsuranceNumber
    /// <param name="value">
    ///   String representation of UK National Insurance Number.
    /// </param>
-   /// <exception cref="KfValidationException{GbNationalInsuranceNumberValidationResult}">
+   /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
@@ -221,10 +250,18 @@ public record GbNationalInsuranceNumber
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         GbNationalInsuranceNumberValidationResult validationResult = Validate(value);
-         if (validationResult != GbNationalInsuranceNumberValidationResult.ValidationPassed)
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            throw validationResult.ToValidationException();
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidGbNationalInsuranceNumberPrefix invalidPrefix => new UKfValidationException<ValidationError>(invalidPrefix),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
          }
       }
 
@@ -264,20 +301,22 @@ public record GbNationalInsuranceNumber
    ///   String representation of a UK National Insurance Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{GbNationalInsuranceNumber, GbNationalInsuranceNumberValidationResult}"/>.
-   ///   Will contain the new <see cref="GbNationalInsuranceNumber"/> if
-   ///   <paramref name="value"/> is valid or an
-   ///   <see cref="GbNationalInsuranceNumberValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="value"/> is
-   ///   invalid.
+   ///   A <see cref="UCreateResult{GbNationalInsuranceNumber, ValidationError}"/>. Will
+   ///   contain the new <see cref="GbNationalInsuranceNumber"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<GbNationalInsuranceNumber, GbNationalInsuranceNumberValidationResult> Create(String? value)
-   {
-      GbNationalInsuranceNumberValidationResult validationResult = Validate(value);
-      return validationResult == GbNationalInsuranceNumberValidationResult.ValidationPassed
-         ? new GbNationalInsuranceNumber(value, validationMode: ValidationMode.BypassValidation)
-         : validationResult;
-   }
+   public static UCreateResult<GbNationalInsuranceNumber, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new GbNationalInsuranceNumber(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidGbNationalInsuranceNumberPrefix invalidPrefix => (ValidationError)invalidPrefix,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
 
    /// <summary>
    ///   Determines whether the current National Insurance number is equal to
@@ -368,38 +407,86 @@ public record GbNationalInsuranceNumber
    ///   String representation of a UK National Insurance Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="GbNationalInsuranceNumberValidationResult"/> enumeration
-   ///   value that indicates if the <paramref name="value"/> passed
-   ///   validation or what validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
-   public static GbNationalInsuranceNumberValidationResult Validate(String? value)
+   public static ValidationResult Validate(String? value)
    {
       if (String.IsNullOrWhiteSpace(value))
       {
-         return GbNationalInsuranceNumberValidationResult.Empty;
-      }
-      else if (!ValidateLength(value))
-      {
-         return GbNationalInsuranceNumberValidationResult.InvalidLength;
-      }
-      else if (!ValidatePrefix(value))
-      {
-         return GbNationalInsuranceNumberValidationResult.InvalidPrefix;
-      }
-      else if (!ValidatePrefixFirstCharacter(value)
-         || !ValidatePrefixSecondCharacter(value)
-         || !ValidateDigits(value)
-         || !ValidateSuffixCharacter(value))
-      {
-         return GbNationalInsuranceNumberValidationResult.InvalidCharacter;
-      }
-      else if (!ValidateSeparators(value))
-      {
-         return GbNationalInsuranceNumberValidationResult.InvalidSeparator;
+         return default(EmptyValue);
       }
 
-      return GbNationalInsuranceNumberValidationResult.ValidationPassed;
+      if (!ValidateLength(value))
+      {
+         return new InvalidLength(
+            Messages.GbNationalInsuranceNumberInvalidLength,
+            value.Length,
+            GetValidLengthDefinitions());
+      }
+
+      if (!ValidatePrefix(value))
+      {
+         return new InvalidGbNationalInsuranceNumberPrefix(
+            Messages.GbNationalInsuranceNumberInvalidPrefix,
+            value[..2]);
+      }
+
+      if (!ValidatePrefixFirstCharacter(value))
+      {
+         return GetInvalidCharacterResult(value, 0);
+      }
+
+      if (!ValidatePrefixSecondCharacter(value))
+      {
+         return GetInvalidCharacterResult(value, 1);
+      }
+
+      if (!ValidateDigits(value, out var invalidCharacterPosition))
+      {
+         return GetInvalidCharacterResult(value, invalidCharacterPosition);
+      }
+
+      if (!ValidateSuffixCharacter(value))
+      {
+         return GetInvalidCharacterResult(value, value.Length - 1);
+      }
+
+      if (!ValidateSeparators(value, out invalidCharacterPosition))
+      {
+         return new InvalidSeparator(
+            Messages.GbNationalInsuranceNumberInvalidSeparator,
+            value[invalidCharacterPosition],
+            invalidCharacterPosition);
+      }
+
+      return default(ValidValue);
    }
+
+   /// <summary>
+   ///   Gets an array of details about valid lengths accepted for a National
+   ///   Insurance Number.
+   /// </summary>
+   /// <returns>
+   ///   An array of <see cref="ValidLengthDefinition"/>s.
+   /// </returns>
+   internal static ValidLengthDefinition[] GetValidLengthDefinitions()
+      =>
+      [
+         new ValidLengthDefinition(UnformattedWithoutSuffixLength, Messages.GbNationalInsuranceNumberUnformattedNoSuffixLength),
+         new ValidLengthDefinition(UnformattedWithSuffixLength, Messages.GbNationalInsuranceNumberUnformattedWithSuffixLength),
+         new ValidLengthDefinition(FormattedWithoutSuffixLength, Messages.GbNationalInsuranceNumberFormattedNoSuffixLength),
+         new ValidLengthDefinition(FormattedWithSuffixLength, Messages.GbNationalInsuranceNumberFormattedWithSuffixLength),
+      ];
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      ReadOnlySpan<Char> value,
+      Int32 position)
+      => new(
+         Messages.GbNationalInsuranceNumberInvalidCharacter,
+         value[position],
+         position);
 
    private static String GetRawValue(String value)
    {
@@ -451,8 +538,11 @@ public record GbNationalInsuranceNumber
    private static Boolean IsFormatted(ReadOnlySpan<Char> value)
       => value.Length > UnformattedWithSuffixLength;
 
-   private static Boolean ValidateDigits(ReadOnlySpan<Char> value)
+   private static Boolean ValidateDigits(
+      ReadOnlySpan<Char> value,
+      out Int32 invalidCharacterPosition)
    {
+      invalidCharacterPosition = -1;
       var isFormatted = IsFormatted(value);
       var start = isFormatted ? 3 : 2;
       var end = value.Length switch
@@ -472,6 +562,7 @@ public record GbNationalInsuranceNumber
 
          if (!value[index].IsAsciiDigit())
          {
+            invalidCharacterPosition = index;
             return false;
          }
       }
@@ -497,25 +588,45 @@ public record GbNationalInsuranceNumber
    private static Boolean ValidatePrefixSecondCharacter(ReadOnlySpan<Char> value)
       => _allowedPrefixSecondCharacters.Contains(value[1]);
 
-   private static Boolean ValidateSeparators(ReadOnlySpan<Char> value)
+   private static Boolean ValidateSeparators(
+      ReadOnlySpan<Char> value,
+      out Int32 invalidCharacterOffset)
    {
+      invalidCharacterOffset = -1;
       if (value.Length < FormattedWithoutSuffixLength)
       {
          return true;
       }
 
-      var ch = value[Separator1Offset];
-      if (ch is (>= Chars.DigitZero and Chars.DigitNine)
-         or (>= Chars.UpperCaseA and Chars.UpperCaseZ)
-         or (>= Chars.LowerCaseA and Chars.LowerCaseZ))
+      var initialSeparator = value[Separator1Offset];
+      if (initialSeparator is (>= Chars.DigitZero and <= Chars.DigitNine)
+         or (>= Chars.UpperCaseA and <= Chars.UpperCaseZ)
+         or (>= Chars.LowerCaseA and <= Chars.LowerCaseZ))
       {
+         invalidCharacterOffset = Separator1Offset;
          return false;
       }
 
-      return ch == value[Separator2Offset]
-         && ch == value[Separator3Offset]
-         && (value.Length == FormattedWithoutSuffixLength
-            || ch == value[Separator4Offset]);
+      if (value[Separator2Offset] != initialSeparator)
+      {
+         invalidCharacterOffset = Separator2Offset;
+         return false;
+      }
+
+      if (value[Separator3Offset] != initialSeparator)
+      {
+         invalidCharacterOffset = Separator3Offset;
+         return false;
+      }
+
+      if (value.Length == FormattedWithSuffixLength
+         && value[Separator4Offset] != initialSeparator)
+      {
+         invalidCharacterOffset = Separator4Offset;
+         return false;
+      }
+
+      return true;
    }
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]

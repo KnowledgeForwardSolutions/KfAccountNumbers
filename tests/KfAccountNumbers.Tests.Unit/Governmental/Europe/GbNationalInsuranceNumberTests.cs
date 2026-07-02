@@ -1,5 +1,13 @@
 // Ignore Spelling: Deserialize Deserialization Json Kf
 
+using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+   KfAccountNumbers.Governmental.Europe.GbNationalInsuranceNumber,
+   KfAccountNumbers.Governmental.Europe.GbNationalInsuranceNumber.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.Europe.GbNationalInsuranceNumber.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.Europe.GbNationalInsuranceNumber.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.Europe.GbNationalInsuranceNumber.ValidationResult;
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 #pragma warning disable IDE0008 // Use explicit type
@@ -147,7 +155,7 @@ public class GbNationalInsuranceNumberTests
       { "B", false },
       { "C", false },
       { "D", false },
-      { "", true },
+      { String.Empty, true },
       { "A", true },
       { "B", true },
       { "C", true },
@@ -216,24 +224,24 @@ public class GbNationalInsuranceNumberTests
       { 'V', true },
    };
 
-   public static TheoryData<String, Boolean> InvalidDigits = new()
+   public static TheoryData<String, Int32, Boolean> InvalidDigits = new()
    {
-      { " 12345", false },
-      { "0-2345", false },
-      { "01=345", false },
-      { "012A45", false },
-      { "0123b5", false },
-      { "01234~", false },
-      { "01234\u2153", false },       // Unicode fraction 1/3
-      { "01234\u00D6", false },       // unicode O with umlaut
-      { " 12345", true },
-      { "0-2345", true },
-      { "01=345", true },
-      { "012A45", true },
-      { "0123b5", true },
-      { "01234~", true },
-      { "01234\u2153", true },        // Unicode fraction 1/3
-      { "01234\u00D6", true },        // unicode O with umlaut
+      { " 12345", 2, false },
+      { "0-2345", 3, false },
+      { "01=345", 4, false },
+      { "012A45", 5, false },
+      { "0123b5", 6, false },
+      { "01234~", 7, false },
+      { "01234\u2153", 7, false },     // Unicode fraction 1/3
+      { "01234\u00D6", 7, false },     // unicode O with umlaut
+      { " 12345", 3, true },
+      { "0-2345", 4, true },
+      { "01=345", 6, true },
+      { "012A45", 7, true },
+      { "0123b5", 9, true },
+      { "01234~", 10, true },
+      { "01234\u2153", 10, true },     // Unicode fraction 1/3
+      { "01234\u00D6", 10, true },     // unicode O with umlaut
    };
 
    public static TheoryData<String, Boolean> InvalidSuffixCharacters = new()
@@ -260,57 +268,86 @@ public class GbNationalInsuranceNumberTests
       { "\u00D6", true },       // unicode O with umlaut
    };
 
-   public static TheoryData<String> InvalidSeparatorValues =>
-   [
-      "AB012 34 56 A",
-      "AB912 34 56 A",
-      "ABA12 34 56 A",
-      "ABZ12 34 56 A",
-      "ABa12 34 56 A",
-      "ABz12 34 56 A",
+   public static TheoryData<String, Int32> InvalidSeparatorValues = new()
+   {
+      { "AB012 34 56 A", 2 },
+      { "AB912 34 56 A", 2 },
+      { "ABA12 34 56 A", 2 },
+      { "ABZ12 34 56 A", 2 },
+      { "ABa12 34 56 A", 2 },
+      { "ABz12 34 56 A", 2 },
 
-      "AB 12034 56 A",
-      "AB 12934 56 A",
-      "AB 12A34 56 A",
-      "AB 12Z34 56 A",
-      "AB 12a34 56 A",
-      "AB 12z34 56 A",
+      { "AB 12034 56 A", 5 },
+      { "AB 12934 56 A", 5 },
+      { "AB 12A34 56 A", 5 },
+      { "AB 12Z34 56 A", 5 },
+      { "AB 12a34 56 A", 5 },
+      { "AB 12z34 56 A", 5 },
 
-      "AB 12 34056 A",
-      "AB 12 34956 A",
-      "AB 12 34A56 A",
-      "AB 12 34Z56 A",
-      "AB 12 34a56 A",
-      "AB 12 34z56 A",
+      { "AB 12 34056 A", 8 },
+      { "AB 12 34956 A", 8 },
+      { "AB 12 34A56 A", 8 },
+      { "AB 12 34Z56 A", 8 },
+      { "AB 12 34a56 A", 8 },
+      { "AB 12 34z56 A", 8 },
 
-      "AB 12 34 560A",
-      "AB 12 34 569A",
-      "AB 12 34 56AA",
-      "AB 12 34 56ZA",
-      "AB 12 34 56aA",
-      "AB 12 34 56zA",
+      { "AB 12 34 560A", 11 },
+      { "AB 12 34 569A", 11 },
+      { "AB 12 34 56AA", 11 },
+      { "AB 12 34 56ZA", 11 },
+      { "AB 12 34 56aA", 11 },
+      { "AB 12 34 56zA", 11 },
 
-      "AB012 34 56",
-      "AB912 34 56",
-      "ABA12 34 56",
-      "ABZ12 34 56",
-      "ABa12 34 56",
-      "ABz12 34 56",
+      { "AB012 34 56", 2 },
+      { "AB912 34 56", 2 },
+      { "ABA12 34 56", 2 },
+      { "ABZ12 34 56", 2 },
+      { "ABa12 34 56", 2 },
+      { "ABz12 34 56", 2 },
 
-      "AB 12034 56",
-      "AB 12934 56",
-      "AB 12A34 56",
-      "AB 12Z34 56",
-      "AB 12a34 56",
-      "AB 12z34 56",
+      { "AB 12034 56", 5 },
+      { "AB 12934 56", 5 },
+      { "AB 12A34 56", 5 },
+      { "AB 12Z34 56", 5 },
+      { "AB 12a34 56", 5 },
+      { "AB 12z34 56", 5 },
 
-      "AB 12 34056",
-      "AB 12 34956",
-      "AB 12 34A56",
-      "AB 12 34Z56",
-      "AB 12 34a56",
-      "AB 12 34z56",
-   ];
+      { "AB 12 34056", 8 },
+      { "AB 12 34956", 8 },
+      { "AB 12 34A56", 8 },
+      { "AB 12 34Z56", 8 },
+      { "AB 12 34a56", 8 },
+      { "AB 12 34z56", 8 },
+   };
+
+   private static InvalidLength GetInvalidLengthResult(
+      String value,
+      String? message = null)
+      => new(
+         message ?? Messages.GbNationalInsuranceNumberInvalidLength,
+         value.Length,
+         GbNationalInsuranceNumber.GetValidLengthDefinitions());
+
+   private static InvalidGbNationalInsuranceNumberPrefix GetInvalidPrefixResult(String value)
+      => new(
+         Messages.GbNationalInsuranceNumberInvalidPrefix,
+         value[..2]);
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.GbNationalInsuranceNumberInvalidCharacter,
+         value[position],
+         position);
+
+   private static InvalidSeparator GetInvalidSeparatorResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.GbNationalInsuranceNumberInvalidSeparator,
+         value[position],
+         position);
 
    #region Constructor Tests
    // ==========================================================================
@@ -388,20 +425,33 @@ public class GbNationalInsuranceNumberTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void GbNationalInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new GbNationalInsuranceNumber(value))
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberEmpty + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void GbNationalInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new GbNationalInsuranceNumber(value))
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidLength + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidPrefixValues))]
@@ -411,13 +461,13 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(prefix, formatted: formatted);
+      LocalValidationError expected = GetInvalidPrefixResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbNationalInsuranceNumber(value))
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidPrefix + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidPrefix);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -428,13 +478,13 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(ch, formatted: formatted);
+      LocalValidationError expected = GetInvalidCharacterResult(value, 0);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbNationalInsuranceNumber(value))
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -445,30 +495,31 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(prefix2: ch, formatted: formatted);
+      LocalValidationError expected = GetInvalidCharacterResult(value, 1);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbNationalInsuranceNumber(value))
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidDigits))]
    public void GbNationalInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDigitCharacters(
       String digits,
+      Int32 position,
       Boolean formatted)
    {
       // Arrange.
       var value = GetNationalInsuranceNumber("AB", digits: digits, formatted: formatted);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbNationalInsuranceNumber(value))
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -479,23 +530,30 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber("AB", suffix: suffix, formatted: formatted);
+      LocalValidationError expected = GetInvalidCharacterResult(value, value.Length - 1);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new GbNationalInsuranceNumber(value))
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void GbNationalInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
-      => FluentActions
+   public void GbNationalInsuranceNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new GbNationalInsuranceNumber(value))
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -532,8 +590,7 @@ public class GbNationalInsuranceNumberTests
       String str = sut;
 
       // Assert.
-      str.Should().NotBeNullOrEmpty();
-      str.Should().Be(value);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
@@ -542,14 +599,12 @@ public class GbNationalInsuranceNumberTests
       // Arrange.
       var value = Valid11CharacterValue;
       var sut = new GbNationalInsuranceNumber(value);
-      var expected = GetRawNationalInsuranceNumber(value);
 
       // Act.
       var str = (String)sut;
 
       // Assert.
-      str.Should().NotBeNullOrEmpty();
-      str.Should().Be(expected);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
@@ -648,20 +703,33 @@ public class GbNationalInsuranceNumberTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (GbNationalInsuranceNumber)value)
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberEmpty + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (GbNationalInsuranceNumber)value)
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidLength + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidPrefixValues))]
@@ -671,13 +739,13 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(prefix, formatted: formatted);
+      LocalValidationError expected = GetInvalidPrefixResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (GbNationalInsuranceNumber)value)
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidPrefix + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidPrefix);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -688,13 +756,13 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(ch, formatted: formatted);
+      LocalValidationError expected = GetInvalidCharacterResult(value, 0);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (GbNationalInsuranceNumber)value)
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -705,30 +773,31 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(prefix2: ch, formatted: formatted);
+      LocalValidationError expected = GetInvalidCharacterResult(value, 1);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (GbNationalInsuranceNumber)value)
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidDigits))]
    public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldThrowKfValidationException_WhenValueHasInvalidDigitCharacters(
       String digits,
+      Int32 position,
       Boolean formatted)
    {
       // Arrange.
       var value = GetNationalInsuranceNumber("AB", digits: digits, formatted: formatted);
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (GbNationalInsuranceNumber)value)
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -739,23 +808,30 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber("AB", suffix: suffix, formatted: formatted);
+      LocalValidationError expected = GetInvalidCharacterResult(value, value.Length - 1);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (GbNationalInsuranceNumber)value)
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
-      => FluentActions
+   public void GbNationalInsuranceNumber_ExplicitCastToGbNationalInsuranceNumber_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (GbNationalInsuranceNumber)value)
-         .Should().Throw<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -876,16 +952,13 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expectedValue = new GbNationalInsuranceNumber(value);
+      LocalCreateResult expected = new GbNationalInsuranceNumber(value);
 
       // Act.
       var result = GbNationalInsuranceNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -896,16 +969,13 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(ch, formatted: formatted);
-      var expectedValue = new GbNationalInsuranceNumber(value);
+      LocalCreateResult expected = new GbNationalInsuranceNumber(value);
 
       // Act.
       var result = GbNationalInsuranceNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -916,16 +986,13 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(prefix2: ch, formatted: formatted);
-      var expectedValue = new GbNationalInsuranceNumber(value);
+      LocalCreateResult expected = new GbNationalInsuranceNumber(value);
 
       // Act.
       var result = GbNationalInsuranceNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -936,44 +1003,45 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber("AB", suffix: suffix, formatted: formatted);
-      var expectedValue = new GbNationalInsuranceNumber(value);
+      LocalCreateResult expected = new GbNationalInsuranceNumber(value);
 
       // Act.
       var result = GbNationalInsuranceNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void GbNationalInsuranceNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
+
       // Act.
       var result = GbNationalInsuranceNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.Empty);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void GbNationalInsuranceNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
+
       // Act.
       var result = GbNationalInsuranceNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidLength);
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<LocalValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
@@ -984,15 +1052,13 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(prefix, formatted: formatted);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidPrefixResult(value);
 
       // Act.
       var result = GbNationalInsuranceNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidPrefix);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1003,15 +1069,13 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(ch, formatted: formatted);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, 0);
 
       // Act.
       var result = GbNationalInsuranceNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1022,34 +1086,31 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(prefix2: ch, formatted: formatted);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, 1);
 
       // Act.
       var result = GbNationalInsuranceNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidDigits))]
    public void GbNationalInsuranceNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasInvalidDigitCharacters(
       String digits,
+      Int32 position,
       Boolean formatted)
    {
       // Arrange.
       var value = GetNationalInsuranceNumber("AB", digits: digits, formatted: formatted);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = GbNationalInsuranceNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1060,29 +1121,28 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber("AB", suffix: suffix, formatted: formatted);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, value.Length - 1);
 
       // Act.
       var result = GbNationalInsuranceNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void GbNationalInsuranceNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidSeparator(String value)
+   public void GbNationalInsuranceNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
    {
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value, position);
+
       // Act.
       var result = GbNationalInsuranceNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidSeparator);
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -1433,7 +1493,16 @@ public class GbNationalInsuranceNumberTests
    [Theory]
    [MemberData(nameof(ValidNationalInsuranceNumberValues))]
    public void GbNationalInsuranceNumber_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
-      => GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = GbNationalInsuranceNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(ValidPrefixFirstCharacters))]
@@ -1443,9 +1512,13 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(ch, formatted: formatted);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.ValidationPassed);
+      // Act.
+      var result = GbNationalInsuranceNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1456,9 +1529,13 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(prefix2: ch, formatted: formatted);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.ValidationPassed);
+      // Act.
+      var result = GbNationalInsuranceNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1469,20 +1546,45 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber("AB", suffix: suffix, formatted: formatted);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.ValidationPassed);
+      // Act.
+      var result = GbNationalInsuranceNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void GbNationalInsuranceNumber_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String value)
-      => GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.Empty);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(EmptyValue);
+
+      // Act.
+      var result = GbNationalInsuranceNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void GbNationalInsuranceNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
-      => GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidLength);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidLengthResult(value);
+
+      // Act.
+      var result = GbNationalInsuranceNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidPrefixValues))]
@@ -1492,9 +1594,13 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(prefix, formatted: formatted);
+      LocalValidationResult expected = GetInvalidPrefixResult(value);
 
-      // Act/assert.
-      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidPrefix);
+      // Act.
+      var result = GbNationalInsuranceNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1505,9 +1611,13 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(ch, formatted: formatted);
+      LocalValidationResult expected = GetInvalidCharacterResult(value, 0);
 
-      // Act/assert.
-      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+      // Act.
+      var result = GbNationalInsuranceNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1518,22 +1628,31 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber(prefix2: ch, formatted: formatted);
+      LocalValidationResult expected = GetInvalidCharacterResult(value, 1);
 
-      // Act/assert.
-      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+      // Act.
+      var result = GbNationalInsuranceNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidDigits))]
    public void GbNationalInsuranceNumber_Validate_ShouldReturnInvalidCharacter_WhenValueHasInvalidDigitCharacters(
       String digits,
+      Int32 position,
       Boolean formatted)
    {
       // Arrange.
       var value = GetNationalInsuranceNumber("AB", digits: digits, formatted: formatted);
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
 
-      // Act/assert.
-      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+      // Act.
+      var result = GbNationalInsuranceNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1544,15 +1663,30 @@ public class GbNationalInsuranceNumberTests
    {
       // Arrange.
       var value = GetNationalInsuranceNumber("AB", suffix: suffix, formatted: formatted);
+      LocalValidationResult expected = GetInvalidCharacterResult(value, value.Length - 1);
 
-      // Act/assert.
-      GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidCharacter);
+      // Act.
+      var result = GbNationalInsuranceNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void GbNationalInsuranceNumber_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(String value)
-      => GbNationalInsuranceNumber.Validate(value).Should().Be(GbNationalInsuranceNumberValidationResult.InvalidSeparator);
+   public void GbNationalInsuranceNumber_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidSeparatorResult(value, position);
+
+      // Act.
+      var result = GbNationalInsuranceNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -1641,15 +1775,14 @@ public class GbNationalInsuranceNumberTests
    public void GbNationalInsuranceNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenNationalInsuranceNumberIsInvalid()
    {
       // Arrange.
-      var json = "{\"NationalInsuranceNumber\":\"AB123456CB\"}";  // Invalid length
+      var json = "{\"NationalInsuranceNumber\":\"BG123456\"}";  // Invalid prefix
+      LocalValidationError expected = GetInvalidPrefixResult("BG123456");
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should()
-         .ThrowExactly<KfValidationException<GbNationalInsuranceNumberValidationResult>>()
-         .WithMessage(Messages.GbNationalInsuranceNumberInvalidLength + "*")
-         .And.ValidationResult.Should().Be(GbNationalInsuranceNumberValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion

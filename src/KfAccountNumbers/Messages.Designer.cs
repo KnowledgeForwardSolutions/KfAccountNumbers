@@ -646,6 +646,24 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to GB National Insurance Number with separator characters and without a suffix character.
+        /// </summary>
+        internal static string GbNationalInsuranceNumberFormattedNoSuffixLength {
+            get {
+                return ResourceManager.GetString("GbNationalInsuranceNumberFormattedNoSuffixLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB National Insurance Number with a suffix character and separator characters.
+        /// </summary>
+        internal static string GbNationalInsuranceNumberFormattedWithSuffixLength {
+            get {
+                return ResourceManager.GetString("GbNationalInsuranceNumberFormattedWithSuffixLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to GB National Insurance Number contains one or more invalid characters. Offset 0 must contain A-C, E, G, H, J-P, R-T, W-Z. Offset 1 must contain A-C, E, G, H, J-N, P, R-T, W-Z. Offsets 2-7 must contain ASCII digits. Offset 8, if present, must contain A-D..
         /// </summary>
         internal static string GbNationalInsuranceNumberInvalidCharacter {
@@ -678,6 +696,24 @@ namespace KfAccountNumbers {
         internal static string GbNationalInsuranceNumberInvalidSeparator {
             get {
                 return ResourceManager.GetString("GbNationalInsuranceNumberInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB National Insurance Number without a suffix character or separator characters.
+        /// </summary>
+        internal static string GbNationalInsuranceNumberUnformattedNoSuffixLength {
+            get {
+                return ResourceManager.GetString("GbNationalInsuranceNumberUnformattedNoSuffixLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB National Insurance Number with a suffix character and without separator characters.
+        /// </summary>
+        internal static string GbNationalInsuranceNumberUnformattedWithSuffixLength {
+            get {
+                return ResourceManager.GetString("GbNationalInsuranceNumberUnformattedWithSuffixLength", resourceCulture);
             }
         }
         
