@@ -1576,7 +1576,7 @@ public class GbNationalInsuranceNumberTests
    }
 
    [Fact]
-   public void GbNationalInsuranceNumber_GetHashCode_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   public void GbNationalInsuranceNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
    {
       // Arrange.
       var sut1 = new GbNationalInsuranceNumber(ValidFormattedValueWithoutSuffix);
@@ -1591,7 +1591,7 @@ public class GbNationalInsuranceNumberTests
    }
 
    [Fact]
-   public void GbNationalInsuranceNumber_GetHashCode_ShouldReturnTrue_WhenValuesDifferOnlyByCase()
+   public void GbNationalInsuranceNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyByCase()
    {
       // Arrange.
       var sut1 = new GbNationalInsuranceNumber(ValidFormattedValueWithoutSuffix);

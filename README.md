@@ -471,7 +471,7 @@ A valid National Insurance Number must meet all of the following rules:
 * Character position 0 (zero-based) must be an uppercase or lowercase letter, A-C, E, G, H, J-P, R-T, W-Z. The letters D, F, I, Q, U and V (and their lowercase equivalents) are not allowed.
 * Character position 1 (zero-based) must be an uppercase or lowercase letter, A-C, E, G, H, J-N, P, R-T, W-Z. The letters D, F, I, O, Q, U and V (and their lowercase equivalents) are not allowed. (Note O is the only additional excluded character.)
 * Character positions 2-7 (zero-based) must be ASCII digits ('0'-'9').
-* Character position 8 (zero-based), if present, must be an uppercase letter or lowercase, A-D.
+* Character position 8 (zero-based), if present, must be an uppercase or lowercase letter, A-D.
 * Separator characters, if present, may not be ASCII digits ('0'-'9') or uppercase or lowercase letters (A-Z, a-z).
 * The same character must be used in every separator position.
 

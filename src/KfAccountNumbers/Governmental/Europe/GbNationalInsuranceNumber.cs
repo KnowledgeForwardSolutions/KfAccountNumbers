@@ -296,10 +296,10 @@ public record GbNationalInsuranceNumber
    ///   Defines an explicit conversion of a string to a <see cref="GbNationalInsuranceNumber"/>.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a UK National Insurance Number.
+   ///   String representation of a GB National Insurance Number.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
-   ///   <paramref name="value"/> is not a valid PPS number.
+   ///   <paramref name="value"/> is not a valid National Insurance Number.
    /// </exception>
    public static explicit operator GbNationalInsuranceNumber(String? value) => new(value);
 
@@ -307,7 +307,7 @@ public record GbNationalInsuranceNumber
    ///   Create a new <see cref="GbNationalInsuranceNumber"/> using the Result pattern.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a UK National Insurance Number.
+   ///   String representation of a GB National Insurance Number.
    /// </param>
    /// <returns>
    ///   A <see cref="UCreateResult{GbNationalInsuranceNumber, ValidationError}"/>. Will
@@ -410,10 +410,10 @@ public record GbNationalInsuranceNumber
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a
-   ///   valid UK National Insurance Number.
+   ///   valid GB National Insurance Number.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a UK National Insurance Number.
+   ///   String representation of a GB National Insurance Number.
    /// </param>
    /// <returns>
    ///   A <see cref="ValidationResult"/> union that indicates if the
