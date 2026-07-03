@@ -461,12 +461,12 @@ public record BeRijksregisternummer
    ///   String representation of a Belgian rijksregisternummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{BeRijksregisternummer, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{BeRijksregisternummer, ValidationError}"/>. Will
    ///   contain the new <see cref="BeRijksregisternummer"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<BeRijksregisternummer, ValidationError> Create(String? value)
+   public static CreateResult<BeRijksregisternummer, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new BeRijksregisternummer(value, ValidationMode.BypassValidation),

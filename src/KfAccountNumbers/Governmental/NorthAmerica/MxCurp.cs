@@ -312,13 +312,13 @@ public record MxCurp
    ///   String representation of a CURP.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{MxCurp, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{MxCurp, ValidationError}"/>. Will
    ///   contain the new <see cref="MxCurp"/> if
    ///   <paramref name="value"/> is valid or a <see cref="ValidationError"/>
    ///   that identifies the validation rule that was failed if
    ///   <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<MxCurp, ValidationError> Create(String? value)
+   public static CreateResult<MxCurp, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new MxCurp(value, ValidationMode.BypassValidation),

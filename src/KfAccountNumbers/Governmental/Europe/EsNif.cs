@@ -292,12 +292,12 @@ public record EsNif
    ///   String representation of a Spanish Número de Identificación Fiscal.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{EsNif, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{EsNif, ValidationError}"/>. Will
    ///   contain the new <see cref="EsNif"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<EsNif, ValidationError> Create(String? value)
+   public static CreateResult<EsNif, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new EsNif(value, ValidationMode.BypassValidation),

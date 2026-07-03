@@ -6,7 +6,7 @@
 
 using Microsoft.Extensions.Time.Testing;
 
-using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
    KfAccountNumbers.Governmental.Europe.SePersonnummer,
    KfAccountNumbers.Governmental.Europe.SePersonnummer.ValidationError>;
 using LocalValidationError = KfAccountNumbers.Governmental.Europe.SePersonnummer.ValidationError;

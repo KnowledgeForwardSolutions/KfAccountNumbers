@@ -217,12 +217,12 @@ public record NlBurgerservicenummer
    ///   String representation of a Dutch burgerservicenummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{NlBurgerservicenummer, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{NlBurgerservicenummer, ValidationError}"/>. Will
    ///   contain the new <see cref="NlBurgerservicenummer"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<NlBurgerservicenummer, ValidationError> Create(String? value)
+   public static CreateResult<NlBurgerservicenummer, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new NlBurgerservicenummer(value, ValidationMode.BypassValidation),

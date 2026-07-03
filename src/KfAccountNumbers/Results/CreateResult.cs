@@ -1,7 +1,5 @@
 namespace KfAccountNumbers.Results;
 
-// TODO: rename to CreateResult and delete enum based CreateResult once all existing code converted to union pattern
-
 /// <summary>
 ///   Represents a result of a create operation that can either be successful,
 ///   containing a value of type TS, or unsuccessful, containing an error of
@@ -25,7 +23,7 @@ namespace KfAccountNumbers.Results;
 ///   type must implement the IUnion interface.
 /// </typeparam>
 [Union]
-public readonly struct UCreateResult<TS, TE> : IUnion
+public readonly struct CreateResult<TS, TE> : IUnion
    where TS : notnull
    where TE : IUnion
 {
@@ -33,7 +31,7 @@ public readonly struct UCreateResult<TS, TE> : IUnion
    private readonly TE _error;
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="UCreateResult{TS, TE}"/>
+   ///   Initializes a new instance of the <see cref="CreateResult{TS, TE}"/>
    ///   struct with a successful result.
    /// </summary>
    /// <param name="value">
@@ -43,7 +41,7 @@ public readonly struct UCreateResult<TS, TE> : IUnion
    /// <exception cref="ArgumentNullException">
    ///   <paramref name="value"/> is <see langword="null"/>.
    /// </exception>
-   public UCreateResult(TS value)
+   public CreateResult(TS value)
    {
       _success = value ?? throw new ArgumentNullException(nameof(value));
       _error = default!;
@@ -51,13 +49,13 @@ public readonly struct UCreateResult<TS, TE> : IUnion
    }
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="UCreateResult{TS, TE}"/>
+   ///   Initializes a new instance of the <see cref="CreateResult{TS, TE}"/>
    ///   struct with a value that indicates a failed create operation.
    /// </summary>
    /// <param name="error">
    ///   The error that caused the failure.
    /// </param>
-   public UCreateResult(TE error)
+   public CreateResult(TE error)
    {
       _error = error;
       _success = default!;
@@ -91,7 +89,7 @@ public readonly struct UCreateResult<TS, TE> : IUnion
    /// <param name="value">
    ///   The success value.
    /// </param>
-   public static implicit operator UCreateResult<TS, TE>(TS value) => new(value);
+   public static implicit operator CreateResult<TS, TE>(TS value) => new(value);
 
    /// <summary>
    ///   Implicitly converts a <typeparamref name="TE"/> error value to a
@@ -100,7 +98,7 @@ public readonly struct UCreateResult<TS, TE> : IUnion
    /// <param name="error">
    ///   The error value.
    /// </param>
-   public static implicit operator UCreateResult<TS, TE>(TE error) => new(error);
+   public static implicit operator CreateResult<TS, TE>(TE error) => new(error);
 
    /// <summary>
    ///   Gets the success value if available, or the default value otherwise.

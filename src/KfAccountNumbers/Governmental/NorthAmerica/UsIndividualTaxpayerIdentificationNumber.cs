@@ -190,13 +190,13 @@ public record UsIndividualTaxpayerIdentificationNumber
    ///   String representation of an Individual Taxpayer Identification Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{UsIndividualTaxpayerIdentificationNumber, ValidationError}"/>.
+   ///   A <see cref="CreateResult{UsIndividualTaxpayerIdentificationNumber, ValidationError}"/>.
    ///   Will contain the new <see cref="UsIndividualTaxpayerIdentificationNumber"/>
    ///   if <paramref name="value"/> is valid or a <see cref="ValidationError"/>
    ///   that identifies the validation rule that was failed if
    ///   <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<UsIndividualTaxpayerIdentificationNumber, ValidationError> Create(String? value)
+   public static CreateResult<UsIndividualTaxpayerIdentificationNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new UsIndividualTaxpayerIdentificationNumber(value, ValidationMode.BypassValidation),

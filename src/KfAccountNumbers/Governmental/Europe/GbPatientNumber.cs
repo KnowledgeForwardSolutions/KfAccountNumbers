@@ -413,12 +413,12 @@ public record GbPatientNumber : GbPatientNumberBase
    ///   H&amp;C number, CHI number or a test number.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{GbPatientNumber, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{GbPatientNumber, ValidationError}"/>. Will
    ///   contain the new <see cref="GbPatientNumber"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<GbPatientNumber, ValidationError> Create(String? value)
+   public static CreateResult<GbPatientNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new GbPatientNumber(value, ValidationMode.BypassValidation),

@@ -284,12 +284,12 @@ public record GbNhsNumber : GbPatientNumberBase
    ///   String representation of a UK National Health Service number.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{GbNhsNumber, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{GbNhsNumber, ValidationError}"/>. Will
    ///   contain the new <see cref="GbNhsNumber"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<GbNhsNumber, ValidationError> Create(String? value)
+   public static CreateResult<GbNhsNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new GbNhsNumber(value, ValidationMode.BypassValidation),

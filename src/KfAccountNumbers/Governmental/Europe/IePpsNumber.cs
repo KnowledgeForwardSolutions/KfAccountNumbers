@@ -238,12 +238,12 @@ public record IePpsNumber
    ///   String representation of an Irish Personal Public Service Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{IePpsNumber, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{IePpsNumber, ValidationError}"/>. Will
    ///   contain the new <see cref="IePpsNumber"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<IePpsNumber, ValidationError> Create(String? value)
+   public static CreateResult<IePpsNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new IePpsNumber(value, ValidationMode.BypassValidation),

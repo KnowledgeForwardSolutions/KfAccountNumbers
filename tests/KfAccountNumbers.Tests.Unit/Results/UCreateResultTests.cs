@@ -22,7 +22,7 @@ public class UCreateResultTests
       var success = new IntBetweenOneAndTen(number);
 
       // Act.
-      var sut = new UCreateResult<IntBetweenOneAndTen, NumberValidationError>(success);
+      var sut = new CreateResult<IntBetweenOneAndTen, NumberValidationError>(success);
 
       // Assert.
       sut.IsSuccess.Should().BeTrue();
@@ -37,7 +37,7 @@ public class UCreateResultTests
       var validationError = new NumberValidationError(new TooLow(number));
 
       // Act.
-      var sut = new UCreateResult<IntBetweenOneAndTen, NumberValidationError>(validationError);
+      var sut = new CreateResult<IntBetweenOneAndTen, NumberValidationError>(validationError);
 
       // Assert.
       sut.IsSuccess.Should().BeFalse();
@@ -56,7 +56,7 @@ public class UCreateResultTests
       // Arrange.
       var number = 9;
       var success = new IntBetweenOneAndTen(number);
-      var sut = new UCreateResult<IntBetweenOneAndTen, NumberValidationError>(success);
+      var sut = new CreateResult<IntBetweenOneAndTen, NumberValidationError>(success);
 
       // Act/assert.
       sut.HasValue.Should().BeTrue();
@@ -68,7 +68,7 @@ public class UCreateResultTests
       // Arrange.
       var number = -1;
       var validationError = new NumberValidationError(new TooLow(number));
-      var sut = new UCreateResult<IntBetweenOneAndTen, NumberValidationError>(validationError);
+      var sut = new CreateResult<IntBetweenOneAndTen, NumberValidationError>(validationError);
 
       // Act/assert.
       sut.HasValue.Should().BeTrue();
@@ -86,7 +86,7 @@ public class UCreateResultTests
       // Arrange.
       var number = 9;
       var success = new IntBetweenOneAndTen(number);
-      var sut = new UCreateResult<IntBetweenOneAndTen, NumberValidationError>(success);
+      var sut = new CreateResult<IntBetweenOneAndTen, NumberValidationError>(success);
 
       // Act/assert.
       sut.IsSuccess.Should().BeTrue();
@@ -98,7 +98,7 @@ public class UCreateResultTests
       // Arrange.
       var number = -1;
       var validationError = new NumberValidationError(new TooLow(number));
-      var sut = new UCreateResult<IntBetweenOneAndTen, NumberValidationError>(validationError);
+      var sut = new CreateResult<IntBetweenOneAndTen, NumberValidationError>(validationError);
 
       // Act/assert.
       sut.IsSuccess.Should().BeFalse();
@@ -116,7 +116,7 @@ public class UCreateResultTests
       // Arrange.
       var number = 9;
       var success = new IntBetweenOneAndTen(number);
-      var sut = new UCreateResult<IntBetweenOneAndTen, NumberValidationError>(success);
+      var sut = new CreateResult<IntBetweenOneAndTen, NumberValidationError>(success);
 
       // Act/assert.
       sut.Value.Should().Be(success);
@@ -128,7 +128,7 @@ public class UCreateResultTests
       // Arrange.
       var number = -1;
       var validationError = new NumberValidationError(new TooLow(number));
-      var sut = new UCreateResult<IntBetweenOneAndTen, NumberValidationError>(validationError);
+      var sut = new CreateResult<IntBetweenOneAndTen, NumberValidationError>(validationError);
 
       // Act/assert.
       sut.Value.Should().Be(validationError);
@@ -148,7 +148,7 @@ public class UCreateResultTests
       var success = new IntBetweenOneAndTen(number);
 
       // Act.
-      UCreateResult<IntBetweenOneAndTen, NumberValidationError> sut = success;
+      CreateResult<IntBetweenOneAndTen, NumberValidationError> sut = success;
 
       // Assert.
       sut.IsSuccess.Should().BeTrue();
@@ -163,7 +163,7 @@ public class UCreateResultTests
       var validationError = new NumberValidationError(new TooLow(number));
 
       // Act.
-      UCreateResult<IntBetweenOneAndTen, NumberValidationError> sut = validationError;
+      CreateResult<IntBetweenOneAndTen, NumberValidationError> sut = validationError;
 
       // Assert.
       sut.IsSuccess.Should().BeFalse();
@@ -182,7 +182,7 @@ public class UCreateResultTests
       // Arrange.
       var number = 9;
       var success = new IntBetweenOneAndTen(number);
-      var sut = new UCreateResult<IntBetweenOneAndTen, NumberValidationError>(success);
+      var sut = new CreateResult<IntBetweenOneAndTen, NumberValidationError>(success);
 
       // Act.
       var result = sut.TryGetValue(out IntBetweenOneAndTen value);
@@ -198,7 +198,7 @@ public class UCreateResultTests
       // Arrange.
       var number = -1;
       var validationError = new NumberValidationError(new TooLow(number));
-      var sut = new UCreateResult<IntBetweenOneAndTen, NumberValidationError>(validationError);
+      var sut = new CreateResult<IntBetweenOneAndTen, NumberValidationError>(validationError);
       IntBetweenOneAndTen expected = default;
 
       // Act.
@@ -215,7 +215,7 @@ public class UCreateResultTests
       // Arrange.
       var number = -1;
       var validationError = new NumberValidationError(new TooLow(number));
-      var sut = new UCreateResult<IntBetweenOneAndTen, NumberValidationError>(validationError);
+      var sut = new CreateResult<IntBetweenOneAndTen, NumberValidationError>(validationError);
 
       // Act.
       var result = sut.TryGetValue(out NumberValidationError value);
@@ -231,7 +231,7 @@ public class UCreateResultTests
       // Arrange.
       var number = 9;
       var success = new IntBetweenOneAndTen(number);
-      var sut = new UCreateResult<IntBetweenOneAndTen, NumberValidationError>(success);
+      var sut = new CreateResult<IntBetweenOneAndTen, NumberValidationError>(success);
       NumberValidationError expected = default;
 
       // Act.

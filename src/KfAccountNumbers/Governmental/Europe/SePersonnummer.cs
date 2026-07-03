@@ -426,12 +426,12 @@ public record SePersonnummer
    ///   String representation of a Swedish Personal Identity Number (Personnummer).
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{SePersonnummer, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{SePersonnummer, ValidationError}"/>. Will
    ///   contain the new <see cref="SePersonnummer"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<SePersonnummer, ValidationError> Create(String? value)
+   public static CreateResult<SePersonnummer, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new SePersonnummer(value, ValidationMode.BypassValidation),

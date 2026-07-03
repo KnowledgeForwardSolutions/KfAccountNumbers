@@ -4,7 +4,7 @@
 #pragma warning disable IDE0058 // Expression value is never used
 #pragma warning disable CA2211 // Non-constant fields should not be visible
 
-using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
    KfAccountNumbers.Governmental.Europe.NoFoedselsnummer,
    KfAccountNumbers.Governmental.Europe.NoFoedselsnummer.ValidationError>;
 using LocalValidationError = KfAccountNumbers.Governmental.Europe.NoFoedselsnummer.ValidationError;

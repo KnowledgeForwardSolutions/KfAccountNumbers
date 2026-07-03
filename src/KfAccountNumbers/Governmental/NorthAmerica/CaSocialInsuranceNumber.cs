@@ -187,13 +187,13 @@ public record CaSocialInsuranceNumber
    ///   String representation of a Social Insurance Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{CaSocialInsuranceNumber, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{CaSocialInsuranceNumber, ValidationError}"/>. Will
    ///   contain the new <see cref="CaSocialInsuranceNumber"/> if
    ///   <paramref name="value"/> is valid or a <see cref="ValidationError"/>
    ///   that identifies the validation rule that was failed if
    ///   <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<CaSocialInsuranceNumber, ValidationError> Create(String? value)
+   public static CreateResult<CaSocialInsuranceNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new CaSocialInsuranceNumber(value, ValidationMode.BypassValidation),

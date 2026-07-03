@@ -1,4 +1,4 @@
-using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
    KfAccountNumbers.Governmental.Europe.GbNhsNumber,
    KfAccountNumbers.Governmental.Europe.GbNhsNumber.ValidationError>;
 using LocalValidationError = KfAccountNumbers.Governmental.Europe.GbNhsNumber.ValidationError;

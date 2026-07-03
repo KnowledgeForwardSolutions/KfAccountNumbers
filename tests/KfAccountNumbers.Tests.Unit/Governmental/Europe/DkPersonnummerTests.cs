@@ -3,7 +3,7 @@
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
 
-using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
    KfAccountNumbers.Governmental.Europe.DkPersonnummer,
    KfAccountNumbers.Governmental.Europe.DkPersonnummer.ValidationError>;
 using LocalValidationError = KfAccountNumbers.Governmental.Europe.DkPersonnummer.ValidationError;

@@ -1,6 +1,6 @@
 // Ignore Spelling: Deserialize Deserialization Json Kf
 
-using LocalCreateResult = KfAccountNumbers.Results.UCreateResult<
+using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
    KfAccountNumbers.Governmental.Europe.IePpsNumber,
    KfAccountNumbers.Governmental.Europe.IePpsNumber.ValidationError>;
 using LocalValidationError = KfAccountNumbers.Governmental.Europe.IePpsNumber.ValidationError;

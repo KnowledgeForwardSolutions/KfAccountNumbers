@@ -397,12 +397,12 @@ public record NoFoedselsnummer
    ///   String representation of a Norwegian National Identity Number (fødselsnummer).
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{NoFoedselsnummer, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{NoFoedselsnummer, ValidationError}"/>. Will
    ///   contain the new <see cref="NoFoedselsnummer"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<NoFoedselsnummer, ValidationError> Create(String? value)
+   public static CreateResult<NoFoedselsnummer, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new NoFoedselsnummer(value, ValidationMode.BypassValidation),

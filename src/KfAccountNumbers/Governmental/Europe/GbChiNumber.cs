@@ -287,12 +287,12 @@ public record class GbChiNumber : GbPatientNumberBase
    ///   String representation of a Scottish CHI number.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{GbChiNumber, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{GbChiNumber, ValidationError}"/>. Will
    ///   contain the new <see cref="GbChiNumber"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<GbChiNumber, ValidationError> Create(String? value)
+   public static CreateResult<GbChiNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new GbChiNumber(value, ValidationMode.BypassValidation),

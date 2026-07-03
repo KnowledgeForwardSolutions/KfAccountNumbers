@@ -355,12 +355,12 @@ public record IsKennitala
    ///   String representation of an Icelandic kennitala.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{IsKennitala, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{IsKennitala, ValidationError}"/>. Will
    ///   contain the new <see cref="IsKennitala"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<IsKennitala, ValidationError> Create(String? value)
+   public static CreateResult<IsKennitala, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new IsKennitala(value, ValidationMode.BypassValidation),

@@ -310,12 +310,12 @@ public record GbNationalInsuranceNumber
    ///   String representation of a GB National Insurance Number.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{GbNationalInsuranceNumber, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{GbNationalInsuranceNumber, ValidationError}"/>. Will
    ///   contain the new <see cref="GbNationalInsuranceNumber"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<GbNationalInsuranceNumber, ValidationError> Create(String? value)
+   public static CreateResult<GbNationalInsuranceNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new GbNationalInsuranceNumber(value, ValidationMode.BypassValidation),

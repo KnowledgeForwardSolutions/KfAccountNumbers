@@ -26,7 +26,7 @@ public class UsSocialSecurityNumberBenchmarks
    [Arguments("012-34-5678")]
    public void UsSsnCreateMethod(String ssn)
    {
-      UCreateResult<UsSocialSecurityNumber, UsSocialSecurityNumber.ValidationError> validatedSsn =
+      CreateResult<UsSocialSecurityNumber, UsSocialSecurityNumber.ValidationError> validatedSsn =
          UsSocialSecurityNumber.Create(ssn);
    }
 

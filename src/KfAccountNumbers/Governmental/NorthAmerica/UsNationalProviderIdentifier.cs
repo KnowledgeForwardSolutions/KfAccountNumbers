@@ -159,13 +159,13 @@ public record UsNationalProviderIdentifier
    ///   String representation of a US National Provider Identifier.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{UsNationalProviderIdentifier, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{UsNationalProviderIdentifier, ValidationError}"/>. Will
    ///   contain the new <see cref="UsNationalProviderIdentifier"/> if
    ///   <paramref name="value"/> is valid or a <see cref="ValidationError"/>
    ///   that identifies the validation rule that was failed if
    ///   <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<UsNationalProviderIdentifier, ValidationError> Create(
+   public static CreateResult<UsNationalProviderIdentifier, ValidationError> Create(
       String? value)
       => Validate(value) switch
       {

@@ -285,12 +285,12 @@ public record GbHcNumber : GbPatientNumberBase
    ///   String representation of a H&amp;C number.
    /// </param>
    /// <returns>
-   ///   A <see cref="UCreateResult{GbHcNumber, ValidationError}"/>. Will
+   ///   A <see cref="CreateResult{GbHcNumber, ValidationError}"/>. Will
    ///   contain the new <see cref="GbHcNumber"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static UCreateResult<GbHcNumber, ValidationError> Create(String? value)
+   public static CreateResult<GbHcNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
          ValidValue => new GbHcNumber(value, ValidationMode.BypassValidation),
