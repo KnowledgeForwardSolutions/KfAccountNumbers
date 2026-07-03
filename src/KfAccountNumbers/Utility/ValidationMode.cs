@@ -22,5 +22,5 @@ internal enum ValidationMode
    ///   Safe to bypass constructor validation because value was previously
    ///   validated.
    /// </summary>
-   BypassValidation
+   BypassValidation,
 }
