@@ -11,7 +11,7 @@ The business objects in KfAccountNumbers all have the following capabilities:
 * Implicit conversion to string and explicit conversion from string.
 
 If the business object represents an account number that has a defined format (ex. US Social Security
-Number, etc.), the constructor, Create and Validate methods and implicit string to business object
+Number, etc.), the constructor, Create and Validate methods and explicit string to business object
 operator will accept either a string that consists of only the characters in the account number or a
 string that includes format characters (ex. dashes, spaces, etc.) in the appropriate places. The
 business object will also implement a Format method that returns a string representation of the
@@ -19,7 +19,7 @@ account number with the appropriate format characters in the appropriate places.
 
 If the business object represents an account number that normally has no formatting other than the
 raw characters of the account number then the business object constructor, Create and Validate methods
-and implicit string to business object operator will only accept strings that consist of the raw
+and explicit string to business object operator will only accept strings that consist of the raw
 characters of the account number. Nor will the business object implement a Format method since there
 is no formatting to be done.
 
@@ -40,22 +40,23 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Asia (future)
 	- Australia (future)
 	- Europe
-        - [BeRijksregisternummer](#berijksregisternummer) 
-        - [DkPersonnummer](#dkpersonnummer)
-        - [EsNif](#esnif)
-        - [FiHenkilotunnus](#fihenkilotunnus)
-        - [FrInseeNumber](#frinseenumber)
-        - [GbNationalInsuranceNumber](#gbnationalinsurancenumber)
-        - [IePpsNumber](#ieppsnumber)
-        - [IsKennitala](#iskennitala)
-        - [NlBurgerservicenummer](#nlburgerservicenummer)
-        - [NoFoedselsnummer](#nofoedselsnummer) 
-        - [SePersonnummer](#sepersonnummer)
+		- [BeRijksregisternummer](#berijksregisternummer) 
+		- [DkPersonnummer](#dkpersonnummer)
+		- [EsNif](#esnif)
+		- [FiHenkilotunnus](#fihenkilotunnus)
+		- [FrInseeNumber](#frinseenumber)
+		- [Gb National Health Service Patient Numbers (GbChiNumber, GbHcNumber, GbNhsNumber, GbPatientNumber)](#gb-national-health-service-patient-numbers-gbchinumber-gbhcnumber-gbnhsnumber-gbpatientnumber)
+		- [GbNationalInsuranceNumber](#gbnationalinsurancenumber)
+		- [IePpsNumber](#ieppsnumber)
+		- [IsKennitala](#iskennitala)
+		- [NlBurgerservicenummer](#nlburgerservicenummer)
+		- [NoFoedselsnummer](#nofoedselsnummer) 
+		- [SePersonnummer](#sepersonnummer)
 	- NorthAmerica
 		- [CaSocialInsuranceNumber](#casocialinsurancenumber) 
 		- [MxCurp](#mxcurp)
-        - [UsIndividualTaxpayerIdentificationNumber](#usindividualtaxpayeridentificationnumber)
-        - [UsNationalProviderIdentifier](#usnationalprovideridentifier)
+		- [UsIndividualTaxpayerIdentificationNumber](#usindividualtaxpayeridentificationnumber)
+		- [UsNationalProviderIdentifier](#usnationalprovideridentifier)
 		- [UsSocialSecurityNumber](#ussocialsecuritynumber)
 	- South America
 * Utility
@@ -219,7 +220,8 @@ the trailing alphabetic character.
 A NIF must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
 * The value must be 9 characters in length (without separators) or 10 characters (DNI with one separator) or
-  11 characters (NIE with two separators).
+  11 characters (NIE with two separators). Additionally, if a value has length 10, it must be a DNI (starts with
+  a digit) and if a value has length 11, it must be a NIE (starts with X, Y or Z).
 * All characters other than the leading and trailing characters (and the optional separators) must be ASCII digits
   ('0'-'9'). The leading character must be either an ASCII digit or X, Y, or Z.
 * The trailing character must be a valid modulus 23 check character. Valid characters are "TRWAGMYFPDXBNJZSQVHLCKE"
@@ -228,8 +230,10 @@ A NIF must meet all of the following rules:
   For a DNI, the separator must be in character position 8 (zero-based). For a NIE, the separators must be in character
   positions 1 and 9 (zero-based) and both separator characters must be the same.
 
-Note that the `EsNif` constructor and Create/Validate methods are case-sensitive and require that alphabetic characters
-be upper-case.
+EsNif is case-insensitive for validation and parsing purposes. The EsNif constructor, Create
+method and explicit string to EsNif operator will normalize any lowercase letters to uppercase.
+Equality and inequality comparisons between instances of EsNif will compare the normalized
+uppercase versions of the value.
 
 Example values:
 * 12345678Z - DNI
@@ -254,7 +258,8 @@ A Finnish henkilötunnus is an 11 character value structured as DDMMYYCZZZQ with
   indicate males and even numbers indicate females. Values from 002-899 indicate persons born in Finland or permanent residents
   and values from 900-999 indicate a temporary value (for example, a hospital patient where the official henkilötunnus is unknown).
   Individual numbers less than 002 are not valid.
-* Q - a modulus 31 check digit (or check character, actually). The check character will be one of 31 alphanumeric
+* Q - a modulus 31 check digit (or check character, actually) calculated from the digits of the date of birth and the individual
+  number. (The century indicator is excluded from the calculation.) The check character will be one of 31 alphanumeric
   characters, `0123456789ABCDEFHJKLMNPRSTUVWXY` (the letters `G, I, O, Q and Z` are excluded to avoid possible confusion with
   digit characters).
 
@@ -266,6 +271,10 @@ A henkilötunnus must meet all of the following rules:
 * The date of birth, after deriving the century of birth from the century indicator, must be a valid date between January 1, 1800 and December 31, 2099.
 * The individual number must be greater than or equal to 002.
 * The check character must be a valid modulus 31 check character calculated from the date of birth and the individual number.
+
+FiHenkilotunnus is case-insensitive for validation and parsing purposes. The FiHenkilotunnus constructor, Create
+method and explicit string to FiHenkilotunnus operator will normalize any lowercase letters to uppercase. Equality and
+inequality comparisons between instances of FiHenkilotunnus will compare the normalized uppercase versions of the value.
 
 Example values:
 * 230526-034N - date of birth May 23, 1926, gender = female, permanent resident
@@ -307,7 +316,12 @@ A valid INSEE number must meet all of the following rules:
 * The month element (MM) must be a number between 01 and 12 (for known dates) or 13, 20-42, 50-99 (for persons with unknown or
   incomplete date of birth documentation).
 * The COG element (LLOOO) must start with a valid department code, or 99 for persons born abroad. For departments
-  with alphabetic characters (Corsica 2A, 2B), the alphabetic character must be uppercase.
+  with alphabetic characters (Corsica 2A, 2B), the alphabetic character may be uppercase or lowercase.
+
+FrInseeNumber is case-insensitive for validation and parsing purposes. The FrInseeNumber constructor, Create
+method and explicit string to FrInseeNumber operator will normalize any lowercase letters to uppercase.
+Equality and inequality comparisons between instances of FrInseeNumber will compare the normalized
+uppercase versions of the value.
 
 Example values:
 * 188121884813236 - gender = male, year of birth = 88, month of birth = 12, department = 18 (Cher)
@@ -317,6 +331,115 @@ Example values:
 
 See [Wikipedia - INSEE code](https://en.wikipedia.org/wiki/INSEE_code) and
 [Wikipedia (French) - Numéro de sécurité sociale en France](https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_s%C3%A9curit%C3%A9_sociale_en_France) for more info.
+
+## Gb National Health Service Patient Numbers (GbChiNumber, GbHcNumber, GbNhsNumber, GbPatientNumber)
+
+The multiple public health services in the United Kingdom use patient numbers with significant similarities so the
+various types are all described in this one section.
+
+The three public health services in the United Kingdom are:
+* The National Health Service (NHS) of England, Wales and the Isle of Man.
+* The Scottish Community Health Index (CHI).
+* Northern Ireland Health and Care (H&C).
+
+Each of the services uses a 10-digit patient number, with the first nine digits assigned by the
+service and the trailing (right-most) digit calculated using the Modulus 11 check digit algorithm.
+The patient numbers used by NHS and H&C have no embedded patient information while CHI numbers
+embed the patient date of birth and gender (see below).
+
+The patient numbers can be displayed as a string of 10 digits or formatted with separator characters
+for readability. NHS and H&C numbers are formatted as three groups of digits in a '3 3 4' pattern
+(e.g. "123 456 7890") while CHI numbers are formatted as two groups of digits in a '6 4' pattern
+(e.g. "123456 7890"). The six-digit grouping in CHI numbers corresponds to the first six digits
+representing the patient's date of birth (see below). The optional separator characters can be any
+character that is not an ASCII digit ('0' - '9'), but for NHS and H&C numbers both separator
+characters must be the same. The typical separator character is a space (' ').
+
+Each of the services is allocated one or more non-overlapping blocks of nine-digit numbers so it is
+possible to determine what service issued the number by comparing the number to a list of valid
+ranges for each service. There is also a block of numbers that is reserved for test purposes and is
+not issued to the public.
+
+The current assigned blocks of numbers are:
+* 010 000 000 to 311 299 999 - Scottish CHI
+* 320 000 000 to 399 999 999 - Northern Irish H&C
+* 400 000 000 to 499 999 999 - NHS
+* 600 000 000 to 799 999 999 - NHS
+* 900 000 000 to 999 999 999 - Test
+
+The actual patient number is a nine-digit number selected from the block of numbers allocated to the
+issuing service, to which a Modulus 11 check digit is appended, resulting in a 10-digit final number.
+Note that the Modulus 11 algorithm can generate a final checksum equal to 10, which can not be
+represented with a single decimal digit. In this case, the number is not issued and another number
+is selected. In practice this means that approximately 9.09% of all possible numbers are never
+issued.
+
+A valid patient number for any of the UK public health services must meet all of the following rules:
+* The value may not be null, empty or all whitespace characters.
+* The value must be either 10 characters long (without separators) or 11 characters (CHI number with separator) or 12 characters long (NHS and H&C numbers with separators).
+* All characters (except the optional separator characters) must be ASCII digits ('0' - '9').
+* The trailing (right-most) digit must be a valid Modulus 11 check digit.
+* If the value is 11 characters long, character position 6 (zero-based) must not be an ASCII digit ('0' - '9').
+* If the value is 12 characters long, character positions 3 and 7 (zero-based) must not be ASCII digits ('0' - '9'). The same character must be used in each separator position.
+* The first nine digits must be in a range appropriate to the issuing service (or the test range in the case of NHS or H&C).
+
+KfAccountNumbers includes types for the patient numbers for each of the UK public health services and an additional type
+that can represent a patient number from any of the health services.
+
+### GbNhsNumber
+
+`GbNhsNumber` represents a patient number issued by the NHS. The actual number may be from one of the two blocks of numbers
+allocated to the NHS or a number from the test block. A NHS patient number does not encode any additional information such
+as date of birth or gender in the number.
+
+### GbHcNumber
+
+`GbHcNumber` represents a patient number issued by H&C. The actual number may be from the block of numbers allocated to
+H&C or a number from the test block. A H&C patient number does not encode any additional information such
+as date of birth or gender in the number.
+
+### GbChiNumber
+
+`GbChiNumber` represents a patient number issued by CHI. A CHI patient number encodes both date of birth and gender in the
+patient number and is structured as DDMMYYNNGC where
+* DDMMYY is the patient date of birth encoded in DDMMYY format.
+* NNG are three digits used to differentiate between two persons born on the same day. The third digit (G) also indicates
+ the person's gender, where odd numbers = male and even numbers = female.
+* C is the Modulus 11 check digit.
+
+`GbChiNumber` has an additional validation rule where the initial six digits of the number must be a valid date. `GbChiNumber`
+does not allow numbers from the test block because they would fail date of birth validation.
+
+`GbChiNumber` has an additional property for retrieving the patient's gender and a method for retrieving the patient's date
+of birth.
+
+### GbPatientNumber
+
+`GbPatientNumber` represents a patient number issued by any of the UK public health services. `GbPatientNumber` uses all
+of the validation rules described above, including ensuring that the length of formatted values is appropriate for the
+specific number block (length 11 for values in the CHI block and 12 for values in other blocks) and ensuring that date
+of birth is valid if the number is in the CHI block.
+
+`GbPatientNumber` has an `IdentifierType` property that allows the user to determine the service that issued the number.
+`GbPatientNumber` allows implicit conversion from `GbNhsNumber`, `GbHcNumber` and `GbChiNumber` and implements 
+`ToGbNhsNumber`, `ToGbHcNumber` and `ToGbChiNumber` methods that support converting `GbPatientNumber` to a more specific
+type using the option pattern. For example, if `GbPatientNumber` contains a CHI number and you want to get the patient's
+gender, you would use the `ToGbChiNumber` method to convert to an instance of `GbChiNumber` from which you can use the
+Gender property.
+
+Example values:
+* 4000000004 - unformatted NHS number
+* 400 000 0004 - formatted NHS number
+* 3200000007 - unformatted H&C number
+* 320 000 0007 - formatted H&C number
+* 3112999991 - unformatted CHI number, date of birth December 31, 1999, gender = male
+* 311299 9991 - formatted CHI number, date of birth December 31, 1999, gender = male
+* 9000000009 - unformatted test number
+* 900 000 0009 - formatted test number
+
+See [Wikipedia - NHS Number](https://en.wikipedia.org/wiki/NHS_number),
+[NHS Data Model and Dictionary](https://www.datadictionary.nhs.uk/attributes/nhs_number.html) and
+[Allocated Ranges for NHS Numbers](https://webarchive.nationalarchives.gov.uk/ukgwa/20231221081503/https://digital.nhs.uk/about-nhs-digital/contact-us/freedom-of-information/freedom-of-information-disclosure-log/december-2022/nic-690159-k8h4z)
 
 ## GbNationalInsuranceNumber
 
@@ -330,8 +453,12 @@ A National Insurance Number consists of nine characters structured as PPDDDDDDS,
   to the uniqueness of the value.
 
 A National Insurance Number is typically displayed as a single string of nine characters but can be formatted for readability
-as groups of two characters with a separator character, typically a space (i.e. PP DD DD DD S). `GbNationalInsuranceNumber`
-is case-sensitive and requires the prefix and suffix characters to be uppercase letters.
+as groups of two characters with a separator character, typically a space (i.e. PP DD DD DD S).
+
+`GbNationalInsuranceNumber` is case-insensitive for validation and parsing purposes. The `GbNationalInsuranceNumber` constructor, Create
+method and explicit string to `GbNationalInsuranceNumber` operator will normalize any lowercase letters to uppercase.
+Equality and inequality comparisons between instances of `GbNationalInsuranceNumber` will compare the normalized
+uppercase versions of the value.
 
 A valid National Insurance Number must meet all of the following rules:
 * The value may not be null, empty or all whitespace characters.
@@ -341,10 +468,10 @@ A valid National Insurance Number must meet all of the following rules:
   * 11 characters (formatted, without suffix character)
   * 13 characters (formatted, with suffix character)
 * The leading (left-most) two characters may not be BG, GB, NK, KN, TN, NT, or ZZ.
-* Character position 0 (zero-based) must be an uppercase letter, A-C, E, G, H, J-P, R-T, W-Z. The letters D, F, I, Q, U and V are not allowed.
-* Character position 1 (zero-based) must be an uppercase letter, A-C, E, G, H, J-N, P, R-T, W-Z. The letters D, F, I, O, Q, U and V are not allowed. (Note O is the only additional excluded character.)
+* Character position 0 (zero-based) must be an uppercase or lowercase letter, A-C, E, G, H, J-P, R-T, W-Z. The letters D, F, I, Q, U and V (and their lowercase equivalents) are not allowed.
+* Character position 1 (zero-based) must be an uppercase or lowercase letter, A-C, E, G, H, J-N, P, R-T, W-Z. The letters D, F, I, O, Q, U and V (and their lowercase equivalents) are not allowed. (Note O is the only additional excluded character.)
 * Character positions 2-7 (zero-based) must be ASCII digits ('0'-'9').
-* Character position 8 (zero-based), if present, must be an uppercase letter, A-D.
+* Character position 8 (zero-based), if present, must be an uppercase or lowercase letter, A-D.
 * Separator characters, if present, may not be ASCII digits ('0'-'9') or uppercase or lowercase letters (A-Z, a-z).
 * The same character must be used in every separator position.
 
@@ -472,7 +599,9 @@ A valid CURP must meet all of the following rules (specific character offsets ar
 * Character 17 must be a digit (0-9)
 
 MxCurp is case-insensitive for validation and parsing purposes. The MxCurp constructor, Create
-method and implicit string to MxCurp operator will convert any lowercase letters to uppercase.
+method and explicit string to MxCurp operator will normalize any lowercase letters to uppercase.
+Equality and inequality comparisons between instances of MxCurp will compare the normalized
+uppercase versions of the value.
 
 Note that the homoclave value is used to determine the century of birth. This has two implications.
 First, the DateOfBirth property will return a DateOnly value with a year in the range 1900-1999 for

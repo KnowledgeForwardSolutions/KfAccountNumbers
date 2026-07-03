@@ -45,5 +45,8 @@ public enum DateElements
    /// </summary>
    CompleteDate = Year | Month | Day,
 
+   /// <summary>
+   ///   Specifies that only the year component of a date is available.
+   /// </summary>
    YearOnly = Year,
 }

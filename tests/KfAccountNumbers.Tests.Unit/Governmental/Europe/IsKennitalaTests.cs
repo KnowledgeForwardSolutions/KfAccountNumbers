@@ -4,25 +4,33 @@
 #pragma warning disable IDE0058 // Expression value is never used
 #pragma warning disable CA2211 // Non-constant fields should not be visible
 
+using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
+   KfAccountNumbers.Governmental.Europe.IsKennitala,
+   KfAccountNumbers.Governmental.Europe.IsKennitala.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.Europe.IsKennitala.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.Europe.IsKennitala.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.Europe.IsKennitala.ValidationResult;
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class IsKennitalaTests
 {
-   private const String Valid10CharacterEinstaklingurKennitala = "1205854369";
-   private const String Valid11CharacterEinstaklingurKennitala = "120585-4369";
-   private const String AltValid10CharacterEinstaklingurKennitala = "1302058360";
-   private const String AltValid11CharacterEinstaklingurKennitala = "130205-8360";
-   private const String Valid10CharacterFyrirtaekiKennitala = "5311073810";
-   private const String Valid11CharacterFyrirtaekiKennitala = "531107 3810";
-   private const String AltValid10CharacterFyrirtaekiKennitala = "6005203690";
-   private const String AltValid11CharacterFyrirtaekiKennitala = "600520 3690";
+   private const String ValidUnformattedEinstaklingurKennitala = "1205854369";
+   private const String ValidFormattedEinstaklingurKennitala = "120585-4369";
+   private const String AltValidUnformattedEinstaklingurKennitala = "1302058360";
+   private const String AltValidFormattedEinstaklingurKennitala = "130205-8360";
+   private const String ValidUnformattedFyrirtaekiKennitala = "5311073810";
+   private const String ValidFormattedFyrirtaekiKennitala = "531107 3810";
+   private const String AltValidUnformattedFyrirtaekiKennitala = "6005203690";
+   private const String AltValidFormattedFyrirtaekiKennitala = "600520 3690";
 
    private static String GetRawKennitala(String kennitala)
       => kennitala.Length == 10
          ? kennitala
          : kennitala[..6] + kennitala[7..];
 
-   private static String GetKennitalaWithValidCheckDigits(
+   private static String GetKennitalaWithValidCheckDigit(
       String dateOfBirth = "130295",
       String separator = "",
       String randomDigits = "37",
@@ -44,6 +52,7 @@ public class IsKennitalaTests
          // Values that would result in a check digit = 10 are not issued.
          return String.Empty;
       }
+
       var checkDigit = (remainder == 0) ? 0 : 11 - remainder;
 
       return $"{dateOfBirth}{separator}{randomDigits}{checkDigit}{centuryIndicator}";
@@ -51,14 +60,14 @@ public class IsKennitalaTests
 
    public static TheoryData<String> ValidKennitalaValues =>
    [
-      Valid10CharacterEinstaklingurKennitala,
-      Valid11CharacterEinstaklingurKennitala,
-      AltValid10CharacterEinstaklingurKennitala,
-      AltValid11CharacterEinstaklingurKennitala,
-      Valid10CharacterFyrirtaekiKennitala,
-      Valid11CharacterFyrirtaekiKennitala,
-      AltValid10CharacterFyrirtaekiKennitala,
-      AltValid11CharacterFyrirtaekiKennitala,
+      ValidUnformattedEinstaklingurKennitala,
+      ValidFormattedEinstaklingurKennitala,
+      AltValidUnformattedEinstaklingurKennitala,
+      AltValidFormattedEinstaklingurKennitala,
+      ValidUnformattedFyrirtaekiKennitala,
+      ValidFormattedFyrirtaekiKennitala,
+      AltValidUnformattedFyrirtaekiKennitala,
+      AltValidFormattedFyrirtaekiKennitala,
    ];
 
    public static TheoryData<String> ValidSeparators =>
@@ -85,6 +94,7 @@ public class IsKennitalaTests
       { "010100", "25", "0" },         // January 1, 2000
       { "311299", "25", "0" },         // December 31, 2099
 
+      // Max days per month
       { "310101", "25", "9" },         // maximum days for January, any year
       { "280291", "25", "9" },         // maximum days for February, non leap year
       { "290296", "25", "9" },         // maximum days for February, leap year
@@ -106,6 +116,7 @@ public class IsKennitalaTests
       { "410100", "25", "0" },         // January 1, 2000
       { "711299", "25", "0" },         // December 31, 2099
 
+      // Max days per month
       { "710101", "25", "9" },         // maximum days for January, any year
       { "680291", "24", "9" },         // maximum days for February, non leap year
       { "690296", "24", "9" },         // maximum days for February, leap year
@@ -122,30 +133,33 @@ public class IsKennitalaTests
       { "711204", "25", "0" },         // maximum days for December, any year
    };
 
-   public static TheoryData<String> InvalidCharacterValues =>
-   [
-      "A205854369",
-      "1 05854369",
-      "12#5854369",
-      "120=854369",
-      "1205B54369",
-      "12058C4369",
-      "120585D369",
-      "1205854a69",
-      "12058543b9",
-      "120585436~",
+   // Values that will report an invalid character encountered
+   public static TheoryData<String, Int32> InvalidCharacterValues = new()
+   {
+      // Unformatted values
+      { ".205854369", 0 },          // Non-digit character '.'
+      { "1 05854369", 1 },          // Non-digit character ' '
+      { "12A5854369", 2 },          // Non-digit character 'A'
+      { "120Z854369", 3 },          // Non-digit character 'Z'
+      { "1205^54369", 4 },          // Non-digit character '^'
+      { "12058a4369", 5 },          // Non-digit character 'a'
+      { "120585z369", 6 },          // Non-digit character 'z'
+      { "1205854~69", 7 },          // Non-digit character '~'
+      { "12058543\u21539", 8 },     // Non-digit character Unicode fraction 1/3
+      { "120585436\u00D6", 9 },     // Invalid character unicode O with umlaut
 
-      "A20585-4369",
-      "1 0585-4369",
-      "12#585-4369",
-      "120=85-4369",
-      "1205B5-4369",
-      "12058C-4369",
-      "120585 D369",
-      "120585 4a69",
-      "120585 43b9",
-      "120585 436~",
-   ];
+      // Formatted values
+      { ".10585 4369", 0 },         // Non-digit character '.'
+      { "1 0585 4369", 1 },         // Non-digit character ' '
+      { "12A585 4369", 2 },         // Non-digit character 'A'
+      { "120Z85 4369", 3 },         // Non-digit character 'Z'
+      { "1205^5 4369", 4 },         // Non-digit character '^'
+      { "12058a 4369", 5 },         // Non-digit character 'a'
+      { "120585 z369", 7 },         // Non-digit character 'z'
+      { "120585-4~69", 8 },         // Non-digit character '~'
+      { "120585-43\u21539", 9 },    // Non-digit character Unicode fraction 1/3
+      { "120585-436\u00D6", 10 },   // Invalid character unicode O with umlaut
+   };
 
    public static TheoryData<String> InvalidCheckDigitValues =>
    [
@@ -243,9 +257,41 @@ public class IsKennitalaTests
       { "721204", "25", "9" },      // Invalid day of for December, any year
    };
 
+   private static InvalidLength GetInvalidLengthResult(String value)
+      => new(
+         Messages.IsKennitalaInvalidLength,
+         value.Length,
+         IsKennitala.GetValidLengthDefinitions());
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.IsKennitalaInvalidCharacter,
+         value[position],
+         position);
+
+   private static InvalidChecksum GetInvalidChecksumResult()
+      => new(
+         Messages.IsKennitalaInvalidCheckDigit,
+         IsKennitala.CheckDigitAlgorithmName);
+
+   private static InvalidSeparator GetInvalidSeparatorResult(String value)
+      => new(Messages.IsKennitalaInvalidSeparator, value[6], 6);
+
+   private static InvalidCentury GetInvalidCenturyResult(String value)
+      => new(Messages.IsKennitalaInvalidCentury, value[^1].ToString());
+
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
+      => new(Messages.IsKennitalaInvalidDateOfBirth, value[..6], DateFormatName.DDMMYY);
+
    #region Constants Tests
    // ==========================================================================
    // ==========================================================================
+
+   [Fact]
+   public void IsKennitala_CheckDigitAlgorithmName_ShouldHaveExpectedValue()
+      => IsKennitala.CheckDigitAlgorithmName.Should().Be("Weighted Modulus 11");
 
    [Fact]
    public void IsKennitala_MinimumValidYearOfBirth_ShouldHaveExpectedValue()
@@ -285,7 +331,7 @@ public class IsKennitalaTests
    public void IsKennitala_Constructor_ShouldCreateInstance_WhenValueHasValidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
       var expected = GetRawKennitala(value);
 
       // Act.
@@ -304,7 +350,7 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
@@ -321,61 +367,91 @@ public class IsKennitalaTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void IsKennitala_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new IsKennitala(value))
-         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaEmpty + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void IsKennitala_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new IsKennitala(value))
-         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaInvalidLength + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void IsKennitala_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(String value)
-      => FluentActions
+   public void IsKennitala_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new IsKennitala(value))
-         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void IsKennitala_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new IsKennitala(value))
-         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidCheckDigit);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCenturyIndicatorValues))]
    public void IsKennitala_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCenturyIndicator(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCenturyResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new IsKennitala(value))
-         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaInvalidCentury + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidCentury);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparators))]
    public void IsKennitala_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
+      LocalValidationError expected = GetInvalidSeparatorResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new IsKennitala(value))
-         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -386,17 +462,17 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new IsKennitala(value))
-         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaInvalidDateOfBirth + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidDateOfBirth);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -429,7 +505,7 @@ public class IsKennitalaTests
       String expectedDateOfBirth)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
@@ -437,7 +513,7 @@ public class IsKennitalaTests
       var expected = DateOnly.ParseExact(
          expectedDateOfBirth,
          "yyyyMMdd",
-         System.Globalization.CultureInfo.InvariantCulture);
+         CultureInfo.InvariantCulture);
 
       // Act/assert.
       sut.DateOfBirth.Should().Be(expected);
@@ -458,14 +534,15 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
       var sut = new IsKennitala(value);
+      IsKennitala.IdentifierCategory expected = default(IsIdentifierType.Einstaklingur);
 
       // Act/assert.
-      sut.IdentifierType.Should().Be(IsIdentifierType.Einstaklingur);
+      sut.IdentifierType.Should().Be(expected);
    }
 
    [Theory]
@@ -477,14 +554,15 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
       var sut = new IsKennitala(value);
+      IsKennitala.IdentifierCategory expected = default(IsIdentifierType.Fyrirtaeki);
 
       // Act/assert.
-      sut.IdentifierType.Should().Be(IsIdentifierType.Fyrirtaeki);
+      sut.IdentifierType.Should().Be(expected);
    }
 
    #endregion
@@ -494,10 +572,10 @@ public class IsKennitalaTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(Valid10CharacterEinstaklingurKennitala, Valid10CharacterEinstaklingurKennitala)]
-   [InlineData(Valid11CharacterEinstaklingurKennitala, Valid10CharacterEinstaklingurKennitala)]
-   [InlineData(Valid10CharacterFyrirtaekiKennitala, Valid10CharacterFyrirtaekiKennitala)]
-   [InlineData(Valid11CharacterFyrirtaekiKennitala, Valid10CharacterFyrirtaekiKennitala)]
+   [InlineData(ValidUnformattedEinstaklingurKennitala, ValidUnformattedEinstaklingurKennitala)]
+   [InlineData(ValidFormattedEinstaklingurKennitala, ValidUnformattedEinstaklingurKennitala)]
+   [InlineData(ValidUnformattedFyrirtaekiKennitala, ValidUnformattedFyrirtaekiKennitala)]
+   [InlineData(ValidFormattedFyrirtaekiKennitala, ValidUnformattedFyrirtaekiKennitala)]
    public void IsKennitala_Value_ShouldReturnValidatedKennitala(
       String value,
       String expected)
@@ -519,7 +597,7 @@ public class IsKennitalaTests
    public void IsKennitala_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid10CharacterEinstaklingurKennitala;
+      var value = ValidUnformattedEinstaklingurKennitala;
       var sut = new IsKennitala(value);
 
       // Act.
@@ -527,23 +605,22 @@ public class IsKennitalaTests
 
       // Assert.
       str.Should().NotBeNullOrEmpty();
-      str.Should().Be(value);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
    public void IsKennitala_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid11CharacterEinstaklingurKennitala;
+      var value = ValidFormattedEinstaklingurKennitala;
       var sut = new IsKennitala(value);
-      var expected = GetRawKennitala(value);
 
       // Act.
       var str = (String)sut;
 
       // Assert.
       str.Should().NotBeNullOrEmpty();
-      str.Should().Be(expected);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
@@ -555,7 +632,7 @@ public class IsKennitalaTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -569,7 +646,7 @@ public class IsKennitalaTests
       // Act.
       var str = (String)sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -579,14 +656,13 @@ public class IsKennitalaTests
    public void IsKennitala_ExplicitCastToIsKennitala_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expected = GetRawKennitala(value);
+      var expected = new IsKennitala(value);
 
       // Act.
       var sut = (IsKennitala)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -594,15 +670,14 @@ public class IsKennitalaTests
    public void IsKennitala_ExplicitCastToIsKennitala_ShouldCreateInstance_WhenValueHasValidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
-      var expected = GetRawKennitala(value);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
+      var expected = new IsKennitala(value);
 
       // Act.
       var sut = (IsKennitala)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -613,78 +688,107 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
-      var expected = GetRawKennitala(value);
+      var expected = new IsKennitala(value);
 
       // Act.
       var sut = (IsKennitala)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (IsKennitala)value)
-         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaEmpty + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (IsKennitala)value)
-         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaInvalidLength + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueHasInvalidNonDigitCharacter(String value)
-      => FluentActions
+   public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueHasInvalidNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (IsKennitala)value)
-         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (IsKennitala)value)
-         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidCheckDigit);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCenturyIndicatorValues))]
    public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueHasInvalidCenturyIndicator(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCenturyResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (IsKennitala)value)
-         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaInvalidCentury + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidCentury);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparators))]
    public void IsKennitala_ExplicitCastToIsKennitala_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
+      LocalValidationError expected = GetInvalidSeparatorResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (IsKennitala)value)
-         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -695,17 +799,17 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (IsKennitala)value)
-         .Should().Throw<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaInvalidDateOfBirth + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidDateOfBirth);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -718,8 +822,8 @@ public class IsKennitalaTests
    public void IsKennitala_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -729,8 +833,8 @@ public class IsKennitalaTests
    public void IsKennitala_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(AltValid11CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(AltValidFormattedEinstaklingurKennitala);
 
       // Act/assert.
       (sut1 == sut2).Should().BeFalse();
@@ -740,8 +844,30 @@ public class IsKennitalaTests
    public void IsKennitala_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 11 character versions for same person should still be equal.
-      var sut1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
-      var sut2 = new IsKennitala(Valid11CharacterFyrirtaekiKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedFyrirtaekiKennitala);
+      var sut2 = new IsKennitala(ValidFormattedFyrirtaekiKennitala);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IsKennitala_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', '.'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IsKennitala_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', 'A'));
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', 'a'));
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -757,8 +883,8 @@ public class IsKennitalaTests
    public void IsKennitala_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
-      var sut2 = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedFyrirtaekiKennitala);
+      var sut2 = new IsKennitala(AltValidUnformattedFyrirtaekiKennitala);
 
       // Act/assert.
       (sut1 != sut2).Should().BeTrue();
@@ -768,8 +894,8 @@ public class IsKennitalaTests
    public void IsKennitala_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 11 character versions for same person should still be equal.
-      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -779,8 +905,30 @@ public class IsKennitalaTests
    public void IsKennitala_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void IsKennitala_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', '.'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void IsKennitala_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', 'A'));
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', 'a'));
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -797,16 +945,13 @@ public class IsKennitalaTests
    public void IsKennitala_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expectedValue = new IsKennitala(value);
+      LocalCreateResult expected = new IsKennitala(value);
 
       // Act.
       var result = IsKennitala.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -814,17 +959,14 @@ public class IsKennitalaTests
    public void IsKennitala_Create_ShouldCreateInstance_WhenValueHasValidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
-      var expectedValue = new IsKennitala(value);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
+      LocalCreateResult expected = new IsKennitala(value);
 
       // Act.
       var result = IsKennitala.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -835,90 +977,93 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
-      var expectedValue = new IsKennitala(value);
+      LocalCreateResult expected = new IsKennitala(value);
 
       // Act.
       var result = IsKennitala.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void IsKennitala_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
+
       // Act.
       var result = IsKennitala.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(IsKennitalaValidationResult.Empty);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void IsKennitala_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
+
       // Act.
       var result = IsKennitala.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(IsKennitalaValidationResult.InvalidLength);
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<LocalValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void IsKennitala_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacter(String value)
+   public void IsKennitala_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
+
       // Act.
       var result = IsKennitala.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(IsKennitalaValidationResult.InvalidCharacter);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void IsKennitala_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigit(String value)
+   public void IsKennitala_Create_ShouldReturnInvalidCheckDigitValidationResult_WhenValueHasInvalidCheckDigit(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
+
       // Act.
       var result = IsKennitala.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(IsKennitalaValidationResult.InvalidCheckDigit);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCenturyIndicatorValues))]
-   public void IsKennitala_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCenturyIndicator(String value)
+   public void IsKennitala_Create_ShouldReturnInvalidCenturyValidationResult_WhenValueHasInvalidCenturyIndicator(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCenturyResult(value);
+
       // Act.
       var result = IsKennitala.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(IsKennitalaValidationResult.InvalidCentury);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -926,16 +1071,14 @@ public class IsKennitalaTests
    public void IsKennitala_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value);
 
       // Act.
       var result = IsKennitala.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(IsKennitalaValidationResult.InvalidSeparator);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -946,19 +1089,17 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
 
       // Act.
       var result = IsKennitala.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(IsKennitalaValidationResult.InvalidDateOfBirth);
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -971,8 +1112,8 @@ public class IsKennitalaTests
    public void IsKennitala_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -982,8 +1123,8 @@ public class IsKennitalaTests
    public void IsKennitala_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
-      var sut2 = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedFyrirtaekiKennitala);
+      var sut2 = new IsKennitala(AltValidUnformattedFyrirtaekiKennitala);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeFalse();
@@ -993,11 +1134,53 @@ public class IsKennitalaTests
    public void IsKennitala_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 11 character versions for same person should still be equal.
-      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IsKennitala_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', '.'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IsKennitala_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', 'A'));
+      var sut2 = new IsKennitala(ValidFormattedEinstaklingurKennitala.Replace('-', 'a'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void IsKennitala_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+
+      // Act/assert.
+      sut.Equals(ValidFormattedEinstaklingurKennitala).Should().BeFalse();
+   }
+
+   [Fact]
+   public void IsKennitala_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
    }
 
    #endregion
@@ -1010,8 +1193,8 @@ public class IsKennitalaTests
    public void IsKennitala_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
    {
       // Arrange.
-      var sut = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var expected = Valid11CharacterEinstaklingurKennitala;
+      var sut = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+      var expected = ValidFormattedEinstaklingurKennitala;
 
       // Act.
       var str = sut.Format();
@@ -1024,9 +1207,9 @@ public class IsKennitalaTests
    public void IsKennitala_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
    {
       // Arrange.
-      var sut = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
+      var sut = new IsKennitala(AltValidUnformattedFyrirtaekiKennitala);
       var mask = "______ ____";
-      var expected = AltValid11CharacterFyrirtaekiKennitala;
+      var expected = AltValidFormattedFyrirtaekiKennitala;
 
       // Act.
       var str = sut.Format(mask);
@@ -1039,7 +1222,7 @@ public class IsKennitalaTests
    public void IsKennitala_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
    {
       // Arrange.
-      var sut = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
       String mask = null!;
 
       // Act/assert.
@@ -1057,7 +1240,7 @@ public class IsKennitalaTests
    public void IsKennitala_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
    {
       // Arrange.
-      var sut = new IsKennitala(AltValid10CharacterFyrirtaekiKennitala);
+      var sut = new IsKennitala(AltValidUnformattedFyrirtaekiKennitala);
       var expectedMessage = Messages.FormatMaskEmpty + "*";
       var act = () => _ = sut.Format(mask);
 
@@ -1077,8 +1260,8 @@ public class IsKennitalaTests
    public void IsKennitala_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1092,8 +1275,8 @@ public class IsKennitalaTests
    public void IsKennitala_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid11CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(AltValid11CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidFormattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(AltValidFormattedEinstaklingurKennitala);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1107,8 +1290,38 @@ public class IsKennitalaTests
    public void IsKennitala_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 10 and 11 character versions for same person should still be equal.
-      var sut1 = new IsKennitala(Valid10CharacterFyrirtaekiKennitala);
-      var sut2 = new IsKennitala(Valid11CharacterFyrirtaekiKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedFyrirtaekiKennitala);
+      var sut2 = new IsKennitala(ValidFormattedFyrirtaekiKennitala);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void IsKennitala_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedFyrirtaekiKennitala);
+      var sut2 = new IsKennitala(ValidFormattedFyrirtaekiKennitala.Replace('-', '.'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void IsKennitala_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new IsKennitala(ValidFormattedFyrirtaekiKennitala.Replace('-', 'A'));
+      var sut2 = new IsKennitala(ValidFormattedFyrirtaekiKennitala.Replace('-', 'a'));
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1132,8 +1345,8 @@ public class IsKennitalaTests
    public void IsKennitala_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var sut1 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
-      var sut2 = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut1 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
+      var sut2 = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
@@ -1167,17 +1380,30 @@ public class IsKennitalaTests
    [Theory]
    [MemberData(nameof(ValidKennitalaValues))]
    public void IsKennitala_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
-      => IsKennitala.Validate(value).Should().Be(IsKennitalaValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = IsKennitala.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(ValidSeparators))]
    public void IsKennitala_Validate_ShouldReturnValidationPassed_WhenValueHasValidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      IsKennitala.Validate(value).Should().Be(IsKennitalaValidationResult.ValidationPassed);
+      // Act.
+      var result = IsKennitala.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1188,49 +1414,107 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      IsKennitala.Validate(value).Should().Be(IsKennitalaValidationResult.ValidationPassed);
+      // Act.
+      var result = IsKennitala.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void IsKennitala_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String value)
-      => IsKennitala.Validate(value).Should().Be(IsKennitalaValidationResult.Empty);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(EmptyValue);
+
+      // Act.
+      var result = IsKennitala.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void IsKennitala_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
-      => IsKennitala.Validate(value).Should().Be(IsKennitalaValidationResult.InvalidLength);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidLengthResult(value);
+
+      // Act.
+      var result = IsKennitala.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void IsKennitala_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(String value)
-      => IsKennitala.Validate(value).Should().Be(IsKennitalaValidationResult.InvalidCharacter);
+   public void IsKennitala_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
+
+      // Act.
+      var result = IsKennitala.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void IsKennitala_Validate_ShouldReturnInvalidCheckDigit_WhenValueHasInvalidCheckDigits(String value)
-      => IsKennitala.Validate(value).Should().Be(IsKennitalaValidationResult.InvalidCheckDigit);
+   public void IsKennitala_Validate_ShouldReturnInvalidCheckDigit_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidChecksumResult();
+
+      // Act.
+      var result = IsKennitala.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCenturyIndicatorValues))]
    public void IsKennitala_Validate_ShouldReturnInvalidCentury_WhenValueHasInvalidCenturyIndicator(String value)
-      => IsKennitala.Validate(value).Should().Be(IsKennitalaValidationResult.InvalidCentury);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidCenturyResult(value);
+
+      // Act.
+      var result = IsKennitala.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparators))]
    public void IsKennitala_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(String separator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(separator: separator);
+      var value = GetKennitalaWithValidCheckDigit(separator: separator);
+      LocalValidationResult expected = GetInvalidSeparatorResult(value);
 
-      // Act/assert.
-      IsKennitala.Validate(value).Should().Be(IsKennitalaValidationResult.InvalidSeparator);
+      // Act.
+      var result = IsKennitala.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1241,13 +1525,17 @@ public class IsKennitalaTests
       String centuryIndicator)
    {
       // Arrange.
-      var value = GetKennitalaWithValidCheckDigits(
+      var value = GetKennitalaWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          randomDigits: randomDigits,
          centuryIndicator: centuryIndicator);
+      LocalValidationResult expected = GetInvalidDateOfBirthResult(value);
 
-      // Act/assert.
-      IsKennitala.Validate(value).Should().Be(IsKennitalaValidationResult.InvalidDateOfBirth);
+      // Act.
+      var result = IsKennitala.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -1260,7 +1548,7 @@ public class IsKennitalaTests
    public void IsKennitala_JsonSerialization_ShouldRoundTripSuccessfully()
    {
       // Arrange.
-      var sut = new IsKennitala(Valid10CharacterEinstaklingurKennitala);
+      var sut = new IsKennitala(ValidUnformattedEinstaklingurKennitala);
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
@@ -1275,7 +1563,7 @@ public class IsKennitalaTests
    public void IsKennitala_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
    {
       // Arrange.
-      var sut = new IsKennitala(Valid11CharacterFyrirtaekiKennitala);
+      var sut = new IsKennitala(ValidFormattedFyrirtaekiKennitala);
       var expected = sut.Value;
 
       // Act.
@@ -1294,7 +1582,7 @@ public class IsKennitalaTests
    public void IsKennitala_JsonSerialization_ShouldDeserializeComplexObject()
    {
       // Arrange.
-      var foo = new Foo { Kennitala = new IsKennitala(Valid11CharacterEinstaklingurKennitala) };
+      var foo = new Foo { Kennitala = new IsKennitala(ValidFormattedEinstaklingurKennitala) };
       var json = JsonSerializer.Serialize(foo);
 
       // Act.
@@ -1337,15 +1625,14 @@ public class IsKennitalaTests
    public void IsKennitala_JsonDeserialization_ShouldThrowKfValidationException_WhenKennitalaIsInvalid()
    {
       // Arrange.
-      var json = "{\"Kennitala\":\"100612-707079\"}";  // Invalid length
+      var json = "{\"Kennitala\":\"1295854369\"}";  // Invalid check digit
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should()
-         .ThrowExactly<KfValidationException<IsKennitalaValidationResult>>()
-         .WithMessage(Messages.IsKennitalaInvalidLength + "*")
-         .And.ValidationResult.Should().Be(IsKennitalaValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion

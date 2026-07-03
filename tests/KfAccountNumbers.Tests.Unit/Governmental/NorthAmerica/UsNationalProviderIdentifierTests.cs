@@ -1,14 +1,22 @@
-// Ignore Spelling: Deserialization Deserialize Json Kf npi
+// Ignore Spelling: Deserialization Deserialize Json Kf
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
+
+using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
+   KfAccountNumbers.Governmental.NorthAmerica.UsNationalProviderIdentifier,
+   KfAccountNumbers.Governmental.NorthAmerica.UsNationalProviderIdentifier.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.NorthAmerica.UsNationalProviderIdentifier.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.NorthAmerica.UsNationalProviderIdentifier.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.NorthAmerica.UsNationalProviderIdentifier.ValidationResult;
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.NorthAmerica;
 
 public class UsNationalProviderIdentifierTests
 {
    private const String ValidNpi = "1245319599";         // Example from www.hippaspace.com
-   private const String AltValidNpi = "1234567893";     // Example from Wikipedia article on Luhn algorithm
+   private const String AltValidNpi = "1234567893";      // Example from Wikipedia article on Luhn algorithm
 
    public static TheoryData<String> InvalidLengthValues =>
    [
@@ -16,46 +24,65 @@ public class UsNationalProviderIdentifierTests
       "12453195999"
    ];
 
-   public static TheoryData<String> InvalidCharacterValues =>
-   [
-      "A245319599",
-      "1A45319599",
-      "12A5319599",
-      "124A319599",
-      "1245A19599",
-      "12453A9599",
-      "124531A599",
-      "1245319A99",
-      "12453195A9",
-      "124531959A",
-      "1;45319599",
-      "1\u215345319599",      // Unicode fraction 1/3
-      "1\u216745319599",      // Unicode Roman numeral VII
-      "1\u0BEF45319599",      // Unicode Tamil number 9
-   ];
+   public static TheoryData<String, Int32> InvalidCharacterValues = new()
+   {
+      // Unformatted values
+      { ".234567899", 0 },           // Non-digit character '.'
+      { "1 34567899", 1 },           // Non-digit character ' '
+      { "12A4567899", 2 },           // Non-digit character 'A'
+      { "123Z567899", 3 },           // Non-digit character 'Z'
+      { "1234^67899", 4 },           // Non-digit character '^'
+      { "12345a7899", 5 },           // Non-digit character 'a'
+      { "123456z899", 6 },           // Non-digit character 'z'
+      { "1234567~99", 7 },           // Non-digit character '~'
+      { "12345678\u21539", 8 },      // Non-digit character Unicode fraction 1/3
+      { "123456789\u00D6", 9 },      // Invalid character unicode O with umlaut
+   };
 
+   // Luhn algorithm is unable to detect these errors so they should pass
+   // validation (and the constructor/Create method should create an instance of
+   // UsNationalProviderIdentifier).
    public static TheoryData<String> CheckDigitUndetectableErrorValues =>
    [
-      "1234569071",           // Valid NPI 1234560971 with two digit transposition 09 -> 90
-      "1230967899",           // Valid NPI 1239067899 with two digit transposition 90 -> 09
-      "1122334497",           // Valid NPI 1122334497 with two digit twin error 22 -> 55
-      "1122337797",           // Valid NPI 1122334497 with two digit twin error 44 -> 77
-      "1122664497",           // Valid NPI 1122334497 with two digit twin error 33 -> 66
+      "1234569071",           // 1234560971 with two digit transposition 09 -> 90
+      "1230967899",           // 1239067899 with two digit transposition 90 -> 09
+      "1122334497",           // 1122334497 with two digit twin error 22 -> 55
+      "1122337797",           // 1122334497 with two digit twin error 44 -> 77
+      "1122664497",           // 1122334497 with two digit twin error 33 -> 66
    ];
 
    public static TheoryData<String> CheckDigitDetectableErrorValues =>
    [
-      "1238560971",           // Valid NPI 1234560971 with single digit transcription error 4 -> 8
-      "1243560971",           // Valid NPI 1234560971 with two digit transposition error 34 -> 43
-      "4422334497",           // Valid NPI 1122334497 with two digit twin error 11 -> 44
+      "1238560971",           // 1234560971 with single digit transcription error 4 -> 8
+      "1243560971",           // 1234560971 with two digit transposition error 34 -> 43
+      "4422334497",           // 1122334497 with two digit twin error 11 -> 44
    ];
+
+   private static InvalidLength GetInvalidLengthResult(String value)
+      => new(
+         Messages.UsNpiInvalidLength,
+         value.Length,
+         new ValidLengthDefinition(10, Messages.UsNpiValidLength));
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.UsNpiInvalidCharacter,
+         value[position],
+         position);
+
+   private static InvalidChecksum GetInvalidChecksumResult()
+      => new(
+         Messages.UsNpiInvalidCheckDigit,
+         Algorithms.Luhn.AlgorithmName);
 
    #region Constructor Tests
    // ==========================================================================
    // ==========================================================================
 
    [Fact]
-   public void UsNationalProviderIdentifier_Constructor_ShouldCreateObject_WhenValueContainsValidNpi()
+   public void UsNationalProviderIdentifier_Constructor_ShouldCreateInstance_WhenValueIsValid()
    {
       // Arrange.
       var value = ValidNpi;
@@ -71,32 +98,49 @@ public class UsNationalProviderIdentifierTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenValueIsEmpty(String? value)
-      => FluentActions
-         .Invoking(() => _ = new UsNationalProviderIdentifier(value))
-         .Should()
-         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
-         .WithMessage(Messages.UsNpiEmpty + "*")
-         .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.Empty);
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new UsNationalProviderIdentifier(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String? value)
-      => FluentActions
-         .Invoking(() => _ = new UsNationalProviderIdentifier(value))
-         .Should()
-         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
-         .WithMessage(Messages.UsNpiInvalidLength + "*")
-         .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.InvalidLength);
+   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new UsNationalProviderIdentifier(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String value)
-      => FluentActions
-         .Invoking(() => _ = new UsNationalProviderIdentifier(value))
-         .Should()
-         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
-         .WithMessage(Messages.UsNpiInvalidCharacterEncountered + "*")
-         .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.InvalidCharacterEncountered);
+   public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new UsNationalProviderIdentifier(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(CheckDigitUndetectableErrorValues))]
@@ -113,12 +157,16 @@ public class UsNationalProviderIdentifierTests
    [Theory]
    [MemberData(nameof(CheckDigitDetectableErrorValues))]
    public void UsNationalProviderIdentifier_Constructor_ShouldThrowKfValidationException_WhenCheckDigitContainsDetectableError(String value)
-      => FluentActions
-         .Invoking(() => _ = new UsNationalProviderIdentifier(value))
-         .Should()
-         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
-         .WithMessage(Messages.UsNpiInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.InvalidCheckDigit);
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new UsNationalProviderIdentifier(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -183,7 +231,7 @@ public class UsNationalProviderIdentifierTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -197,54 +245,71 @@ public class UsNationalProviderIdentifierTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
 
    [Fact]
-   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldCreateObject_WhenValueContainsValidNpi()
+   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldCreateInstance_WhenValueIsValid()
    {
       // Arrange.
       var value = ValidNpi;
+      var expected = new UsNationalProviderIdentifier(value);
 
       // Act.
       var sut = (UsNationalProviderIdentifier)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(value);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenValueIsEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (UsNationalProviderIdentifier)value)
-         .Should()
-         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
-         .WithMessage(Messages.UsNpiEmpty + "*")
-         .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
-         .Invoking(() => _ = (UsNationalProviderIdentifier)value)
-         .Should()
-         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
-         .WithMessage(Messages.UsNpiInvalidLength + "*")
-         .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.InvalidLength);
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (UsNationalProviderIdentifier)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(String value)
-      => FluentActions
+   public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenValueContainsNonAsciiDigit(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (UsNationalProviderIdentifier)value)
-         .Should()
-         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
-         .WithMessage(Messages.UsNpiInvalidCharacterEncountered + "*")
-         .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.InvalidCharacterEncountered);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(CheckDigitUndetectableErrorValues))]
@@ -261,12 +326,16 @@ public class UsNationalProviderIdentifierTests
    [Theory]
    [MemberData(nameof(CheckDigitDetectableErrorValues))]
    public void UsNationalProviderIdentifier_ExplicitCastToUsNpi_ShouldThrowKfValidationException_WhenCheckDigitContainsDetectableError(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (UsNationalProviderIdentifier)value)
-         .Should()
-         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
-         .WithMessage(Messages.UsNpiInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.InvalidCheckDigit);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -331,88 +400,79 @@ public class UsNationalProviderIdentifierTests
    // ==========================================================================
 
    [Fact]
-   public void UsNationalProviderIdentifier_Create_ShouldCreateObject_WhenValueContainsValidNpi()
+   public void UsNationalProviderIdentifier_Create_ShouldCreateInstance_WhenValueIsValid()
    {
       // Arrange.
       var value = ValidNpi;
-      var expected = new UsNationalProviderIdentifier(value);
+      LocalCreateResult expected = new UsNationalProviderIdentifier(value);
 
       // Act.
       var result = UsNationalProviderIdentifier.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expected);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void UsNationalProviderIdentifier_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
+   public void UsNationalProviderIdentifier_Create_ShouldReturnEmptyValue_WhenValueIsEmpty(String value)
    {
       // Arrange.
-      var expected = UsNationalProviderIdentifierValidationResult.Empty;
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
 
       // Act.
       var result = UsNationalProviderIdentifier.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().BeNull();
-      result.ValidationFailure.Should().Be(expected);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void UsNationalProviderIdentifier_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   public void UsNationalProviderIdentifier_Create_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
-      var expected = UsNationalProviderIdentifierValidationResult.InvalidLength;
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
 
       // Act.
       var result = UsNationalProviderIdentifier.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().BeNull();
-      result.ValidationFailure.Should().Be(expected);
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<LocalValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsNationalProviderIdentifier_Create_ShouldReturnInvalidCharacterEncounteredResult_WhenValueContainsNonAsciiDigit(String value)
+   public void UsNationalProviderIdentifier_Create_ShouldReturnInvalidCharacter_WhenValueContainsNonAsciiDigit(
+      String value,
+      Int32 position)
    {
       // Arrange.
-      var expected = UsNationalProviderIdentifierValidationResult.InvalidCharacterEncountered;
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
 
       // Act.
       var result = UsNationalProviderIdentifier.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().BeNull();
-      result.ValidationFailure.Should().Be(expected);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(CheckDigitUndetectableErrorValues))]
-   public void UsNationalProviderIdentifier_Create_ShouldCreateObject_WhenCheckDigitContainsUndetectableError(String value)
+   public void UsNationalProviderIdentifier_Create_ShouldCreateInstance_WhenCheckDigitContainsUndetectableError(String value)
    {
       // Arrange.
-      var expected = new UsNationalProviderIdentifier(value);
+      LocalCreateResult expected = new UsNationalProviderIdentifier(value);
 
       // Act.
       var result = UsNationalProviderIdentifier.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expected);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -420,16 +480,13 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_Create_ShouldReturnInvalidCheckDigit_WhenCheckDigitContainsDetectableError(String value)
    {
       // Arrange.
-      var expected = UsNationalProviderIdentifierValidationResult.InvalidCheckDigit;
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
 
       // Act.
       var result = UsNationalProviderIdentifier.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().BeNull();
-      result.ValidationFailure.Should().Be(expected);
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -562,39 +619,93 @@ public class UsNationalProviderIdentifierTests
    // ==========================================================================
 
    [Fact]
-   public void UsNationalProviderIdentifier_Validate_ShouldReturnValidationPassed_WhenValueContainsValidNpi()
-      => UsNationalProviderIdentifier.Validate(ValidNpi)
-         .Should().Be(UsNationalProviderIdentifierValidationResult.ValidationPassed);
+   public void UsNationalProviderIdentifier_Validate_ShouldReturnValidValue_WhenValueIsValid()
+   {
+      // Arrange.
+      var value = ValidNpi;
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = UsNationalProviderIdentifier.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void UsNationalProviderIdentifier_Validate_ShouldReturnEmpty_WhenValueIsEmpty(String? value)
-      => UsNationalProviderIdentifier.Validate(value)
-         .Should().Be(UsNationalProviderIdentifierValidationResult.Empty);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(EmptyValue);
+
+      // Act.
+      var result = UsNationalProviderIdentifier.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void UsNationalProviderIdentifier_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
-      => UsNationalProviderIdentifier.Validate(value)
-         .Should().Be(UsNationalProviderIdentifierValidationResult.InvalidLength);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidLengthResult(value);
+
+      // Act.
+      var result = UsNationalProviderIdentifier.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void UsNationalProviderIdentifier_Validate_ShouldReturnInvalidCharacterEncountered_WhenValueContainsNonAsciiDigit(String value)
-      => UsNationalProviderIdentifier.Validate(value)
-         .Should().Be(UsNationalProviderIdentifierValidationResult.InvalidCharacterEncountered);
+   public void UsNationalProviderIdentifier_Validate_ShouldReturnInvalidCharacter_WhenValueContainsNonAsciiDigit(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
+
+      // Act.
+      var result = UsNationalProviderIdentifier.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(CheckDigitUndetectableErrorValues))]
    public void UsNationalProviderIdentifier_Validate_ShouldReturnValidationPassed_WhenCheckDigitContainsUndetectableError(String value)
-      => UsNationalProviderIdentifier.Validate(value)
-         .Should().Be(UsNationalProviderIdentifierValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = UsNationalProviderIdentifier.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(CheckDigitDetectableErrorValues))]
    public void UsNationalProviderIdentifier_Validate_ShouldReturnInvalidCheckDigit_WhenCheckDigitContainsDetectableError(String value)
-      => UsNationalProviderIdentifier.Validate(value)
-         .Should().Be(UsNationalProviderIdentifierValidationResult.InvalidCheckDigit);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidChecksumResult();
+
+      // Act.
+      var result = UsNationalProviderIdentifier.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -682,15 +793,14 @@ public class UsNationalProviderIdentifierTests
    public void UsNationalProviderIdentifier_JsonDeserialization_ShouldThrowKfValidationException_WhenNpiIsInvalid()
    {
       // Arrange.
-      var json = "{\"Npi\":\"124531959\"}";  // Invalid length
+      var json = "{\"Npi\":\"1238560971\"}";  // Invalid check digit
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should()
-         .ThrowExactly<KfValidationException<UsNationalProviderIdentifierValidationResult>>()
-         .WithMessage(Messages.UsNpiInvalidLength + "*")
-         .And.ValidationResult.Should().Be(UsNationalProviderIdentifierValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion

@@ -1,7 +1,15 @@
-// Ignore Spelling: Burgerservicenummer Deserialize Deserialization Json Kf
+// Ignore Spelling: Burgerservicenummer Deserialize Deserialization Json Kf proef
 
 #pragma warning disable IDE0008 // Use explicit type
 #pragma warning disable IDE0058 // Expression value is never used
+
+using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
+   KfAccountNumbers.Governmental.Europe.NlBurgerservicenummer,
+   KfAccountNumbers.Governmental.Europe.NlBurgerservicenummer.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.Europe.NlBurgerservicenummer.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.Europe.NlBurgerservicenummer.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.Europe.NlBurgerservicenummer.ValidationResult;
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
@@ -44,30 +52,33 @@ public class NlBurgerservicenummerTests
       new String('1', 100) // Very long string
    ];
 
-   public static TheoryData<String> InvalidCharacterValues =>
-   [
-      "A23456782",         // Non-digit character 'A'
-      "1 3456782",         // Non-digit character ' '
-      "12-456782",         // Non-digit character '-'
-      "123=56782",         // Non-digit character '='
-      "1234B6782",         // Non-digit character 'B'
-      "12345C782",         // Non-digit character 'C'
-      "123456a82",         // Non-digit character 'a'
-      "1234567b2",         // Non-digit character 'b'
-      "12345678~",         // Non-digit character '~'
-      "12345678\u2153",    // Non-digit character Unicode fraction 1/3
+   // Values that will report an invalid character encountered
+   public static TheoryData<String, Int32> InvalidCharacterValues = new()
+   {
+      // Unformatted values
+      { ".23456782", 0 },           // Non-digit character '.'
+      { "1 3456782", 1 },           // Non-digit character ' '
+      { "12A456782", 2 },           // Non-digit character 'A'
+      { "123Z56782", 3 },           // Non-digit character 'Z'
+      { "1234^6782", 4 },           // Non-digit character '^'
+      { "12345a782", 5 },           // Non-digit character 'a'
+      { "123456z36", 6 },           // Non-digit character 'z'
+      { "1234567~6", 7 },           // Non-digit character '~'
+      { "12345678\u2153", 8 },      // Non-digit character Unicode fraction 1/3
+      { "12345678\u00D6", 8 },      // Invalid character unicode O with umlaut
 
-      "A234 56 782",       // Non-digit character 'A'
-      "1 34 56 782",       // Non-digit character ' '
-      "12-4 56 782",       // Non-digit character '-'
-      "123= 56 782",       // Non-digit character '='
-      "1234 B6 782",       // Non-digit character 'B'
-      "1234 5C 782",       // Non-digit character 'C'
-      "1234 56 a82",       // Non-digit character 'a'
-      "1234 56 7b2",       // Non-digit character 'b'
-      "1234 56 78~",       // Non-digit character '~'
-      "1234 56 78\u2153",  // Non-digit character Unicode fraction 1/3
-   ];
+      // Formatted values
+      { ".234 56 782", 0 },         // Non-digit character '.'
+      { "1 34 56 782", 1 },         // Non-digit character ' '
+      { "12A4 56 782", 2 },         // Non-digit character 'A'
+      { "123Z 56 782", 3 },         // Non-digit character 'Z'
+      { "1234 ^6 782", 5 },         // Non-digit character '^'
+      { "1234 5a 782", 6 },         // Non-digit character 'a'
+      { "1234 56 z86", 8 },         // Non-digit character 'z'
+      { "1234 56 7~6", 9 },         // Non-digit character '~'
+      { "1234 56 78\u2153", 10 },   // Non-digit character Unicode fraction 1/3
+      { "1234 56 78\u00D6", 10 },   // Invalid character unicode O with umlaut
+   };
 
    public static TheoryData<String> InvalidCheckDigitValues =>
    [
@@ -81,33 +92,68 @@ public class NlBurgerservicenummerTests
       "111222344",         // 111222333 with two digit twin error, 33 -> 44
    ];
 
-   public static TheoryData<String> InvalidSeparatorValues =>
-   [
-      "1234056-782",
-      "1234156-782",
-      "1234256-782",
-      "1234356-782",
-      "1234456-782",
-      "1234556-782",
-      "1234656-782",
-      "1234756-782",
-      "1234856-782",
-      "1234956-782",
+   public static TheoryData<String, Int32> InvalidSeparatorValues = new()
+   {
+      // First separator position
+      { "1234056-782", 4 },
+      { "1234156-782", 4 },
+      { "1234256-782", 4 },
+      { "1234356-782", 4 },
+      { "1234456-782", 4 },
+      { "1234556-782", 4 },
+      { "1234656-782", 4 },
+      { "1234756-782", 4 },
+      { "1234856-782", 4 },
+      { "1234956-782", 4 },
 
-      "1234-560782",
-      "1234-561782",
-      "1234-562782",
-      "1234-563782",
-      "1234-564782",
-      "1234-565782",
-      "1234-566782",
-      "1234-567782",
-      "1234-568782",
-      "1234-569782",
+      // Second separator position
+      { "1234-560782", 7 },
+      { "1234-561782", 7 },
+      { "1234-562782", 7 },
+      { "1234-563782", 7 },
+      { "1234-564782", 7 },
+      { "1234-565782", 7 },
+      { "1234-566782", 7 },
+      { "1234-567782", 7 },
+      { "1234-568782", 7 },
+      { "1234-569782", 7 },
 
-      "1234-56.782",
-      "1234.56-782",
-   ];
+      // Mixed separators
+      { "1234-56.782", 7 },
+      { "1234.56-782", 7 },
+   };
+
+   private static InvalidLength GetInvalidLengthResult(String value)
+      => new(
+         Messages.NlBurgerservicenummerInvalidLength,
+         value.Length,
+         NlBurgerservicenummer.GetValidLengthDefinitions());
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.NlBurgerservicenummerInvalidCharacter,
+         value[position],
+         position);
+
+   private static InvalidChecksum GetInvalidChecksumResult()
+      => new(
+         Messages.NlBurgerservicenummerInvalidCheckDigit,
+         NlBurgerservicenummer.CheckDigitAlgorithmName);
+
+   private static InvalidSeparator GetInvalidSeparatorResult(String value, Int32 position)
+      => new(Messages.NlBurgerservicenummerInvalidSeparator, value[position], position);
+
+   #region Constants Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void NlBurgerservicenummer_CheckDigitAlgorithmName_ShouldHaveExpectedValue()
+      => NlBurgerservicenummer.CheckDigitAlgorithmName.Should().Be("11-proef");
+
+   #endregion
 
    #region Check Digit Algorithm Tests
    // ==========================================================================
@@ -115,9 +161,9 @@ public class NlBurgerservicenummerTests
 
    [Theory]
    // Values designed to produce all possible check digits 0-9
-                                 // Weights: 9 8 7 6 5 4 3 2 -1 
-   [InlineData("110000006")]     //          9 8             -6 = 11, mod 11 = 0             
-   [InlineData("101000005")]     //          9   7           -5 
+                                 // Weights: 9 8 7 6 5 4 3 2 -1
+   [InlineData("110000006")]     //          9 8             -6 = 11, mod 11 = 0
+   [InlineData("101000005")]     //          9   7           -5
    [InlineData("100100004")]     //          9     6         -4
    [InlineData("100010003")]     //          9       5       -3
    [InlineData("100001002")]     //          9         4     -2
@@ -127,7 +173,16 @@ public class NlBurgerservicenummerTests
    [InlineData("010110008")]     //            8   6 5       -8
    [InlineData("001110007")]     //              7 6 5       -7
    public void NlBurgerservicenummer_CheckDigitAlgorithm_ShouldValidateAllPossibleCheckDigits(String value)
-      => NlBurgerservicenummer.Validate(value).Should().Be(NlBurgerservicenummerValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = NlBurgerservicenummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -168,47 +223,79 @@ public class NlBurgerservicenummerTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void NlBurgerservicenummer_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new NlBurgerservicenummer(value))
-         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
-         .WithMessage(Messages.NlBurgerservicenummerEmpty + "*")
-         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void NlBurgerservicenummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new NlBurgerservicenummer(value))
-         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
-         .WithMessage(Messages.NlBurgerservicenummerInvalidLength + "*")
-         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void NlBurgerservicenummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
-      => FluentActions
+   public void NlBurgerservicenummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new NlBurgerservicenummer(value))
-         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
-         .WithMessage(Messages.NlBurgerservicenummerInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void NlBurgerservicenummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new NlBurgerservicenummer(value))
-         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
-         .WithMessage(Messages.NlBurgerservicenummerInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.InvalidCheckDigit);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void NlBurgerservicenummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
-      => FluentActions
+   public void NlBurgerservicenummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new NlBurgerservicenummer(value))
-         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
-         .WithMessage(Messages.NlBurgerservicenummerInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -278,7 +365,7 @@ public class NlBurgerservicenummerTests
       // Act.
       String str = sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -292,7 +379,7 @@ public class NlBurgerservicenummerTests
       // Act.
       var str = (String)sut;
 
-      // Act/assert.
+      // Assert.
       str.Should().NotBeNull();
       str.Should().BeEmpty();
    }
@@ -302,14 +389,13 @@ public class NlBurgerservicenummerTests
    public void NlBurgerservicenummer_ExplicitCastToNlBurgerservicenummer_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expected = GetRawBurgerservicenummer(value);
+      var expected = new NlBurgerservicenummer(value);
 
       // Act.
       var sut = (NlBurgerservicenummer)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -317,60 +403,91 @@ public class NlBurgerservicenummerTests
    public void NlBurgerservicenummer_ExplicitCastToNlBurgerservicenummer_ShouldCreateInstance_WhenValueHasValidSeparator(String value)
    {
       // Arrange.
-      var expected = GetRawBurgerservicenummer(value);
+      var expected = new NlBurgerservicenummer(value);
 
       // Act.
       var sut = (NlBurgerservicenummer)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void NlBurgerservicenummer_ExplicitCastToNlBurgerservicenummer_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (NlBurgerservicenummer)value)
-         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
-         .WithMessage(Messages.NlBurgerservicenummerEmpty + "*")
-         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void NlBurgerservicenummer_ExplicitCastToNlBurgerservicenummer_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (NlBurgerservicenummer)value)
-         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
-         .WithMessage(Messages.NlBurgerservicenummerInvalidLength + "*")
-         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void NlBurgerservicenummer_ExplicitCastToNlBurgerservicenummer_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
-      => FluentActions
+   public void NlBurgerservicenummer_ExplicitCastToNlBurgerservicenummer_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (NlBurgerservicenummer)value)
-         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
-         .WithMessage(Messages.NlBurgerservicenummerInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void NlBurgerservicenummer_ExplicitCastToNlBurgerservicenummer_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (NlBurgerservicenummer)value)
-         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
-         .WithMessage(Messages.NlBurgerservicenummerInvalidCheckDigit + "*")
-         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.InvalidCheckDigit);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void NlBurgerservicenummer_ExplicitCastToNlBurgerservicenummer_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
-      => FluentActions
+   public void NlBurgerservicenummer_ExplicitCastToNlBurgerservicenummer_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (NlBurgerservicenummer)value)
-         .Should().Throw<KfValidationException<NlBurgerservicenummerValidationResult>>()
-         .WithMessage(Messages.NlBurgerservicenummerInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -406,6 +523,28 @@ public class NlBurgerservicenummerTests
       // Arrange. 9 and 11 character versions for same person should still be equal.
       var sut1 = new NlBurgerservicenummer(ValidBurgerservicenummer);
       var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', '.'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'A'));
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'a'));
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -450,6 +589,28 @@ public class NlBurgerservicenummerTests
       (sut1 != sut2).Should().BeFalse();
    }
 
+   [Fact]
+   public void NlBurgerservicenummer_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', '.'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'A'));
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'a'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
    #endregion
 
    #region Create Method Tests
@@ -461,16 +622,13 @@ public class NlBurgerservicenummerTests
    public void NlBurgerservicenummer_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expectedValue = new NlBurgerservicenummer(value);
+      LocalCreateResult expected = new NlBurgerservicenummer(value);
 
       // Act.
       var result = NlBurgerservicenummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -478,86 +636,91 @@ public class NlBurgerservicenummerTests
    public void NlBurgerservicenummer_Create_ShouldCreateInstance_WhenValueHasValidSeparator(String value)
    {
       // Arrange.
-      var expectedValue = new NlBurgerservicenummer(value);
+      LocalCreateResult expected = new NlBurgerservicenummer(value);
 
       // Act.
       var result = NlBurgerservicenummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void NlBurgerservicenummer_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
+
       // Act.
       var result = NlBurgerservicenummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(NlBurgerservicenummerValidationResult.Empty);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void NlBurgerservicenummer_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
+
       // Act.
       var result = NlBurgerservicenummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(NlBurgerservicenummerValidationResult.InvalidLength);
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<LocalValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void NlBurgerservicenummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+   public void NlBurgerservicenummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacterWhereDigitExpected(
+      String value,
+      Int32 position)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
+
       // Act.
       var result = NlBurgerservicenummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(NlBurgerservicenummerValidationResult.InvalidCharacter);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void NlBurgerservicenummer_Create_ShouldReturnInvalidCheckDigitValidationResult_WhenValueHasInvalidCheckDigit(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
+
       // Act.
       var result = NlBurgerservicenummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(NlBurgerservicenummerValidationResult.InvalidCheckDigit);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void NlBurgerservicenummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(String value)
+   public void NlBurgerservicenummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value, position);
+
       // Act.
       var result = NlBurgerservicenummer.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(NlBurgerservicenummerValidationResult.InvalidSeparator);
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -597,6 +760,48 @@ public class NlBurgerservicenummerTests
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', '.'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'A'));
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'a'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+
+      // Act/assert.
+      sut.Equals(ValidFormattedBurgerservicenummer).Should().BeFalse();
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
    }
 
    #endregion
@@ -717,6 +922,36 @@ public class NlBurgerservicenummerTests
       hash1.Should().Be(hash2);
    }
 
+   [Fact]
+   public void NlBurgerservicenummer_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer);
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', '.'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void NlBurgerservicenummer_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'A'));
+      var sut2 = new NlBurgerservicenummer(ValidFormattedBurgerservicenummer.Replace('-', 'a'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
    #endregion
 
    #region ReferenceEquals Method Tests
@@ -766,37 +1001,107 @@ public class NlBurgerservicenummerTests
    [Theory]
    [MemberData(nameof(ValidBurgerservicenummerValues))]
    public void NlBurgerservicenummer_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
-      => NlBurgerservicenummer.Validate(value).Should().Be(NlBurgerservicenummerValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = NlBurgerservicenummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(ValidSeparatorValues))]
    public void NlBurgerservicenummer_Validate_ShouldReturnValidationPassed_WhenValueHasValidSeparator(String value)
-      => NlBurgerservicenummer.Validate(value).Should().Be(NlBurgerservicenummerValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = NlBurgerservicenummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void NlBurgerservicenummer_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String value)
-      => NlBurgerservicenummer.Validate(value).Should().Be(NlBurgerservicenummerValidationResult.Empty);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(EmptyValue);
+
+      // Act.
+      var result = NlBurgerservicenummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void NlBurgerservicenummer_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
-      => NlBurgerservicenummer.Validate(value).Should().Be(NlBurgerservicenummerValidationResult.InvalidLength);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidLengthResult(value);
+
+      // Act.
+      var result = NlBurgerservicenummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void NlBurgerservicenummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
-      => NlBurgerservicenummer.Validate(value).Should().Be(NlBurgerservicenummerValidationResult.InvalidCharacter);
+   public void NlBurgerservicenummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacterWhereDigitExpected(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
+
+      // Act.
+      var result = NlBurgerservicenummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void NlBurgerservicenummer_Validate_ShouldReturnInvalidCheckDigit_WhenValueHasInvalidCheckDigit(String value)
-      => NlBurgerservicenummer.Validate(value).Should().Be(NlBurgerservicenummerValidationResult.InvalidCheckDigit);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidChecksumResult();
+
+      // Act.
+      var result = NlBurgerservicenummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void NlBurgerservicenummer_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(String value)
-      => NlBurgerservicenummer.Validate(value).Should().Be(NlBurgerservicenummerValidationResult.InvalidSeparator);
+   public void NlBurgerservicenummer_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidSeparatorResult(value, position);
+
+      // Act.
+      var result = NlBurgerservicenummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    #endregion
 
@@ -885,15 +1190,14 @@ public class NlBurgerservicenummerTests
    public void NlBurgerservicenummer_JsonDeserialization_ShouldThrowKfValidationException_WhenBurgerservicenummerIsInvalid()
    {
       // Arrange.
-      var json = "{\"Burgerservicenummer\":\"100612-707079\"}";  // Invalid length
+      var json = "{\"Burgerservicenummer\":\"122456782\"}";  // Invalid check digit
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should()
-         .ThrowExactly<KfValidationException<NlBurgerservicenummerValidationResult>>()
-         .WithMessage(Messages.NlBurgerservicenummerInvalidLength + "*")
-         .And.ValidationResult.Should().Be(NlBurgerservicenummerValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion

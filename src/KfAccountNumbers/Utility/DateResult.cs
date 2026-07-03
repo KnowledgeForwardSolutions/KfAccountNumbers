@@ -53,9 +53,14 @@ public record DateResult
       {
          if (day > DateTime.DaysInMonth(year.Value, month.Value))
          {
-            throw new ArgumentOutOfRangeException(nameof(day),
+#pragma warning disable CA1305 // Specify IFormatProvider
+#pragma warning disable CA1863 // Use 'CompositeFormat'
+            throw new ArgumentOutOfRangeException(
+               nameof(day),
                day,
                String.Format(Messages.DayOutOfRangeForYearAndMonth, day, year, month));
+#pragma warning restore CA1863 // Use 'CompositeFormat'
+#pragma warning restore CA1305 // Specify IFormatProvider
          }
       }
       else if (day is < 1 or > 31)

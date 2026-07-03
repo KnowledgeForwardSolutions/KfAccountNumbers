@@ -1,11 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<Compile Update="Messages.Designer.cs">
 			<DesignTime>True</DesignTime>
@@ -26,11 +20,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="Governmental\NorthAmerica\UsSocialSecurityNumber.cs" />
+		<None Include="Governmental\NorthAmerica\UsSocialSecurityNumber.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="CheckDigits.Net" Version="3.1.0" />
+		<PackageReference Include="CheckDigits.Net" Version="3.1.0" />
 	</ItemGroup>
 
 </Project>

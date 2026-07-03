@@ -70,6 +70,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer formatted as YY.MM.DD-XXX.CC.
+        /// </summary>
+        internal static string BeRijksregisternummerFormattedLength {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to BE Rijksregisternummer contains a non-digit character where a digit was expected.
         /// </summary>
         internal static string BeRijksregisternummerInvalidCharacter {
@@ -124,6 +133,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BE Rijksregisternummer without separator characters (YYMMDDXXXCC).
+        /// </summary>
+        internal static string BeRijksregisternummerUnformattedLength {
+            get {
+                return ResourceManager.GetString("BeRijksregisternummerUnformattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CA Social Insurance Number may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string CaSinEmpty {
@@ -133,11 +151,20 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A CA Social Insurance Number with separator characters at offsets 3 and 7 (zero-based).
+        /// </summary>
+        internal static string CaSinFormattedLength {
+            get {
+                return ResourceManager.GetString("CaSinFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CA Social Insurance Number must only contain digit characters (0-9) in non-separator character locations.
         /// </summary>
-        internal static string CaSinInvalidCharacterEncountered {
+        internal static string CaSinInvalidCharacter {
             get {
-                return ResourceManager.GetString("CaSinInvalidCharacterEncountered", resourceCulture);
+                return ResourceManager.GetString("CaSinInvalidCharacter", resourceCulture);
             }
         }
         
@@ -171,9 +198,18 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to CA Social Insurance Number with length 11 contains an unexpected character at a separator position.
         /// </summary>
-        internal static string CaSinInvalidSeparatorEncountered {
+        internal static string CaSinInvalidSeparator {
             get {
-                return ResourceManager.GetString("CaSinInvalidSeparatorEncountered", resourceCulture);
+                return ResourceManager.GetString("CaSinInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A CA Social Insurance Number without separator characters.
+        /// </summary>
+        internal static string CaSinUnformattedLength {
+            get {
+                return ResourceManager.GetString("CaSinUnformattedLength", resourceCulture);
             }
         }
         
@@ -192,6 +228,15 @@ namespace KfAccountNumbers {
         internal static string CreateResultValueNull {
             get {
                 return ResourceManager.GetString("CreateResultValueNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CurrentCentury must be a multiple of 100; i.e. 1900, 2000, etc..
+        /// </summary>
+        internal static string CurrentCenturyInvalidModulus {
+            get {
+                return ResourceManager.GetString("CurrentCenturyInvalidModulus", resourceCulture);
             }
         }
         
@@ -241,6 +286,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to DK Personnummer formatted for readability with a separator character at character position 6 (zero-based).
+        /// </summary>
+        internal static string DkPersonnummerFormattedLength {
+            get {
+                return ResourceManager.GetString("DkPersonnummerFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DK Personnummer contains a non-digit character where a digit was expected.
         /// </summary>
         internal static string DkPersonnummerInvalidCharacter {
@@ -273,6 +327,42 @@ namespace KfAccountNumbers {
         internal static string DkPersonnummerInvalidSeparator {
             get {
                 return ResourceManager.GetString("DkPersonnummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DK Personnummer without a separator character.
+        /// </summary>
+        internal static string DkPersonnummerUnformattedLength {
+            get {
+                return ResourceManager.GetString("DkPersonnummerUnformattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value may not be null, empty (&quot;&quot;) or all whitespace characters.
+        /// </summary>
+        internal static string EmptyValueDescription {
+            get {
+                return ResourceManager.GetString("EmptyValueDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES DNI formatted as DDDDDDDD-C.
+        /// </summary>
+        internal static string EsDniFormattedLength {
+            get {
+                return ResourceManager.GetString("EsDniFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES NIE formatted as P-DDDDDDD-C.
+        /// </summary>
+        internal static string EsNieFormattedLength {
+            get {
+                return ResourceManager.GetString("EsNieFormattedLength", resourceCulture);
             }
         }
         
@@ -313,11 +403,29 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ES NIF with length 10 must be a DNI (starts with digit) and ES NIF with length 11 must be a NIE (starts with X, Y or Z).
+        /// </summary>
+        internal static string EsNifInvalidLengthForType {
+            get {
+                return ResourceManager.GetString("EsNifInvalidLengthForType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ES NIF separator character may not be an ASCII digit (&apos;0&apos;-&apos;9&apos;). For NIE both separator characters must be the same.
         /// </summary>
         internal static string EsNifInvalidSeparator {
             get {
                 return ResourceManager.GetString("EsNifInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES NIF without separator characters.
+        /// </summary>
+        internal static string EsNifUnformattedLength {
+            get {
+                return ResourceManager.GetString("EsNifUnformattedLength", resourceCulture);
             }
         }
         
@@ -385,6 +493,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to FI Henkilotunnus should be 11 characters (including century indicator).
+        /// </summary>
+        internal static string FiHenkilotunnusValidLength {
+            get {
+                return ResourceManager.GetString("FiHenkilotunnusValidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to String formatting mask may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string FormatMaskEmpty {
@@ -408,6 +525,15 @@ namespace KfAccountNumbers {
         internal static string FrInseeNumberEmpty {
             get {
                 return ResourceManager.GetString("FrInseeNumberEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FR INSEE number formatted as S YY MM LL OOO KKK CC.
+        /// </summary>
+        internal static string FrInseeNumberFormattedLength {
+            get {
+                return ResourceManager.GetString("FrInseeNumberFormattedLength", resourceCulture);
             }
         }
         
@@ -475,11 +601,65 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to FR INSEE number without separator characters (SYYMMLLOOOKKKCC).
+        /// </summary>
+        internal static string FrInseeNumberUnformattedLength {
+            get {
+                return ResourceManager.GetString("FrInseeNumberUnformattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB CHI Number must contain a valid date of birth (in DDMMYY format) as the first six digits.
+        /// </summary>
+        internal static string GbChiNumberInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("GbChiNumberInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB CHI Number must be in the range 010 000 000 to 311 299 999, excluding trailing check digit.
+        /// </summary>
+        internal static string GbChiNumberInvalidRange {
+            get {
+                return ResourceManager.GetString("GbChiNumberInvalidRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB H&amp;C Number must be in the range 320 000 000 to 399 999 999 or 900 000 000 to 999 999 999, excluding trailing check digit.
+        /// </summary>
+        internal static string GbHcNumberInvalidRange {
+            get {
+                return ResourceManager.GetString("GbHcNumberInvalidRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to GB National Insurance Number may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string GbNationalInsuranceNumberEmpty {
             get {
                 return ResourceManager.GetString("GbNationalInsuranceNumberEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB National Insurance Number with separator characters and without a suffix character.
+        /// </summary>
+        internal static string GbNationalInsuranceNumberFormattedNoSuffixLength {
+            get {
+                return ResourceManager.GetString("GbNationalInsuranceNumberFormattedNoSuffixLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB National Insurance Number with a suffix character and separator characters.
+        /// </summary>
+        internal static string GbNationalInsuranceNumberFormattedWithSuffixLength {
+            get {
+                return ResourceManager.GetString("GbNationalInsuranceNumberFormattedWithSuffixLength", resourceCulture);
             }
         }
         
@@ -520,6 +700,105 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to GB National Insurance Number without a suffix character or separator characters.
+        /// </summary>
+        internal static string GbNationalInsuranceNumberUnformattedNoSuffixLength {
+            get {
+                return ResourceManager.GetString("GbNationalInsuranceNumberUnformattedNoSuffixLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB National Insurance Number with a suffix character and without separator characters.
+        /// </summary>
+        internal static string GbNationalInsuranceNumberUnformattedWithSuffixLength {
+            get {
+                return ResourceManager.GetString("GbNationalInsuranceNumberUnformattedWithSuffixLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB NHS Number must be in the range 400 000 000 to 499 999 999, 600 000 000 to 799 999 999, or 900 000 000 to 999 999 999, excluding trailing check digit.
+        /// </summary>
+        internal static string GbNhsNumberInvalidRange {
+            get {
+                return ResourceManager.GetString("GbNhsNumberInvalidRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A formatted NHS, H&amp;C or test patient number with separator characters at offsets 3 and 7 (zero-based).
+        /// </summary>
+        internal static string GbPatientNumberDoubleSeparatorFormattedLength {
+            get {
+                return ResourceManager.GetString("GbPatientNumberDoubleSeparatorFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB patient number must have only digit characters (0-9) in non-separator positions.
+        /// </summary>
+        internal static string GbPatientNumberInvalidCharacter {
+            get {
+                return ResourceManager.GetString("GbPatientNumberInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB patient number must have a valid Modulus 11 check digit in the trailing (right-most) character position.
+        /// </summary>
+        internal static string GbPatientNumberInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("GbPatientNumberInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB patient number must have a length of 10 (without separators), 11 (CHI number with separator) or 12 (NHS, H&amp;C or test number with separators).
+        /// </summary>
+        internal static string GbPatientNumberInvalidLength {
+            get {
+                return ResourceManager.GetString("GbPatientNumberInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB patient number must be in the range 010 000 000 to 311 299 999, 320 000 000 to 399 999 999, 400 000 000 to 499 999 999, 600 000 000 to 799 999 999, or 900 000 000 to 999 999 999, excluding trailing check digit.
+        /// </summary>
+        internal static string GbPatientNumberInvalidRange {
+            get {
+                return ResourceManager.GetString("GbPatientNumberInvalidRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GB patient number may not contain an ASCII digit (0-9) in a separator position and if two separators are used, both separator positions must contain the same non-digit character.
+        /// </summary>
+        internal static string GbPatientNumberInvalidSeparator {
+            get {
+                return ResourceManager.GetString("GbPatientNumberInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A formatted CHI number with a single separator character at offset 6 (zero-based).
+        /// </summary>
+        internal static string GbPatientNumberSingleSeparatorFormattedLength {
+            get {
+                return ResourceManager.GetString("GbPatientNumberSingleSeparatorFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A GB patient number (NHS, CHI or H&amp;C) without any separator characters.
+        /// </summary>
+        internal static string GbPatientNumberUnformattedLength {
+            get {
+                return ResourceManager.GetString("GbPatientNumberUnformattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to IE PPS Number may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string IePpsNumberEmpty {
@@ -556,11 +835,56 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to IE PPS Number without optional suffix.
+        /// </summary>
+        internal static string IePpsNumberWithoutSuffixLength {
+            get {
+                return ResourceManager.GetString("IePpsNumberWithoutSuffixLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IE PPS Number with suffix character (optional, made permanent in 2013).
+        /// </summary>
+        internal static string IePpsNumberWithSuffixLength {
+            get {
+                return ResourceManager.GetString("IePpsNumberWithSuffixLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Century cutoff must be an integer between 1 and 100 (inclusive).
+        /// </summary>
+        internal static string InvalidCenturyCutoff {
+            get {
+                return ResourceManager.GetString("InvalidCenturyCutoff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value to convert from a two-digit year to a four-digit year must be in the range 0-99 or 1000-9999.
+        /// </summary>
+        internal static string InvalidYearForYyToYyyyConversion {
+            get {
+                return ResourceManager.GetString("InvalidYearForYyToYyyyConversion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to IS Kennitala may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string IsKennitalaEmpty {
             get {
                 return ResourceManager.GetString("IsKennitalaEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IS Kennitala formatted for readability with a separator character at character position 6 (zero-based).
+        /// </summary>
+        internal static string IsKennitalaFormattedLength {
+            get {
+                return ResourceManager.GetString("IsKennitalaFormattedLength", resourceCulture);
             }
         }
         
@@ -619,6 +943,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to IS Kennitala without a separator character.
+        /// </summary>
+        internal static string IsKennitalaUnformattedLength {
+            get {
+                return ResourceManager.GetString("IsKennitalaUnformattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Month must be between 1 and 12, inclusive.
         /// </summary>
         internal static string MonthOutOfRange {
@@ -639,9 +972,9 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to MX CURP requires alphabetic characters in positions 0-3 and 13-15 (zero-based).
         /// </summary>
-        internal static string MxCurpInvalidAlphabeticCharacterEncountered {
+        internal static string MxCurpInvalidAlphabeticCharacter {
             get {
-                return ResourceManager.GetString("MxCurpInvalidAlphabeticCharacterEncountered", resourceCulture);
+                return ResourceManager.GetString("MxCurpInvalidAlphabeticCharacter", resourceCulture);
             }
         }
         
@@ -700,11 +1033,29 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to MX CURP should be 18 characters without separator or format characters.
+        /// </summary>
+        internal static string MxCurpValidLength {
+            get {
+                return ResourceManager.GetString("MxCurpValidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to NL Burgerservicenummer may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string NlBurgerservicenummerEmpty {
             get {
                 return ResourceManager.GetString("NlBurgerservicenummerEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NL Burgerservicenummer formatted as NNNN-NN-NNN, where &apos;-&apos; may be any non-digit character (same character must be used in both locations).
+        /// </summary>
+        internal static string NlBurgerservicenummerFormattedLength {
+            get {
+                return ResourceManager.GetString("NlBurgerservicenummerFormattedLength", resourceCulture);
             }
         }
         
@@ -745,11 +1096,29 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NL Burgerservicenummer without separator characters (NNNNNNNNN).
+        /// </summary>
+        internal static string NlBurgerservicenummerUnformattedLength {
+            get {
+                return ResourceManager.GetString("NlBurgerservicenummerUnformattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to NO Foedselsnummer may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string NoFoedselsnummerEmpty {
             get {
                 return ResourceManager.GetString("NoFoedselsnummerEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Foedselsnummer formatted for readability with a separator character at character position 6 (zero-based).
+        /// </summary>
+        internal static string NoFoedselsnummerFormattedLength {
+            get {
+                return ResourceManager.GetString("NoFoedselsnummerFormattedLength", resourceCulture);
             }
         }
         
@@ -795,6 +1164,15 @@ namespace KfAccountNumbers {
         internal static string NoFoedselsnummerInvalidSeparator {
             get {
                 return ResourceManager.GetString("NoFoedselsnummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Foedselsnummer without a separator character.
+        /// </summary>
+        internal static string NoFoedselsnummerUnformattedLength {
+            get {
+                return ResourceManager.GetString("NoFoedselsnummerUnformattedLength", resourceCulture);
             }
         }
         
@@ -853,6 +1231,24 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SE Personnummer with eight-digit date of birth (YYYYMMDD) format.
+        /// </summary>
+        internal static string SePersonnummerLongFormatLength {
+            get {
+                return ResourceManager.GetString("SePersonnummerLongFormatLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SE Personnummer with six-digit date of birth (YYMMDD) format.
+        /// </summary>
+        internal static string SePersonnummerShortFormatLength {
+            get {
+                return ResourceManager.GetString("SePersonnummerShortFormatLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to US Individual Taxpayer Identification Number may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string UsItinEmpty {
@@ -873,9 +1269,9 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to US Individual Taxpayer Identification Number must only contain digit characters (0-9) in non-separator character locations.
         /// </summary>
-        internal static string UsItinInvalidCharacterEncountered {
+        internal static string UsItinInvalidCharacter {
             get {
-                return ResourceManager.GetString("UsItinInvalidCharacterEncountered", resourceCulture);
+                return ResourceManager.GetString("UsItinInvalidCharacter", resourceCulture);
             }
         }
         
@@ -900,9 +1296,9 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to US Individual Taxpayer Identification Number with length 11 contains an unexpected character at a separator position.
         /// </summary>
-        internal static string UsItinInvalidSeparatorEncountered {
+        internal static string UsItinInvalidSeparator {
             get {
-                return ResourceManager.GetString("UsItinInvalidSeparatorEncountered", resourceCulture);
+                return ResourceManager.GetString("UsItinInvalidSeparator", resourceCulture);
             }
         }
         
@@ -918,9 +1314,9 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to US National Provider Identifier must only contain digit characters (0-9).
         /// </summary>
-        internal static string UsNpiInvalidCharacterEncountered {
+        internal static string UsNpiInvalidCharacter {
             get {
-                return ResourceManager.GetString("UsNpiInvalidCharacterEncountered", resourceCulture);
+                return ResourceManager.GetString("UsNpiInvalidCharacter", resourceCulture);
             }
         }
         
@@ -939,6 +1335,15 @@ namespace KfAccountNumbers {
         internal static string UsNpiInvalidLength {
             get {
                 return ResourceManager.GetString("UsNpiInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to US National Provider Identifier should be 10 digits without separator or format characters.
+        /// </summary>
+        internal static string UsNpiValidLength {
+            get {
+                return ResourceManager.GetString("UsNpiValidLength", resourceCulture);
             }
         }
         
@@ -972,9 +1377,9 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to US Social Security Number must only contain digit characters (0-9) in non-separator character locations.
         /// </summary>
-        internal static string UsSsnInvalidCharacterEncountered {
+        internal static string UsSsnInvalidCharacter {
             get {
-                return ResourceManager.GetString("UsSsnInvalidCharacterEncountered", resourceCulture);
+                return ResourceManager.GetString("UsSsnInvalidCharacter", resourceCulture);
             }
         }
         
@@ -1008,9 +1413,9 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to US Social Security Number with length 11 contains an unexpected character at a separator position.
         /// </summary>
-        internal static string UsSsnInvalidSeparatorEncountered {
+        internal static string UsSsnInvalidSeparator {
             get {
-                return ResourceManager.GetString("UsSsnInvalidSeparatorEncountered", resourceCulture);
+                return ResourceManager.GetString("UsSsnInvalidSeparator", resourceCulture);
             }
         }
         
@@ -1024,11 +1429,38 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A US TIN (SSN or ITIN) with separator characters at offsets 3 and 6 (zero-based).
+        /// </summary>
+        internal static string UsTinFormattedLength {
+            get {
+                return ResourceManager.GetString("UsTinFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A US TIN (SSN or ITIN) without separator characters.
+        /// </summary>
+        internal static string UsTinUnformattedLength {
+            get {
+                return ResourceManager.GetString("UsTinUnformattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value does not contain any validation errors.
         /// </summary>
         internal static string ValidationPassed {
             get {
                 return ResourceManager.GetString("ValidationPassed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value is valid.
+        /// </summary>
+        internal static string ValidValueDescription {
+            get {
+                return ResourceManager.GetString("ValidValueDescription", resourceCulture);
             }
         }
         

@@ -1,5 +1,13 @@
 // Ignore Spelling: Deserialize Deserialization Insee Json Kf
 
+using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
+   KfAccountNumbers.Governmental.Europe.FrInseeNumber,
+   KfAccountNumbers.Governmental.Europe.FrInseeNumber.ValidationError>;
+using LocalValidationError = KfAccountNumbers.Governmental.Europe.FrInseeNumber.ValidationError;
+using LocalValidationException = KfAccountNumbers.UKfValidationException<
+   KfAccountNumbers.Governmental.Europe.FrInseeNumber.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.Governmental.Europe.FrInseeNumber.ValidationResult;
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 #pragma warning disable IDE0008 // Use explicit type
@@ -8,16 +16,18 @@ namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class FrInseeNumberTests
 {
-   private const String Valid15CharacterInseeNumber = "188121884813236";
-   private const String AltValid15CharacterInseeNumber = "255102445387701";
-   private const String Valid15CharacterInseeNumberCorsica = "112072A28806058";
-   private const String AltValid15CharacterInseeNumberCorsica = "112072B28806085";
-   private const String Valid15CharacterTemporaryInseeNumber = "821099901013371";
-   private const String Valid21CharacterInseeNumber = "1 88 12 18 848 132 36";
-   private const String AltValid21CharacterInseeNumber = "2 55 10 24 453 877 01";
-   private const String Valid21CharacterInseeNumberCorsica = "1 12 07 2A 288 060 58";
-   private const String AltValid21CharacterInseeNumberCorsica = "1 12 07 2B 288 060 85";
-   private const String Valid21CharacterTemporaryInseeNumber = "8-21-09-99-010-133-71";
+   private const String ValidUnformattedInseeNumber = "188121884813236";
+   private const String AltValidUnformattedInseeNumber = "255102445387701";
+   private const String ValidUnformattedInseeNumberCorsica = "112072A28806058";
+   private const String ValidUnformattedLowercaseInseeNumberCorsica = "112072a28806058";
+   private const String AltValidUnformattedInseeNumberCorsica = "112072B28806085";
+   private const String ValidUnformattedTemporaryInseeNumber = "821099901013371";
+   private const String ValidFormattedInseeNumber = "1 88 12 18 848 132 36";
+   private const String AltValidFormattedInseeNumber = "2 55 10 24 453 877 01";
+   private const String ValidFormattedInseeNumberCorsica = "1 12 07 2A 288 060 58";
+   private const String AltValidFormattedInseeNumberCorsica = "1 12 07 2B 288 060 85";
+   private const String AltValidFormattedLowercaseInseeNumberCorsica = "1 12 07 2b 288 060 85";
+   private const String ValidFormattedTemporaryInseeNumber = "8-21-09-99-010-133-71";
 
    private static String GetInseeWithValidCheckDigits(
       Char gender = Chars.DigitOne,
@@ -35,7 +45,7 @@ public class FrInseeNumberTests
       {
          "2A" => "19",
          "2B" => "18",
-         _ => department
+         _ => department,
       };
       var work = $"{gender}{year}{month}{checksumDepartment}{commune}{registrationOrder}";
       var checkSum = GetCheckSum(work);
@@ -63,21 +73,23 @@ public class FrInseeNumberTests
 
    private static String GetRawInsee(String insee)
       => insee.Length == 15
-      ? insee
-      : insee[..1] + insee[2..4] + insee[5..7] + insee[8..10] + insee[11..14] + insee[15..18] + insee[19..];
+      ? insee.ToUpperInvariant()
+      : (insee[..1] + insee[2..4] + insee[5..7] + insee[8..10] + insee[11..14] + insee[15..18] + insee[19..]).ToUpperInvariant();
 
    public static TheoryData<String> ValidInseeNumbers =>
    [
-      Valid15CharacterInseeNumber,
-      AltValid15CharacterInseeNumber,
-      Valid15CharacterInseeNumberCorsica,
-      AltValid15CharacterInseeNumberCorsica,
-      Valid15CharacterTemporaryInseeNumber,
-      Valid21CharacterInseeNumber,
-      AltValid21CharacterInseeNumber,
-      Valid21CharacterInseeNumberCorsica,
-      AltValid21CharacterInseeNumberCorsica,
-      Valid21CharacterTemporaryInseeNumber,
+      ValidUnformattedInseeNumber,
+      AltValidUnformattedInseeNumber,
+      ValidUnformattedInseeNumberCorsica,
+      AltValidUnformattedInseeNumberCorsica,
+      ValidUnformattedTemporaryInseeNumber,
+      ValidFormattedInseeNumber,
+      AltValidFormattedInseeNumber,
+      ValidFormattedInseeNumberCorsica,
+      AltValidFormattedInseeNumberCorsica,
+      ValidFormattedTemporaryInseeNumber,
+      ValidUnformattedLowercaseInseeNumberCorsica,
+      AltValidFormattedLowercaseInseeNumberCorsica,
    ];
 
    public static TheoryData<Char> ValidGenders =>
@@ -96,9 +108,9 @@ public class FrInseeNumberTests
          var formatOptions = new Boolean[] { true, false };
          var departmentCodes = FrDepartmentCodes.GetAllDepartmentCodes();
 
-         foreach(var opt in formatOptions)
+         foreach (var opt in formatOptions)
          {
-            foreach(var code in departmentCodes)
+            foreach (var code in departmentCodes)
             {
                data.Add(code, opt);
             }
@@ -113,7 +125,7 @@ public class FrInseeNumberTests
       // Standard months
       { "01", false },
       { "12", false },
-   
+
       // Special month codes for unknown/incomplete DOB
       { "13", false },     // Unknown month (birth month not known)
       { "20", false },     // Incomplete DOB range start
@@ -124,7 +136,7 @@ public class FrInseeNumberTests
       // Standard months
       { "01", true },
       { "12", true },
-   
+
       // Special month codes for unknown/incomplete DOB
       { "13", true },      // Unknown month (birth month not known)
       { "20", true },      // Incomplete DOB range start
@@ -142,48 +154,47 @@ public class FrInseeNumberTests
       new String('1', 100)    // Very long string
    ];
 
-   public static TheoryData<String> InvalidCharacterValues =>
-   [
-      "A88121884813236",               // Non-digit character 'A'
-      "1 8121884813236",               // Non-digit character ' '
-      "18-121884813236",               // Non-digit character '-'
-      "188=21884813236",               // Non-digit character '='
-      "1881B1884813236",               // Non-digit character 'B'
-      "18812C884813236",               // Non-digit character 'C'
-      "188121a84813236",               // Non-digit character 'a' - 'A' would be valid in this location but not 'a'
-      "1881218b4813236",               // Non-digit character 'b'
-      "18812188~813236",               // Non-digit character '~'
-      "188121884\u215313236",          // Non-digit character Unicode fraction 1/3
-      "1881218848\u00D63236",          // Invalid character unicode O with umlaut
-      "18812188481A236",               // Non-digit character 'A'
-      "188121884813 36",               // Non-digit character ' '
-      "1881218848132-6",               // Non-digit character '-'
-      "18812188481323=",               // Non-digit character '='
+   // Values that will report an invalid character encountered
+   public static TheoryData<String, Int32> InvalidCharacterValues = new()
+   {
+      // Unformatted values
+      { ".88121884813236", 0 },              // Non-digit character '.'
+      { "1 8121884813236", 1 },              // Non-digit character ' '
+      { "18A121884813236", 2 },              // Non-digit character 'A'
+      { "188Z21884813236", 3 },              // Non-digit character 'Z'
+      { "1881^1884813236", 4 },              // Non-digit character '^'
+      { "18812a884813236", 5 },              // Non-digit character 'a'
+      { "188121z84813236", 6 },              // Non-digit character 'z'
+      { "1881218~4813236", 7 },              // Non-digit character '~'
+      { "18812188\u2153803236", 8 },         // Non-digit character Unicode fraction 1/3
+      { "188121884\u00D603236", 9 },         // Invalid character unicode O with umlaut
+      { "1881218848\u0BE63236", 10 },        // Invalid character unicode Tamil digit 0
+      { "18812188481.236", 11 },             // Non-digit character '.'
+      { "188121884813 36", 12 },             // Non-digit character ' '
+      { "1881218848132A6", 13 },             // Non-digit character 'A'
+      { "18812188481323Z", 14 },             // Non-digit character 'Z'
 
-      "A 88 12 18 848 132 36",         // Non-digit character 'A'
-      "1  8 12 18 848 132 36",         // Non-digit character ' '
-      "1 8- 12 18 848 132 36",         // Non-digit character '-'
-      "1 88 =2 18 848 132 36",         // Non-digit character '='
-      "1 88 1B 18 848 132 36",         // Non-digit character 'B'
-      "1 88 12 C8 848 132 36",         // Non-digit character 'C'
-      "1 88 12 1a 848 132 36",         // Non-digit character 'a' - 'A' would be valid in this location but not 'a'
-      "1 88 12 18 b48 132 36",         // Non-digit character 'b'
-      "1 88 12 18 8~8 132 36",         // Non-digit character '~'
-      "1 88 12 18 84\u2153 132 36",    // Non-digit character Unicode fraction 1/3
-      "1 88 12 18 848 \u00D632 36",    // Invalid character unicode O with umlaut
-      "1 88 12 18 848 1A2 36",         // Non-digit character 'A'
-      "1 88 12 18 848 13  36",         // Non-digit character ' '
-      "1 88 12 18 848 132 -6",         // Non-digit character '-'
-      "1 88 12 18 848 132 3=",         // Non-digit character '='
-
-      "112072a28806058",               // lowercase 'a' in Corsican department position
-      "112072b28806085",               // lowercase 'b' in Corsican department position
-      "1 12 07 2a 288 060 58",         // lowercase 'a' formatted
-      "1 12 07 2b 288 060 85",         // lowercase 'b' formatted
-   ];
+      // Formatted values
+      { ". 88 12 18 848 132 36", 0 },        // Non-digit character '.'
+      { "1  8 12 18 848 132 36", 2 },        // Non-digit character ' '
+      { "1 8A 12 18 848 132 36", 3 },        // Non-digit character 'A'
+      { "1 88 Z2 18 848 132 36", 5 },        // Non-digit character 'Z'
+      { "1 88 1^ 18 848 132 36", 6 },        // Non-digit character '^'
+      { "1 88 12 a8 848 132 36", 8 },        // Non-digit character 'a'
+      { "1 88 12 1z 848 132 36", 9 },        // Non-digit character 'z'
+      { "1 88 12 18 ~48 132 36", 11 },       // Non-digit character '~'
+      { "1 88 12 18 8\u21538 032 36", 12 },  // Non-digit character Unicode fraction 1/3
+      { "1 88 12 18 84\u00D6 032 36", 13 },  // Invalid character unicode O with umlaut
+      { "1 88 12 18 848 \u0BE632 36", 15 },  // Invalid character unicode Tamil digit 0
+      { "1 88 12 18 848 1.2 36", 16 },       // Non-digit character '.'
+      { "1 88 12 18 848 13  36", 17 },       // Non-digit character ' '
+      { "1 88 12 18 848 132 A6", 19 },       // Non-digit character 'A'
+      { "1 88 12 18 848 132 3Z", 20 },       // Non-digit character 'Z'
+   };
 
    public static TheoryData<String> InvalidCheckDigitValues =>
    [
+      // Unformatted
       "188121884812236",               // 188121884813236 with single digit transcription error, 3 -> 2
       "255102545387701",               // 255102445387701 with single digit transcription error, 4 -> 5
       "112072A28806059",               // 112072A28806058 with check digit transcription error, 8 -> 9
@@ -196,6 +207,7 @@ public class FrInseeNumberTests
       "188121884813298",               // 188121884813236 with invalid check digits -> 98
       "255102445387799",               // 255102445387701 with invalid check digits -> 99
 
+      // Formatted
       "1 88 12 18 848 122 36",         // 188121884813236 with single digit transcription error, 3 -> 2
       "2 55 10 25 453 877 01",         // 255102445387701 with single digit transcription error, 4 -> 5
       "1 12 07 2A 288 060 59",         // 112072A28806058 with check digit transcription error, 8 -> 9
@@ -209,31 +221,94 @@ public class FrInseeNumberTests
       "2 55 10 24 453 877 99",         // 255102445387701 with invalid check digits -> 99
    ];
 
-   public static TheoryData<String> InvalidSeparatorValues =>
-   [
-      "1088 12 18 848 132 36",
-      "1188 12 18 848 132 36",
-      "1288 12 18 848 132 36",
-      "1388 12 18 848 132 36",
-      "1488 12 18 848 132 36",
-      "1588 12 18 848 132 36",
-      "1688 12 18 848 132 36",
-      "1788 12 18 848 132 36",
-      "1888 12 18 848 132 36",
-      "1988 12 18 848 132 36",
+   public static TheoryData<String, Int32> InvalidSeparatorValues = new()
+   {
+      // First separator position
+      { "1088 12 18 848 132 36", 1 },
+      { "1188 12 18 848 132 36", 1 },
+      { "1288 12 18 848 132 36", 1 },
+      { "1388 12 18 848 132 36", 1 },
+      { "1488 12 18 848 132 36", 1 },
+      { "1588 12 18 848 132 36", 1 },
+      { "1688 12 18 848 132 36", 1 },
+      { "1788 12 18 848 132 36", 1 },
+      { "1888 12 18 848 132 36", 1 },
+      { "1988 12 18 848 132 36", 1 },
 
-      "1 88012 18 848 132 36",
-      "1 88 12018 848 132 36",
-      "1 88 12 180848 132 36",
-      "1 88 12 18 8480132 36",
-      "1 88 12 18 848 132036",
+      // Second separator position
+      { "1 88012 18 848 132 36", 4 },
+      { "1 88112 18 848 132 36", 4 },
+      { "1 88212 18 848 132 36", 4 },
+      { "1 88312 18 848 132 36", 4 },
+      { "1 88412 18 848 132 36", 4 },
+      { "1 88512 18 848 132 36", 4 },
+      { "1 88612 18 848 132 36", 4 },
+      { "1 88712 18 848 132 36", 4 },
+      { "1 88812 18 848 132 36", 4 },
+      { "1 88912 18 848 132 36", 4 },
 
-      "1.88-12.18.848.132.36",
-      "1 88 12.18 848 132 36",
-      "1 88 12 18.848 132 36",
-      "1 88 12 18 848.132 36",
-      "1 88 12 18 848 132*36",
-   ];
+      // Third separator position
+      { "1 88 12018 848 132 36", 7 },
+      { "1 88 12118 848 132 36", 7 },
+      { "1 88 12218 848 132 36", 7 },
+      { "1 88 12318 848 132 36", 7 },
+      { "1 88 12418 848 132 36", 7 },
+      { "1 88 12518 848 132 36", 7 },
+      { "1 88 12618 848 132 36", 7 },
+      { "1 88 12718 848 132 36", 7 },
+      { "1 88 12818 848 132 36", 7 },
+      { "1 88 12918 848 132 36", 7 },
+
+      // Fourth separator position
+      { "1 88 12 180848 132 36", 10 },
+      { "1 88 12 181848 132 36", 10 },
+      { "1 88 12 182848 132 36", 10 },
+      { "1 88 12 183848 132 36", 10 },
+      { "1 88 12 184848 132 36", 10 },
+      { "1 88 12 185848 132 36", 10 },
+      { "1 88 12 186848 132 36", 10 },
+      { "1 88 12 187848 132 36", 10 },
+      { "1 88 12 188848 132 36", 10 },
+      { "1 88 12 189848 132 36", 10 },
+
+      // Fifth separator position
+      { "1 88 12 18 8480132 36", 14 },
+      { "1 88 12 18 8481132 36", 14 },
+      { "1 88 12 18 8482132 36", 14 },
+      { "1 88 12 18 8483132 36", 14 },
+      { "1 88 12 18 8484132 36", 14 },
+      { "1 88 12 18 8485132 36", 14 },
+      { "1 88 12 18 8486132 36", 14 },
+      { "1 88 12 18 8487132 36", 14 },
+      { "1 88 12 18 8488132 36", 14 },
+      { "1 88 12 18 8489132 36", 14 },
+
+      // Sixth separator position
+      { "1 88 12 18 848 132036", 18 },
+      { "1 88 12 18 848 132136", 18 },
+      { "1 88 12 18 848 132236", 18 },
+      { "1 88 12 18 848 132336", 18 },
+      { "1 88 12 18 848 132436", 18 },
+      { "1 88 12 18 848 132536", 18 },
+      { "1 88 12 18 848 132636", 18 },
+      { "1 88 12 18 848 132736", 18 },
+      { "1 88 12 18 848 132836", 18 },
+      { "1 88 12 18 848 132936", 18 },
+
+      // Mixed separators - digits
+      { "1 88012 18 848 132 36", 4 },
+      { "1 88 12018 848 132 36", 7 },
+      { "1 88 12 180848 132 36", 10 },
+      { "1 88 12 18 8480132 36", 14 },
+      { "1 88 12 18 848 132036", 18 },
+
+      // Mixed separators
+      { "1.88-12.18.848.132.36", 4 },
+      { "1 88 12.18 848 132 36", 7 },
+      { "1 88 12 18.848 132 36", 10 },
+      { "1 88 12 18 848.132 36", 14 },
+      { "1 88 12 18 848 132*36", 18 },
+   };
 
    public static TheoryData<Char> InvalidGenderValues =>
    [
@@ -246,12 +321,14 @@ public class FrInseeNumberTests
 
    public static TheoryData<String, Boolean> InvalidMonthValues = new()
    {
+      // Unformatted
       { "00", false },
       { "14", false },
       { "19", false },
       { "43", false },
       { "49", false },
 
+      // Formatted
       { "00", true },
       { "14", true },
       { "19", true },
@@ -261,6 +338,7 @@ public class FrInseeNumberTests
 
    public static TheoryData<String, Boolean> InvalidDepartmentCodes = new()
    {
+      // Unformatted
       { "00", false },
       { "20", false },
       { "97", false },
@@ -270,6 +348,7 @@ public class FrInseeNumberTests
       { "978", false },    // Invalid overseas department
       { "979", false },    // Invalid overseas department
 
+      // Formatted
       { "00", true },
       { "20", true },
       { "97", true },
@@ -279,6 +358,55 @@ public class FrInseeNumberTests
       { "978", true },     // Invalid overseas department
       { "979", true },     // Invalid overseas department
    };
+
+   private static InvalidLength GetInvalidLengthResult(String value)
+      => new(
+         Messages.FrInseeNumberInvalidLength,
+         value.Length,
+         FrInseeNumber.GetValidLengthDefinitions());
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      String value,
+      Int32 position)
+      => new(
+         Messages.FrInseeNumberInvalidCharacter,
+         value[position],
+         position);
+
+   private static InvalidChecksum GetInvalidChecksumResult()
+      => new(
+         Messages.FrInseeNumberInvalidCheckDigits,
+         FrInseeNumber.CheckDigitAlgorithmName);
+
+   private static InvalidSeparator GetInvalidSeparatorResult(
+      String value,
+      Int32 position)
+      => new(Messages.FrInseeNumberInvalidSeparator, value[position], position);
+
+   private static InvalidGender GetInvalidGenderResult(String value)
+      => new(
+         Messages.FrInseeNumberInvalidGender,
+         value[0].ToString());
+
+   private static InvalidMonth GetInvalidMonthResult(String value)
+      => new(
+         Messages.FrInseeNumberInvalidMonth,
+         value.Length == 15 ? value[3..5] : value[5..7]);
+
+   private static InvalidFrInseeDepartment GetInvalidFrInseeDepartmentResult(String value)
+      => new(
+         Messages.FrInseeNumberInvalidDepartment,
+         FrInseeNumber.GetDepartmentCode(value));
+
+   #region Constants Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void FrInseeNumber_CheckDigitAlgorithmName_ShouldHaveExpectedValue()
+      => FrInseeNumber.CheckDigitAlgorithmName.Should().Be("Modulus 97");
+
+   #endregion
 
    #region Constructor Tests
    // ==========================================================================
@@ -354,47 +482,79 @@ public class FrInseeNumberTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new FrInseeNumber(value))
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberEmpty + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new FrInseeNumber(value))
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidLength + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
-      => FluentActions
+   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new FrInseeNumber(value))
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new FrInseeNumber(value))
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidCheckDigits + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidCheckDigits);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
-      => FluentActions
+   public void FrInseeNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => new FrInseeNumber(value))
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidGenderValues))]
@@ -402,13 +562,13 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(gender: gender);
+      LocalValidationError expected = GetInvalidGenderResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new FrInseeNumber(value))
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidGender + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidGender);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -419,13 +579,13 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
+      LocalValidationError expected = GetInvalidMonthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new FrInseeNumber(value))
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidMonth + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidMonth);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -436,13 +596,13 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
+      LocalValidationError expected = GetInvalidFrInseeDepartmentResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => new FrInseeNumber(value))
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidDepartment + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidDepartment);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -460,7 +620,7 @@ public class FrInseeNumberTests
       // Arrange.
       var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
       var sut = new FrInseeNumber(value);
-      var expected = Int32.Parse(month);
+      var expected = Int32.Parse(month, CultureInfo.InvariantCulture);
 
       // Act/assert.
       sut.BirthMonth.Should().Be(expected);
@@ -486,7 +646,7 @@ public class FrInseeNumberTests
       // Arrange.
       var value = GetInseeWithValidCheckDigits(year: year, formatted: formatted);
       var sut = new FrInseeNumber(value);
-      var expected = Int32.Parse(year);
+      var expected = Int32.Parse(year, CultureInfo.InvariantCulture);
 
       // Act/assert.
       sut.BirthYear.Should().Be(expected);
@@ -537,25 +697,73 @@ public class FrInseeNumberTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(Chars.DigitOne, BinaryGender.Male, true)]
-   [InlineData(Chars.DigitTwo, BinaryGender.Female, true)]
-   [InlineData(Chars.DigitSeven, BinaryGender.Male, true)]
-   [InlineData(Chars.DigitEight, BinaryGender.Female, true)]
-   [InlineData(Chars.DigitOne, BinaryGender.Male, false)]
-   [InlineData(Chars.DigitTwo, BinaryGender.Female, false)]
-   [InlineData(Chars.DigitSeven, BinaryGender.Male, false)]
-   [InlineData(Chars.DigitEight, BinaryGender.Female, false)]
-   public void FrInseeNumber_Gender_ShouldReturnExpectedValue(
+   [InlineData(Chars.DigitOne, true)]
+   [InlineData(Chars.DigitSeven, true)]
+   [InlineData(Chars.DigitOne, false)]
+   [InlineData(Chars.DigitSeven, false)]
+   public void FrInseeNumber_Gender_ShouldReturnMale_WhenGenderCodeIsOdd(
       Char gender,
-      BinaryGender expectedGender,
       Boolean formatted)
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(gender, formatted: formatted);
       var sut = new FrInseeNumber(value);
+      Gender.BinaryGender expected = default(Gender.Male);
 
-      // Act/arrange
-      sut.Gender.Should().Be(expectedGender);
+      // Act/assert.
+      sut.Gender.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData(Chars.DigitTwo, true)]
+   [InlineData(Chars.DigitEight, true)]
+   [InlineData(Chars.DigitTwo, false)]
+   [InlineData(Chars.DigitEight, false)]
+   public void FrInseeNumber_Gender_ShouldReturnFemale_WhenGenderCodeIsEven(
+      Char gender,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender, formatted: formatted);
+      var sut = new FrInseeNumber(value);
+      Gender.BinaryGender expected = default(Gender.Female);
+
+      // Act/assert.
+      sut.Gender.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region IdentifierType Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData(Chars.DigitOne)]
+   [InlineData(Chars.DigitTwo)]
+   public void FrInseeNumber_IdentifierType_ShouldReturnExpectedValue_WhenValueIsPermanentInsee(Char gender)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender);
+      var sut = new FrInseeNumber(value);
+      FrInseeNumber.IdentifierCategory expected = default(FrIdentifierType.Insee);
+
+      // Act/assert.
+      sut.IdentifierType.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData(Chars.DigitSeven)]
+   [InlineData(Chars.DigitEight)]
+   public void FrInseeNumber_IdentifierType_ShouldReturnExpectedValue_WhenValueIsTemporaryInsee(Char gender)
+   {
+      // Arrange.
+      var value = GetInseeWithValidCheckDigits(gender);
+      var sut = new FrInseeNumber(value);
+      FrInseeNumber.IdentifierCategory expected = default(FrIdentifierType.TemporaryInsee);
+
+      // Act/assert.
+      sut.IdentifierType.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -582,31 +790,8 @@ public class FrInseeNumberTests
       var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
       var sut = new FrInseeNumber(value);
 
-      // Act/arrange
+      // Act/assert.
       sut.IsBornAbroad.Should().Be(expectedResult);
-   }
-
-   #endregion
-
-   #region IsTemporary Property Tests
-   // ==========================================================================
-   // ==========================================================================
-
-   [Theory]
-   [InlineData(Chars.DigitOne, false)]
-   [InlineData(Chars.DigitTwo, false)]
-   [InlineData(Chars.DigitSeven, true)]
-   [InlineData(Chars.DigitEight, true)]
-   public void FrInseeNumber_IsTemporary_ShouldReturnExpectedValue(
-      Char gender,
-      Boolean expected)
-   {
-      // Arrange.
-      var value = GetInseeWithValidCheckDigits(gender);
-      var sut = new FrInseeNumber(value);
-
-      // Act/arrange
-      sut.IsTemporaryInsee.Should().Be(expected);
    }
 
    #endregion
@@ -616,10 +801,10 @@ public class FrInseeNumberTests
    // ==========================================================================
 
    [Theory]
-   [InlineData(Valid15CharacterInseeNumber, Valid15CharacterInseeNumber)]
-   [InlineData(Valid21CharacterInseeNumber, Valid15CharacterInseeNumber)]
-   [InlineData(Valid15CharacterInseeNumberCorsica, Valid15CharacterInseeNumberCorsica)]
-   [InlineData(Valid21CharacterInseeNumberCorsica, Valid15CharacterInseeNumberCorsica)]
+   [InlineData(ValidUnformattedInseeNumber, ValidUnformattedInseeNumber)]
+   [InlineData(ValidFormattedInseeNumber, ValidUnformattedInseeNumber)]
+   [InlineData(ValidUnformattedInseeNumberCorsica, ValidUnformattedInseeNumberCorsica)]
+   [InlineData(ValidFormattedInseeNumberCorsica, ValidUnformattedInseeNumberCorsica)]
    public void FrInseeNumber_Value_ShouldReturnValidatedInseeNumber(
       String value,
       String expected)
@@ -641,31 +826,28 @@ public class FrInseeNumberTests
    public void FrInseeNumber_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid15CharacterInseeNumber;
+      var value = ValidUnformattedInseeNumber;
       var sut = new FrInseeNumber(value);
 
       // Act.
       String str = sut;
 
       // Assert.
-      str.Should().NotBeNullOrEmpty();
-      str.Should().Be(value);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
    public void FrInseeNumber_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = Valid21CharacterInseeNumberCorsica;
+      var value = ValidFormattedInseeNumberCorsica;
       var sut = new FrInseeNumber(value);
-      var expected = GetRawInsee(value);
 
       // Act.
       var str = (String)sut;
 
       // Assert.
-      str.Should().NotBeNullOrEmpty();
-      str.Should().Be(expected);
+      str.Should().Be(sut.Value);
    }
 
    [Fact]
@@ -766,47 +948,79 @@ public class FrInseeNumberTests
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (FrInseeNumber)value)
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberEmpty + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.Empty);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (FrInseeNumber)value)
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidLength + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
-      => FluentActions
+   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (FrInseeNumber)value)
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidCharacter + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidCharacter);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
-      => FluentActions
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (FrInseeNumber)value)
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidCheckDigits + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidCheckDigits);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(String value)
-      => FluentActions
+   public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
          .Invoking(() => _ = (FrInseeNumber)value)
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidSeparator + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidSeparator);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidGenderValues))]
@@ -814,13 +1028,13 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(gender: gender);
+      LocalValidationError expected = GetInvalidGenderResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (FrInseeNumber)value)
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidGender + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidGender);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -831,13 +1045,13 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
+      LocalValidationError expected = GetInvalidMonthResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (FrInseeNumber)value)
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidMonth + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidMonth);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -848,13 +1062,13 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
+      LocalValidationError expected = GetInvalidFrInseeDepartmentResult(value);
 
       // Act/assert.
       FluentActions
          .Invoking(() => _ = (FrInseeNumber)value)
-         .Should().Throw<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidDepartment + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidDepartment);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -867,8 +1081,8 @@ public class FrInseeNumberTests
    public void FrInseeNumber_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
-      var sut2 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut1 = new FrInseeNumber(ValidUnformattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidUnformattedInseeNumber);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -878,8 +1092,8 @@ public class FrInseeNumberTests
    public void FrInseeNumber_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
-      var sut2 = new FrInseeNumber(AltValid15CharacterInseeNumber);
+      var sut1 = new FrInseeNumber(ValidUnformattedInseeNumber);
+      var sut2 = new FrInseeNumber(AltValidUnformattedInseeNumber);
 
       // Act/assert.
       (sut1 == sut2).Should().BeFalse();
@@ -889,8 +1103,41 @@ public class FrInseeNumberTests
    public void FrInseeNumber_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 15 and 21 character versions for same person should still be equal.
-      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
-      var sut2 = new FrInseeNumber(Valid21CharacterInseeNumber);
+      var sut1 = new FrInseeNumber(ValidUnformattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FrInseeNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', '.'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FrInseeNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'A'));
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'a'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FrInseeNumber_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyByDepartmentCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumberCorsica);
+      var sut2 = new FrInseeNumber(ValidUnformattedLowercaseInseeNumberCorsica);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -906,8 +1153,8 @@ public class FrInseeNumberTests
    public void FrInseeNumber_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
-      var sut2 = new FrInseeNumber(AltValid15CharacterInseeNumber);
+      var sut1 = new FrInseeNumber(ValidUnformattedInseeNumber);
+      var sut2 = new FrInseeNumber(AltValidUnformattedInseeNumber);
 
       // Act/assert.
       (sut1 != sut2).Should().BeTrue();
@@ -917,8 +1164,8 @@ public class FrInseeNumberTests
    public void FrInseeNumber_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 15 and 21 character versions for same person should still be equal.
-      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
-      var sut2 = new FrInseeNumber(Valid21CharacterInseeNumber);
+      var sut1 = new FrInseeNumber(ValidUnformattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -928,8 +1175,41 @@ public class FrInseeNumberTests
    public void FrInseeNumber_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
-      var sut2 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut1 = new FrInseeNumber(ValidUnformattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidUnformattedInseeNumber);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void FrInseeNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', '.'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void FrInseeNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'A'));
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'a'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void FrInseeNumber_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyByDepartmentCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumberCorsica);
+      var sut2 = new FrInseeNumber(ValidUnformattedLowercaseInseeNumberCorsica);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -946,16 +1226,13 @@ public class FrInseeNumberTests
    public void FrInseeNumber_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expectedValue = new FrInseeNumber(value);
+      LocalCreateResult expected = new FrInseeNumber(value);
 
       // Act.
       var result = FrInseeNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -964,16 +1241,13 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(gender: gender);
-      var expectedValue = new FrInseeNumber(value);
+      LocalCreateResult expected = new FrInseeNumber(value);
 
       // Act.
       var result = FrInseeNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -984,16 +1258,13 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
-      var expectedValue = new FrInseeNumber(value);
+      LocalCreateResult expected = new FrInseeNumber(value);
 
       // Act.
       var result = FrInseeNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1004,86 +1275,91 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
-      var expectedValue = new FrInseeNumber(value);
+      LocalCreateResult expected = new FrInseeNumber(value);
 
       // Act.
       var result = FrInseeNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeTrue();
-      result.Value.Should().BeEquivalentTo(expectedValue);
-      result.ValidationFailure.Should().Be(default);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void FrInseeNumber_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
+
       // Act.
       var result = FrInseeNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.Empty);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void FrInseeNumber_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
+
       // Act.
       var result = FrInseeNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.InvalidLength);
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<LocalValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
    }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void FrInseeNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
+   public void FrInseeNumber_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacterWhereDigitExpected(
+      String value,
+      Int32 position)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
+
       // Act.
       var result = FrInseeNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.InvalidCharacter);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void FrInseeNumber_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigits(String value)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
+
       // Act.
       var result = FrInseeNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.InvalidCheckDigits);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void FrInseeNumber_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(String value)
+   public void FrInseeNumber_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
    {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value, position);
+
       // Act.
       var result = FrInseeNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.InvalidSeparator);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1092,30 +1368,30 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(gender: gender);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidGenderResult(value);
+
+      // Act.
       var result = FrInseeNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.InvalidGender);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidMonthValues))]
-   public void FrInseeNumber_Create_ShouldReturnInvaliMonthValidationResult_WhenValueHasInvalidMonth(
+   public void FrInseeNumber_Create_ShouldReturnInvalidMonthValidationResult_WhenValueHasInvalidMonth(
       String month,
       Boolean formatted)
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidMonthResult(value);
+
+      // Act.
       var result = FrInseeNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.InvalidMonth);
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1126,13 +1402,13 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidFrInseeDepartmentResult(value);
+
+      // Act.
       var result = FrInseeNumber.Create(value);
 
       // Assert.
-      result.Should().NotBeNull();
-      result.IsSuccess.Should().BeFalse();
-      result.Value.Should().Be(null);
-      result.ValidationFailure.Should().Be(FrInseeNumberValidationResult.InvalidDepartment);
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -1145,8 +1421,8 @@ public class FrInseeNumberTests
    public void FrInseeNumber_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
-      var sut2 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut1 = new FrInseeNumber(ValidUnformattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidUnformattedInseeNumber);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -1156,8 +1432,8 @@ public class FrInseeNumberTests
    public void FrInseeNumber_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
-      var sut2 = new FrInseeNumber(AltValid15CharacterInseeNumber);
+      var sut1 = new FrInseeNumber(ValidUnformattedInseeNumber);
+      var sut2 = new FrInseeNumber(AltValidUnformattedInseeNumber);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeFalse();
@@ -1167,8 +1443,61 @@ public class FrInseeNumberTests
    public void FrInseeNumber_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 15 and 21 character versions for same person should still be equal.
-      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
-      var sut2 = new FrInseeNumber(Valid21CharacterInseeNumber);
+      var sut1 = new FrInseeNumber(ValidUnformattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FrInseeNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', '.'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FrInseeNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'A'));
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'a'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void FrInseeNumber_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new FrInseeNumber(ValidFormattedInseeNumber);
+
+      // Act/assert.
+      sut.Equals(ValidFormattedInseeNumber).Should().BeFalse();
+   }
+
+   [Fact]
+   public void FrInseeNumber_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new FrInseeNumber(ValidFormattedInseeNumber);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
+   }
+
+   [Fact]
+   public void FrInseeNumber_Equals_ShouldReturnTrue_WhenValuesDifferOnlyByDepartmentCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumberCorsica);
+      var sut2 = new FrInseeNumber(ValidUnformattedLowercaseInseeNumberCorsica);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -1184,8 +1513,8 @@ public class FrInseeNumberTests
    public void FrInseeNumber_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
    {
       // Arrange.
-      var sut = new FrInseeNumber(Valid15CharacterInseeNumber);
-      var expected = Valid21CharacterInseeNumber;
+      var sut = new FrInseeNumber(ValidUnformattedInseeNumber);
+      var expected = ValidFormattedInseeNumber;
 
       // Act.
       var str = sut.Format();
@@ -1198,9 +1527,9 @@ public class FrInseeNumberTests
    public void FrInseeNumber_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
    {
       // Arrange.
-      var sut = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut = new FrInseeNumber(ValidUnformattedInseeNumber);
       var mask = "_______________";
-      var expected = Valid15CharacterInseeNumber;
+      var expected = ValidUnformattedInseeNumber;
 
       // Act.
       var str = sut.Format(mask);
@@ -1213,7 +1542,7 @@ public class FrInseeNumberTests
    public void FrInseeNumber_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
    {
       // Arrange.
-      var sut = new FrInseeNumber(Valid15CharacterInseeNumberCorsica);
+      var sut = new FrInseeNumber(ValidUnformattedInseeNumberCorsica);
       String mask = null!;
 
       // Act/assert.
@@ -1231,7 +1560,7 @@ public class FrInseeNumberTests
    public void FrInseeNumber_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
    {
       // Arrange.
-      var sut = new FrInseeNumber(Valid21CharacterInseeNumberCorsica);
+      var sut = new FrInseeNumber(ValidFormattedInseeNumberCorsica);
       var expectedMessage = Messages.FormatMaskEmpty + "*";
       var act = () => _ = sut.Format(mask);
 
@@ -1251,8 +1580,8 @@ public class FrInseeNumberTests
    public void FrInseeNumber_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
-      var sut2 = new FrInseeNumber(Valid15CharacterInseeNumber);
+      var sut1 = new FrInseeNumber(ValidUnformattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidUnformattedInseeNumber);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1266,8 +1595,8 @@ public class FrInseeNumberTests
    public void FrInseeNumber_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
-      var sut2 = new FrInseeNumber(AltValid15CharacterInseeNumber);
+      var sut1 = new FrInseeNumber(ValidUnformattedInseeNumber);
+      var sut2 = new FrInseeNumber(AltValidUnformattedInseeNumber);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1281,8 +1610,53 @@ public class FrInseeNumberTests
    public void FrInseeNumber_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 15 and 21 character versions for same person should still be equal.
-      var sut1 = new FrInseeNumber(Valid15CharacterInseeNumber);
-      var sut2 = new FrInseeNumber(Valid21CharacterInseeNumber);
+      var sut1 = new FrInseeNumber(ValidUnformattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void FrInseeNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber);
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', '.'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void FrInseeNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'A'));
+      var sut2 = new FrInseeNumber(ValidFormattedInseeNumber.Replace(' ', 'a'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void FrInseeNumber_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyByDepartmentCase()
+   {
+      // Arrange.
+      var sut1 = new FrInseeNumber(ValidFormattedInseeNumberCorsica);
+      var sut2 = new FrInseeNumber(ValidUnformattedLowercaseInseeNumberCorsica);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1306,8 +1680,8 @@ public class FrInseeNumberTests
    public void FrInseeNumber_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var sut1 = new FrInseeNumber(Valid15CharacterTemporaryInseeNumber);
-      var sut2 = new FrInseeNumber(Valid15CharacterTemporaryInseeNumber);
+      var sut1 = new FrInseeNumber(ValidUnformattedTemporaryInseeNumber);
+      var sut2 = new FrInseeNumber(ValidUnformattedTemporaryInseeNumber);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
@@ -1341,7 +1715,16 @@ public class FrInseeNumberTests
    [Theory]
    [MemberData(nameof(ValidInseeNumbers))]
    public void FrInseeNumber_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
-      => FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.ValidationPassed);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = FrInseeNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(ValidGenders))]
@@ -1349,9 +1732,13 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(gender: gender);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.ValidationPassed);
+      // Act.
+      var result = FrInseeNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1362,9 +1749,13 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.ValidationPassed);
+      // Act.
+      var result = FrInseeNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1375,35 +1766,91 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
+      LocalValidationResult expected = default(ValidValue);
 
-      // Act/assert.
-      FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.ValidationPassed);
+      // Act.
+      var result = FrInseeNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void FrInseeNumber_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String value)
-      => FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.Empty);
+   {
+      // Arrange.
+      LocalValidationResult expected = default(EmptyValue);
+
+      // Act.
+      var result = FrInseeNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
    public void FrInseeNumber_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
-      => FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidLength);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidLengthResult(value);
+
+      // Act.
+      var result = FrInseeNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalValidationResult>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void FrInseeNumber_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacterWhereDigitExpected(String value)
-      => FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidCharacter);
+   public void FrInseeNumber_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacterWhereDigitExpected(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidCharacterResult(value, position);
+
+      // Act.
+      var result = FrInseeNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
    public void FrInseeNumber_Validate_ShouldReturnInvalidCheckDigits_WhenValueHasInvalidCheckDigits(String value)
-      => FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidCheckDigits);
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidChecksumResult();
+
+      // Act.
+      var result = FrInseeNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void FrInseeNumber_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(String value)
-      => FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidSeparator);
+   public void FrInseeNumber_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidSeparatorResult(value, position);
+
+      // Act.
+      var result = FrInseeNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
 
    [Theory]
    [MemberData(nameof(InvalidGenderValues))]
@@ -1411,9 +1858,13 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(gender: gender);
+      LocalValidationResult expected = GetInvalidGenderResult(value);
 
-      // Act/assert.
-      FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidGender);
+      // Act.
+      var result = FrInseeNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1424,9 +1875,13 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
+      LocalValidationResult expected = GetInvalidMonthResult(value);
 
-      // Act/assert.
-      FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidMonth);
+      // Act.
+      var result = FrInseeNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1437,9 +1892,13 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
+      LocalValidationResult expected = GetInvalidFrInseeDepartmentResult(value);
 
-      // Act/assert.
-      FrInseeNumber.Validate(value).Should().Be(FrInseeNumberValidationResult.InvalidDepartment);
+      // Act.
+      var result = FrInseeNumber.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
    }
 
    #endregion
@@ -1452,7 +1911,7 @@ public class FrInseeNumberTests
    public void FrInseeNumber_JsonSerialization_ShouldRoundTripSuccessfully()
    {
       // Arrange.
-      var sut = new FrInseeNumber(Valid15CharacterInseeNumberCorsica);
+      var sut = new FrInseeNumber(ValidUnformattedInseeNumberCorsica);
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
@@ -1467,7 +1926,7 @@ public class FrInseeNumberTests
    public void FrInseeNumber_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
    {
       // Arrange.
-      var sut = new FrInseeNumber(AltValid21CharacterInseeNumber);
+      var sut = new FrInseeNumber(AltValidFormattedInseeNumber);
       var expected = sut.Value;
 
       // Act.
@@ -1486,7 +1945,7 @@ public class FrInseeNumberTests
    public void FrInseeNumber_JsonSerialization_ShouldDeserializeComplexObject()
    {
       // Arrange.
-      var foo = new Foo { InseeNumber = new FrInseeNumber(Valid15CharacterInseeNumber) };
+      var foo = new Foo { InseeNumber = new FrInseeNumber(ValidUnformattedInseeNumber) };
       var json = JsonSerializer.Serialize(foo);
 
       // Act.
@@ -1529,15 +1988,14 @@ public class FrInseeNumberTests
    public void FrInseeNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenInseeNumberIsInvalid()
    {
       // Arrange.
-      var json = "{\"InseeNumber\":\"1881218848132613\"}";  // Invalid length
+      var json = "{\"InseeNumber\":\"188121884812236\"}";  // Invalid check digits
+      LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
          .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
-         .Should()
-         .ThrowExactly<KfValidationException<FrInseeNumberValidationResult>>()
-         .WithMessage(Messages.FrInseeNumberInvalidLength + "*")
-         .And.ValidationResult.Should().Be(FrInseeNumberValidationResult.InvalidLength);
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion

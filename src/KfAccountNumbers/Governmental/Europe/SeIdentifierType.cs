@@ -4,13 +4,13 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   Defines the possible types of identifiers that can be represented with a
 ///   <see cref="SePersonnummer"/> object.
 /// </summary>
-public enum SeIdentifierType
+public class SeIdentifierType
 {
    /// <summary>
    ///   Personal identity number, issued to individuals residing in Sweden for
    ///   more than 12 months (or planning to do so).
    /// </summary>
-   Personnummer = 0,
+   public struct Personnummer { }
 
    /// <summary>
    ///   Coordination number serving many of the purposes of a personnummer
@@ -18,5 +18,5 @@ public enum SeIdentifierType
    ///   format as a personnummer, except 60 is added to the day component of
    ///   the day of birth (i.e. "950123" -> "950183").
    /// </summary>
-   Samordningsnummer = 1
+   public struct Samordningsnummer { }
 }

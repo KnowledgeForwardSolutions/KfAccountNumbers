@@ -1,5 +1,7 @@
 namespace KfAccountNumbers.Tests.Unit.Utility;
 
+#pragma warning disable SA1008 // Opening parenthesis should be spaced correctly
+
 public class DateResultTests
 {
    #region Constructor Tests
@@ -7,15 +9,19 @@ public class DateResultTests
    // ==========================================================================
 
    [Theory]
+   // 19th century bounds
    [InlineData(1800,    1,    1)]      // January 1, 1800
    [InlineData(1899,   12,   31)]      // December 31, 1899
 
+   // 20th century bounds
    [InlineData(1900,    1,    1)]      // January 1, 1900
    [InlineData(1999,   12,   31)]      // December 31, 1999
 
+   // 21st century bounds
    [InlineData(2000,    1,    1)]      // January 1, 2000
    [InlineData(2099,   12,   31)]      // December 31, 2099
 
+   // Maximum days for month
    [InlineData(1901,    1,   31)]      // maximum days for January, any year
    [InlineData(1991,    2,   28)]      // maximum days for February, non leap year
    [InlineData(1996,    2,   29)]      // maximum days for February, leap year
@@ -31,6 +37,7 @@ public class DateResultTests
    [InlineData(2004,   11,   30)]      // maximum days for November, any year
    [InlineData(2004,   12,   31)]      // maximum days for December, any year
 
+   // Partial dates
    [InlineData(null, null, null)]      // Unknown date
    [InlineData(2001, null, null)]      // Partial date, year only
    [InlineData(2001,   12, null)]      // Partial date, year and month
@@ -39,6 +46,7 @@ public class DateResultTests
    [InlineData(null,    1,    1)]      // Partial date, month and day
    [InlineData(null, null,   28)]      // Partial date, day only
 
+   // Maximum values for individual elements
    [InlineData(   1, null, null)]      // Minimum valid year
    [InlineData(9999, null, null)]      // Maximum valid year
    [InlineData(null,    1, null)]      // Minimum valid month
@@ -97,7 +105,7 @@ public class DateResultTests
    [InlineData(1904,  1, 32)]       // Invalid day of month for January, any year
    [InlineData(1901,  2, 29)]       // Invalid day of for February, non-leap year
    [InlineData(1904,  2, 30)]       // Invalid day of for February, leap year
-   [InlineData(1904,  2, 30)]       // Invalid day of for February, leap year (2000 is leap-year)
+   [InlineData(2000,  2, 30)]       // Invalid day of for February, leap year (2000 is leap-year)
    [InlineData(1904,  3, 32)]       // Invalid day of for March, any year
    [InlineData(1904,  4, 31)]       // Invalid day of for April, any year
    [InlineData(1904,  5, 32)]       // Invalid day of for May, any year
@@ -114,7 +122,11 @@ public class DateResultTests
       Int32 day)
    {
       // Arrange.
+#pragma warning disable CA1305 // Specify IFormatProvider
+#pragma warning disable CA1863 // Use 'CompositeFormat'
       var expectedMessage = String.Format(Messages.DayOutOfRangeForYearAndMonth, day, year, month);
+#pragma warning restore CA1863 // Use 'CompositeFormat'
+#pragma warning restore CA1305 // Specify IFormatProvider
 
       // Act/assert.
       FluentActions

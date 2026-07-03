@@ -1,5 +1,8 @@
 // Ignore Spelling: Curp Json Mx
 
+#pragma warning disable IDE0250 // Make struct 'readonly'
+#pragma warning disable IDE0046 // Convert to conditional expression
+
 namespace KfAccountNumbers.Governmental.NorthAmerica;
 
 /// <summary>
@@ -8,10 +11,10 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A valid CURP is an 18-character alphanumeric identifier assigned to 
-///      Mexican citizens by the Registro Nacional de Población (RENAPO). 
-///      Portions of the string are generated from a person's personal 
-///      information and the two trailing characters are assigned by RENAPO. 
+///      A valid CURP is an 18-character alphanumeric identifier assigned to
+///      Mexican citizens by the Registro Nacional de Población (RENAPO).
+///      Portions of the string are generated from a person's personal
+///      information and the two trailing characters are assigned by RENAPO.
 ///   </para>
 ///   <para>
 ///      A valid CURP meets the following criteria:
@@ -29,14 +32,14 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         </item>
 ///         <item>
 ///            <description>
-///               Has alphabetic characters derived the persons surname(s) and
-///               given name in positions 0-3 and 13-15 (zero-based).
+///               Has alphabetic characters derived from the person's surname(s)
+///               and given name in positions 0-3 and 13-15 (zero-based).
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               Has a valid date of birth (formatted as YYMMDD) in positions 
-///               4-9 (zero-based). 
+///               Has a valid date of birth (formatted as YYMMDD) in positions
+///               4-9 (zero-based).
 ///            </description>
 ///         </item>
 ///         <item>
@@ -52,9 +55,9 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         </item>
 ///         <item>
 ///            <description>
-///               Has an alphanumeric homoclave character in position 16 
-///               (zero-based). The homoclave is assigned by RENAPO to avoid 
-///               duplicate CURP values. A digit homoclave character indicates a 
+///               Has an alphanumeric homoclave character in position 16
+///               (zero-based). The homoclave is assigned by RENAPO to avoid
+///               duplicate CURP values. A digit homoclave character indicates a
 ///               birth in the 1900-1999 century, while an alphabetic homoclave
 ///               indicates a birth in the 2000-2099 century.
 ///            </description>
@@ -70,11 +73,19 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///      </list>
 ///   </para>
 ///   <para>
+///      <see cref="MxCurp"/> is case-insensitive for validation and
+///      parsing purposes. The MxCurp constructor, Create method and
+///      explicit string to MxCurp operator will normalize any
+///      lowercase letters to uppercase. Equality and inequality comparisons
+///      between instances of MxCurp will compare the normalized
+///      uppercase versions of the value.
+///   </para>
+///   <para>
 ///      Note that YYMMDD date of birth format presents some ambiguity for the
 ///      century of birth. This has several impacts:
 ///      <list type="bullet">
 ///         <item>
-///            The <see cref="DateOfBirth"/> property uses the homoclave 
+///            The <see cref="DateOfBirth"/> property uses the homoclave
 ///            character to infer the century of birth. In cases where the
 ///            person was born before 1900 and assigned a CURP when first issued
 ///            in 1996, the century will be incorrectly reported as 1900's. This
@@ -84,15 +95,15 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 ///         <item>
 ///            The validation for leap year dates is impacted. Specifically, the
 ///            value "000229" will be considered invalid if the homoclave is a
-///            digit (since 1900 was not a leap year) but valid if the homoclave 
+///            digit (since 1900 was not a leap year) but valid if the homoclave
 ///            is a letter (since 2000 was a leap year).
 ///         </item>
 ///         <item>
-///            While not specifically connected to the YYMMDD date of birth 
+///            While not specifically connected to the YYMMDD date of birth
 ///            format, it should be noted that the date of birth validation does
 ///            not attempt to check for future dates. So a CURP with a date of
-///            "991231" and an alphabetic homoclave character would be 
-///            considered valid, even though it would indicate a birthdate of 
+///            "991231" and an alphabetic homoclave character would be
+///            considered valid, even though it would indicate a birthdate of
 ///            December 31, 2099.
 ///         </item>
 ///      </list>
@@ -106,93 +117,135 @@ namespace KfAccountNumbers.Governmental.NorthAmerica;
 [JsonConverter(typeof(MxCurpJsonConverter))]
 public record MxCurp
 {
+   /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new <see cref="MxCurp"/>.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidDateOfBirth,
+      InvalidGender,
+      InvalidStateProvince,
+      InvalidMxCurpHomoclave,
+      InvalidChecksum)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating a <see cref="MxCurp"/>.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidDateOfBirth,
+      InvalidGender,
+      InvalidStateProvince,
+      InvalidMxCurpHomoclave,
+      InvalidChecksum)
+   {
+   }
+
    private const Int32 ValidLength = 18;
 
    private const Int32 GenderOffset = 10;
    private const Int32 HomoclaveOffset = 16;
    private const Int32 CheckDigitOffset = 17;
 
-   private enum CurpSection
-   {
-      Initials,
-      DateOfBirth,
-      GenderCode,
-      StateCode,
-      InternalConsonants,
-      Homoclave,
-      CheckDigit
-   }
+   private static readonly SegmentRange _initialsRange = new(0, 4);
+   private static readonly SegmentRange _dateOfBirthRange = new(4, 10);
+   private static readonly SegmentRange _stateRange = new(11, 13);
+   private static readonly SegmentRange _consonantsRange = new(13, 16);
 
    /// <summary>
-   ///   Initialize a new instance of the <see cref="MxCurp"/> class.
+   ///   Initializes a new instance of the <see cref="MxCurp"/> class.
    /// </summary>
-   /// <param name="curp">
+   /// <param name="value">
    ///   String representation of a CURP.
    /// </param>
    /// <remarks>
-   ///   Validation of <paramref name="curp"/> is performed in a case-insensitive
+   ///   Validation of <paramref name="value"/> is performed in a case-insensitive
    ///   manner. However, the <see cref="Value"/> property will normalize the
    ///   CURP to upper-case.
    /// </remarks>
-   /// <exception cref="KfValidationException{MxCurpValidationResult}">
-   ///   <paramref name="curp"/> is <see langword="null"/>, empty or all 
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
-   ///   <paramref name="curp"/> does not have length of 18.
+   ///   <paramref name="value"/> does not have length of 18.
    ///   - or -
-   ///   <paramref name="curp"/> contains non-alphabetic characters in positions
+   ///   <paramref name="value"/> contains non-alphabetic characters in positions
    ///   0-3 or 13-15 (zero-based).
    ///   - or -
-   ///   <paramref name="curp"/> contains an invalid date of birth in positions
+   ///   <paramref name="value"/> contains an invalid date of birth in positions
    ///   4-9 (zero-based).
    ///   - or -
-   ///   <paramref name="curp"/> contains an invalid gender character in position
-   ///   10 (zero-based). Valid gender characters are H (Hombre/male), 
+   ///   <paramref name="value"/> contains an invalid gender character in position
+   ///   10 (zero-based). Valid gender characters are H (Hombre/male),
    ///   M (Mujer/female) or X (non-binary).
    ///   - or -
-   ///   <paramref name="curp"/> contains an invalid state code in positions
+   ///   <paramref name="value"/> contains an invalid state code in positions
    ///   11-12 (zero-based).
    ///   - or -
-   ///   <paramref name="curp"/> contains a non-alphanumeric homoclave character
+   ///   <paramref name="value"/> contains a non-alphanumeric homoclave character
    ///   in position 16 (zero-based).
    ///   - or -
-   ///   <paramref name="curp"/> contains a non-digit check digit character in
+   ///   <paramref name="value"/> contains a non-digit check digit character in
    ///   position 17 (zero-based).
    /// </exception>
-   public MxCurp(String? curp) : this(curp, ValidationMode.ValidationRequired) { }
+   public MxCurp(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Private constructor that actually does the work. Supports bypassing
-   ///   validation when creating a new instance from a value that has already
-   ///   been validated.
+   ///   Initializes a new instance of the <see cref="MxCurp"/> class.
    /// </summary>
-   private MxCurp(String? curp, ValidationMode validationMode)
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private MxCurp(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
-         MxCurpValidationResult validationResult = Validate(curp);
-         if (validationResult != MxCurpValidationResult.ValidationPassed)
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
          {
-            throw validationResult.ToValidationException();
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               InvalidGender invalidGender => new UKfValidationException<ValidationError>(invalidGender),
+               InvalidStateProvince invalidState => new UKfValidationException<ValidationError>(invalidState),
+               InvalidMxCurpHomoclave invalidHomoclave => new UKfValidationException<ValidationError>(invalidHomoclave),
+               InvalidChecksum invalidCheckDigit => new UKfValidationException<ValidationError>(invalidCheckDigit),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
          }
       }
 
-      Value = curp!.ToUpperInvariant();
+      Value = value!.ToUpperInvariant();
    }
 
    /// <summary>
-   ///   The person's date of birth, derived from the YYMMDD date of birth and 
-   ///   homoclave elements of the CURP.
+   ///   Gets the person's date of birth, derived from the YYMMDD date of birth
+   ///   and homoclave elements of the CURP.
    /// </summary>
    /// <remarks>
-   ///   Homoclave values 0-9 indicate birth in the 1900-1999 century, homoclave 
+   ///   Homoclave values 0-9 indicate birth in the 1900-1999 century, homoclave
    ///   values A-Z indicate birth in the 2000-2099 century.
    /// </remarks>
    public DateOnly DateOfBirth
    {
       get
       {
-         ReadOnlySpan<Char> dateOfBirthSpan = GetSectionSpan(Value, CurpSection.DateOfBirth);
+         ReadOnlySpan<Char> dateOfBirthSpan = _dateOfBirthRange.Extract(Value);
 #pragma warning disable IDE0008 // Use explicit type
          var (year, month, day) = GetYearMonthDay(dateOfBirthSpan);
 #pragma warning restore IDE0008 // Use explicit type
@@ -203,7 +256,7 @@ public record MxCurp
    }
 
    /// <summary>
-   ///   The person's gender, as coded in the CURP.
+   ///   Gets the person's gender, as coded in the CURP.
    /// </summary>
    /// <remarks>
    ///   Gender will be H (Hombre/male), M (Mujer/female) or X (non-binary).
@@ -211,122 +264,156 @@ public record MxCurp
    public Char GenderCode => Value[GenderOffset];
 
    /// <summary>
-   ///   The person's state of birth as coded in the CURP.
+   ///   Gets the person's state of birth as coded in the CURP.
    /// </summary>
-   public String StateCode => GetSectionSpan(Value, CurpSection.StateCode).ToString();
+   public String StateCode => _stateRange.Extract(Value).ToString();
 
    /// <summary>
-   ///   The raw CURP value.
+   ///   Gets the CURP value.
    /// </summary>
    /// <remarks>
    ///   The CURP value is always normalized to upper-case.
    /// </remarks>
    public String Value { get; private init; }
 
-   public static implicit operator String(MxCurp curp)
-      => curp?.Value ?? String.Empty;     // Handle null CURP object gracefully by returning empty string
+   /// <summary>
+   ///   Implicitly converts a <see cref="MxCurp"/> to a <see cref="String"/>,
+   ///   returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="MxCurp"/> to convert.
+   /// </param>
+   public static implicit operator String(MxCurp source)
+      => source?.Value ?? String.Empty;     // Handle null CURP object gracefully by returning empty string
 
-   // Explicit conversion from String to avoid unintentional conversions that may throw exceptions.
-   public static explicit operator MxCurp(String curp) => new(curp);
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="MxCurp"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a CURP.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid CURP.
+   /// </exception>
+   public static explicit operator MxCurp(String value) => new(value);
 
    /// <summary>
    ///   Get a string representation of the CURP.
    /// </summary>
+   /// <returns>
+   ///   The CURP value, normalized to upper-case.
+   /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
    ///   Create a new <see cref="MxCurp"/> using the Result pattern.
    /// </summary>
-   /// <param name="curp">
+   /// <param name="value">
    ///   String representation of a CURP.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{MxCurp, MxCurpValidationResult}"/>.
-   ///   Will contain the new <see cref="MxCurpValidationResult"/> if 
-   ///   <paramref name="curp"/> is valid or 
-   ///   <see cref="MxCurpValidationResult"/> that identifies
-   ///   the validation rule that was failed if <paramref name="curp"/> is 
-   ///   invalid.
+   ///   A <see cref="CreateResult{MxCurp, ValidationError}"/>. Will
+   ///   contain the new <see cref="MxCurp"/> if
+   ///   <paramref name="value"/> is valid or a <see cref="ValidationError"/>
+   ///   that identifies the validation rule that was failed if
+   ///   <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<MxCurp, MxCurpValidationResult> Create(String? curp)
-   {
-      MxCurpValidationResult validationResult = Validate(curp);
-      return validationResult == MxCurpValidationResult.ValidationPassed
-         ? new MxCurp(curp, validationMode: ValidationMode.BypassValidation)
-         : validationResult;
-   }
+   public static CreateResult<MxCurp, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new MxCurp(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         InvalidGender invalidGender => (ValidationError)invalidGender,
+         InvalidStateProvince invalidState => (ValidationError)invalidState,
+         InvalidMxCurpHomoclave invalidHomoclave => (ValidationError)invalidHomoclave,
+         InvalidChecksum invalidCheckDigit => (ValidationError)invalidCheckDigit,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
 
    /// <summary>
-   ///   Check the <paramref name="curp"/> to determine if it contains a valid
+   ///   Check the <paramref name="value"/> to determine if it contains a valid
    ///   CURP value.
    /// </summary>
-   /// <param name="curp">
+   /// <param name="value">
    ///   String representation of a CURP.
    /// </param>
    /// <returns>
-   ///   A <see cref="MxCurpValidationResult"/> enumeration 
-   ///   value that indicates if the <paramref name="curp"/> passed validation
-   ///   or what validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
    /// <remarks>
    ///   Validation is case-insensitive.
    /// </remarks>
-   public static MxCurpValidationResult Validate(String? curp)
+   public static ValidationResult Validate(String? value)
    {
-      if (String.IsNullOrWhiteSpace(curp))
+      if (String.IsNullOrWhiteSpace(value))
       {
-         return MxCurpValidationResult.Empty;
-      }
-      else if (curp.Length != ValidLength)
-      {
-         return MxCurpValidationResult.InvalidLength;
-      }
-      else if (!ValidateNameCharacters(curp))
-      {
-         return MxCurpValidationResult.InvalidAlphabeticCharacterEncountered;
-      }
-      else if (!Char.IsAsciiLetterOrDigit(curp[HomoclaveOffset]))
-      {
-         // Check moved prior to date of birth validation since homoclave is used to determine
-         // the century for leap year date of birth validation.
-         return MxCurpValidationResult.InvalidHomoclave;
-      }
-      else if (!ValidateDateOfBirth(curp))
-      {
-         return MxCurpValidationResult.InvalidDateOfBirth;
-      }
-      else if (!ValidateGenderCode(curp))
-      {
-         return MxCurpValidationResult.InvalidGender;
-      }
-      else if (!ValidateStateCode(curp))
-      {
-         return MxCurpValidationResult.InvalidState;
-      }
-      else if (!Char.IsAsciiDigit(curp[CheckDigitOffset]))
-      {
-         return MxCurpValidationResult.InvalidCheckDigit;
+         return default(EmptyValue);
       }
 
-      return MxCurpValidationResult.ValidationPassed;
+      if (value.Length != ValidLength)
+      {
+         return new InvalidLength(
+            Messages.MxCurpInvalidLength,
+            value.Length,
+            new ValidLengthDefinition(ValidLength, Messages.MxCurpValidLength));
+      }
+
+      if (!ValidateNameCharacters(value, out var invalidCharacterPosition))
+      {
+         return new InvalidCharacter(
+            Messages.MxCurpInvalidAlphabeticCharacter,
+            value[invalidCharacterPosition],
+            invalidCharacterPosition);
+      }
+
+      if (!Char.IsAsciiLetterOrDigit(value[HomoclaveOffset]))
+      {
+         // Required to check prior to date of birth validation since homoclave
+         // is used to determine the century for leap year date of birth
+         // validation.
+         return new InvalidMxCurpHomoclave(
+            Messages.MxCurpInvalidHomoclave,
+            value[HomoclaveOffset]);
+      }
+
+      if (!ValidateDateOfBirth(value))
+      {
+         return new InvalidDateOfBirth(
+            Messages.MxCurpInvalidDateOfBirth,
+            _dateOfBirthRange.Extract(value).ToString(),
+            DateFormatName.YYMMDD);
+      }
+
+      if (!ValidateGenderCode(value))
+      {
+         return new InvalidGender(
+            Messages.MxCurpInvalidGender,
+            value[GenderOffset].ToString());
+      }
+
+      if (!ValidateStateCode(value))
+      {
+         return new InvalidStateProvince(
+            Messages.MxCurpInvalidState,
+            _stateRange.Extract(value).ToString());
+      }
+
+      if (!Char.IsAsciiDigit(value[CheckDigitOffset]))
+      {
+         // No algorithm published for CURP check digit, so algorithm name is N/A.
+         return new InvalidChecksum(Messages.MxCurpInvalidCheckDigit, "N/A");
+      }
+
+      return default(ValidValue);
    }
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static ReadOnlySpan<Char> GetSectionSpan(ReadOnlySpan<Char> curp, CurpSection section)
-      => section switch
-      {
-         CurpSection.Initials => curp[..4],
-         CurpSection.DateOfBirth => curp[4..10],
-         CurpSection.GenderCode => curp[10..11],
-         CurpSection.StateCode => curp[11..13],
-         CurpSection.InternalConsonants => curp[13..16],
-         CurpSection.Homoclave => curp[16..17],
-         CurpSection.CheckDigit => curp[17..],
-         _ => throw new SwitchExpressionException(section)
-      };
-
-   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static (Int32 year, Int32 month, Int32 day) GetYearMonthDay(ReadOnlySpan<Char> dateOfBirthSpan)
+   private static (Int32 Year, Int32 Month, Int32 Day) GetYearMonthDay(ReadOnlySpan<Char> dateOfBirthSpan)
    {
       var year = dateOfBirthSpan.ParseTwoDigits();
       var month = dateOfBirthSpan[2..].ParseTwoDigits();
@@ -334,13 +421,12 @@ public record MxCurp
       return (year, month, day);
    }
 
-   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> curp)
+   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> value)
    {
-      ReadOnlySpan<Char> dateOfBirthSpan = GetSectionSpan(curp, CurpSection.DateOfBirth);
+      ReadOnlySpan<Char> dateOfBirthSpan = _dateOfBirthRange.Extract(value);
 
       // Switching from DateTime.TryParseExact to manual validation resulted in
       // a performance improvement from > 60ns to < 20ns per call in benchmark tests.
-
       foreach (var ch in dateOfBirthSpan)
       {
          if (!Char.IsAsciiDigit(ch))
@@ -359,16 +445,16 @@ public record MxCurp
       }
 
       // Use homoclave value to adjust the year century.
-      year += curp[HomoclaveOffset].IsAsciiDigit()
+      year += value[HomoclaveOffset].IsAsciiDigit()
          ? 1900
          : 2000;
 
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);
    }
 
-   private static Boolean ValidateGenderCode(ReadOnlySpan<Char> curp)
+   private static Boolean ValidateGenderCode(ReadOnlySpan<Char> value)
    {
-      var genderCode = curp[GenderOffset];
+      var genderCode = value[GenderOffset];
 
       return genderCode is Chars.UpperCaseH
          or Chars.UpperCaseM
@@ -378,36 +464,42 @@ public record MxCurp
          or Chars.LowerCaseX;
    }
 
-   private static Boolean ValidateNameCharacters(ReadOnlySpan<Char> curp)
+   private static Boolean ValidateNameCharacters(
+      ReadOnlySpan<Char> value,
+      out Int32 invalidCharacterPosition)
    {
-      ReadOnlySpan<Char> initials = GetSectionSpan(curp, CurpSection.Initials);
-      foreach (var c in initials)
+      invalidCharacterPosition = -1;
+      for (var index = _initialsRange.Start; index < _initialsRange.End; index++)
       {
-         if (!Char.IsAsciiLetter(c))
+         if (!Char.IsAsciiLetter(value[index]))
          {
+            invalidCharacterPosition = index;
             return false;
          }
       }
 
-      ReadOnlySpan<Char> internalConsonants = GetSectionSpan(curp, CurpSection.InternalConsonants);
-      foreach (var c in internalConsonants)
+      for (var index = _consonantsRange.Start; index < _consonantsRange.End; index++)
       {
-         if (!Char.IsAsciiLetter(c))
+         if (!Char.IsAsciiLetter(value[index]))
          {
+            invalidCharacterPosition = index;
             return false;
          }
       }
+
       return true;
    }
 
-   private static Boolean ValidateStateCode(ReadOnlySpan<Char> curp)
+   private static Boolean ValidateStateCode(ReadOnlySpan<Char> value)
    {
-      ReadOnlySpan<Char> stateCode = GetSectionSpan(curp, CurpSection.StateCode);
+      ReadOnlySpan<Char> stateCode = _stateRange.Extract(value);
 
       return MxCurpStateCodes.ValidateStateCode(stateCode);
    }
 }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
 public class MxCurpJsonConverter : JsonConverter<MxCurp>
 {
    public override MxCurp Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

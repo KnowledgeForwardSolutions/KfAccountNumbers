@@ -147,10 +147,10 @@
   <data name="UsSsnInvalidAreaNumber" xml:space="preserve">
     <value>US Social Security Number area number segment (AAA-xx-xxxx) must not be 000, 666 or 900-999</value>
   </data>
-  <data name="UsSsnInvalidCharacterEncountered" xml:space="preserve">
+  <data name="UsSsnInvalidCharacter" xml:space="preserve">
     <value>US Social Security Number must only contain digit characters (0-9) in non-separator character locations</value>
   </data>
-  <data name="CaSinInvalidCharacterEncountered" xml:space="preserve">
+  <data name="CaSinInvalidCharacter" xml:space="preserve">
     <value>CA Social Insurance Number must only contain digit characters (0-9) in non-separator character locations</value>
   </data>
   <data name="UsSsnInvalidGroupNumber" xml:space="preserve">
@@ -162,7 +162,7 @@
   <data name="UsSsnInvalidRun" xml:space="preserve">
     <value>US Social Security Number may not have sequence 123456789</value>
   </data>
-  <data name="UsSsnInvalidSeparatorEncountered" xml:space="preserve">
+  <data name="UsSsnInvalidSeparator" xml:space="preserve">
     <value>US Social Security Number with length 11 contains an unexpected character at a separator position</value>
   </data>
   <data name="UsSsnInvalidSerialNumber" xml:space="preserve">
@@ -171,7 +171,7 @@
   <data name="ValidationPassed" xml:space="preserve">
     <value>Value does not contain any validation errors</value>
   </data>
-  <data name="CaSinInvalidSeparatorEncountered" xml:space="preserve">
+  <data name="CaSinInvalidSeparator" xml:space="preserve">
     <value>CA Social Insurance Number with length 11 contains an unexpected character at a separator position</value>
   </data>
   <data name="CaSinInvalidCheckDigit" xml:space="preserve">
@@ -186,7 +186,7 @@
   <data name="MxCurpInvalidLength" xml:space="preserve">
     <value>MX CURP must have length 18</value>
   </data>
-  <data name="MxCurpInvalidAlphabeticCharacterEncountered" xml:space="preserve">
+  <data name="MxCurpInvalidAlphabeticCharacter" xml:space="preserve">
     <value>MX CURP requires alphabetic characters in positions 0-3 and 13-15 (zero-based)</value>
   </data>
   <data name="MxCurpInvalidDateOfBirth" xml:space="preserve">
@@ -210,7 +210,7 @@
   <data name="UsNpiInvalidLength" xml:space="preserve">
     <value>US National Provider Identifier must have length 10</value>
   </data>
-  <data name="UsNpiInvalidCharacterEncountered" xml:space="preserve">
+  <data name="UsNpiInvalidCharacter" xml:space="preserve">
     <value>US National Provider Identifier must only contain digit characters (0-9)</value>
   </data>
   <data name="UsNpiInvalidCheckDigit" xml:space="preserve">
@@ -222,10 +222,10 @@
   <data name="UsItinInvalidLength" xml:space="preserve">
     <value>US Individual Taxpayer Identification Number must have length 9 (digits only) or 11 (9 digits with two separator characters)</value>
   </data>
-  <data name="UsItinInvalidSeparatorEncountered" xml:space="preserve">
+  <data name="UsItinInvalidSeparator" xml:space="preserve">
     <value>US Individual Taxpayer Identification Number with length 11 contains an unexpected character at a separator position</value>
   </data>
-  <data name="UsItinInvalidCharacterEncountered" xml:space="preserve">
+  <data name="UsItinInvalidCharacter" xml:space="preserve">
     <value>US Individual Taxpayer Identification Number must only contain digit characters (0-9) in non-separator character locations</value>
   </data>
   <data name="UsItinInvalidAreaNumber" xml:space="preserve">
@@ -443,5 +443,149 @@
   </data>
   <data name="GbNationalInsuranceNumberInvalidSeparator" xml:space="preserve">
     <value>GB National Insurance Number with length 11 or 13 contains an invalid separator character. Separator characters may not be ASCII digits ('0'-'9') or uppercase or lowercase letters (A-Z, a-z). All separator locations must contain the same character.</value>
+  </data>
+  <data name="GbPatientNumberUnformattedLength" xml:space="preserve">
+    <value>A GB patient number (NHS, CHI or H&amp;C) without any separator characters</value>
+  </data>
+  <data name="GbPatientNumberDoubleSeparatorFormattedLength" xml:space="preserve">
+    <value>A formatted NHS, H&amp;C or test patient number with separator characters at offsets 3 and 7 (zero-based)</value>
+  </data>
+  <data name="EmptyValueDescription" xml:space="preserve">
+    <value>Value may not be null, empty ("") or all whitespace characters</value>
+  </data>
+  <data name="ValidValueDescription" xml:space="preserve">
+    <value>Value is valid</value>
+  </data>
+  <data name="GbPatientNumberInvalidLength" xml:space="preserve">
+    <value>GB patient number must have a length of 10 (without separators), 11 (CHI number with separator) or 12 (NHS, H&amp;C or test number with separators)</value>
+  </data>
+  <data name="GbPatientNumberInvalidCharacter" xml:space="preserve">
+    <value>GB patient number must have only digit characters (0-9) in non-separator positions</value>
+  </data>
+  <data name="GbPatientNumberInvalidCheckDigit" xml:space="preserve">
+    <value>GB patient number must have a valid Modulus 11 check digit in the trailing (right-most) character position</value>
+  </data>
+  <data name="GbPatientNumberInvalidSeparator" xml:space="preserve">
+    <value>GB patient number may not contain an ASCII digit (0-9) in a separator position and if two separators are used, both separator positions must contain the same non-digit character</value>
+  </data>
+  <data name="GbNhsNumberInvalidRange" xml:space="preserve">
+    <value>GB NHS Number must be in the range 400 000 000 to 499 999 999, 600 000 000 to 799 999 999, or 900 000 000 to 999 999 999, excluding trailing check digit</value>
+  </data>
+  <data name="GbHcNumberInvalidRange" xml:space="preserve">
+    <value>GB H&amp;C Number must be in the range 320 000 000 to 399 999 999 or 900 000 000 to 999 999 999, excluding trailing check digit</value>
+  </data>
+  <data name="GbChiNumberInvalidRange" xml:space="preserve">
+    <value>GB CHI Number must be in the range 010 000 000 to 311 299 999, excluding trailing check digit</value>
+  </data>
+  <data name="GbChiNumberInvalidDateOfBirth" xml:space="preserve">
+    <value>GB CHI Number must contain a valid date of birth (in DDMMYY format) as the first six digits</value>
+  </data>
+  <data name="InvalidCenturyCutoff" xml:space="preserve">
+    <value>Century cutoff must be an integer between 1 and 100 (inclusive)</value>
+  </data>
+  <data name="InvalidYearForYyToYyyyConversion" xml:space="preserve">
+    <value>The value to convert from a two-digit year to a four-digit year must be in the range 0-99 or 1000-9999</value>
+  </data>
+  <data name="GbPatientNumberSingleSeparatorFormattedLength" xml:space="preserve">
+    <value>A formatted CHI number with a single separator character at offset 6 (zero-based)</value>
+  </data>
+  <data name="GbPatientNumberInvalidRange" xml:space="preserve">
+    <value>GB patient number must be in the range 010 000 000 to 311 299 999, 320 000 000 to 399 999 999, 400 000 000 to 499 999 999, 600 000 000 to 799 999 999, or 900 000 000 to 999 999 999, excluding trailing check digit</value>
+  </data>
+  <data name="UsTinUnformattedLength" xml:space="preserve">
+    <value>A US TIN (SSN or ITIN) without separator characters</value>
+  </data>
+  <data name="UsTinFormattedLength" xml:space="preserve">
+    <value>A US TIN (SSN or ITIN) with separator characters at offsets 3 and 6 (zero-based)</value>
+  </data>
+  <data name="UsNpiValidLength" xml:space="preserve">
+    <value>US National Provider Identifier should be 10 digits without separator or format characters</value>
+  </data>
+  <data name="CaSinFormattedLength" xml:space="preserve">
+    <value>A CA Social Insurance Number with separator characters at offsets 3 and 7 (zero-based)</value>
+  </data>
+  <data name="CaSinUnformattedLength" xml:space="preserve">
+    <value>A CA Social Insurance Number without separator characters</value>
+  </data>
+  <data name="MxCurpValidLength" xml:space="preserve">
+    <value>MX CURP should be 18 characters without separator or format characters</value>
+  </data>
+  <data name="CurrentCenturyInvalidModulus" xml:space="preserve">
+    <value>CurrentCentury must be a multiple of 100; i.e. 1900, 2000, etc.</value>
+  </data>
+  <data name="SePersonnummerShortFormatLength" xml:space="preserve">
+    <value>SE Personnummer with six-digit date of birth (YYMMDD) format</value>
+  </data>
+  <data name="SePersonnummerLongFormatLength" xml:space="preserve">
+    <value>SE Personnummer with eight-digit date of birth (YYYYMMDD) format</value>
+  </data>
+  <data name="NoFoedselsnummerUnformattedLength" xml:space="preserve">
+    <value>NO Foedselsnummer without a separator character</value>
+  </data>
+  <data name="NoFoedselsnummerFormattedLength" xml:space="preserve">
+    <value>NO Foedselsnummer formatted for readability with a separator character at character position 6 (zero-based)</value>
+  </data>
+  <data name="IsKennitalaFormattedLength" xml:space="preserve">
+    <value>IS Kennitala formatted for readability with a separator character at character position 6 (zero-based)</value>
+  </data>
+  <data name="IsKennitalaUnformattedLength" xml:space="preserve">
+    <value>IS Kennitala without a separator character</value>
+  </data>
+  <data name="DkPersonnummerFormattedLength" xml:space="preserve">
+    <value>DK Personnummer formatted for readability with a separator character at character position 6 (zero-based)</value>
+  </data>
+  <data name="DkPersonnummerUnformattedLength" xml:space="preserve">
+    <value>DK Personnummer without a separator character</value>
+  </data>
+  <data name="FiHenkilotunnusValidLength" xml:space="preserve">
+    <value>FI Henkilotunnus should be 11 characters (including century indicator)</value>
+  </data>
+  <data name="NlBurgerservicenummerUnformattedLength" xml:space="preserve">
+    <value>NL Burgerservicenummer without separator characters (NNNNNNNNN)</value>
+  </data>
+  <data name="NlBurgerservicenummerFormattedLength" xml:space="preserve">
+    <value>NL Burgerservicenummer formatted as NNNN-NN-NNN, where '-' may be any non-digit character (same character must be used in both locations)</value>
+  </data>
+  <data name="BeRijksregisternummerUnformattedLength" xml:space="preserve">
+    <value>BE Rijksregisternummer without separator characters (YYMMDDXXXCC)</value>
+  </data>
+  <data name="BeRijksregisternummerFormattedLength" xml:space="preserve">
+    <value>BE Rijksregisternummer formatted as YY.MM.DD-XXX.CC</value>
+  </data>
+  <data name="FrInseeNumberUnformattedLength" xml:space="preserve">
+    <value>FR INSEE number without separator characters (SYYMMLLOOOKKKCC)</value>
+  </data>
+  <data name="FrInseeNumberFormattedLength" xml:space="preserve">
+    <value>FR INSEE number formatted as S YY MM LL OOO KKK CC</value>
+  </data>
+  <data name="EsNifUnformattedLength" xml:space="preserve">
+    <value>ES NIF without separator characters</value>
+  </data>
+  <data name="EsDniFormattedLength" xml:space="preserve">
+    <value>ES DNI formatted as DDDDDDDD-C</value>
+  </data>
+  <data name="EsNieFormattedLength" xml:space="preserve">
+    <value>ES NIE formatted as P-DDDDDDD-C</value>
+  </data>
+  <data name="EsNifInvalidLengthForType" xml:space="preserve">
+    <value>ES NIF with length 10 must be a DNI (starts with digit) and ES NIF with length 11 must be a NIE (starts with X, Y or Z)</value>
+  </data>
+  <data name="IePpsNumberWithoutSuffixLength" xml:space="preserve">
+    <value>IE PPS Number without optional suffix</value>
+  </data>
+  <data name="IePpsNumberWithSuffixLength" xml:space="preserve">
+    <value>IE PPS Number with suffix character (optional, made permanent in 2013)</value>
+  </data>
+  <data name="GbNationalInsuranceNumberUnformattedNoSuffixLength" xml:space="preserve">
+    <value>GB National Insurance Number without a suffix character or separator characters</value>
+  </data>
+  <data name="GbNationalInsuranceNumberUnformattedWithSuffixLength" xml:space="preserve">
+    <value>GB National Insurance Number with a suffix character and without separator characters</value>
+  </data>
+  <data name="GbNationalInsuranceNumberFormattedNoSuffixLength" xml:space="preserve">
+    <value>GB National Insurance Number with separator characters and without a suffix character</value>
+  </data>
+  <data name="GbNationalInsuranceNumberFormattedWithSuffixLength" xml:space="preserve">
+    <value>GB National Insurance Number with a suffix character and separator characters</value>
   </data>
 </root>
