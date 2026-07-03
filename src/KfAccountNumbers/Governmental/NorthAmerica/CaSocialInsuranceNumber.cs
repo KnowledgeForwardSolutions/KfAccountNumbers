@@ -274,8 +274,8 @@ public record CaSocialInsuranceNumber
 
       // Validate the check digit and province code.
       var validCheckDigit = IsFormatted(value)
-         ? CheckDigitAlgorithms.Luhn.Validate(value, CaSocialInsuranceNumberMask.Instance)
-         : CheckDigitAlgorithms.Luhn.Validate(value);
+         ? MaskedAlgorithms.Luhn.Validate(value, CaSocialInsuranceNumberMask.Instance)
+         : Algorithms.Luhn.Validate(value);
       if (!validCheckDigit)
       {
          // Either invalid check digit or invalid character encountered.

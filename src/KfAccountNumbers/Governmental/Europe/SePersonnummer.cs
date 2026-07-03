@@ -721,7 +721,7 @@ public record SePersonnummer
       ICheckDigitMask checkDigitMask = value.Length == ShortFormatLength
          ? SePersonNumberShortFormatCheckDigitMask.Instance
          : SePersonNumberLongFormatCheckDigitMask.Instance;
-      return CheckDigitAlgorithms.Luhn.Validate(value, checkDigitMask);
+      return MaskedAlgorithms.Luhn.Validate(value, checkDigitMask);
    }
 
    private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> value)
