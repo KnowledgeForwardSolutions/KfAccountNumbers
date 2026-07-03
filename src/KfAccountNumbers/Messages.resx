@@ -576,4 +576,16 @@
   <data name="IePpsNumberWithSuffixLength" xml:space="preserve">
     <value>IE PPS Number with suffix character (optional, made permanent in 2013)</value>
   </data>
+  <data name="GbNationalInsuranceNumberUnformattedNoSuffixLength" xml:space="preserve">
+    <value>GB National Insurance Number without a suffix character or separator characters</value>
+  </data>
+  <data name="GbNationalInsuranceNumberUnformattedWithSuffixLength" xml:space="preserve">
+    <value>GB National Insurance Number with a suffix character and without separator characters</value>
+  </data>
+  <data name="GbNationalInsuranceNumberFormattedNoSuffixLength" xml:space="preserve">
+    <value>GB National Insurance Number with separator characters and without a suffix character</value>
+  </data>
+  <data name="GbNationalInsuranceNumberFormattedWithSuffixLength" xml:space="preserve">
+    <value>GB National Insurance Number with a suffix character and separator characters</value>
+  </data>
 </root>
