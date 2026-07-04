@@ -1258,6 +1258,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SE Samordningsnummer requires the day component of the date of birth to be offset by 60 (i.e. 1-31 is represented by 61-91).
+        /// </summary>
+        internal static string SeSamordingsnummerrInvalidDateOfBirthDayRange {
+            get {
+                return ResourceManager.GetString("SeSamordingsnummerrInvalidDateOfBirthDayRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SE Samordningsnummer contains a non-digit character where a digit was expected.
         /// </summary>
         internal static string SeSamordningsnummerInvalidCharacter {

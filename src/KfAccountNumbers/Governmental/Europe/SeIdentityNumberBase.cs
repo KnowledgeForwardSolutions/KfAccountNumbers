@@ -82,15 +82,17 @@ public abstract record SeIdentityNumberBase
    protected const Int32 SeparatorOffset = 5;
 
    /// <summary>
+   ///   Identifies the location of the gender character, measured from the
+   ///   end of the value.
+   /// </summary>
+   protected const Int32 GenderOffset = 2;
+
+   /// <summary>
    ///   Century cutoff used when separator character is '+'.
    /// </summary>
    protected static readonly CenturyCutoff TwentithCenturyCutoff = new(currentCentury: 1900);
 
    private const Int32 InternalRepresentationLength = 12;      // YYYYMMDD + birth serial number + check digit
-
-   // These offsets are measured from the end of the string instead of the start
-   // because the date of birth has variable length.
-   private const Int32 GenderOffset = 2;
 
    /// <summary>
    ///   Get the correct century cutoff, based on the separator character.
@@ -107,6 +109,83 @@ public abstract record SeIdentityNumberBase
       => value[^SeparatorOffset] == Chars.Dash
          ? CenturyCutoff.DefaultInstance
          : TwentithCenturyCutoff;
+
+   /// <summary>
+   ///   Extract just the day component of the <paramref name="value"/>'s date
+   ///   of birth.
+   /// </summary>
+   /// <param name="value">
+   ///   The value to process.
+   /// </param>
+   /// <returns>
+   ///   The integer day component of the <paramref name="value"/>'s date of
+   ///   birth.
+   /// </returns>
+   protected static Int32 GetDayOfBirth(ReadOnlySpan<Char> value)
+   {
+      var offset = value.Length == ShortFormatLength ? 4 : 6;
+
+      return value[offset..].ParseTwoDigits();
+   }
+
+   /// <summary>
+   ///   Given a validated identity number, get the internal representation
+   ///   which converts six digit date of birth to eight digits and strips out the
+   ///   separator character.
+   /// </summary>
+   /// <param name="value">
+   ///   The validated identity number.
+   /// </param>
+   /// <returns>
+   ///   The normalized identity number.
+   /// </returns>
+   protected static String GetNormalizedValue(ReadOnlySpan<Char> value)
+   {
+      var buffer = ArrayPool<Char>.Shared.Rent(InternalRepresentationLength);
+      try
+      {
+         var span = new Span<Char>(buffer);
+         ReadOnlySpan<Char> source;
+         Int32 sourceOffset;
+
+         // Copy 4-digit year.
+         Span<Char> target = span[..4];
+         if (value.Length == ShortFormatLength)
+         {
+            sourceOffset = 2;
+            CenturyCutoff centuryCutoff = GetCenturyCutoff(value);
+            var year = value.ParseTwoDigits();
+            year = centuryCutoff.ToFourDigitYear(year);
+            _ = year.TryFormat(target, out _, format: "D4", provider: CultureInfo.InvariantCulture);
+         }
+         else
+         {
+            sourceOffset = 4;
+            source = value[..4];
+            target = span[..4];
+            source.CopyTo(target);
+         }
+
+         // Month & day.
+         var end = sourceOffset + 4;
+         source = value[sourceOffset..end];
+         target = span[4..8];
+         source.CopyTo(target);
+
+         // Birth serial number and check digit.
+         sourceOffset += 5;
+         end += 5;
+         source = value[sourceOffset..end];
+         target = span[8..12];
+         source.CopyTo(target);
+
+         return span[..InternalRepresentationLength].ToString();
+      }
+      finally
+      {
+         ArrayPool<Char>.Shared.Return(buffer);
+      }
+   }
 
    /// <summary>
    ///   Extract the year, month and day elements of the person's date of birth.

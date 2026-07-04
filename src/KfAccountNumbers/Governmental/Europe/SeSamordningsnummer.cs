@@ -174,6 +174,169 @@ namespace KfAccountNumbers.Governmental.Europe;
 public record SeSamordningsnummer : SeIdentityNumberBase
 {
    /// <summary>
+   ///   Initializes a new instance of the <see cref="SeSamordningsnummer"/>
+   ///   class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a samordningsnummer.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="value"/> is not length 11 or 13.
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid date of birth in
+   ///   positions 0-5 (11 character values) or positions 0-7 (13 character
+   ///   values).
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid separator character
+   ///   in position 6 (11 character values) or position 8 (13 character values).
+   ///   Valid separator characters are dash ('-') and plus ('+').
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid birth serial number
+   ///   (i.e. one or more non-digit characters) in positions 7-9 (11 character
+   ///   values) or positions 9-11 (13 character values).
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid check digit in
+   ///   position 10 (11 character values) or position 12 (13 character values).
+   ///   The check digit is calculated using the Luhn algorithm based on the six
+   ///   digit date of birth and the three-digit birth serial number. (The
+   ///   leading two digits of an eight digit date of birth are ignored.)
+   /// </exception>
+   /// <remarks>
+   ///   The indices given in the exception description are all zero-based.
+   /// </remarks>
+   public SeSamordningsnummer(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="SeSamordningsnummer"/>
+   ///   class.
+   /// </summary>
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private SeSamordningsnummer(String? value, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
+         {
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
+         }
+      }
+
+      Value = GetNormalizedValue(value);
+   }
+
+   /// <summary>
+   ///   Gets the person's date of birth, derived from the date of birth portion
+   ///   of 13 character personnummer (YYYYMMDD format) or from the date portion
+   ///   of an 11 character personnummer (YYMMDD format) and the separator
+   ///   character.
+   /// </summary>
+   /// <remarks>
+   ///   <para>
+   ///         See the class comments for the rules for deriving the date of birth
+   ///   for an 11 character personnummer.
+   ///   </para>
+   ///   <para>
+   ///      Note that the indicated date of birth may not be the person's exact
+   ///      date of birth as it is possible that a day may run out of birth
+   ///      serial numbers. In that case, a date close to the actual date of
+   ///      birth is used instead.
+   ///   </para>
+   ///   <para>
+   ///      Note also that samordningsnummer values encode the date of birth by
+   ///      adding 60 to the day (i.e. "950123" encodes as "950183"). The
+   ///      DateOfBirth property will automatically adjust the date of birth to
+   ///      an actual date.
+   ///   </para>
+   /// </remarks>
+   public DateOnly DateOfBirth
+   {
+      get
+      {
+#pragma warning disable IDE0008 // Use explicit type
+         var (year, month, day) = GetYearMonthDay(Value);
+#pragma warning restore IDE0008 // Use explicit type
+
+         return new DateOnly(year, month, day);
+      }
+   }
+
+   /// <summary>
+   ///   Gets the person's gender, as indicated by the third character of the
+   ///   birth sequence number. Odd digits = Male; even digits = Female.
+   /// </summary>
+   public Gender.BinaryGender Gender
+      => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
+
+   /// <summary>
+   ///   Gets the normalized samordningsnummer value.
+   /// </summary>
+   public String Value { get; private init; }
+
+   /// <summary>
+   ///   Implicitly converts a <see cref="SeSamordningsnummer"/> to a <see cref="String"/>,
+   ///   returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="SeSamordningsnummer"/> to convert.
+   /// </param>
+   public static implicit operator String(SeSamordningsnummer source)
+      => source?.Value ?? String.Empty;     // Handle null object gracefully by returning empty string
+
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="SeSamordningsnummer"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a samordningsnummer.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid samordningsnummer number.
+   /// </exception>
+   public static explicit operator SeSamordningsnummer(String? value) => new(value);
+
+   /// <summary>
+   ///   Create a new <see cref="SeSamordningsnummer"/> using the Result pattern.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a samordningsnummer.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{SeSamordningsnummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="SeSamordningsnummer"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
+   /// </returns>
+   public static CreateResult<SeSamordningsnummer, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new SeSamordningsnummer(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
+
+   /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a
    ///   valid Swedish samordningsnummer.
    /// </summary>
@@ -232,6 +395,13 @@ public record SeSamordningsnummer : SeIdentityNumberBase
          return GetInvalidDateOfBirthResult(value);
       }
 
+      // Ensure that the date of birth indicates a samordningsnummer.
+      var day = GetDayOfBirth(value);
+      if (day is < 61 or > 91)
+      {
+         return GetInvalidDateOfBirthResult(value, Messages.SeSamordingsnummerrInvalidDateOfBirthDayRange);
+      }
+
       return default(ValidValue);
    }
 
@@ -252,9 +422,11 @@ public record SeSamordningsnummer : SeIdentityNumberBase
             new ValidLengthDefinition(LongFormatLength, Messages.SeSamordningsnummerLongFormatLength),
          ]);
 
-   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(
+      String value,
+      String? message = null)
       => new(
-         Messages.SeSamordingsnummerrInvalidDateOfBirth,
+         message ?? Messages.SeSamordingsnummerrInvalidDateOfBirth,
          value[..^SeparatorOffset],
          value.Length == ShortFormatLength ? DateFormatName.YYMMDD : DateFormatName.YYYYMMDD);
 

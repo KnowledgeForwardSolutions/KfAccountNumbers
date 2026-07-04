@@ -2,15 +2,19 @@ namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class SeIdentityNumberTestsBase
 {
-   private const String ValidShortFormatDashSamordningsnummer = "811288-9871";
-   private const String ValidShortFormatPlusSamordningsnummer = "811288+9871";
-   private const String ValidLongFormatDashSamordningsnummer = "19670979-9537";
-   private const String ValidLongFormatPlusSamordningsnummer = "20670979+9537"; // Future date, but valid format and checksum
+   protected const String ValidShortFormatDashSamordningsnummer = "811288-9871";
+   protected const String ValidShortFormatPlusSamordningsnummer = "811288+9871";
+   protected const String AltValidShortFormatDashSamordningsnummer = "670979-9537";
+   protected const String AltValidShortFormatPlusSamordningsnummer = "670979+9537";
+   protected const String ValidLongFormatDashSamordningsnummer = "19670979-9537";
+   protected const String ValidLongFormatPlusSamordningsnummer = "20670979+9537"; // Future date, but valid format and checksum
 
    public static TheoryData<String> ValidSamordningsnummerValues =>
    [
       ValidShortFormatDashSamordningsnummer,
       ValidShortFormatPlusSamordningsnummer,
+      AltValidShortFormatDashSamordningsnummer,
+      AltValidShortFormatPlusSamordningsnummer,
       ValidLongFormatDashSamordningsnummer,
       ValidLongFormatPlusSamordningsnummer
    ];
@@ -31,118 +35,118 @@ public class SeIdentityNumberTestsBase
       "19880471-2555",     // 19880471+2225 with two digit twin error 22 -> 55
    ];
 
-   public static TheoryData<String, Char> PersonnummerValidDateOfBirthValues = new()
+   public static TheoryData<String, Char, String> PersonnummerValidDateOfBirthValues = new()
    {
       // Min/max/boundary values
-      { "500101", '+' },         // Minimum valid six digit date, January 1, 1850
-      { "991231", '+' },         // December 31, 1899
-      { "000101", '+' },         // January 1, 1900
-      { "991231", '-' },         // December 31 1999
-      { "000101", '-' },         // January 1, 2000
-      { "491231", '-' },         // Maximum valid six digit date, December 31, 2049
+      { "500101", '+', "18500101" },      // Minimum valid six digit date, January 1, 1850
+      { "991231", '+', "18991231" },      // December 31, 1899
+      { "000101", '+', "19000101" },      // January 1, 1900
+      { "991231", '-', "19991231" },      // December 31 1999
+      { "000101", '-', "20000101" },      // January 1, 2000
+      { "491231", '-', "20491231" },      // Maximum valid six digit date, December 31, 2049
 
       // Month max days
-      { "010131", '-' },         // Max day of month January 2001
-      { "910228", '+' },         // Max day of month February 1891 (non-leap year)
-      { "960229", '+' },         // Max day of month February 1896 (leap year)
-      { "000228", '+' },         // Max day of month February 1900 (non-leap year)
-      { "520229", '-' },         // Max day of month February 1952 (leap year)
-      { "000229", '-' },         // Max day of month February 2000 (leap year, century divisible by 400)
-      { "010228", '-' },         // Max day of month February 2001 (non-leap year)
-      { "530331", '+' },         // Max day of month March 1853
-      { "080430", '-' },         // Max day of month April 2008
-      { "150531", '+' },         // Max day of month May 1915
-      { "600630", '-' },         // Max day of month June 1960
-      { "750731", '+' },         // Max day of month July 1875
-      { "810831", '-' },         // Max day of month August 1981
-      { "090930", '+' },         // Max day of month September 1909
-      { "101031", '-' },         // Max day of month October 2010
-      { "111130", '+' },         // Max day of month November 1911
-      { "121231", '-' },         // Max day of month December 2012
+      { "010131", '-', "20010131" },      // Max day of month January 2001
+      { "910228", '+', "18910228" },      // Max day of month February 1891 (non-leap year)
+      { "960229", '+', "18960229" },      // Max day of month February 1896 (leap year)
+      { "000228", '+', "19000228" },      // Max day of month February 1900 (non-leap year)
+      { "520229", '-', "19520229" },      // Max day of month February 1952 (leap year)
+      { "000229", '-', "20000229" },      // Max day of month February 2000 (leap year, century divisible by 400)
+      { "010228", '-', "20010228" },      // Max day of month February 2001 (non-leap year)
+      { "530331", '+', "18530331" },      // Max day of month March 1853
+      { "080430", '-', "20080430" },      // Max day of month April 2008
+      { "150531", '+', "19150531" },      // Max day of month May 1915
+      { "600630", '-', "19600630" },      // Max day of month June 1960
+      { "750731", '+', "18750731" },      // Max day of month July 1875
+      { "810831", '-', "19810831" },      // Max day of month August 1981
+      { "090930", '+', "19090930" },      // Max day of month September 1909
+      { "101031", '-', "20101031" },      // Max day of month October 2010
+      { "111130", '+', "19111130" },      // Max day of month November 1911
+      { "121231", '-', "20121231" },      // Max day of month December 2012
 
       // Min/max/boundary values
-      { "18500101", '+' },       // Minimum valid six digit date, January 1, 1850
-      { "18991231", '+' },       // December 31, 1899
-      { "19000101", '+' },       // January 1, 1900
-      { "19991231", '-' },       // December 31 1999
-      { "20000101", '-' },       // January 1, 2000
-      { "20491231", '-' },       // Maximum valid six digit date, December 31, 2049
+      { "18000101", '+', "18000101" },    // Minimum valid eight digit date, January 1, 1800
+      { "18991231", '+', "18991231" },    // December 31, 1899
+      { "19000101", '+', "19000101" },    // January 1, 1900
+      { "19991231", '-', "19991231" },    // December 31 1999
+      { "20000101", '-', "20000101" },    // January 1, 2000
+      { "20991231", '-', "20991231" },    // Maximum valid six digit date, December 31, 2099
 
       // Month max days
-      { "20010131", '-' },       // Max day of month January 2001
-      { "18910228", '+' },       // Max day of month February 1891 (non-leap year)
-      { "18960229", '+' },       // Max day of month February 1896 (leap year)
-      { "19000228", '+' },       // Max day of month February 1900 (non-leap year)
-      { "19520229", '-' },       // Max day of month February 1952 (leap year)
-      { "20000229", '-' },       // Max day of month February 2000 (leap year, century divisible by 400)
-      { "20010228", '-' },       // Max day of month February 2001 (non-leap year)
-      { "18530331", '+' },       // Max day of month March 1853
-      { "20080430", '-' },       // Max day of month April 2008
-      { "19150531", '+' },       // Max day of month May 1915
-      { "19600630", '-' },       // Max day of month June 1960
-      { "18750731", '+' },       // Max day of month July 1875
-      { "19810831", '-' },       // Max day of month August 1981
-      { "19090930", '+' },       // Max day of month September 1909
-      { "20101031", '-' },       // Max day of month October 2010
-      { "19111130", '+' },       // Max day of month November 1911
-      { "20121231", '-' },       // Max day of month December 2012
+      { "20010131", '-', "20010131" },    // Max day of month January 2001
+      { "18910228", '+', "18910228" },    // Max day of month February 1891 (non-leap year)
+      { "18960229", '+', "18960229" },    // Max day of month February 1896 (leap year)
+      { "19000228", '+', "19000228" },    // Max day of month February 1900 (non-leap year)
+      { "19520229", '-', "19520229" },    // Max day of month February 1952 (leap year)
+      { "20000229", '-', "20000229" },    // Max day of month February 2000 (leap year, century divisible by 400)
+      { "20010228", '-', "20010228" },    // Max day of month February 2001 (non-leap year)
+      { "18530331", '+', "18530331" },    // Max day of month March 1853
+      { "20080430", '-', "20080430" },    // Max day of month April 2008
+      { "19150531", '+', "19150531" },    // Max day of month May 1915
+      { "19600630", '-', "19600630" },    // Max day of month June 1960
+      { "18750731", '+', "18750731" },    // Max day of month July 1875
+      { "19810831", '-', "19810831" },    // Max day of month August 1981
+      { "19090930", '+', "19090930" },    // Max day of month September 1909
+      { "20101031", '-', "20101031" },    // Max day of month October 2010
+      { "19111130", '+', "19111130" },    // Max day of month November 1911
+      { "20121231", '-', "20121231" },    // Max day of month December 2012
    };
 
-   public static TheoryData<String, Char> SamordningsnummerValidDateOfBirthValues = new()
+   public static TheoryData<String, Char, String> SamordningsnummerValidDateOfBirthValues = new()
    {
-      // Min/max/boundary values
-      { "500161", '+' },         // Minimum valid six digit date, January 1, 1850
-      { "991291", '+' },         // December 31, 1899
-      { "000161", '+' },         // January 1, 1900
-      { "991291", '-' },         // December 31 1999
-      { "000161", '-' },         // January 1, 2000
-      { "491291", '-' },         // Maximum valid six digit date, December 31, 2049
+      // Min/max/boundary values, short format
+      { "500161", '+', "18500101" },      // Minimum valid six digit date, January 1, 1850
+      { "991291", '+', "18991231" },      // December 31, 1899
+      { "000161", '+', "19000101" },      // January 1, 1900
+      { "991291", '-', "19991231" },      // December 31 1999
+      { "000161", '-', "20000101" },      // January 1, 2000
+      { "491291", '-', "20491231" },      // Maximum valid six digit date, December 31, 2049
 
-      // Month max days
-      { "010191", '-' },         // Max day of month January 2001
-      { "910288", '+' },         // Max day of month February 1891 (non-leap year)
-      { "960289", '+' },         // Max day of month February 1896 (leap year)
-      { "000288", '+' },         // Max day of month February 1900 (non-leap year)
-      { "520289", '-' },         // Max day of month February 1952 (leap year)
-      { "000289", '-' },         // Max day of month February 2000 (leap year, century divisible by 400)
-      { "010288", '-' },         // Max day of month February 2001 (non-leap year)
-      { "530391", '+' },         // Max day of month March 1853
-      { "080490", '-' },         // Max day of month April 2008
-      { "150591", '+' },         // Max day of month May 1915
-      { "600690", '-' },         // Max day of month June 1960
-      { "750791", '+' },         // Max day of month July 1875
-      { "810891", '-' },         // Max day of month August 1981
-      { "090990", '+' },         // Max day of month September 1909
-      { "101091", '-' },         // Max day of month October 2010
-      { "111190", '+' },         // Max day of month November 1911
-      { "121291", '-' },         // Max day of month December 2012
+      // Month max days, short format
+      { "010191", '-', "20010131" },      // Max day of month January 2001
+      { "910288", '+', "18910228" },      // Max day of month February 1891 (non-leap year)
+      { "960289", '+', "18960229" },      // Max day of month February 1896 (leap year)
+      { "000288", '+', "19000228" },      // Max day of month February 1900 (non-leap year)
+      { "520289", '-', "19520229" },      // Max day of month February 1952 (leap year)
+      { "000289", '-', "20000229" },      // Max day of month February 2000 (leap year, century divisible by 400)
+      { "010288", '-', "20010228" },      // Max day of month February 2001 (non-leap year)
+      { "530391", '+', "18530331" },      // Max day of month March 1853
+      { "080490", '-', "20080430" },      // Max day of month April 2008
+      { "150591", '+', "19150531" },      // Max day of month May 1915
+      { "600690", '-', "19600630" },      // Max day of month June 1960
+      { "750791", '+', "18750731" },      // Max day of month July 1875
+      { "810891", '-', "19810831" },      // Max day of month August 1981
+      { "090990", '+', "19090930" },      // Max day of month September 1909
+      { "101091", '-', "20101031" },      // Max day of month October 2010
+      { "111190", '+', "19111130" },      // Max day of month November 1911
+      { "121291", '-', "20121231" },      // Max day of month December 2012
 
-      // Min/max/boundary values
-      { "18500161", '+' },       // Minimum valid six digit date, January 1, 1850
-      { "18991291", '+' },       // December 31, 1899
-      { "19000161", '+' },       // January 1, 1900
-      { "19991291", '-' },       // December 31 1999
-      { "20000161", '-' },       // January 1, 2000
-      { "20491291", '-' },       // Maximum valid six digit date, December 31, 2049
+      // Min/max/boundary values, long format
+      { "18000161", '+', "18000101" },    // Minimum valid eight digit date, January 1, 1800
+      { "18991291", '+', "18991231" },    // December 31, 1899
+      { "19000161", '+', "19000101" },    // January 1, 1900
+      { "19991291", '-', "19991231" },    // December 31 1999
+      { "20000161", '-', "20000101" },    // January 1, 2000
+      { "20991291", '-', "20991231" },    // Maximum valid eight digit date, December 31, 2099
 
-      // Month max days
-      { "20010191", '-' },       // Max day of month January 2001
-      { "18910288", '+' },       // Max day of month February 1891 (non-leap year)
-      { "18960289", '+' },       // Max day of month February 1896 (leap year)
-      { "19000288", '+' },       // Max day of month February 1900 (non-leap year)
-      { "19520289", '-' },       // Max day of month February 1952 (leap year)
-      { "20000289", '-' },       // Max day of month February 2000 (leap year, century divisible by 400)
-      { "20010288", '-' },       // Max day of month February 2001 (non-leap year)
-      { "18530391", '+' },       // Max day of month March 1853
-      { "20080490", '-' },       // Max day of month April 2008
-      { "19150591", '+' },       // Max day of month May 1915
-      { "19600690", '-' },       // Max day of month June 1960
-      { "18750791", '+' },       // Max day of month July 1875
-      { "19810891", '-' },       // Max day of month August 1981
-      { "19090990", '+' },       // Max day of month September 1909
-      { "20101091", '-' },       // Max day of month October 2010
-      { "19111190", '+' },       // Max day of month November 1911
-      { "20121291", '-' },       // Max day of month December 2012
+      // Month max days, long format
+      { "20010191", '-', "20010131" },    // Max day of month January 2001
+      { "18910288", '+', "18910228" },    // Max day of month February 1891 (non-leap year)
+      { "18960289", '+', "18960229" },    // Max day of month February 1896 (leap year)
+      { "19000288", '+', "19000228" },    // Max day of month February 1900 (non-leap year)
+      { "19520289", '-', "19520229" },    // Max day of month February 1952 (leap year)
+      { "20000289", '-', "20000229" },    // Max day of month February 2000 (leap year, century divisible by 400)
+      { "20010288", '-', "20010228" },    // Max day of month February 2001 (non-leap year)
+      { "18530391", '+', "18530331" },    // Max day of month March 1853
+      { "20080490", '-', "20080430" },    // Max day of month April 2008
+      { "19150591", '+', "19150531" },    // Max day of month May 1915
+      { "19600690", '-', "19600630" },    // Max day of month June 1960
+      { "18750791", '+', "18750731" },    // Max day of month July 1875
+      { "19810891", '-', "19810831" },    // Max day of month August 1981
+      { "19090990", '+', "19090930" },    // Max day of month September 1909
+      { "20101091", '-', "20101031" },    // Max day of month October 2010
+      { "19111190", '+', "19111130" },    // Max day of month November 1911
+      { "20121291", '-', "20121231" },    // Max day of month December 2012
    };
 
    public static TheoryData<String> InvalidLengthValues =>
@@ -313,5 +317,23 @@ public class SeIdentityNumberTestsBase
       _ = Algorithms.Luhn.TryCalculateCheckDigit(partialValue, out var checkDigit);
 
       return $"{dateOfBirth}{separator}{birthSerialNumber}{checkDigit}";
+   }
+
+   protected static String GetNormalizedValue(String value)
+   {
+      if (value.Length == 13)
+      {
+         return value[..8] + value[^4..];
+      }
+
+      var year = ((value[0] - Chars.DigitZero) * 10)
+                 + (value[1] - Chars.DigitZero);
+      year = CenturyCutoff.DefaultInstance.ToFourDigitYear(year);
+      if (value[6] == Chars.Plus)
+      {
+         year -= 100;
+      }
+
+      return $"{year}{value[2..6]}{value[^4..]}";
    }
 }
