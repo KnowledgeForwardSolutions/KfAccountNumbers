@@ -1177,6 +1177,69 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SE Identity Number contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string SeIdentityNumberInvalidCharacter {
+            get {
+                return ResourceManager.GetString("SeIdentityNumberInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SE Identity Number must have a valid Luhn algorithm check digit in character position 10 (YYMMDD format) or character position 12 (YYYYMMDD format).
+        /// </summary>
+        internal static string SeIdentityNumberInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("SeIdentityNumberInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SE Personnummer requires valid six digit date of birth (YYMMDD) in character positions 0-5 (zero-based) or a valid eight digit date of birth (YYYYMMDD) in character positions 0-7 (zero-based).
+        /// </summary>
+        internal static string SeIdentityNumberInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("SeIdentityNumberInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SE Identity Number must have length 11 (YYMMDD format) or 13 (YYYYMMDD format).
+        /// </summary>
+        internal static string SeIdentityNumberInvalidLength {
+            get {
+                return ResourceManager.GetString("SeIdentityNumberInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SE Identity Number must have a valid separator character (either &apos;-&apos; or &apos;+&apos;) in character position 6 (zero-based, YYMMDD format) or character position 8 (zero-based, YYYYMMDD format).
+        /// </summary>
+        internal static string SeIdentityNumberInvalidSeparator {
+            get {
+                return ResourceManager.GetString("SeIdentityNumberInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SE Identity Number with eight-digit date of birth (YYYYMMDD) format.
+        /// </summary>
+        internal static string SeIdentityNumberLongFormatLength {
+            get {
+                return ResourceManager.GetString("SeIdentityNumberLongFormatLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SE Identity Number with six-digit date of birth (YYMMDD) format.
+        /// </summary>
+        internal static string SeIdentityNumberShortFormatLength {
+            get {
+                return ResourceManager.GetString("SeIdentityNumberShortFormatLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SE Personnummer may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string SePersonnummerEmpty {
@@ -1249,20 +1312,20 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SE Samordningsnummer requires valid six digit date of birth (YYMMDD) in character positions 0-5 (zero-based) or a valid eight digit date of birth (YYYYMMDD) in character positions 0-7 (zero-based).
+        /// </summary>
+        internal static string SeSamordingsnummerInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("SeSamordingsnummerInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SE Samordningsnummer requires the day component of the date of birth to be offset by 60 (i.e. 1-31 is represented by 61-91).
         /// </summary>
         internal static string SeSamordingsnummerInvalidDateOfBirthDayRange {
             get {
                 return ResourceManager.GetString("SeSamordingsnummerInvalidDateOfBirthDayRange", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SE Samordningsnummer requires valid six digit date of birth (YYMMDD) in character positions 0-5 (zero-based) or a valid eight digit date of birth (YYYYMMDD) in character positions 0-7 (zero-based).
-        /// </summary>
-        internal static string SeSamordingsnummerrInvalidDateOfBirth {
-            get {
-                return ResourceManager.GetString("SeSamordingsnummerrInvalidDateOfBirth", resourceCulture);
             }
         }
         

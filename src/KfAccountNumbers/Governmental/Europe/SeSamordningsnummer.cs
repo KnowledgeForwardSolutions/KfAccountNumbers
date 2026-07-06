@@ -72,11 +72,15 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               For 11-character strings, the first 6 characters must represent
-///               a valid date in the format YYMMDD. For 13-character strings,
-///               the first 8 characters must represent a valid date in the
-///               format YYYYMMDD. Note that the validation specifically does
-///               <b>NOT</b> check for future dates, only that the date exists.
+///               All non-separator characters must be ASCII digits ('0'-'9').
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The trailing character must be a valid Luhn algorithm check
+///               digit, calculated from the YYMMDD digits of the date of birth
+///               (if the value uses YYYYMMDD format, the leading two digits are
+///               ignored) and the three digits of the birth serial number.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -88,17 +92,17 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The separator must be followed by a three digit birth serial
-///               number.
+///               The leading 6 digits of an 11 character value or the leading
+///               8 digits of a 13 character value must represent a valid date
+///               (after adjusting for the samordningsnummer day offset). Note
+///               that the validation specifically does <b>NOT</b> check for
+///               future dates, only that the date exists.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               The birth serial number must be followed by a valid checksum
-///               calculated using the Luhn algorithm based on the six digit
-///               date of birth and the three-digit birth serial number. (The
-///               leading two digits of an eight digit date of birth are
-///               ignored.)
+///               The day component of the date of birth must be 61-91 (i.e.
+///               1-31 after applying the samordningsnummer day offset).
 ///            </description>
 ///         </item>
 ///      </list>
@@ -187,27 +191,24 @@ public record SeSamordningsnummer : SeIdentityNumberBase
    ///   - or -
    ///   <paramref name="value"/> is not length 11 or 13.
    ///   - or -
-   ///   <paramref name="value"/> contains an invalid date of birth in
-   ///   positions 0-5 (11 character values) or positions 0-7 (13 character
-   ///   values).
+   ///   <paramref name="value"/> has a non-separator character that is not an
+   ///   ASCII digit ('0'-9').
    ///   - or -
-   ///   <paramref name="value"/> contains an invalid separator character
-   ///   in position 6 (11 character values) or position 8 (13 character values).
-   ///   Valid separator characters are dash ('-') and plus ('+').
+   ///   <paramref name="value"/> does not have a valid Luhn algorithm check
+   ///   digit in the trailing (right-most) character position.
    ///   - or -
-   ///   <paramref name="value"/> contains an invalid birth serial number
-   ///   (i.e. one or more non-digit characters) in positions 7-9 (11 character
-   ///   values) or positions 9-11 (13 character values).
+   ///   <paramref name="value"/> has a separator character that is not a dash
+   ///   ('-') or a plus sign ('+'). The separator position is 6 (when length is
+   ///   11) or 8 (when length is 13). The character positions are zero-based.
    ///   - or -
-   ///   <paramref name="value"/> contains an invalid check digit in
-   ///   position 10 (11 character values) or position 12 (13 character values).
-   ///   The check digit is calculated using the Luhn algorithm based on the six
-   ///   digit date of birth and the three-digit birth serial number. (The
-   ///   leading two digits of an eight digit date of birth are ignored.)
+   ///   <paramref name="value"/> does not have start with a valid date of birth
+   ///   (either YYMMDD format for values with length 11 or YYYYMMDD format for
+   ///   values with length 13). (The samordningsnummer day offset is applied
+   ///   before checking if the date of birth is valid.)
+   ///   - or -
+   ///   The day component of the date of birth is not 61-91 (1-31 adjusted by
+   ///   the samordningsnummer date offset).
    /// </exception>
-   /// <remarks>
-   ///   The indices given in the exception description are all zero-based.
-   /// </remarks>
    public SeSamordningsnummer(String? value)
       : this(value, ValidationMode.ValidationRequired) { }
 
@@ -464,7 +465,7 @@ public record SeSamordningsnummer : SeIdentityNumberBase
       String value,
       String? message = null)
       => new(
-         message ?? Messages.SeSamordingsnummerrInvalidDateOfBirth,
+         message ?? Messages.SeSamordingsnummerInvalidDateOfBirth,
          value[..^SeparatorOffset],
          value.Length == ShortFormatLength ? DateFormatName.YYMMDD : DateFormatName.YYYYMMDD);
 

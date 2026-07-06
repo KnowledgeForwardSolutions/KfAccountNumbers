@@ -47,7 +47,7 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
       var isShortFormat = value.Length == SeIdentityNumberBase.ShortFormatLength;
 
       return new InvalidDateOfBirth(
-         Messages.SeSamordingsnummerrInvalidDateOfBirth,
+         Messages.SeSamordingsnummerInvalidDateOfBirth,
          isShortFormat ? value[..6] : value[..8],
          isShortFormat ? DateFormatName.YYMMDD : DateFormatName.YYYYMMDD);
    }

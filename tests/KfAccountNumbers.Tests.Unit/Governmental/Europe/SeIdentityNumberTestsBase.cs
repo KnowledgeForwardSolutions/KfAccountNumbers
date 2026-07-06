@@ -2,12 +2,29 @@ namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class SeIdentityNumberTestsBase
 {
+   protected const String ValidShortFormatDashPersonnummer = "811228-9874";        // From Wikipedia, https://en.wikipedia.org/wiki/Personal_identity_number_(Sweden)
+   protected const String ValidShortFormatPlusPersonnummer = "811228+9874";
+   protected const String AltValidShortFormatDashPersonnummer = "670919-9530";
+   protected const String AltValidShortFormatPlusPersonnummer = "670919+9530";
+   protected const String ValidLongFormatDashPersonnummer = "19670919-9530";
+   protected const String ValidLongFormatPlusPersonnummer = "20670919+9530";      // Future date, but valid format and checksum
+
    protected const String ValidShortFormatDashSamordningsnummer = "811288-9871";
    protected const String ValidShortFormatPlusSamordningsnummer = "811288+9871";
    protected const String AltValidShortFormatDashSamordningsnummer = "670979-9537";
    protected const String AltValidShortFormatPlusSamordningsnummer = "670979+9537";
    protected const String ValidLongFormatDashSamordningsnummer = "19670979-9537";
    protected const String ValidLongFormatPlusSamordningsnummer = "20670979+9537"; // Future date, but valid format and checksum
+
+   public static TheoryData<String> ValidPersonnummerValues =>
+   [
+      ValidShortFormatDashPersonnummer,
+      ValidShortFormatPlusPersonnummer,
+      AltValidShortFormatDashPersonnummer,
+      AltValidShortFormatPlusPersonnummer,
+      ValidLongFormatDashPersonnummer,
+      ValidLongFormatPlusPersonnummer
+   ];
 
    public static TheoryData<String> ValidSamordningsnummerValues =>
    [
