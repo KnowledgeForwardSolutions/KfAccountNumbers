@@ -11,3 +11,5 @@ global using KfAccountNumbers.Governmental.NorthAmerica;
 global using KfAccountNumbers.Tests.Unit.TestData;
 global using KfAccountNumbers.Results;
 global using KfAccountNumbers.Utility;
+
+global using Microsoft.Extensions.Time.Testing;

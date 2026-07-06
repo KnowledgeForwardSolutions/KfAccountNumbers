@@ -822,33 +822,33 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Fact]
-   public void SePersonnummer_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   public void SeSamordningsnummer_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new SePersonnummer(ValidLongFormatPlusSamordningsnummer);
-      var sut2 = new SePersonnummer(ValidLongFormatPlusSamordningsnummer);
+      var sut1 = new SeSamordningsnummer(ValidLongFormatPlusSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(ValidLongFormatPlusSamordningsnummer);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
    }
 
    [Fact]
-   public void SePersonnummer_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   public void SeSamordningsnummer_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new SePersonnummer(ValidShortFormatPlusSamordningsnummer);
-      var sut2 = new SePersonnummer(AltValidShortFormatPlusSamordningsnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatPlusSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(AltValidShortFormatPlusSamordningsnummer);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeFalse();
    }
 
    [Fact]
-   public void SePersonnummer_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   public void SeSamordningsnummer_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 13 character versions for same person should still be equal.
-      var sut1 = new SePersonnummer(ValidShortFormatPlusSamordningsnummer);
-      var sut2 = new SePersonnummer("18" + ValidShortFormatPlusSamordningsnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatPlusSamordningsnummer);
+      var sut2 = new SeSamordningsnummer("18" + ValidShortFormatPlusSamordningsnummer);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -866,20 +866,20 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
    }
 
    [Fact]
-   public void SePersonnummer_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   public void SeSamordningsnummer_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
    {
       // Arrange.
-      var sut = new SePersonnummer(ValidLongFormatPlusSamordningsnummer);
+      var sut = new SeSamordningsnummer(ValidLongFormatPlusSamordningsnummer);
 
       // Act/assert.
       sut.Equals(ValidLongFormatPlusSamordningsnummer).Should().BeFalse();
    }
 
    [Fact]
-   public void SePersonnummer_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   public void SeSamordningsnummer_Equals_ShouldReturnFalse_WhenComparedWithNull()
    {
       // Arrange.
-      var sut = new SePersonnummer(ValidLongFormatPlusSamordningsnummer);
+      var sut = new SeSamordningsnummer(ValidLongFormatPlusSamordningsnummer);
 
       // Act/assert.
       sut.Equals(null).Should().BeFalse();
@@ -892,11 +892,11 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Fact]
-   public void SePersonnummer_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   public void SeSamordningsnummer_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new SePersonnummer(ValidShortFormatDashSamordningsnummer);
-      var sut2 = new SePersonnummer(ValidShortFormatDashSamordningsnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -907,11 +907,11 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
    }
 
    [Fact]
-   public void SePersonnummer_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   public void SeSamordningsnummer_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var sut1 = new SePersonnummer(ValidShortFormatDashSamordningsnummer);
-      var sut2 = new SePersonnummer(AltValidShortFormatDashSamordningsnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(AltValidShortFormatDashSamordningsnummer);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -922,11 +922,11 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
    }
 
    [Fact]
-   public void SePersonnummer_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
+   public void SeSamordningsnummer_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 13 character versions for same person should still be equal.
-      var sut1 = new SePersonnummer(ValidShortFormatDashSamordningsnummer);
-      var sut2 = new SePersonnummer("19" + ValidShortFormatDashSamordningsnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer("19" + ValidShortFormatDashSamordningsnummer);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -937,7 +937,7 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
    }
 
    [Fact]
-   public void SePersonnummer_GetHashCode_ShouldReturnDifferentValues_WhenShortFormatValuesDifferOnlyBySeparator()
+   public void SeSamordningsnummer_GetHashCode_ShouldReturnDifferentValues_WhenShortFormatValuesDifferOnlyBySeparator()
    {
       // Arrange.
       var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
@@ -957,20 +957,114 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
    // ==========================================================================
 
-   // SePersonnummer does not override Object.ReferenceEquals, so this test just
+   // SeSamordningsnummer does not override Object.ReferenceEquals, so this test just
    // confirms that two different instances with the same value are not
    // considered reference equal.
 
    [Fact]
-   public void SePersonnummer_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   public void SeSamordningsnummer_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var sut1 = new SePersonnummer(ValidShortFormatDashSamordningsnummer);
-      var sut2 = new SePersonnummer(ValidShortFormatDashSamordningsnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
       ReferenceEquals(sut1, sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToLongFormat Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeSamordningsnummer_ToLongFormat_ShouldReturnExpectedValue_WhenTimeProviderIsNull(String value)
+   {
+      // Arrange.
+      var sut = new SeSamordningsnummer(value);
+      var expected = sut.Value[..8] + '-' + sut.Value[^4..];
+
+      // Act/assert.
+      sut.ToLongFormatValue().Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(FormatValueTestData))]
+   public void SeSamordningsnummer_ToLongFormat_ShouldReturnExpectedValue_WhenTimeProviderIsSupplied(
+      Int32 years,
+      Int32 days,
+      Char expectedSeparator)
+   {
+      // Arrange.
+      var sut = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var currentDate = sut.DateOfBirth.AddYears(years).AddDays(days).ToDateTime(TimeOnly.MinValue);
+      var timeProvider = new FakeTimeProvider(currentDate);
+      var expected = $"{sut.Value[..8]}{expectedSeparator}{sut.Value[^4..]}";
+
+      // Act.
+      var result = sut.ToLongFormatValue(timeProvider);
+
+      // Assert.
+      result.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region ToShortFormat Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeSamordningsnummer_ToShortFormat_ShouldReturnExpectedValue_WhenTimeProviderIsNull(String value)
+   {
+      // Arrange.
+      var sut = new SeSamordningsnummer(value);
+      var expected = sut.Value[2..8] + '-' + sut.Value[^4..];
+
+      // Act/assert.
+      sut.ToShortFormatValue().Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(FormatValueTestData))]
+   public void SeSamordningsnummer_ToShortFormat_ShouldReturnExpectedValue_WhenTimeProviderIsSupplied(
+      Int32 years,
+      Int32 days,
+      Char expectedSeparator)
+   {
+      // Arrange.
+      var sut = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var currentDate = sut.DateOfBirth.AddYears(years).AddDays(days).ToDateTime(TimeOnly.MinValue);
+      var timeProvider = new FakeTimeProvider(currentDate);
+      var expected = $"{sut.Value[2..8]}{expectedSeparator}{sut.Value[^4..]}";
+
+      // Act.
+      var result = sut.ToShortFormatValue(timeProvider);
+
+      // Assert.
+      result.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeSamordningsnummer_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new SeSamordningsnummer(value);
+      var expected = sut.ToLongFormatValue();
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
    }
 
    #endregion
@@ -1143,6 +1237,103 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void SeSamordningsnummer_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<SeSamordningsnummer>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void SeSamordningsnummer_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var expected = sut.ToLongFormatValue();
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public SeSamordningsnummer Samordningsnummer { get; set; } = null!;
+   }
+
+   [Fact]
+   public void SeSamordningsnummer_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { Samordningsnummer = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void SeSamordningsnummer_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"Samordningsnummer\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void SeSamordningsnummer_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"Samordningsnummer\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.Samordningsnummer.Should().BeNull();
+   }
+
+   [Fact]
+   public void SeSamordningsnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenPersonnummerIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"Samordningsnummer\":\"811228-9875\"}";  // Invalid check digit
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion

@@ -111,6 +111,26 @@ public abstract record SeIdentityNumberBase
          : TwentithCenturyCutoff;
 
    /// <summary>
+   ///   Given the internal representation of a Swedish identity number, extract
+   ///   the date of birth from the first 8 digits.
+   /// </summary>
+   /// <param name="value">
+   ///   Internal representation of a Swedish identity number in YYYYMMDDSSSC
+   ///   format.
+   /// </param>
+   /// <returns>
+   ///   The person's date of birth.
+   /// </returns>
+   protected static DateOnly GetDateOfBirth(String value)
+   {
+#pragma warning disable IDE0008 // Use explicit type
+      var (year, month, day) = GetYearMonthDay(value);
+#pragma warning restore IDE0008 // Use explicit type
+
+      return new DateOnly(year, month, day);
+   }
+
+   /// <summary>
    ///   Extract just the day component of the <paramref name="value"/>'s date
    ///   of birth.
    /// </summary>
@@ -229,6 +249,62 @@ public abstract record SeIdentityNumberBase
    }
 
    /// <summary>
+   ///   Format an internal representation (YYYYMMDDSSSC) to a long format
+   ///   value, including the correct separator for the person's age.
+   /// </summary>
+   /// <param name="value">
+   ///   The internal representation of a Swedish identity number.
+   /// </param>
+   /// <param name="timeProvider">
+   ///   Optional <see cref="TimeProvider"/> used to determine the current date,
+   ///   which is then used to pick the correct separator character to use (
+   ///   dash ('-') for persons less than 100 years old and plus ('+') for
+   ///   persons 100 years or older. If <see langword="null"/>, then the
+   ///   separator will default to dash ('-').
+   /// </param>
+   /// <returns>
+   ///   The identity number reformatted to YYYYMMDD-SSSC format.
+   /// </returns>
+   protected static String InternalRepresentationToLongFormat(
+      String value,
+      TimeProvider? timeProvider)
+   {
+      var separator = timeProvider is not null
+         ? GetCorrectSeparatorForAgeOfPerson(GetDateOfBirth(value), timeProvider)
+         : Chars.Dash;
+
+      return value[..8] + separator + value[^4..];
+   }
+
+   /// <summary>
+   ///   Format an internal representation (YYYYMMDDSSSC) to a short format
+   ///   value, including the correct separator for the person's age.
+   /// </summary>
+   /// <param name="value">
+   ///   The internal representation of a Swedish identity number.
+   /// </param>
+   /// <param name="timeProvider">
+   ///   Optional <see cref="TimeProvider"/> used to determine the current date,
+   ///   which is then used to pick the correct separator character to use (
+   ///   dash ('-') for persons less than 100 years old and plus ('+') for
+   ///   persons 100 years or older. If <see langword="null"/>, then the
+   ///   separator will default to dash ('-').
+   /// </param>
+   /// <returns>
+   ///   The identity number reformatted to YYMMDD-SSSC format.
+   /// </returns>
+   protected static String InternalRepresentationToShortFormat(
+      String value,
+      TimeProvider? timeProvider)
+   {
+      var separator = timeProvider is not null
+         ? GetCorrectSeparatorForAgeOfPerson(GetDateOfBirth(value), timeProvider)
+         : Chars.Dash;
+
+      return value[2..8] + separator + value[^4..];
+   }
+
+   /// <summary>
    ///   If <see cref="ValidateCheckDigit(String)"/> returns false, determine
    ///   if the reason was an invalid character or an invalid check digit.
    /// </summary>
@@ -273,8 +349,8 @@ public abstract record SeIdentityNumberBase
    protected static Boolean ValidateCheckDigit(String value)
    {
       ICheckDigitMask checkDigitMask = value.Length == ShortFormatLength
-         ? SePersonNumberShortFormatCheckDigitMask.Instance
-         : SePersonNumberLongFormatCheckDigitMask.Instance;
+         ? SeIdentityNumberShortFormatCheckDigitMask.Instance
+         : SeIdentityNumberLongFormatCheckDigitMask.Instance;
       return MaskedAlgorithms.Luhn.Validate(value, checkDigitMask);
    }
 
@@ -321,4 +397,47 @@ public abstract record SeIdentityNumberBase
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    protected static Boolean ValidateLength(ReadOnlySpan<Char> value)
       => value.Length is ShortFormatLength or LongFormatLength;
+
+   private static Char GetCorrectSeparatorForAgeOfPerson(
+      DateOnly dateOfBirth,
+      TimeProvider timeProvider)
+   {
+      DateTime today = timeProvider.GetLocalNow().Date;
+      var age = today.Year - dateOfBirth.Year;
+      if (today.Month < dateOfBirth.Month ||
+          (today.Month == dateOfBirth.Month && today.Day < dateOfBirth.Day))
+      {
+         age--;
+      }
+
+      return age >= 100 ? Chars.Plus : Chars.Dash;
+   }
+}
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
+internal class SeIdentityNumberShortFormatCheckDigitMask : ICheckDigitMask
+{
+   private static readonly Lazy<SeIdentityNumberShortFormatCheckDigitMask> _instance =
+      new(() => new SeIdentityNumberShortFormatCheckDigitMask());
+
+   public static SeIdentityNumberShortFormatCheckDigitMask Instance => _instance.Value;
+
+   public Boolean ExcludeCharacter(Int32 index) => index == 6;
+
+   public Boolean IncludeCharacter(Int32 index) => index != 6;
+}
+
+internal class SeIdentityNumberLongFormatCheckDigitMask : ICheckDigitMask
+{
+   private static readonly Lazy<SeIdentityNumberLongFormatCheckDigitMask> _instance =
+      new(() => new SeIdentityNumberLongFormatCheckDigitMask());
+
+   public static SeIdentityNumberLongFormatCheckDigitMask Instance => _instance.Value;
+
+   public Boolean ExcludeCharacter(Int32 index)
+      => index is 0 or 1 or 8;
+
+   public Boolean IncludeCharacter(Int32 index)
+      => index is not 0 and not 1 and not 8;
 }

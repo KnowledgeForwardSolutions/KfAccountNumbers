@@ -308,6 +308,18 @@ public class SeIdentityNumberTestsBase
       { "19011292", '+' },    // Invalid day of month December
    };
 
+   public static TheoryData<Int32, Int32, Char> FormatValueTestData = new()
+   {
+      // Year offset, day offset, expected separator
+      { -150,  0, '-' },
+      {  -50,  0, '-' },
+      {   50,  0, '-' },
+      {  100, -1, '-' },
+      {  100,  0, '+' },
+      {  100,  1, '+' },
+      {  150,  0, '+' },
+   };
+
    protected static String GetValueWithValidCheckDigit(
       String dateOfBirth = "811228",
       Char separator = '-',

@@ -171,6 +171,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      for more details.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(SeSamordningsnummerJsonConverter))]
 public record SeSamordningsnummer : SeIdentityNumberBase
 {
    /// <summary>
@@ -250,8 +251,8 @@ public record SeSamordningsnummer : SeIdentityNumberBase
    /// </summary>
    /// <remarks>
    ///   <para>
-   ///         See the class comments for the rules for deriving the date of birth
-   ///   for an 11 character personnummer.
+   ///      See the class comments for the rules for deriving the date of birth
+   ///      for an 11 character personnummer.
    ///   </para>
    ///   <para>
    ///      Note that the indicated date of birth may not be the person's exact
@@ -266,17 +267,7 @@ public record SeSamordningsnummer : SeIdentityNumberBase
    ///      an actual date.
    ///   </para>
    /// </remarks>
-   public DateOnly DateOfBirth
-   {
-      get
-      {
-#pragma warning disable IDE0008 // Use explicit type
-         var (year, month, day) = GetYearMonthDay(Value);
-#pragma warning restore IDE0008 // Use explicit type
-
-         return new DateOnly(year, month, day);
-      }
-   }
+   public DateOnly DateOfBirth => GetDateOfBirth(Value);
 
    /// <summary>
    ///   Gets the person's gender, as indicated by the third character of the
@@ -320,7 +311,7 @@ public record SeSamordningsnummer : SeIdentityNumberBase
    /// <returns>
    ///   A <see cref="CreateResult{SeSamordningsnummer, ValidationError}"/>. Will
    ///   contain the new <see cref="SeSamordningsnummer"/> if <paramref name="value"/>
-   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   is valid or a <see cref="SeIdentityNumberBase.ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
    public static CreateResult<SeSamordningsnummer, ValidationError> Create(String? value)
@@ -335,6 +326,53 @@ public record SeSamordningsnummer : SeIdentityNumberBase
          InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
          _ => throw new UnreachableException("This branch should never be reached"),
       };
+
+   /// <summary>
+   ///   Returns a string representation of the value in a long 13 character
+   ///   format, combining the date of birth in YYYYMMDD format, a separator
+   ///   character, the three digit birth serial number and the check digit.
+   /// </summary>
+   /// <param name="timeProvider">
+   ///   Optional. <see cref="TimeProvider"/> instance used to determine the
+   ///   exact age of the person. Persons 100 years or older will have a plus
+   ///   ('+') as a separator; otherwise a dash ('-') is used as the separator.
+   ///   If the <paramref name="timeProvider"/> is <see langword="null"/> then
+   ///   the separator character will default to a dash ('-').
+   /// </param>
+   /// <returns>
+   ///   The samordningsnummer formatted as a 13 character string.
+   /// </returns>
+   public String ToLongFormatValue(TimeProvider? timeProvider = null)
+      => InternalRepresentationToLongFormat(Value, timeProvider);
+
+   /// <summary>
+   ///   Returns a string representation of the value in a short 11 character
+   ///   format, combining the date of birth in YYMMDD format, a separator
+   ///   character, the three digit birth serial number and the check digit.
+   /// </summary>
+   /// <param name="timeProvider">
+   ///   Optional. <see cref="TimeProvider"/> instance used to determine the
+   ///   exact age of the person. Persons 100 years or older will have a plus
+   ///   ('+') as a separator; otherwise a dash ('-') is used as the separator.
+   ///   If the <paramref name="timeProvider"/> is <see langword="null"/> then
+   ///   the separator character will default to a dash ('-').
+   /// </param>
+   /// <returns>
+   ///   The samordningsnummer formatted as an 11 character string.
+   /// </returns>
+   public String ToShortFormatValue(TimeProvider? timeProvider = null)
+      => InternalRepresentationToShortFormat(Value, timeProvider);
+
+   /// <summary>
+   ///   Get a string representation of the samordningsnummer.
+   /// </summary>
+   /// <returns>
+   ///   The samordningsnummer formatted as a 13 character string.
+   /// </returns>
+   /// <remarks>
+   ///   See <see cref="ToLongFormatValue"/> for additional details.
+   /// </remarks>
+   public override String ToString() => InternalRepresentationToLongFormat(Value, null);
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a
@@ -435,4 +473,23 @@ public record SeSamordningsnummer : SeIdentityNumberBase
          Messages.SeSamordningsnummerInvalidSeparator,
          value[^SeparatorOffset],
          value.Length - SeparatorOffset);
+}
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
+public class SeSamordningsnummerJsonConverter : JsonConverter<SeSamordningsnummer>
+{
+   public override SeSamordningsnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new SeSamordningsnummer(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, SeSamordningsnummer value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.ToLongFormatValue());
 }
