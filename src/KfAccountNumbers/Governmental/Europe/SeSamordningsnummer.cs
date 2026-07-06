@@ -94,7 +94,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The birth serial number must be followed by a  valid checksum
+///               The birth serial number must be followed by a valid checksum
 ///               calculated using the Luhn algorithm based on the six digit
 ///               date of birth and the three-digit birth serial number. (The
 ///               leading two digits of an eight digit date of birth are
@@ -113,8 +113,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   <para>
 ///      Note that the encoded date of birth may not be the person's actual
 ///      date of birth. It is possible to run out of birth serial numbers for
-///      a particular day and in this case a day close to the actual date of
-///      birth is substituted in its stead.
+///      a particular day, in which case a day close to the actual date of birth
+///      is used instead.
 ///   </para>
 ///   <para>
 ///      When determining if a date of birth is valid, values with six digit
@@ -437,7 +437,7 @@ public record SeSamordningsnummer : SeIdentityNumberBase
       var day = GetDayOfBirth(value);
       if (day is < 61 or > 91)
       {
-         return GetInvalidDateOfBirthResult(value, Messages.SeSamordingsnummerrInvalidDateOfBirthDayRange);
+         return GetInvalidDateOfBirthResult(value, Messages.SeSamordingsnummerInvalidDateOfBirthDayRange);
       }
 
       return default(ValidValue);

@@ -42,14 +42,22 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
          value[position],
          position);
 
-   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(
-      String value,
-      String? message = null)
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
    {
       var isShortFormat = value.Length == SeIdentityNumberBase.ShortFormatLength;
 
       return new InvalidDateOfBirth(
-         message ?? Messages.SeSamordingsnummerrInvalidDateOfBirth,
+         Messages.SeSamordingsnummerrInvalidDateOfBirth,
+         isShortFormat ? value[..6] : value[..8],
+         isShortFormat ? DateFormatName.YYMMDD : DateFormatName.YYYYMMDD);
+   }
+
+   private static InvalidDateOfBirth GetInvalidDateOfBirthRangeResult(String value)
+   {
+      var isShortFormat = value.Length == SeIdentityNumberBase.ShortFormatLength;
+
+      return new InvalidDateOfBirth(
+         Messages.SeSamordingsnummerInvalidDateOfBirthDayRange,
          isShortFormat ? value[..6] : value[..8],
          isShortFormat ? DateFormatName.YYMMDD : DateFormatName.YYYYMMDD);
    }
@@ -205,6 +213,9 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
+   // This test is critical: it verifies that SeSamordningsnummer rejects
+   // valid personnummer dates (day 01-31) because samordningsnummer requires
+   // day 61-91 (personnummer day + 60 offset).
    [Theory]
    [MemberData(nameof(PersonnummerValidDateOfBirthValues))]
    public void SeSamordningsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasValidPersonnummerDateOfBirth(
@@ -216,9 +227,7 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
       var value = GetValueWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
-      LocalValidationError expected = GetInvalidDateOfBirthResult(
-         value,
-         Messages.SeSamordingsnummerrInvalidDateOfBirthDayRange);
+      LocalValidationError expected = GetInvalidDateOfBirthRangeResult(value);
 
       // Act/assert.
       FluentActions
@@ -531,9 +540,7 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
       var value = GetValueWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
-      LocalValidationError expected = GetInvalidDateOfBirthResult(
-         value,
-         Messages.SeSamordingsnummerrInvalidDateOfBirthDayRange);
+      LocalValidationError expected = GetInvalidDateOfBirthRangeResult(value);
 
       // Act/assert.
       FluentActions
@@ -804,9 +811,7 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
       var value = GetValueWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
-      LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(
-         value,
-         Messages.SeSamordingsnummerrInvalidDateOfBirthDayRange);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthRangeResult(value);
 
       // Act.
       var result = SeSamordningsnummer.Create(value);
@@ -1228,9 +1233,7 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
       var value = GetValueWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
-      LocalValidationResult expected = GetInvalidDateOfBirthResult(
-         value,
-         Messages.SeSamordingsnummerrInvalidDateOfBirthDayRange);
+      LocalValidationResult expected = GetInvalidDateOfBirthRangeResult(value);
 
       // Act.
       var result = SeSamordningsnummer.Validate(value);
@@ -1323,7 +1326,7 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
    }
 
    [Fact]
-   public void SeSamordningsnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenPersonnummerIsInvalid()
+   public void SeSamordningsnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenSamordningsnummerIsInvalid()
    {
       // Arrange.
       var json = "{\"Samordningsnummer\":\"811228-9875\"}";  // Invalid check digit

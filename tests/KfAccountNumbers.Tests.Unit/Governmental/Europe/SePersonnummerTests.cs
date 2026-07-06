@@ -4,8 +4,6 @@
 #pragma warning disable IDE0058 // Expression value is never used
 #pragma warning disable CA2211 // Non-constant fields should not be visible
 
-using Microsoft.Extensions.Time.Testing;
-
 using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
    KfAccountNumbers.Governmental.Europe.SePersonnummer,
    KfAccountNumbers.Governmental.Europe.SePersonnummer.ValidationError>;

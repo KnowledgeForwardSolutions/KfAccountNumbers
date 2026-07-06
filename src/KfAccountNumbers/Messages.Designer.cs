@@ -1249,20 +1249,20 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SE Samordningsnummer requires the day component of the date of birth to be offset by 60 (i.e. 1-31 is represented by 61-91).
+        /// </summary>
+        internal static string SeSamordingsnummerInvalidDateOfBirthDayRange {
+            get {
+                return ResourceManager.GetString("SeSamordingsnummerInvalidDateOfBirthDayRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SE Samordningsnummer requires valid six digit date of birth (YYMMDD) in character positions 0-5 (zero-based) or a valid eight digit date of birth (YYYYMMDD) in character positions 0-7 (zero-based).
         /// </summary>
         internal static string SeSamordingsnummerrInvalidDateOfBirth {
             get {
                 return ResourceManager.GetString("SeSamordingsnummerrInvalidDateOfBirth", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SE Samordningsnummer requires the day component of the date of birth to be offset by 60 (i.e. 1-31 is represented by 61-91).
-        /// </summary>
-        internal static string SeSamordingsnummerrInvalidDateOfBirthDayRange {
-            get {
-                return ResourceManager.GetString("SeSamordingsnummerrInvalidDateOfBirthDayRange", resourceCulture);
             }
         }
         
