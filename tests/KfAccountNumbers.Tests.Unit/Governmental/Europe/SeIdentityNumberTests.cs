@@ -5,7 +5,7 @@ using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
    KfAccountNumbers.Governmental.Europe.SeIdentityNumberBase.ValidationError>;
 using LocalValidationError = KfAccountNumbers.Governmental.Europe.SeIdentityNumberBase.ValidationError;
 using LocalValidationException = KfAccountNumbers.UKfValidationException<
-   KfAccountNumbers.Governmental.Europe.SeIdentityNumber.ValidationError>;
+   KfAccountNumbers.Governmental.Europe.SeIdentityNumberBase.ValidationError>;
 using LocalValidationResult = KfAccountNumbers.Governmental.Europe.SeIdentityNumberBase.ValidationResult;
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;

@@ -1,3 +1,5 @@
+#pragma warning disable IDE0046 // Convert to conditional expression
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -94,7 +96,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            <description>
 ///               Samordningsnummer, date of birth 19890261 (actual date of
 ///               birth = 19890201), less than 100 years old, gender = female,
-///               check digit  = 3.
+///               check digit = 3.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -205,7 +207,7 @@ public record SeIdentityNumber : SeIdentityNumberBase
    ///   class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a samordningsnummer.
+   ///   String representation of a Swedish identity number.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
@@ -301,13 +303,11 @@ public record SeIdentityNumber : SeIdentityNumberBase
    ///   Gets the specific type of identifier that this instance represents.
    /// </summary>
    public IdentifierCategory IdentifierType
-   {
-      get => Value.AsSpan(6..).ParseTwoDigits() switch
+      => Value.AsSpan(6..).ParseTwoDigits() switch
       {
-         <= 31 => default(SeIdentifierType.Personnummer),
-         _ => default(SeIdentifierType.Samordningsnummer),
+         <= 31 => default(SeIdentifierType.Personnummer),         // Day 01-31: Personnummer
+         _ => default(SeIdentifierType.Samordningsnummer),        // Day 61-91: Samordningsnummer
       };
-   }
 
    /// <summary>
    ///   Gets the normalized identity number value.
