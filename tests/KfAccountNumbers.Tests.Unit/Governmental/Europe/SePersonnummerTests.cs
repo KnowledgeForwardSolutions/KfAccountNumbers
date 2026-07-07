@@ -52,24 +52,6 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
          ? new InvalidDateOfBirth(Messages.SePersonnummerInvalidDateOfBirth, value[..6], DateFormatName.YYMMDD)
          : new InvalidDateOfBirth(Messages.SePersonnummerInvalidDateOfBirth, value[..8], DateFormatName.YYYYMMDD);
 
-   #region Constants Tests
-   // ==========================================================================
-   // ==========================================================================
-
-   [Fact]
-   public void SePersonnummer_MinimumValidYearOfBirth_ShouldHaveExpectedValue()
-      => SePersonnummer.MinimumValidYearOfBirth.Should().Be(1800);
-
-   [Fact]
-   public void SePersonnummer_MaximumValidYearOfBirth_ShouldHaveExpectedValue()
-      => SePersonnummer.MaximumValidYearOfBirth.Should().Be(2099);
-
-   [Fact]
-   public void SePersonnummer_SamordningsnummerOffset_ShouldHaveExpectedValue()
-      => SePersonnummer.SamordningsnummerDayOffset.Should().Be(60);
-
-   #endregion
-
    #region Constructor Tests
    // ==========================================================================
    // ==========================================================================

@@ -3,9 +3,17 @@
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
-///   Strongly typed business object that represents a coordination number
-///   (samordningsnummer) issued by the Swedish Tax Agency to temporary
-///   residents (persons who reside in Sweden for less than 12 months).
+///   <para>
+///      Strongly typed business object that represents a coordination number
+///      (samordningsnummer) issued by the Swedish Tax Agency to temporary
+///      residents (persons who reside in Sweden for less than 12 months).
+///   </para>
+///   <para>
+///      <b>Note:</b>See <see cref="SePersonnummer"/> for a similar
+///      identifier (personnummer) issued to permanent residents of Sweden and
+///      <see cref="SeIdentityNumber"/> for a compoosite type that can represent
+///      either a personnummer or a samordningsnummer.
+///   </para>
 /// </summary>
 /// <remarks>
 ///   <para>

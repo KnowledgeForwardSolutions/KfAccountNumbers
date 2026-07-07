@@ -3,15 +3,21 @@
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
-///   Strongly typed business object that represents either of two identifiers
-///   issued by the Swedish Tax Agency that have the same format and are used
-///   for similar purposes. The first, the Personal Identity Number
-///   (personnummer) is issued to persons born in Sweden or who are residents
-///   of Sweden for 12 months or longer. The second, the coordination number
-///   (samordningsnummer) is issued to persons who reside in Sweden for less
-///   than a year. The <see cref="IdentifierType"/> property will indicate
-///   the exact type of identifier represented by an instance of
-///   <see cref="SePersonnummer"/>.
+///   <para>
+///      Strongly typed business object that represents either of two
+///      identifiers issued by the Swedish Tax Agency that have the same format
+///      and are used for similar purposes. The first, the Personal Identity
+///      Number (personnummer) is issued to persons born in Sweden or who are
+///      residents of Sweden for 12 months or longer. The second, the
+///      coordination number (samordningsnummer) is issued to persons who reside
+///      in Sweden for less than a year. The <see cref="IdentifierType"/>
+///      property will indicate the exact type of identifier represented by an
+///      instance of <see cref="SeIdentityNumber"/>.
+///   </para>
+///   <para>
+///      See <see cref="SePersonnummer"/> and <see cref="SeSamordningsnummer"/>
+///      for types that represent specific identifiers.
+///   </para>
 /// </summary>
 /// <remarks>
 ///   <para>
@@ -154,6 +160,13 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            </description>
 ///         </item>
 ///      </list>
+///   </para>
+///   <para>
+///      Personnummers are distinguished from other identity numbers by the fact
+///      that the of the date of birth embeded in the value is not modified in
+///      any way. In a samordningsnummer, 60 is added to the day, resulting in a
+///      day between 61 and 91. Personnummers will always have a day between 01
+///      and 31.
 ///   </para>
 ///   <para>
 ///      Note that the encoded date of birth may not be the person's actual
