@@ -130,6 +130,12 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      40 meaning 1900 to 1949 and 50 to 99 meaning 1850 to 1899.
 ///   </para>
 ///   <para>
+///      The valid range for a date of birth is January 1, 1800 to
+///      December 31, 2099. However, if a six digit date of birth is supplied
+///      then the valid range will be between January 1, 1850 to December 31,
+///      2049.
+///   </para>
+///   <para>
 ///      Internally, <see cref="SeSamordningsnummer"/> stores a 12-digit
 ///      representation consisting of the date of birth in YYYYMMDD format
 ///      followed by the birth serial number and check digit (no separator). The
@@ -201,13 +207,9 @@ public record SeSamordningsnummer : SeIdentityNumberBase
    ///   ('-') or a plus sign ('+'). The separator position is 6 (when length is
    ///   11) or 8 (when length is 13). The character positions are zero-based.
    ///   - or -
-   ///   <paramref name="value"/> does not have start with a valid date of birth
-   ///   (either YYMMDD format for values with length 11 or YYYYMMDD format for
-   ///   values with length 13). (The samordningsnummer day offset is applied
-   ///   before checking if the date of birth is valid.)
-   ///   - or -
-   ///   The day component of the date of birth is not 61-91 (1-31 adjusted by
-   ///   the samordningsnummer date offset).
+   ///   <paramref name="value"/> must have a valid date of birth (after
+   ///   applying the +60 samordningsnummer day offset) between 01/01/1800 and
+   ///   31/12/2049.
    /// </exception>
    public SeSamordningsnummer(String? value)
       : this(value, ValidationMode.ValidationRequired) { }
@@ -429,16 +431,9 @@ public record SeSamordningsnummer : SeIdentityNumberBase
          return GetInvalidSeparatorResult(value);
       }
 
-      if (!ValidateDateOfBirth(value))
+      if (!ValidateDateOfBirth(value, DateOffsetMode.Samordningsnummer))
       {
          return GetInvalidDateOfBirthResult(value);
-      }
-
-      // Ensure that the date of birth indicates a samordningsnummer.
-      var day = GetDayOfBirth(value);
-      if (day is < 61 or > 91)
-      {
-         return GetInvalidDateOfBirthResult(value, Messages.SeSamordingsnummerInvalidDateOfBirthDayRange);
       }
 
       return default(ValidValue);
@@ -461,11 +456,9 @@ public record SeSamordningsnummer : SeIdentityNumberBase
             new ValidLengthDefinition(LongFormatLength, Messages.SeSamordningsnummerLongFormatLength),
          ]);
 
-   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(
-      String value,
-      String? message = null)
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
       => new(
-         message ?? Messages.SeSamordingsnummerInvalidDateOfBirth,
+         Messages.SeSamordingsnummerInvalidDateOfBirth,
          value[..^SeparatorOffset],
          value.Length == ShortFormatLength ? DateFormatName.YYMMDD : DateFormatName.YYYYMMDD);
 

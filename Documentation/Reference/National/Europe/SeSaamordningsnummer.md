@@ -21,8 +21,7 @@ Coordination number (samordningsnummer) issued by the Swedish tax agency to pers
 | 3. | All non-separator characters must be ASCII digits ('0'-'9'). | InvalidCharacter |
 | 4. | The trailing character must be a valid Luhn algorithm check digit. | InvalidChecksum |
 | 5. | The separator character must follow the date of birth (either 6 or 8 digits) and must be either a dash ('-') or a plus ('+'). | InvalidSeparator |
-| 6. | The date of birth (either 6 or 8 digits) must be a valid date (after adjusting for samordningsnummer day offset) | InvalidDateOfBirth |
-| 7. | The day component of the date of birth must be between 61 and 91 (1-31 + samordningsnummer day offset) | InvalidDateOfBirth |
+| 6. | The date of birth (after applying the +60 samordningsnummer day offset) must be a valid date between 01/01/1800 and 31/12/2099 | InvalidDateOfBirth |
 
 ### Additional Properties
 

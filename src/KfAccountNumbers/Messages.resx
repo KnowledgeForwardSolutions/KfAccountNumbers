@@ -234,9 +234,6 @@
   <data name="UsItinInvalidGroupNumber" xml:space="preserve">
     <value>US Individual Taxpayer Identification Number group number segment (xxx-GG-xxxx) must not be 00-49, 66-69, 89 or 93</value>
   </data>
-  <data name="SePersonnummerEmpty" xml:space="preserve">
-    <value>SE Personnummer may not be null, empty or all whitespace characters</value>
-  </data>
   <data name="SePersonnummerInvalidLength" xml:space="preserve">
     <value>SE Personnummer must have length 11 (YYMMDD format) or 13 (YYYYMMDD format)</value>
   </data>
@@ -608,9 +605,6 @@
   </data>
   <data name="SeSamordingsnummerInvalidDateOfBirth" xml:space="preserve">
     <value>SE Samordningsnummer requires valid six digit date of birth (YYMMDD) in character positions 0-5 (zero-based) or a valid eight digit date of birth (YYYYMMDD) in character positions 0-7 (zero-based)</value>
-  </data>
-  <data name="SeSamordingsnummerInvalidDateOfBirthDayRange" xml:space="preserve">
-    <value>SE Samordningsnummer requires the day component of the date of birth to be offset by 60 (i.e. 1-31 is represented by 61-91)</value>
   </data>
   <data name="SeIdentityNumberLongFormatLength" xml:space="preserve">
     <value>SE Identity Number with eight-digit date of birth (YYYYMMDD) format</value>

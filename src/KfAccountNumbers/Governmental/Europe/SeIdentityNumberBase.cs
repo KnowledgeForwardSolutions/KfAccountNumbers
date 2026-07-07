@@ -95,6 +95,28 @@ public abstract record SeIdentityNumberBase
    private const Int32 InternalRepresentationLength = 12;      // YYYYMMDD + birth serial number + check digit
 
    /// <summary>
+   ///   Defines how date offsets are applied when extracting the date of birth
+   ///   from a value.
+   /// </summary>
+   protected enum DateOffsetMode
+   {
+      /// <summary>
+      ///   Personnummers never adjust the date.
+      /// </summary>
+      Personummer = 0,
+
+      /// <summary>
+      ///   Samordningsnummers adjust the day by removing the +60 day offset.
+      /// </summary>
+      Samordningsnummer,
+
+      /// <summary>
+      ///   Date will be adjusted to remove an offset if necessary.
+      /// </summary>
+      Optional,
+   }
+
+   /// <summary>
    ///   Get the correct century cutoff, based on the separator character.
    /// </summary>
    /// <param name="value">
@@ -118,13 +140,18 @@ public abstract record SeIdentityNumberBase
    ///   Internal representation of a Swedish identity number in YYYYMMDDSSSC
    ///   format.
    /// </param>
+   /// <param name="dateOffsetMode">
+   ///   Defines how date offsets should be handled.
+   /// </param>
    /// <returns>
    ///   The person's date of birth.
    /// </returns>
-   protected static DateOnly GetDateOfBirth(String value)
+   protected static DateOnly GetDateOfBirth(
+      String value,
+      DateOffsetMode dateOffsetMode = DateOffsetMode.Optional)
    {
 #pragma warning disable IDE0008 // Use explicit type
-      var (year, month, day) = GetYearMonthDay(value);
+      var (year, month, day) = GetYearMonthDay(value, dateOffsetMode);
 #pragma warning restore IDE0008 // Use explicit type
 
       return new DateOnly(year, month, day);
@@ -213,10 +240,15 @@ public abstract record SeIdentityNumberBase
    /// <param name="value">
    ///   The value being processed.
    /// </param>
+   /// <param name="dateOffsetMode">
+   ///   Defines how date offsets should be handled.
+   /// </param>
    /// <returns>
    ///   The year, month and day of the person's date of birth.
    /// </returns>
-   protected static (Int32 Year, Int32 Month, Int32 Day) GetYearMonthDay(ReadOnlySpan<Char> value)
+   protected static (Int32 Year, Int32 Month, Int32 Day) GetYearMonthDay(
+      ReadOnlySpan<Char> value,
+      DateOffsetMode dateOffsetMode)
    {
       Int32 year;
       Int32 month;
@@ -239,11 +271,15 @@ public abstract record SeIdentityNumberBase
          day = value[6..].ParseTwoDigits();
       }
 
-      // Handle samordningsnummer, which adds 60 to the date of birth.
-      if (day > SamordningsnummerDayOffset)
+      // Handle date offset such as samordningsnummer.
+#pragma warning disable IDE0072 // Add missing cases
+      day = dateOffsetMode switch
       {
-         day -= SamordningsnummerDayOffset;
-      }
+         DateOffsetMode.Samordningsnummer => day - SamordningsnummerDayOffset,
+         DateOffsetMode.Optional => day > 31 ? day - SamordningsnummerDayOffset : day,
+         _ => day,
+      };
+#pragma warning restore IDE0072 // Add missing cases
 
       return (year, month, day);
    }
@@ -361,15 +397,20 @@ public abstract record SeIdentityNumberBase
    /// <param name="value">
    ///   The value to check.
    /// </param>
+   /// <param name="dateOffsetMode">
+   ///   Defines how date offsets should be handled.
+   /// </param>
    /// <returns>
    ///   <see langword="true"/> if <paramref name="value"/> has a valid date of
    ///   birth; otherwise <see langword="false"/>.
    /// </returns>
-   protected static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> value)
+   protected static Boolean ValidateDateOfBirth(
+      ReadOnlySpan<Char> value,
+      DateOffsetMode dateOffsetMode)
    {
       // Manual validation is faster than using DateTime.TryParseExact.
 #pragma warning disable IDE0008 // Use explicit type
-      var (year, month, day) = GetYearMonthDay(value);
+      var (year, month, day) = GetYearMonthDay(value, dateOffsetMode);
 #pragma warning restore IDE0008 // Use explicit type
 
       if (year is < MinimumValidYearOfBirth or > MaximumValidYearOfBirth)

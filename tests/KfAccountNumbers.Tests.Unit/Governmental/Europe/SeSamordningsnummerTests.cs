@@ -52,16 +52,6 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
          isShortFormat ? DateFormatName.YYMMDD : DateFormatName.YYYYMMDD);
    }
 
-   private static InvalidDateOfBirth GetInvalidDateOfBirthRangeResult(String value)
-   {
-      var isShortFormat = value.Length == SeIdentityNumberBase.ShortFormatLength;
-
-      return new InvalidDateOfBirth(
-         Messages.SeSamordingsnummerInvalidDateOfBirthDayRange,
-         isShortFormat ? value[..6] : value[..8],
-         isShortFormat ? DateFormatName.YYMMDD : DateFormatName.YYYYMMDD);
-   }
-
    #region Constructor Tests
    // ==========================================================================
    // ==========================================================================
@@ -227,7 +217,7 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
       var value = GetValueWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
-      LocalValidationError expected = GetInvalidDateOfBirthRangeResult(value);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
@@ -558,7 +548,7 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
       var value = GetValueWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
-      LocalValidationError expected = GetInvalidDateOfBirthRangeResult(value);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
       FluentActions
@@ -829,7 +819,7 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
       var value = GetValueWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
-      LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthRangeResult(value);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
 
       // Act.
       var result = SeSamordningsnummer.Create(value);
@@ -1251,7 +1241,7 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
       var value = GetValueWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
-      LocalValidationResult expected = GetInvalidDateOfBirthRangeResult(value);
+      LocalValidationResult expected = GetInvalidDateOfBirthResult(value);
 
       // Act.
       var result = SeSamordningsnummer.Validate(value);

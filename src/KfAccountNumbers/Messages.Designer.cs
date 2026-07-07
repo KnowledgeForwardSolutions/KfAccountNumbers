@@ -1240,15 +1240,6 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SE Personnummer may not be null, empty or all whitespace characters.
-        /// </summary>
-        internal static string SePersonnummerEmpty {
-            get {
-                return ResourceManager.GetString("SePersonnummerEmpty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to SE Personnummer contains a non-digit character where a digit was expected.
         /// </summary>
         internal static string SePersonnummerInvalidCharacter {
@@ -1317,15 +1308,6 @@ namespace KfAccountNumbers {
         internal static string SeSamordingsnummerInvalidDateOfBirth {
             get {
                 return ResourceManager.GetString("SeSamordingsnummerInvalidDateOfBirth", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SE Samordningsnummer requires the day component of the date of birth to be offset by 60 (i.e. 1-31 is represented by 61-91).
-        /// </summary>
-        internal static string SeSamordingsnummerInvalidDateOfBirthDayRange {
-            get {
-                return ResourceManager.GetString("SeSamordingsnummerInvalidDateOfBirthDayRange", resourceCulture);
             }
         }
         

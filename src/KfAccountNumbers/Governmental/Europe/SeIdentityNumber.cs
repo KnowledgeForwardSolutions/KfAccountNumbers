@@ -225,11 +225,9 @@ public record SeIdentityNumber : SeIdentityNumberBase
    ///   ('-') or a plus sign ('+'). The separator position is 6 (when length is
    ///   11) or 8 (when length is 13). The character positions are zero-based.
    ///   - or -
-   ///   <paramref name="value"/> does not have start with a valid date of birth
-   ///   (either YYMMDD format for values with length 11 or YYYYMMDD format for
-   ///   values with length 13). If the value is a samordningsnummer, then the
-   ///   samordningsnummer day offset is applied before checking if the date of
-   ///   birth is valid.
+   ///   <paramref name="value"/> must have a valid date of birth (after
+   ///   applying the +60 samordningsnummer day offset to samordningsnummer
+   ///   values) between 01/01/1800 and 31/12/2049.
    /// </exception>
    public SeIdentityNumber(String? value)
       : this(value, ValidationMode.ValidationRequired) { }
@@ -290,7 +288,7 @@ public record SeIdentityNumber : SeIdentityNumberBase
    ///      an actual date.
    ///   </para>
    /// </remarks>
-   public DateOnly DateOfBirth => GetDateOfBirth(Value);
+   public DateOnly DateOfBirth => GetDateOfBirth(Value, DateOffsetMode.Optional);
 
    /// <summary>
    ///   Gets the person's gender, as indicated by the third character of the
@@ -461,7 +459,7 @@ public record SeIdentityNumber : SeIdentityNumberBase
          return GetInvalidSeparatorResult(value);
       }
 
-      if (!ValidateDateOfBirth(value))
+      if (!ValidateDateOfBirth(value, DateOffsetMode.Optional))
       {
          return GetInvalidDateOfBirthResult(value);
       }

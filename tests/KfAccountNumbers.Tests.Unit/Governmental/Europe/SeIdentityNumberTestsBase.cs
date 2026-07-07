@@ -251,8 +251,8 @@ public class SeIdentityNumberTestsBase
       { "011232", '+' },      // Invalid day of month December
 
       // Invalid year
-      { "17991232", '+' },    // Invalid year (too low)
-      { "21010101", '-' },    // Invalid year (too high)
+      { "17991231", '+' },    // Invalid year (too low)
+      { "21000101", '-' },    // Invalid year (too high)
 
       // Invalid month
       { "19010001", '+' },    // Invalid month (too low)
@@ -300,8 +300,8 @@ public class SeIdentityNumberTestsBase
       { "011292", '+' },      // Invalid day of month December
 
       // Invalid year
-      { "17991292", '+' },    // Invalid year (too low)
-      { "21010161", '-' },    // Invalid year (too high)
+      { "17991291", '+' },    // Invalid year (too low)
+      { "21000161", '-' },    // Invalid year (too high)
 
       // Invalid month
       { "19010061", '+' },    // Invalid month (too low)
