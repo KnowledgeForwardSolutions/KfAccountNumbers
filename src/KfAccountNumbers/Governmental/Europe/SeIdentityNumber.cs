@@ -298,6 +298,18 @@ public record SeIdentityNumber : SeIdentityNumberBase
       => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
 
    /// <summary>
+   ///   Gets the specific type of identifier that this instance represents.
+   /// </summary>
+   public IdentifierCategory IdentifierType
+   {
+      get => Value.AsSpan(6..).ParseTwoDigits() switch
+      {
+         <= 31 => default(SeIdentifierType.Personnummer),
+         _ => default(SeIdentifierType.Samordningsnummer),
+      };
+   }
+
+   /// <summary>
    ///   Gets the normalized identity number value.
    /// </summary>
    public String Value { get; private init; }

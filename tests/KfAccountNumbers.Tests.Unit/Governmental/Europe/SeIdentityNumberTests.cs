@@ -297,6 +297,36 @@ public class SeIdentityNumberTests : SeIdentityNumberTestsBase
 
    #endregion
 
+   #region IdentifierType Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidPersonnummerValues))]
+   public void SeIdentityNumber_IdentifierType_ShouldReturnExpectedIdentifierType_WhenValueIsPersonnummber(String value)
+   {
+      // Arrange.
+      var sut = new SeIdentityNumber(value);
+      SeIdentityNumberBase.IdentifierCategory expected = default(SeIdentifierType.Personnummer);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeIdentityNumber_IdentifierType_ShouldReturnExpectedIdentifierType_WhenValueIsSamordningsnummer(String value)
+   {
+      // Arrange.
+      var sut = new SeIdentityNumber(value);
+      SeIdentityNumberBase.IdentifierCategory expected = default(SeIdentifierType.Samordningsnummer);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(expected);
+   }
+
+   #endregion
+
    #region Value Property Tests
    // ==========================================================================
    // ==========================================================================
