@@ -24,7 +24,7 @@ A Swedish personnummer is Swedish national identification number and is issued t
 | 3. | All non-separator characters must be ASCII digits ('0'-'9'). | InvalidCharacter |
 | 4. | The trailing character must be a valid Luhn algorithm check digit. | InvalidChecksum |
 | 5. | The separator character must follow the date of birth (either 6 or 8 digits) and must be either a dash ('-') or a plus ('+'). | InvalidSeparator |
-| 6. | The date of birth (either 6 or 8 digits) must be a valid date (after adjusting for samordningsnummer day offset, if present) | InvalidDateOfBirth |
+| 6. | The date of birth (either 6 or 8 digits) must be a valid date. If the value is a samordningsnummer, the date of birth must be a valid date after adjusting for samordningsnummer day offset. | InvalidDateOfBirth |
 
 ### Additional Properties
 
@@ -38,8 +38,10 @@ A Swedish personnummer is Swedish national identification number and is issued t
 
 | Name | Description |
 | :--- | :---------- |
+| ToLongFormatValue | Formats the value as a 13 character number with an 8-digit date of birth |
 | ToPersonnummer | Convert this instance to a SePersonnummber |
 | ToSamordningsnummer | Convert this instance to a SeSamordningsnummer |
+| ToShortFormatValue | Formats the value as a 11 character number with an 6-digit date of birth |
 
 ### Notes:
 

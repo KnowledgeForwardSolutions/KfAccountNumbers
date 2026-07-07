@@ -325,6 +325,24 @@ public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
 
    #endregion
 
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeSamordningsnummer_Value_ShouldReturnValidatedSamordningsnummer(String value)
+   {
+      // Arrange.
+      var sut = new SeSamordningsnummer(value);
+      var expected = GetNormalizedValue(value);
+
+      // Act/assert.
+      sut.Value.Should().Be(expected);
+   }
+
+   #endregion
+
    #region Conversion Operator Tests
    // ==========================================================================
    // ==========================================================================

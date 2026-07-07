@@ -197,6 +197,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      for more details.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(SeIdentityNumberJsonConverter))]
 public record SeIdentityNumber : SeIdentityNumberBase
 {
    /// <summary>
@@ -264,9 +265,135 @@ public record SeIdentityNumber : SeIdentityNumberBase
    }
 
    /// <summary>
+   ///   Gets the person's date of birth, derived from the date of birth portion
+   ///   of 13 character identity number (YYYYMMDD format) or from the date
+   ///   portion of an 11 character identity number (YYMMDD format) and the
+   ///   separator character.
+   /// </summary>
+   /// <remarks>
+   ///   <para>
+   ///      See the class comments for the rules for deriving the date of birth
+   ///      for an 11 character identity number.
+   ///   </para>
+   ///   <para>
+   ///      Note that the indicated date of birth may not be the person's exact
+   ///      date of birth as it is possible that a day may run out of birth
+   ///      serial numbers. In that case, a date close to the actual date of
+   ///      birth is used instead.
+   ///   </para>
+   ///   <para>
+   ///      Note also that samordningsnummer values encode the date of birth by
+   ///      adding 60 to the day (i.e. "950123" encodes as "950183"). The
+   ///      DateOfBirth property will automatically adjust the date of birth to
+   ///      an actual date.
+   ///   </para>
+   /// </remarks>
+   public DateOnly DateOfBirth => GetDateOfBirth(Value);
+
+   /// <summary>
+   ///   Gets the person's gender, as indicated by the third character of the
+   ///   birth sequence number. Odd digits = Male; even digits = Female.
+   /// </summary>
+   public Gender.BinaryGender Gender
+      => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
+
+   /// <summary>
    ///   Gets the normalized identity number value.
    /// </summary>
    public String Value { get; private init; }
+
+   /// <summary>
+   ///   Implicitly converts a <see cref="SeIdentityNumber"/> to a <see cref="String"/>,
+   ///   returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="SeIdentityNumber"/> to convert.
+   /// </param>
+   public static implicit operator String(SeIdentityNumber source)
+      => source?.Value ?? String.Empty;     // Handle null object gracefully by returning empty string
+
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="SeIdentityNumber"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Swedish identity number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid Swedish identity number.
+   /// </exception>
+   public static explicit operator SeIdentityNumber(String? value) => new(value);
+
+   /// <summary>
+   ///   Create a new <see cref="SeIdentityNumber"/> using the Result pattern.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Swedish identity number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{SeIdentityNumber, ValidationError}"/>. Will
+   ///   contain the new <see cref="SeIdentityNumber"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="SeIdentityNumberBase.ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
+   /// </returns>
+   public static CreateResult<SeIdentityNumber, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new SeIdentityNumber(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
+
+   /// <summary>
+   ///   Returns a string representation of the value in a long 13 character
+   ///   format, combining the date of birth in YYYYMMDD format, a separator
+   ///   character, the three digit birth serial number and the check digit.
+   /// </summary>
+   /// <param name="timeProvider">
+   ///   Optional. <see cref="TimeProvider"/> instance used to determine the
+   ///   exact age of the person. Persons 100 years or older will have a plus
+   ///   ('+') as a separator; otherwise a dash ('-') is used as the separator.
+   ///   If the <paramref name="timeProvider"/> is <see langword="null"/> then
+   ///   the separator character will default to a dash ('-').
+   /// </param>
+   /// <returns>
+   ///   The identity number formatted as a 13 character string.
+   /// </returns>
+   public String ToLongFormatValue(TimeProvider? timeProvider = null)
+      => InternalRepresentationToLongFormat(Value, timeProvider);
+
+   /// <summary>
+   ///   Returns a string representation of the value in a short 11 character
+   ///   format, combining the date of birth in YYMMDD format, a separator
+   ///   character, the three digit birth serial number and the check digit.
+   /// </summary>
+   /// <param name="timeProvider">
+   ///   Optional. <see cref="TimeProvider"/> instance used to determine the
+   ///   exact age of the person. Persons 100 years or older will have a plus
+   ///   ('+') as a separator; otherwise a dash ('-') is used as the separator.
+   ///   If the <paramref name="timeProvider"/> is <see langword="null"/> then
+   ///   the separator character will default to a dash ('-').
+   /// </param>
+   /// <returns>
+   ///   The identity number formatted as an 11 character string.
+   /// </returns>
+   public String ToShortFormatValue(TimeProvider? timeProvider = null)
+      => InternalRepresentationToShortFormat(Value, timeProvider);
+
+   /// <summary>
+   ///   Get a string representation of the identity number.
+   /// </summary>
+   /// <returns>
+   ///   The identity number formatted as an 11 character string.
+   /// </returns>
+   /// <remarks>
+   ///   See <see cref="ToLongFormatValue"/> for additional details.
+   /// </remarks>
+   public override String ToString() => InternalRepresentationToLongFormat(Value, null);
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a
@@ -358,4 +485,23 @@ public record SeIdentityNumber : SeIdentityNumberBase
          Messages.SeIdentityNumberInvalidSeparator,
          value[^SeparatorOffset],
          value.Length - SeparatorOffset);
+}
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
+public class SeIdentityNumberJsonConverter : JsonConverter<SeIdentityNumber>
+{
+   public override SeIdentityNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new SeIdentityNumber(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, SeIdentityNumber value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.ToLongFormatValue());
 }
