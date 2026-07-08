@@ -622,7 +622,7 @@
     <value>SE Identity Number must have a valid Luhn algorithm check digit in character position 10 (YYMMDD format) or character position 12 (YYYYMMDD format)</value>
   </data>
   <data name="SeIdentityNumberInvalidDateOfBirth" xml:space="preserve">
-    <value>SE Personnummer requires valid six digit date of birth (YYMMDD) in character positions 0-5 (zero-based) or a valid eight digit date of birth (YYYYMMDD) in character positions 0-7 (zero-based)</value>
+    <value>SE Identity Number requires valid six digit date of birth (YYMMDD) in character positions 0-5 (zero-based) or a valid eight digit date of birth (YYYYMMDD) in character positions 0-7 (zero-based)</value>
   </data>
   <data name="SeIdentityNumberInvalidSeparator" xml:space="preserve">
     <value>SE Identity Number must have a valid separator character (either '-' or '+') in character position 6 (zero-based, YYMMDD format) or character position 8 (zero-based, YYYYMMDD format)</value>

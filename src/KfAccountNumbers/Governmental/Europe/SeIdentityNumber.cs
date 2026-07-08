@@ -116,7 +116,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      </list>
 ///   </para>
 ///   <para>
-///      When creating a new <see cref="SePersonnummer"/>, the following
+///      When creating a new <see cref="SeIdentityNumber"/>, the following
 ///      validation rules are applied:
 ///      <list type="bullet">
 ///         <item>
@@ -274,7 +274,7 @@ public record SeIdentityNumber : SeIdentityNumberBase
          }
       }
 
-      Value = GetNormalizedValue(value);
+      Value = GetNormalizedValue(value!);
    }
 
    /// <summary>
@@ -388,6 +388,34 @@ public record SeIdentityNumber : SeIdentityNumberBase
    /// </returns>
    public String ToLongFormatValue(TimeProvider? timeProvider = null)
       => InternalRepresentationToLongFormat(Value, timeProvider);
+
+   /// <summary>
+   ///   Convert this instance to a <see cref="SePersonnummer"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{SePersonnummer}"/> instance that will contain
+   ///   the <see cref="SePersonnummer"/> if this value is a personnummer;
+   ///   otherwise <see cref="None"/> to indicate that this is not a
+   ///   personnummer.
+   /// </returns>
+   public KfOption<SePersonnummer> ToPersonnummer()
+      => IdentifierType is SeIdentifierType.Personnummer
+         ? new SePersonnummer(Value, ValidationMode.BypassValidation)
+         : default(None);
+
+   /// <summary>
+   ///   Convert this instance to a <see cref="SeSamordningsnummer"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{SeSamordningsnummer}"/> instance that will
+   ///   contain the <see cref="SeSamordningsnummer"/> if this value is a
+   ///   samordningsnummer; otherwise <see cref="None"/> to indicate that this
+   ///   is not a samordningsnummer.
+   /// </returns>
+   public KfOption<SeSamordningsnummer> ToSamordningsnummer()
+      => IdentifierType is SeIdentifierType.Samordningsnummer
+         ? new SeSamordningsnummer(Value, ValidationMode.BypassValidation)
+         : default(None);
 
    /// <summary>
    ///   Returns a string representation of the value in a short 11 character

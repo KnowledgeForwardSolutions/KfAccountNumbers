@@ -1195,7 +1195,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SE Personnummer requires valid six digit date of birth (YYMMDD) in character positions 0-5 (zero-based) or a valid eight digit date of birth (YYYYMMDD) in character positions 0-7 (zero-based).
+        ///   Looks up a localized string similar to SE Identity Number requires valid six digit date of birth (YYMMDD) in character positions 0-5 (zero-based) or a valid eight digit date of birth (YYYYMMDD) in character positions 0-7 (zero-based).
         /// </summary>
         internal static string SeIdentityNumberInvalidDateOfBirth {
             get {

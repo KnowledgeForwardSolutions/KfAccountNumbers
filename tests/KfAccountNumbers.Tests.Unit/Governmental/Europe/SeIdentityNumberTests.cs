@@ -1010,6 +1010,78 @@ public class SeIdentityNumberTests : SeIdentityNumberTestsBase
 
    #endregion
 
+   #region ToPersonnnummer Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidPersonnummerValues))]
+   public void SeIdentityNumber_ToPersonnummer_ShouldReturnExpectedResult_WhenValueIsPersonnummer(String value)
+   {
+      // Arrange.
+      var sut = new SeIdentityNumber(value);
+      var expected = new SePersonnummer(value);
+
+      // Act.
+      KfOption<SePersonnummer> result = sut.ToPersonnummer();
+
+      // Assert.
+      result.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeIdentityNumber_ToPersonnummer_ShouldReturnExpectedResult_WhenValueIsNotPersonnummer(String value)
+   {
+      // Arrange.
+      var sut = new SeIdentityNumber(value);
+      var expected = default(None);
+
+      // Act.
+      KfOption<SePersonnummer> result = sut.ToPersonnummer();
+
+      // Assert.
+      result.Value.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region ToPersonnnummer Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeIdentityNumber_ToSamordningsnummer_ShouldReturnExpectedResult_WhenValueIsSamordningsnummer(String value)
+   {
+      // Arrange.
+      var sut = new SeIdentityNumber(value);
+      var expected = new SeSamordningsnummer(value);
+
+      // Act.
+      KfOption<SeSamordningsnummer> result = sut.ToSamordningsnummer();
+
+      // Assert.
+      result.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidPersonnummerValues))]
+   public void SeIdentityNumber_ToSamordningsnummer_ShouldReturnExpectedResult_WhenValueIsNotSamordningsnummer(String value)
+   {
+      // Arrange.
+      var sut = new SeIdentityNumber(value);
+      var expected = default(None);
+
+      // Act.
+      KfOption<SeSamordningsnummer> result = sut.ToSamordningsnummer();
+
+      // Assert.
+      result.Value.Should().Be(expected);
+   }
+
+   #endregion
+
    #region ToShortFormat Method Tests
    // ==========================================================================
    // ==========================================================================

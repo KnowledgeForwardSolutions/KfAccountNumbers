@@ -14,7 +14,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   <para>
 ///      <b>Note:</b>See <see cref="SeSamordningsnummer"/> for a similar
 ///      identifier (samordningsnummer) issued to temporary residents of Sweden
-///      and <see cref="SeIdentityNumber"/> for a compoosite type that can
+///      and <see cref="SeIdentityNumber"/> for a composite type that can
 ///      represent either a personnummer or a samordningsnummer.
 ///   </para>
 /// </summary>
@@ -112,7 +112,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <description>
 ///               Values in YYYYMMDD-SSSC format must have a year value between
-///               1800 and 2049.
+///               1800 and 2099.
 ///            </description>
 ///         </item>
 ///      </list>
@@ -226,12 +226,18 @@ public record SePersonnummer : SeIdentityNumberBase
    /// <summary>
    ///   Initializes a new instance of the <see cref="SePersonnummer"/> class.
    /// </summary>
+   /// <param name="value">
+   ///   String representation of a personnummer.
+   /// </param>
+   /// <param name="validationMode">
+   ///   Indicates whether the <paramref name="value"/> requires validation.
+   /// </param>
    /// <remarks>
    ///   Private constructor that actually does the work. Supports bypassing
    ///   validation when creating a new instance from a value that has
    ///   already been validated.
    /// </remarks>
-   private SePersonnummer(String? value, ValidationMode validationMode)
+   internal SePersonnummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
@@ -251,7 +257,7 @@ public record SePersonnummer : SeIdentityNumberBase
          }
       }
 
-      Value = GetNormalizedValue(value);
+      Value = GetNormalizedValue(value!);
    }
 
    /// <summary>

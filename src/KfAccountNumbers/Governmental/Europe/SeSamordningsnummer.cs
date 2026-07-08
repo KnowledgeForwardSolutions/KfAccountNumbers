@@ -11,7 +11,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   <para>
 ///      <b>Note:</b>See <see cref="SePersonnummer"/> for a similar
 ///      identifier (personnummer) issued to permanent residents of Sweden and
-///      <see cref="SeIdentityNumber"/> for a compoosite type that can represent
+///      <see cref="SeIdentityNumber"/> for a composite type that can represent
 ///      either a personnummer or a samordningsnummer.
 ///   </para>
 /// </summary>
@@ -114,6 +114,9 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            </description>
 ///         </item>
 ///      </list>
+///      Note that the <b>DD</b> portion of the date of birth will be 61-91
+///      because samordningsnummer offsets the day of birth by +60 to
+///      distinguish from personnummer values.
 ///   </para>
 ///   <para>
 ///      Samordningsnummers are distinguished from other identity numbers by an
@@ -217,7 +220,7 @@ public record SeSamordningsnummer : SeIdentityNumberBase
    ///   - or -
    ///   <paramref name="value"/> must have a valid date of birth (after
    ///   applying the +60 samordningsnummer day offset) between 01/01/1800 and
-   ///   31/12/2049.
+   ///   31/12/2099.
    /// </exception>
    public SeSamordningsnummer(String? value)
       : this(value, ValidationMode.ValidationRequired) { }
@@ -226,12 +229,18 @@ public record SeSamordningsnummer : SeIdentityNumberBase
    ///   Initializes a new instance of the <see cref="SeSamordningsnummer"/>
    ///   class.
    /// </summary>
+   /// <param name="value">
+   ///   String representation of a personnummer.
+   /// </param>
+   /// <param name="validationMode">
+   ///   Indicates whether the <paramref name="value"/> requires validation.
+   /// </param>
    /// <remarks>
    ///   Private constructor that actually does the work. Supports bypassing
    ///   validation when creating a new instance from a value that has
    ///   already been validated.
    /// </remarks>
-   private SeSamordningsnummer(String? value, ValidationMode validationMode)
+   internal SeSamordningsnummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
@@ -251,7 +260,7 @@ public record SeSamordningsnummer : SeIdentityNumberBase
          }
       }
 
-      Value = GetNormalizedValue(value);
+      Value = GetNormalizedValue(value!);
    }
 
    /// <summary>

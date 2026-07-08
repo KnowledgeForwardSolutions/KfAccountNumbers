@@ -186,8 +186,15 @@ public abstract record SeIdentityNumberBase
    /// <returns>
    ///   The normalized identity number.
    /// </returns>
-   protected static String GetNormalizedValue(ReadOnlySpan<Char> value)
+   protected static String GetNormalizedValue(String value)
    {
+      // Handle value that is already normalized. This supports the
+      // ToPersonnummer and ToSamordningsnummer methods of SeIdentityNumber.
+      if (value.Length == InternalRepresentationLength)
+      {
+         return value;
+      }
+
       var buffer = ArrayPool<Char>.Shared.Rent(InternalRepresentationLength);
       try
       {
@@ -208,21 +215,21 @@ public abstract record SeIdentityNumberBase
          else
          {
             sourceOffset = 4;
-            source = value[..4];
+            source = value.AsSpan(..4);
             target = span[..4];
             source.CopyTo(target);
          }
 
          // Month & day.
          var end = sourceOffset + 4;
-         source = value[sourceOffset..end];
+         source = value.AsSpan(sourceOffset..end);
          target = span[4..8];
          source.CopyTo(target);
 
          // Birth serial number and check digit.
          sourceOffset += 5;
          end += 5;
-         source = value[sourceOffset..end];
+         source = value.AsSpan(sourceOffset..end);
          target = span[8..12];
          source.CopyTo(target);
 
