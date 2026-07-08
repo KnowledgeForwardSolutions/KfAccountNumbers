@@ -58,6 +58,17 @@ public class NoFoedselsnummerTests
       return c2 == 10 ? String.Empty : $"{dateOfBirth}{separator}{individualNumber}{c1}{c2}";
    }
 
+   [Fact]
+   public void GetTestValue()
+   {
+      var dateOfBirth = "701005";
+      var separator = " ";
+      var individualNumber = "678";
+
+      var value = GetFoedselsnummerWithValidCheckDigits(dateOfBirth, separator, individualNumber);
+      var x = value;
+   }
+
    public static TheoryData<String> ValidFoedselsnummerValues =>
    [
       ValidUnformattedFoedselsnummer,
