@@ -1,12 +1,7 @@
-// Ignore Spelling: Deserialize Deserialization Json Kf Personnummer Samordningsnummer
-
-#pragma warning disable IDE0008 // Use explicit type
-#pragma warning disable IDE0058 // Expression value is never used
-#pragma warning disable CA2211 // Non-constant fields should not be visible
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
 using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
-   KfAccountNumbers.Governmental.Europe.SePersonnummer,
+   KfAccountNumbers.Governmental.Europe.SeSamordningsnummer,
    KfAccountNumbers.Governmental.Europe.SeIdentityNumberBase.ValidationError>;
 using LocalValidationError = KfAccountNumbers.Governmental.Europe.SeIdentityNumberBase.ValidationError;
 using LocalValidationException = KfAccountNumbers.UKfValidationException<
@@ -15,56 +10,61 @@ using LocalValidationResult = KfAccountNumbers.Governmental.Europe.SeIdentityNum
 
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
-public class SePersonnummerTests : SeIdentityNumberTestsBase
+public class SeSamordningsnummerTests : SeIdentityNumberTestsBase
 {
    private static InvalidLength GetInvalidLengthResult(String value)
       => new(
-         Messages.SePersonnummerInvalidLength,
+         Messages.SeSamordningsnummerInvalidLength,
          value.Length,
          [
-            new ValidLengthDefinition(SeIdentityNumberBase.ShortFormatLength, Messages.SePersonnummerShortFormatLength),
-            new ValidLengthDefinition(SeIdentityNumberBase.LongFormatLength, Messages.SePersonnummerLongFormatLength),
+            new ValidLengthDefinition(SeIdentityNumberBase.ShortFormatLength, Messages.SeSamordningsnummerShortFormatLength),
+            new ValidLengthDefinition(SeIdentityNumberBase.LongFormatLength, Messages.SeSamordningsnummerLongFormatLength),
          ]);
 
    private static InvalidCharacter GetInvalidCharacterResult(
       String value,
       Int32 position)
       => new(
-         Messages.SePersonnummerInvalidCharacter,
+         Messages.SeSamordningsnummerInvalidCharacter,
          value[position],
          position);
 
    private static InvalidChecksum GetInvalidChecksumResult()
       => new(
-         Messages.SePersonnummerInvalidCheckDigit,
+         Messages.SeSamordningsnummerInvalidCheckDigit,
          Algorithms.Luhn.AlgorithmName);
 
    private static InvalidSeparator GetInvalidSeparatorResult(
       String value,
       Int32 position)
       => new(
-         Messages.SePersonnummerInvalidSeparator,
+         Messages.SeSamordningsnummerInvalidSeparator,
          value[position],
          position);
 
    private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
-      => value.Length == 11
-         ? new InvalidDateOfBirth(Messages.SePersonnummerInvalidDateOfBirth, value[..6], DateFormatName.YYMMDD)
-         : new InvalidDateOfBirth(Messages.SePersonnummerInvalidDateOfBirth, value[..8], DateFormatName.YYYYMMDD);
+   {
+      var isShortFormat = value.Length == SeIdentityNumberBase.ShortFormatLength;
+
+      return new InvalidDateOfBirth(
+         Messages.SeSamordingsnummerInvalidDateOfBirth,
+         isShortFormat ? value[..6] : value[..8],
+         isShortFormat ? DateFormatName.YYMMDD : DateFormatName.YYYYMMDD);
+   }
 
    #region Constructor Tests
    // ==========================================================================
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidPersonnummerValues))]
-   public void SePersonnummer_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeSamordningsnummer_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
       var expected = GetNormalizedValue(value);
 
       // Act.
-      var sut = new SePersonnummer(value);
+      var sut = new SeSamordningsnummer(value);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -72,14 +72,14 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    }
 
    [Theory]
-   [MemberData(nameof(PersonnummerUndetectableCheckDigitErrors))]
-   public void SePersonnummer_Constructor_ShouldCreateInstance_WhenCheckDigitHasUndetectableError(String value)
+   [MemberData(nameof(SamordningsnummerUndetectableCheckDigitErrors))]
+   public void SeSamordningsnummer_Constructor_ShouldCreateInstance_WhenCheckDigitHasUndetectableError(String value)
    {
       // Arrange.
       var expected = GetNormalizedValue(value);
 
       // Act.
-      var sut = new SePersonnummer(value);
+      var sut = new SeSamordningsnummer(value);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -87,8 +87,8 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    }
 
    [Theory]
-   [MemberData(nameof(PersonnummerValidDateOfBirthValues))]
-   public void SePersonnummer_Constructor_ShouldCreateInstance_WhenDateOfBirthIsValid(
+   [MemberData(nameof(SamordningsnummerValidDateOfBirthValues))]
+   public void SeSamordningsnummer_Constructor_ShouldCreateInstance_WhenDateOfBirthIsValid(
       String dateOfBirth,
       Char separator,
       String _)
@@ -100,7 +100,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       var expected = GetNormalizedValue(value);
 
       // Act.
-      var sut = new SePersonnummer(value);
+      var sut = new SeSamordningsnummer(value);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -109,28 +109,28 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+   public void SeSamordningsnummer_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
    {
       // Arrange.
       LocalValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new SePersonnummer(value))
+         .Invoking(() => new SeSamordningsnummer(value))
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+   public void SeSamordningsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
       LocalValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new SePersonnummer(value))
+         .Invoking(() => new SeSamordningsnummer(value))
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
             .ComparingByMembers<LocalValidationError>()
@@ -140,7 +140,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(
+   public void SeSamordningsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(
       String value,
       Int32 position)
    {
@@ -149,28 +149,28 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new SePersonnummer(value))
+         .Invoking(() => new SeSamordningsnummer(value))
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
+   public void SeSamordningsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
       LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new SePersonnummer(value))
+         .Invoking(() => new SeSamordningsnummer(value))
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+   public void SeSamordningsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
       String value,
       Int32 position)
    {
@@ -179,14 +179,14 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new SePersonnummer(value))
+         .Invoking(() => new SeSamordningsnummer(value))
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
-   [MemberData(nameof(PersonnummerInvalidDateOfBirthValues))]
-   public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
+   [MemberData(nameof(SamordningsnummerInvalidDateOfBirthValues))]
+   public void SeSamordningsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
       String dateOfBirth,
       Char separator)
    {
@@ -198,17 +198,17 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new SePersonnummer(value))
+         .Invoking(() => new SeSamordningsnummer(value))
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
-   // This test is critical: it verifies that SePersonnummer rejects
-   // valid samordningsnummer dates (day 61-91) because samordningsnummer
-   // requires day 61-91 (personnummer day + 60 offset).
+   // This test is critical: it verifies that SeSamordningsnummer rejects
+   // valid personnummer dates (day 01-31) because samordningsnummer requires
+   // day 61-91 (personnummer day + 60 offset).
    [Theory]
-   [MemberData(nameof(SamordningsnummerValidDateOfBirthValues))]
-   public void SePersonnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasValidSamordningsnummerDateOfBirth(
+   [MemberData(nameof(PersonnummerValidDateOfBirthValues))]
+   public void SeSamordningsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasValidPersonnummerDateOfBirth(
       String dateOfBirth,
       Char separator,
       String _)
@@ -221,7 +221,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
       // Act/assert.
       FluentActions
-         .Invoking(() => new SePersonnummer(value))
+         .Invoking(() => new SeSamordningsnummer(value))
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
@@ -233,8 +233,8 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(PersonnummerValidDateOfBirthValues))]
-   public void SePersonnummer_DateOfBirth_ShouldReturnExpectedValue(
+   [MemberData(nameof(SamordningsnummerValidDateOfBirthValues))]
+   public void SeSamordningsnummer_DateOfBirth_ShouldReturnExpectedValue(
       String dateOfBirth,
       Char separator,
       String expectedDateOfBirth)
@@ -243,7 +243,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       var value = GetValueWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
-      var sut = new SePersonnummer(value);
+      var sut = new SeSamordningsnummer(value);
       var expected = DateOnly.ParseExact(
          expectedDateOfBirth,
          "yyyyMMdd",
@@ -260,17 +260,17 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Theory]
-   [InlineData("811228", '1')]
-   [InlineData("811228", '3')]
-   [InlineData("811228", '5')]
-   [InlineData("811228", '7')]
-   [InlineData("811228", '9')]
-   [InlineData("19811228", '1')]
-   [InlineData("19811228", '3')]
-   [InlineData("19811228", '5')]
-   [InlineData("19811228", '7')]
-   [InlineData("19811228", '9')]
-   public void SePersonnummer_Gender_ShouldReturnMale_ForValuesWithOddGenderIndicator(
+   [InlineData("811288", '1')]
+   [InlineData("811288", '3')]
+   [InlineData("811288", '5')]
+   [InlineData("811288", '7')]
+   [InlineData("811288", '9')]
+   [InlineData("19811288", '1')]
+   [InlineData("19811288", '3')]
+   [InlineData("19811288", '5')]
+   [InlineData("19811288", '7')]
+   [InlineData("19811288", '9')]
+   public void SeSamordningsnummer_Gender_ShouldReturnMale_ForValuesWithOddGenderIndicator(
       String dateOfBirth,
       Char digit)
    {
@@ -279,7 +279,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       var value = GetValueWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          birthSerialNumber: birthSerialNumber);
-      var sut = new SePersonnummer(value);
+      var sut = new SeSamordningsnummer(value);
       Gender.BinaryGender expected = default(Gender.Male);
 
       // Act/assert.
@@ -287,17 +287,17 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    }
 
    [Theory]
-   [InlineData("811228", '0')]
-   [InlineData("811228", '2')]
-   [InlineData("811228", '4')]
-   [InlineData("811228", '6')]
-   [InlineData("811228", '8')]
-   [InlineData("19811228", '0')]
-   [InlineData("19811228", '2')]
-   [InlineData("19811228", '4')]
-   [InlineData("19811228", '6')]
-   [InlineData("19811228", '8')]
-   public void SePersonnummer_Gender_ShouldReturnFemale_ForValuesWithEvenGenderIndicator(
+   [InlineData("811288", '0')]
+   [InlineData("811288", '2')]
+   [InlineData("811288", '4')]
+   [InlineData("811288", '6')]
+   [InlineData("811288", '8')]
+   [InlineData("19811288", '0')]
+   [InlineData("19811288", '2')]
+   [InlineData("19811288", '4')]
+   [InlineData("19811288", '6')]
+   [InlineData("19811288", '8')]
+   public void SeSamordningsnummer_Gender_ShouldReturnFemale_ForValuesWithEvenGenderIndicator(
       String dateOfBirth,
       Char digit)
    {
@@ -306,7 +306,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       var value = GetValueWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          birthSerialNumber: birthSerialNumber);
-      var sut = new SePersonnummer(value);
+      var sut = new SeSamordningsnummer(value);
       Gender.BinaryGender expected = default(Gender.Female);
 
       // Act/assert.
@@ -320,12 +320,12 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidPersonnummerValues))]
-   public void SePersonnummer_Value_ShouldReturnValidatedPersonnummer(String personnummer)
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeSamordningsnummer_Value_ShouldReturnValidatedSamordningsnummer(String value)
    {
       // Arrange.
-      var sut = new SePersonnummer(personnummer);
-      var expected = GetNormalizedValue(personnummer);
+      var sut = new SeSamordningsnummer(value);
+      var expected = GetNormalizedValue(value);
 
       // Act/assert.
       sut.Value.Should().Be(expected);
@@ -338,11 +338,11 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Fact]
-   public void SePersonnummer_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   public void SeSamordningsnummer_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = ValidShortFormatDashPersonnummer;
-      var sut = new SePersonnummer(value);
+      var value = ValidShortFormatDashSamordningsnummer;
+      var sut = new SeSamordningsnummer(value);
 
       // Act.
       String str = sut;
@@ -353,11 +353,11 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    }
 
    [Fact]
-   public void SePersonnummer_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   public void SeSamordningsnummer_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
    {
       // Arrange.
-      var value = ValidShortFormatDashPersonnummer;
-      var sut = new SePersonnummer(value);
+      var value = ValidShortFormatDashSamordningsnummer;
+      var sut = new SeSamordningsnummer(value);
 
       // Act.
       var str = (String)sut;
@@ -368,10 +368,10 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    }
 
    [Fact]
-   public void SePersonnummer_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   public void SeSamordningsnummer_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      SePersonnummer sut = null!;
+      SeSamordningsnummer sut = null!;
 
       // Act.
       String str = sut;
@@ -382,10 +382,10 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    }
 
    [Fact]
-   public void SePersonnummer_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   public void SeSamordningsnummer_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
    {
       // Arrange.
-      SePersonnummer sut = null!;
+      SeSamordningsnummer sut = null!;
 
       // Act.
       var str = (String)sut;
@@ -396,36 +396,36 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    }
 
    [Theory]
-   [MemberData(nameof(ValidPersonnummerValues))]
-   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldCreateInstance_WhenValueIsValid(String value)
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeSamordningsnummer_ExplicitCastToSeSamordningsnummer_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expected = new SePersonnummer(value);
+      var expected = new SeSamordningsnummer(value);
 
       // Act.
-      var sut = (SePersonnummer)value;
+      var sut = (SeSamordningsnummer)value;
 
       // Assert.
       sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
-   [MemberData(nameof(PersonnummerUndetectableCheckDigitErrors))]
-   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldCreateInstance_WhenCheckDigitHasUndetectableError(String value)
+   [MemberData(nameof(SamordningsnummerUndetectableCheckDigitErrors))]
+   public void SeSamordningsnummer_ExplicitCastToSeSamordningsnummer_ShouldCreateInstance_WhenCheckDigitHasUndetectableError(String value)
    {
       // Arrange.
-      var expected = new SePersonnummer(value);
+      var expected = new SeSamordningsnummer(value);
 
       // Act.
-      var sut = (SePersonnummer)value;
+      var sut = (SeSamordningsnummer)value;
 
       // Assert.
       sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
-   [MemberData(nameof(PersonnummerValidDateOfBirthValues))]
-   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldCreateInstance_WhenDateOfBirthIsValid(
+   [MemberData(nameof(SamordningsnummerValidDateOfBirthValues))]
+   public void SeSamordningsnummer_ExplicitCastToSeSamordningsnummer_ShouldCreateInstance_WhenDateOfBirthIsValid(
       String dateOfBirth,
       Char separator,
       String _)
@@ -434,8 +434,8 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       var value = GetValueWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
-      var sut = (SePersonnummer)value;
-      var expected = new SePersonnummer(value);
+      var sut = (SeSamordningsnummer)value;
+      var expected = new SeSamordningsnummer(value);
 
       // Assert.
       sut.Should().BeEquivalentTo(expected);
@@ -443,28 +443,28 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+   public void SeSamordningsnummer_ExplicitCastToSeSamordningsnummer_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
    {
       // Arrange.
       LocalValidationError expected = default(EmptyValue);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => _ = (SePersonnummer)value)
+         .Invoking(() => _ = (SeSamordningsnummer)value)
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+   public void SeSamordningsnummer_ExplicitCastToSeSamordningsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
       LocalValidationError expected = GetInvalidLengthResult(value);
 
       // Act/assert.
       FluentActions
-         .Invoking(() => _ = (SePersonnummer)value)
+         .Invoking(() => _ = (SeSamordningsnummer)value)
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
             .ComparingByMembers<LocalValidationError>()
@@ -474,7 +474,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(
+   public void SeSamordningsnummer_ExplicitCastToSeSamordningsnummer_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(
       String value,
       Int32 position)
    {
@@ -483,28 +483,28 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
       // Act/assert.
       FluentActions
-         .Invoking(() => _ = (SePersonnummer)value)
+         .Invoking(() => _ = (SeSamordningsnummer)value)
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
+   public void SeSamordningsnummer_ExplicitCastToSeSamordningsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
       LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.
       FluentActions
-         .Invoking(() => _ = (SePersonnummer)value)
+         .Invoking(() => _ = (SeSamordningsnummer)value)
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+   public void SeSamordningsnummer_ExplicitCastToSeSamordningsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
       String value,
       Int32 position)
    {
@@ -513,14 +513,14 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
       // Act/assert.
       FluentActions
-         .Invoking(() => _ = (SePersonnummer)value)
+         .Invoking(() => _ = (SeSamordningsnummer)value)
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
-   [MemberData(nameof(PersonnummerInvalidDateOfBirthValues))]
-   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
+   [MemberData(nameof(SamordningsnummerInvalidDateOfBirthValues))]
+   public void SeSamordningsnummer_ExplicitCastToSeSamordningsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
       String dateOfBirth,
       Char separator)
    {
@@ -532,14 +532,14 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
       // Act/assert.
       FluentActions
-         .Invoking(() => _ = (SePersonnummer)value)
+         .Invoking(() => _ = (SeSamordningsnummer)value)
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
-   [MemberData(nameof(SamordningsnummerValidDateOfBirthValues))]
-   public void SePersonnummer_ExplicitCastToSePersonnummer_ShouldThrowKfValidationException_WhenValueHasValidSamordningsnummerDateOfBirth(
+   [MemberData(nameof(PersonnummerValidDateOfBirthValues))]
+   public void SeSamordningsnummer_ExplicitCastToSeSamordningsnummer_ShouldThrowKfValidationException_WhenValueHasValidPersonnummerDateOfBirth(
       String dateOfBirth,
       Char separator,
       String _)
@@ -552,7 +552,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
       // Act/assert.
       FluentActions
-         .Invoking(() => _ = (SePersonnummer)value)
+         .Invoking(() => _ = (SeSamordningsnummer)value)
          .Should().ThrowExactly<LocalValidationException>()
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
@@ -564,36 +564,47 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Fact]
-   public void SePersonnummer_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   public void SeSamordningsnummer_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new SePersonnummer(ValidShortFormatDashPersonnummer);
-      var sut2 = new SePersonnummer(ValidShortFormatDashPersonnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
    }
 
    [Fact]
-   public void SePersonnummer_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   public void SeSamordningsnummer_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new SePersonnummer(ValidShortFormatDashPersonnummer);
-      var sut2 = new SePersonnummer(AltValidShortFormatDashPersonnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(AltValidShortFormatDashSamordningsnummer);
 
       // Act/assert.
       (sut1 == sut2).Should().BeFalse();
    }
 
    [Fact]
-   public void SePersonnummer_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   public void SeSamordningsnummer_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 13 character versions for same person should still be equal.
-      var sut1 = new SePersonnummer(ValidShortFormatDashPersonnummer);
-      var sut2 = new SePersonnummer("19" + ValidShortFormatDashPersonnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer("19" + ValidShortFormatDashSamordningsnummer);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void SeSamordningsnummer_EqualityOperator_ShouldReturnFalse_WhenShortFormatValuesDifferOnlyBySeparator()
+   {
+      // Arrange.
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer.Replace('-', '+'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeFalse();
    }
 
    #endregion
@@ -603,36 +614,47 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Fact]
-   public void SePersonnummer_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   public void SeSamordningsnummer_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new SePersonnummer(ValidShortFormatDashPersonnummer);
-      var sut2 = new SePersonnummer(AltValidShortFormatDashPersonnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(AltValidShortFormatDashSamordningsnummer);
 
       // Act/assert.
       (sut1 != sut2).Should().BeTrue();
    }
 
    [Fact]
-   public void SePersonnummer_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   public void SeSamordningsnummer_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 13 character versions for same person should still be equal.
-      var sut1 = new SePersonnummer(ValidShortFormatDashPersonnummer);
-      var sut2 = new SePersonnummer("19" + ValidShortFormatDashPersonnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer("19" + ValidShortFormatDashSamordningsnummer);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
    }
 
    [Fact]
-   public void SePersonnummer_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   public void SeSamordningsnummer_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new SePersonnummer(ValidShortFormatDashPersonnummer);
-      var sut2 = new SePersonnummer(ValidShortFormatDashPersonnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void SeSamordningsnummer_InequalityOperator_ShouldReturnTrue_WhenShortFormatValuesDifferOnlyBySeparator()
+   {
+      // Arrange.
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer.Replace('-', '+'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeTrue();
    }
 
    #endregion
@@ -642,36 +664,36 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidPersonnummerValues))]
-   public void SePersonnummer_Create_ShouldCreateInstance_WhenValueIsValid(String value)
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeSamordningsnummer_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      LocalCreateResult expected = new SePersonnummer(value);
+      LocalCreateResult expected = new SeSamordningsnummer(value);
 
       // Act.
-      var result = SePersonnummer.Create(value);
+      var result = SeSamordningsnummer.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
-   [MemberData(nameof(PersonnummerUndetectableCheckDigitErrors))]
-   public void SePersonnummer_Create_ShouldCreateInstance_WhenValueHasUndetectableCheckDigitError(String value)
+   [MemberData(nameof(SamordningsnummerUndetectableCheckDigitErrors))]
+   public void SeSamordningsnummer_Create_ShouldCreateInstance_WhenValueHasUndetectableCheckDigitError(String value)
    {
       // Arrange.
-      LocalCreateResult expected = new SePersonnummer(value);
+      LocalCreateResult expected = new SeSamordningsnummer(value);
 
       // Act.
-      var result = SePersonnummer.Create(value);
+      var result = SeSamordningsnummer.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
-   [MemberData(nameof(PersonnummerValidDateOfBirthValues))]
-   public void SePersonnummer_Create_ShouldCreateInstance_WhenDateOfBirthIsValid(
+   [MemberData(nameof(SamordningsnummerValidDateOfBirthValues))]
+   public void SeSamordningsnummer_Create_ShouldCreateInstance_WhenDateOfBirthIsValid(
       String dateOfBirth,
       Char separator,
       String _)
@@ -680,10 +702,10 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       var value = GetValueWithValidCheckDigit(
          dateOfBirth: dateOfBirth,
          separator: separator);
-      LocalCreateResult expected = new SePersonnummer(value);
+      LocalCreateResult expected = new SeSamordningsnummer(value);
 
       // Act.
-      var result = SePersonnummer.Create(value);
+      var result = SeSamordningsnummer.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -691,13 +713,13 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void SePersonnummer_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
+   public void SeSamordningsnummer_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
    {
       // Arrange.
       LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
 
       // Act.
-      var result = SePersonnummer.Create(value);
+      var result = SeSamordningsnummer.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -705,13 +727,13 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void SePersonnummer_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   public void SeSamordningsnummer_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
       LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
 
       // Act.
-      var result = SePersonnummer.Create(value);
+      var result = SeSamordningsnummer.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
@@ -723,7 +745,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void SePersonnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacter(
+   public void SeSamordningsnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacter(
       String value,
       Int32 position)
    {
@@ -731,7 +753,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
 
       // Act.
-      var result = SePersonnummer.Create(value);
+      var result = SeSamordningsnummer.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -739,13 +761,13 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void SePersonnummer_Create_ShouldReturnInvalidCheckDigitValidationResult_WhenValueHasInvalidCheckDigit(String value)
+   public void SeSamordningsnummer_Create_ShouldReturnInvalidCheckDigitValidationResult_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
       LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
 
       // Act.
-      var result = SePersonnummer.Create(value);
+      var result = SeSamordningsnummer.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -753,7 +775,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void SePersonnummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(
+   public void SeSamordningsnummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(
       String value,
       Int32 position)
    {
@@ -761,15 +783,15 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value, position);
 
       // Act.
-      var result = SePersonnummer.Create(value);
+      var result = SeSamordningsnummer.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
-   [MemberData(nameof(PersonnummerInvalidDateOfBirthValues))]
-   public void SePersonnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasInvalidDateOfBirth(
+   [MemberData(nameof(SamordningsnummerInvalidDateOfBirthValues))]
+   public void SeSamordningsnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasInvalidDateOfBirth(
       String dateOfBirth,
       Char separator)
    {
@@ -780,15 +802,15 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
 
       // Act.
-      var result = SePersonnummer.Create(value);
+      var result = SeSamordningsnummer.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
-   [MemberData(nameof(SamordningsnummerValidDateOfBirthValues))]
-   public void SePersonnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasValidSamordningsnummerDateOfBirth(
+   [MemberData(nameof(PersonnummerValidDateOfBirthValues))]
+   public void SeSamordningsnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasValidPersonnummerDateOfBirth(
       String dateOfBirth,
       Char separator,
       String _)
@@ -800,7 +822,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
 
       // Act.
-      var result = SePersonnummer.Create(value);
+      var result = SeSamordningsnummer.Create(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -813,53 +835,64 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Fact]
-   public void SePersonnummer_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   public void SeSamordningsnummer_Equals_ShouldReturnTrue_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new SePersonnummer(ValidShortFormatDashPersonnummer);
-      var sut2 = new SePersonnummer(ValidShortFormatDashPersonnummer);
+      var sut1 = new SeSamordningsnummer(ValidLongFormatPlusSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(ValidLongFormatPlusSamordningsnummer);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
    }
 
    [Fact]
-   public void SePersonnummer_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   public void SeSamordningsnummer_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
    {
       // Arrange.
-      var sut1 = new SePersonnummer(ValidShortFormatDashPersonnummer);
-      var sut2 = new SePersonnummer(AltValidShortFormatDashPersonnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatPlusSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(AltValidShortFormatPlusSamordningsnummer);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeFalse();
    }
 
    [Fact]
-   public void SePersonnummer_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   public void SeSamordningsnummer_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 13 character versions for same person should still be equal.
-      var sut1 = new SePersonnummer(ValidShortFormatDashPersonnummer);
-      var sut2 = new SePersonnummer("19" + ValidShortFormatDashPersonnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatPlusSamordningsnummer);
+      var sut2 = new SeSamordningsnummer("18" + ValidShortFormatPlusSamordningsnummer);
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
    }
 
    [Fact]
-   public void SePersonnummer_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   public void SeSamordningsnummer_Equals_ShouldReturnFalse_WhenShortFormatValuesDifferOnlyBySeparator()
    {
       // Arrange.
-      var sut = new SePersonnummer(ValidShortFormatDashPersonnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer.Replace('-', '+'));
 
       // Act/assert.
-      sut.Equals(ValidShortFormatDashPersonnummer).Should().BeFalse();
+      sut1.Equals(sut2).Should().BeFalse();
    }
 
    [Fact]
-   public void SePersonnummer_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   public void SeSamordningsnummer_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
    {
       // Arrange.
-      var sut = new SePersonnummer(ValidShortFormatDashPersonnummer);
+      var sut = new SeSamordningsnummer(ValidLongFormatPlusSamordningsnummer);
+
+      // Act/assert.
+      sut.Equals(ValidLongFormatPlusSamordningsnummer).Should().BeFalse();
+   }
+
+   [Fact]
+   public void SeSamordningsnummer_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new SeSamordningsnummer(ValidLongFormatPlusSamordningsnummer);
 
       // Act/assert.
       sut.Equals(null).Should().BeFalse();
@@ -872,11 +905,11 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Fact]
-   public void SePersonnummer_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   public void SeSamordningsnummer_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
    {
       // Arrange.
-      var sut1 = new SePersonnummer(ValidShortFormatDashPersonnummer);
-      var sut2 = new SePersonnummer(ValidShortFormatDashPersonnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -887,11 +920,11 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    }
 
    [Fact]
-   public void SePersonnummer_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   public void SeSamordningsnummer_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
    {
       // Arrange.
-      var sut1 = new SePersonnummer(ValidShortFormatDashPersonnummer);
-      var sut2 = new SePersonnummer(AltValidShortFormatDashPersonnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(AltValidShortFormatDashSamordningsnummer);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -902,11 +935,11 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    }
 
    [Fact]
-   public void SePersonnummer_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
+   public void SeSamordningsnummer_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
    {
       // Arrange. 11 and 13 character versions for same person should still be equal.
-      var sut1 = new SePersonnummer(ValidShortFormatDashPersonnummer);
-      var sut2 = new SePersonnummer("19" + ValidShortFormatDashPersonnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer("19" + ValidShortFormatDashSamordningsnummer);
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -916,22 +949,37 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       hash1.Should().Be(hash2);
    }
 
+   [Fact]
+   public void SeSamordningsnummer_GetHashCode_ShouldReturnDifferentValues_WhenShortFormatValuesDifferOnlyBySeparator()
+   {
+      // Arrange.
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer.Replace('-', '+'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
    #endregion
 
    #region ReferenceEquals Method Tests
    // ==========================================================================
    // ==========================================================================
 
-   // SePersonnummer does not override Object.ReferenceEquals, so this test just
+   // SeSamordningsnummer does not override Object.ReferenceEquals, so this test just
    // confirms that two different instances with the same value are not
    // considered reference equal.
 
    [Fact]
-   public void SePersonnummer_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   public void SeSamordningsnummer_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
    {
       // Arrange.
-      var sut1 = new SePersonnummer(ValidShortFormatDashPersonnummer);
-      var sut2 = new SePersonnummer(ValidShortFormatDashPersonnummer);
+      var sut1 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
+      var sut2 = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
@@ -945,11 +993,11 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidPersonnummerValues))]
-   public void SePersonnummer_ToLongFormat_ShouldReturnExpectedValue_WhenTimeProviderIsNull(String value)
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeSamordningsnummer_ToLongFormat_ShouldReturnExpectedValue_WhenTimeProviderIsNull(String value)
    {
       // Arrange.
-      var sut = new SePersonnummer(value);
+      var sut = new SeSamordningsnummer(value);
       var expected = sut.Value[..8] + '-' + sut.Value[^4..];
 
       // Act/assert.
@@ -958,13 +1006,13 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(FormatValueTestData))]
-   public void SePersonnummer_ToLongFormat_ShouldReturnExpectedValue_WhenTimeProviderIsSupplied(
+   public void SeSamordningsnummer_ToLongFormat_ShouldReturnExpectedValue_WhenTimeProviderIsSupplied(
       Int32 years,
       Int32 days,
       Char expectedSeparator)
    {
       // Arrange.
-      var sut = new SePersonnummer(ValidShortFormatDashPersonnummer);
+      var sut = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
       var currentDate = sut.DateOfBirth.AddYears(years).AddDays(days).ToDateTime(TimeOnly.MinValue);
       var timeProvider = new FakeTimeProvider(currentDate);
       var expected = $"{sut.Value[..8]}{expectedSeparator}{sut.Value[^4..]}";
@@ -983,11 +1031,11 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidPersonnummerValues))]
-   public void SePersonnummer_ToShortFormat_ShouldReturnExpectedValue_WhenTimeProviderIsNull(String value)
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeSamordningsnummer_ToShortFormat_ShouldReturnExpectedValue_WhenTimeProviderIsNull(String value)
    {
       // Arrange.
-      var sut = new SePersonnummer(value);
+      var sut = new SeSamordningsnummer(value);
       var expected = sut.Value[2..8] + '-' + sut.Value[^4..];
 
       // Act/assert.
@@ -996,13 +1044,13 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(FormatValueTestData))]
-   public void SePersonnummer_ToShortFormat_ShouldReturnExpectedValue_WhenTimeProviderIsSupplied(
+   public void SeSamordningsnummer_ToShortFormat_ShouldReturnExpectedValue_WhenTimeProviderIsSupplied(
       Int32 years,
       Int32 days,
       Char expectedSeparator)
    {
       // Arrange.
-      var sut = new SePersonnummer(ValidShortFormatDashPersonnummer);
+      var sut = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
       var currentDate = sut.DateOfBirth.AddYears(years).AddDays(days).ToDateTime(TimeOnly.MinValue);
       var timeProvider = new FakeTimeProvider(currentDate);
       var expected = $"{sut.Value[2..8]}{expectedSeparator}{sut.Value[^4..]}";
@@ -1021,11 +1069,11 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidPersonnummerValues))]
-   public void SePersonnummer_ToString_ShouldReturnExpectedValue(String value)
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeSamordningsnummer_ToString_ShouldReturnExpectedValue(String value)
    {
       // Arrange.
-      var sut = new SePersonnummer(value);
+      var sut = new SeSamordningsnummer(value);
       var expected = sut.ToLongFormatValue();
 
       // Act/assert.
@@ -1039,36 +1087,36 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidPersonnummerValues))]
-   public void SePersonnummer_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
+   [MemberData(nameof(ValidSamordningsnummerValues))]
+   public void SeSamordningsnummer_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
    {
       // Arrange.
       LocalValidationResult expected = default(ValidValue);
 
       // Act.
-      var result = SePersonnummer.Validate(value);
+      var result = SeSamordningsnummer.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
-   [MemberData(nameof(PersonnummerUndetectableCheckDigitErrors))]
-   public void SePersonnummer_Validate_ShouldReturnValidationPassed_WhenValueHasUndetectableCheckDigitError(String value)
+   [MemberData(nameof(SamordningsnummerUndetectableCheckDigitErrors))]
+   public void SeSamordningsnummer_Validate_ShouldReturnValidationPassed_WhenValueHasUndetectableCheckDigitError(String value)
    {
       // Arrange.
       LocalValidationResult expected = default(ValidValue);
 
       // Act.
-      var result = SePersonnummer.Validate(value);
+      var result = SeSamordningsnummer.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
-   [MemberData(nameof(PersonnummerValidDateOfBirthValues))]
-   public void SePersonnummer_Validate_ShouldReturnValidationPassed_WhenDateOfBirthIsValid(
+   [MemberData(nameof(SamordningsnummerValidDateOfBirthValues))]
+   public void SeSamordningsnummer_Validate_ShouldReturnValidationPassed_WhenDateOfBirthIsValid(
       String dateOfBirth,
       Char separator,
       String _)
@@ -1080,7 +1128,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       LocalValidationResult expected = default(ValidValue);
 
       // Act.
-      var result = SePersonnummer.Validate(value);
+      var result = SeSamordningsnummer.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -1088,13 +1136,13 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
-   public void SePersonnummer_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String value)
+   public void SeSamordningsnummer_Validate_ShouldReturnEmpty_WhenValueIsNullOrEmpty(String value)
    {
       // Arrange.
       LocalValidationResult expected = default(EmptyValue);
 
       // Act.
-      var result = SePersonnummer.Validate(value);
+      var result = SeSamordningsnummer.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -1102,13 +1150,13 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(InvalidLengthValues))]
-   public void SePersonnummer_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
+   public void SeSamordningsnummer_Validate_ShouldReturnInvalidLength_WhenValueHasInvalidLength(String value)
    {
       // Arrange.
       LocalValidationResult expected = GetInvalidLengthResult(value);
 
       // Act.
-      var result = SePersonnummer.Validate(value);
+      var result = SeSamordningsnummer.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected, options => options    // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
@@ -1119,7 +1167,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(InvalidCharacterValues))]
-   public void SePersonnummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
+   public void SeSamordningsnummer_Validate_ShouldReturnInvalidCharacter_WhenValueHasNonDigitCharacter(
       String value,
       Int32 position)
    {
@@ -1127,7 +1175,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       LocalValidationResult expected = GetInvalidCharacterResult(value, position);
 
       // Act.
-      var result = SePersonnummer.Validate(value);
+      var result = SeSamordningsnummer.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -1135,13 +1183,13 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void SePersonnummer_Validate_ShouldReturnInvalidCheckDigit_WhenValueHasInvalidCheckDigit(String value)
+   public void SeSamordningsnummer_Validate_ShouldReturnInvalidCheckDigit_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
       LocalValidationResult expected = GetInvalidChecksumResult();
 
       // Act.
-      var result = SePersonnummer.Validate(value);
+      var result = SeSamordningsnummer.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -1149,7 +1197,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(InvalidSeparatorValues))]
-   public void SePersonnummer_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
+   public void SeSamordningsnummer_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
       String value,
       Int32 position)
    {
@@ -1157,15 +1205,15 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       LocalValidationResult expected = GetInvalidSeparatorResult(value, position);
 
       // Act.
-      var result = SePersonnummer.Validate(value);
+      var result = SeSamordningsnummer.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
-   [MemberData(nameof(PersonnummerInvalidDateOfBirthValues))]
-   public void SePersonnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidDateOfBirth(
+   [MemberData(nameof(SamordningsnummerInvalidDateOfBirthValues))]
+   public void SeSamordningsnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidDateOfBirth(
       String dateOfBirth,
       Char separator)
    {
@@ -1176,15 +1224,15 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       LocalValidationResult expected = GetInvalidDateOfBirthResult(value);
 
       // Act.
-      var result = SePersonnummer.Validate(value);
+      var result = SeSamordningsnummer.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
-   [MemberData(nameof(SamordningsnummerValidDateOfBirthValues))]
-   public void SePersonnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasValidSamordningsnummerDateOfBirth(
+   [MemberData(nameof(PersonnummerValidDateOfBirthValues))]
+   public void SeSamordningsnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasValidPersonnummerDateOfBirth(
       String dateOfBirth,
       Char separator,
       String _)
@@ -1196,7 +1244,7 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
       LocalValidationResult expected = GetInvalidDateOfBirthResult(value);
 
       // Act.
-      var result = SePersonnummer.Validate(value);
+      var result = SeSamordningsnummer.Validate(value);
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
@@ -1209,14 +1257,14 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    // ==========================================================================
 
    [Fact]
-   public void SePersonnummer_JsonSerialization_ShouldRoundTripSuccessfully()
+   public void SeSamordningsnummer_JsonSerialization_ShouldRoundTripSuccessfully()
    {
       // Arrange.
-      var sut = new SePersonnummer(ValidShortFormatDashPersonnummer);
+      var sut = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
-      var result = JsonSerializer.Deserialize<SePersonnummer>(json);
+      var result = JsonSerializer.Deserialize<SeSamordningsnummer>(json);
 
       // Assert.
       result.Should().NotBeNull();
@@ -1224,10 +1272,10 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    }
 
    [Fact]
-   public void SePersonnummer_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   public void SeSamordningsnummer_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
    {
       // Arrange.
-      var sut = new SePersonnummer(ValidShortFormatDashPersonnummer);
+      var sut = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer);
       var expected = sut.ToLongFormatValue();
 
       // Act.
@@ -1239,14 +1287,14 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
 
    public class Foo
    {
-      public SePersonnummer Personnummer { get; set; } = null!;
+      public SeSamordningsnummer Samordningsnummer { get; set; } = null!;
    }
 
    [Fact]
-   public void SePersonnummer_JsonSerialization_ShouldDeserializeComplexObject()
+   public void SeSamordningsnummer_JsonSerialization_ShouldDeserializeComplexObject()
    {
       // Arrange.
-      var foo = new Foo { Personnummer = new SePersonnummer(ValidShortFormatDashPersonnummer) };
+      var foo = new Foo { Samordningsnummer = new SeSamordningsnummer(ValidShortFormatDashSamordningsnummer) };
       var json = JsonSerializer.Serialize(foo);
 
       // Act.
@@ -1258,10 +1306,10 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    }
 
    [Fact]
-   public void SePersonnummer_JsonSerialization_ShouldSerializeNullGracefully()
+   public void SeSamordningsnummer_JsonSerialization_ShouldSerializeNullGracefully()
    {
       // Arrange.
-      var expected = /*lang=json,strict*/ "{\"Personnummer\":null}";
+      var expected = /*lang=json,strict*/ "{\"Samordningsnummer\":null}";
       var foo = new Foo();
 
       // Act.
@@ -1272,24 +1320,24 @@ public class SePersonnummerTests : SeIdentityNumberTestsBase
    }
 
    [Fact]
-   public void SePersonnummer_JsonDeserialization_ShouldDeserializeNullGracefully()
+   public void SeSamordningsnummer_JsonDeserialization_ShouldDeserializeNullGracefully()
    {
       // Arrange.
-      var json = "{\"Personnummer\":null}";
+      var json = "{\"Samordningsnummer\":null}";
 
       // Act.
       var result = JsonSerializer.Deserialize<Foo>(json);
 
       // Assert.
       result.Should().NotBeNull();
-      result!.Personnummer.Should().BeNull();
+      result!.Samordningsnummer.Should().BeNull();
    }
 
    [Fact]
-   public void SePersonnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenPersonnummerIsInvalid()
+   public void SeSamordningsnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenSamordningsnummerIsInvalid()
    {
       // Arrange.
-      var json = "{\"Personnummer\":\"811228-9875\"}";  // Invalid check digit
+      var json = "{\"Samordningsnummer\":\"811228-9875\"}";  // Invalid check digit
       LocalValidationError expected = GetInvalidChecksumResult();
 
       // Act/assert.

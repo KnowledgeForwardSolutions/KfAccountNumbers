@@ -144,6 +144,30 @@ public static class ExtensionMethods
    public static Boolean IsValidDigit(this Int32 num) => num is >= 0 and <= 9;
 
    /// <summary>
+   ///   Parses a four-digit integer value from the specified read-only
+   ///   character span.
+   /// </summary>
+   /// <remarks>
+   ///   The method does not perform validation on the input span. Supplying a
+   ///   span that does not contain at least four valid digit characters
+   ///   results in undefined behavior.
+   /// </remarks>
+   /// <param name="span">
+   ///   A read-only span of characters that must contain at least four
+   ///   consecutive ASCII digit characters representing the number to parse.
+   /// </param>
+   /// <returns>
+   ///   An integer value in the range 0 to 9999 corresponding to the four-digit
+   ///   number represented by the input span.
+   /// </returns>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   public static Int32 ParseFourDigits(this ReadOnlySpan<Char> span)
+      => (span[0].ToSingleDigit() * 1000)
+      + (span[1].ToSingleDigit() * 100)
+      + (span[2].ToSingleDigit() * 10)
+      + span[3].ToSingleDigit();
+
+   /// <summary>
    ///   Parses a three-digit integer value from the specified read-only
    ///   character span.
    /// </summary>
