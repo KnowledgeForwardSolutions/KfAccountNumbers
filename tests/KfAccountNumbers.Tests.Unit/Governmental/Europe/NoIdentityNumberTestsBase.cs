@@ -40,6 +40,62 @@ public class NoIdentityNumberTestsBase
       "!",
    ];
 
+   public static TheoryData<String, String, String, String> FoedselsnummerValidDateOfBirthValues = new()
+   {
+      // See class documentation on how the individual number and two digit year
+      // are used to derive the four digit year. Note also that it is possible for
+      // certain combinations to be invalid because of the modulus 11 check digit. In
+      // those cases, the rows are duplicated and the day is adjusted in one and the
+      // individual number is adjusted in the other
+
+      // Minimum valid date = Jan 1, 1854
+      // Maximum valid date = Dec 31, 2039
+
+      // Rule 1 - individual number >= 500 and <= 749 and year >= 54 - century = 1800's
+      { "010154",  "", "500", "18540101" },     // minimum 6 digit date and minimum individual number
+      { "010154", " ", "749", "18540101" },     // minimum 6 digit date and maximum individual number
+      { "311299",  "", "500", "18991231" },     // maximum 6 digit date and minimum individual number
+      { "301299", " ", "749", "18991230" },     // maximum 6 digit date and maximum individual number (311299 749 adjusted because of check digits)
+      { "311299",  "", "748", "18991231" },     // maximum 6 digit date and maximum individual number  "
+
+      // Rule 2 - individual number < 500, year not considered - century = 1900's
+      { "020100",  "", "000", "19000102" },     // minimum 6 digit date and minimum individual number (010100 000 adjusted because of check digits)
+      { "010100", " ", "001", "19000101" },     // minimum 6 digit date and minimum individual number  "
+      { "010100",  "", "499", "19000101" },     // minimum 6 digit date and maximum individual number
+      { "301299", " ", "000", "19991230" },     // maximum 6 digit date and minimum individual number (311299 000 adjusted because of check digits)
+      { "311299",  "", "001", "19991231" },     // maximum 6 digit date and minimum individual number  "
+      { "311299", " ", "499", "19991231" },     // maximum 6 digit date and maximum individual number
+
+      // Rule 3 - individual number >= 900 and year >= 40 - century = 1900's
+      { "010140",  "", "900", "19000101" },     // minimum 6 digit date and minimum individual number
+      { "010140",  "", "999", "19000101" },     // minimum 6 digit date and maximum individual number
+      { "311299",  "", "900", "19991231" },     // maximum 6 digit date and minimum individual number
+      { "301299",  "", "999", "19991230" },     // maximum 6 digit date and maximum individual number (311299 999 adjusted because of check digits)
+      { "311299",  "", "998", "19991231" },     // maximum 6 digit date and maximum individual number  "
+
+      // Rule 4 - individual number >= 500 and year <= 39 - century - 2000's
+      { "010100",  "", "500", "20000101" },     // minimum 6 digit date and minimum individual number
+      { "010100",  "", "999", "20000101" },     // minimum 6 digit date and maximum individual number
+      { "311239",  "", "500", "20391231" },     // maximum 6 digit date and minimum individual number
+      { "311239",  "", "999", "20391231" },     // maximum 6 digit date and maximum individual number
+
+      // Month maximum days
+      { "310104",  "", "501", "19040131" },     // maximum days for January, any year
+      { "280201",  "", "234", "19040228" },     // maximum days for February, non-leap year
+      { "290204",  "", "234", "19040229" },     // maximum days for February, leap year
+      { "290200",  "", "500", "20000229" },     // maximum days for February, leap year (2000 is leap-year)
+      { "310304",  "", "501", "20040331" },     // maximum days for March, any year
+      { "300404",  "", "499", "19040431" },     // maximum days for April, any year
+      { "310504",  "", "501", "20040531" },     // maximum days for May, any year
+      { "300604",  "", "500", "20040631" },     // maximum days for June, any year
+      { "310704",  "", "501", "20040731" },     // maximum days for July, any year
+      { "310804",  "", "501", "20040831" },     // maximum days for August, any year
+      { "300904",  "", "500", "20040931" },     // maximum days for September, any year
+      { "311004",  "", "501", "20041031" },     // maximum days for October, any year
+      { "301104",  "", "499", "19041131" },     // maximum days for November, any year
+      { "311204",  "", "500", "20041231" },     // maximum days for December, any year
+   };
+
    public static TheoryData<String, String, String, String> DnummerValidDateOfBirthValues = new()
    {
       // Date of birth, separator, individual number, expected date

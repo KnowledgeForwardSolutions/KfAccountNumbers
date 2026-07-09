@@ -190,6 +190,25 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
+   [Theory]
+   [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
+   public void NoDnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDnummerDateOfBirth(
+      String dateOfBirth,
+      String separator,
+      String individualNumber,
+      String _)
+   {
+      // Arrange.
+      var value = GetValueWithValidCheckDigits(dateOfBirth, separator, individualNumber);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new NoDnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
    #endregion
 
    #region DateOfBirth Property Tests
@@ -497,6 +516,25 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
          .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
+   [Theory]
+   [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
+   public void NoDnummer_ExplicitCastToNoDnummer_ShouldThrowKfValidationException_WhenValueHasNonDnummerDateOfBirth(
+      String dateOfBirth,
+      String separator,
+      String individualNumber,
+      String _)
+   {
+      // Arrange.
+      var value = GetValueWithValidCheckDigits(dateOfBirth, separator, individualNumber);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (NoDnummer)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
    #endregion
 
    #region Equality Operator Tests
@@ -760,6 +798,25 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
       var value = GetValueWithValidCheckDigits(
          dateOfBirth: dateOfBirth,
          individualNumber: individualNumber);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
+
+      // Act.
+      var result = NoDnummer.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
+   public void NoDnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasNonDnummerDateOfBirth(
+      String dateOfBirth,
+      String separator,
+      String individualNumber,
+      String _)
+   {
+      // Arrange.
+      var value = GetValueWithValidCheckDigits(dateOfBirth, separator, individualNumber);
       LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
 
       // Act.
@@ -1186,6 +1243,25 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
       result.Should().BeEquivalentTo(expected);
    }
 
+   [Theory]
+   [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
+   public void NoDnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasNonDnummerDateOfBirth(
+      String dateOfBirth,
+      String separator,
+      String individualNumber,
+      String _)
+   {
+      // Arrange.
+      var value = GetValueWithValidCheckDigits(dateOfBirth, separator, individualNumber);
+      LocalValidationResult expected = GetInvalidDateOfBirthResult(value);
+
+      // Act.
+      var result = NoDnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
    #endregion
 
    #region Json Serialization Tests
@@ -1196,7 +1272,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
    public void NoDnummer_JsonSerialization_ShouldRoundTripSuccessfully()
    {
       // Arrange.
-      var sut = new NoDnummer(ValidUnformattedFoedselsnummer);
+      var sut = new NoDnummer(ValidUnformattedDnummer);
 
       // Act.
       var json = JsonSerializer.Serialize(sut);
@@ -1230,7 +1306,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
    public void NoDnummer_JsonSerialization_ShouldDeserializeComplexObject()
    {
       // Arrange.
-      var foo = new Foo { Dnummer = new NoDnummer(ValidFormattedFoedselsnummer) };
+      var foo = new Foo { Dnummer = new NoDnummer(ValidFormattedDnummer) };
       var json = JsonSerializer.Serialize(foo);
 
       // Act.
