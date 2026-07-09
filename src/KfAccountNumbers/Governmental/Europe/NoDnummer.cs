@@ -130,6 +130,76 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </remarks>
 public record NoDnummer : NoIdentityNumberBase
 {
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="NoDnummer"/> class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a D-nummer.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="value"/> is not length 11 (or 12 if a separator
+   ///   character is used).
+   ///   - or -
+   ///   <paramref name="value"/> contains a non-digit character in
+   ///   any position other than the separator location.
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid weighted modulus
+   ///   11 check digit in one or both trailing positions.
+   ///   - or -
+   ///   <paramref name="value"/> contains a digit character in position
+   ///   6 (zero-based). Valid separator characters are any non-digit character,
+   ///   though space (' ') and dash ('-') are the most common values.
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid date of birth in
+   ///   positions 0-5 (zero-based).
+   /// </exception>
+   public NoDnummer(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="NoDnummer"/> class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a D-nummer.
+   /// </param>
+   /// <param name="validationMode">
+   ///   Indicates whether the <paramref name="value"/> requires validation.
+   /// </param>
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private NoDnummer(String? value, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
+         {
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
+         }
+      }
+
+      Value = GetNormalizedValue(value!);
+   }
+
+   /// <summary>
+   ///   Gets a string representation of the D-nummer.
+   /// </summary>
+   public String Value { get; private init; }
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a

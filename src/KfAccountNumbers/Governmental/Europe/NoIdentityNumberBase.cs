@@ -159,6 +159,24 @@ public abstract record NoIdentityNumberBase
       return (day, month, year);
    }
 
+
+   /// <summary>
+   ///   Given a validated identity number, get the normalized representation
+   ///   which  strips out the separator character.
+   /// </summary>
+   /// <param name="value">
+   ///   The validated identity number.
+   /// </param>
+   /// <returns>
+   ///   The normalized identity number.
+   /// </returns>
+   protected static String GetNormalizedValue(String value)
+      => value.Length == UnformattedLength
+         ? value
+         : String.Concat(
+            value.AsSpan(0, SeparatorOffset),
+            value.AsSpan(SeparatorOffset + 1));
+
    /// <summary>
    ///   Determine the <paramref name="value"/> has valid check digits.
    /// </summary>

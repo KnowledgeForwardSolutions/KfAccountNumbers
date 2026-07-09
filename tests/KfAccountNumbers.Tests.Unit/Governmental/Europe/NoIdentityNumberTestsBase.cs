@@ -1,3 +1,5 @@
+#pragma warning disable SA1122 // Use string.Empty for empty strings
+
 namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 
 public class NoIdentityNumberTestsBase
@@ -28,6 +30,44 @@ public class NoIdentityNumberTestsBase
       ValidFormattedDNummer,
       AltValidFormattedDNummer,
    ];
+
+   public static TheoryData<String> ValidSeparators =>
+   [
+      " ",
+      "-",
+      "A",
+      "z",
+      "!",
+   ];
+
+   public static TheoryData<String, String, String, String> DnummerValidDateOfBirthValues = new()
+   {
+      // Date of birth, separator, individual number, expected date
+      { "410100",  "", "001", "19000101" },     // Minimum date that can be represented as a D-nummer
+      { "410100", " ", "499", "19000101" },
+      { "711299",  "", "001", "19991231" },
+      { "711299", " ", "499", "19991231" },
+      { "410100",  "", "500", "20000101" },
+      { "410100", " ", "999", "20000101" },
+      { "711239",  "", "500", "20391231" },     // Maximum date that can be represented as a D-nummer
+      { "711239", " ", "999", "20391231" },
+
+      // Month maximum days
+      { "710104",  "", "002", "19040131" },     // maximum days for January, any year
+      { "680201", " ", "499", "19010228" },     // maximum days for February, non-leap year
+      { "690204",  "", "500", "20040229" },     // maximum days for February, leap year
+      { "690200", " ", "998", "20040229" },     // maximum days for February, leap year (2000 is leap-year)
+      { "710304",  "", "001", "19040331" },     // maximum days for March, any year
+      { "700404", " ", "499", "19040430" },     // maximum days for April, any year
+      { "710504",  "", "501", "20040531" },     // maximum days for May, any year
+      { "700604", " ", "999", "20040630" },     // maximum days for June, any year
+      { "710704",  "", "001", "19040731" },     // maximum days for July, any year
+      { "710804", " ", "499", "19040831" },     // maximum days for August, any year
+      { "700904",  "", "500", "20040930" },     // maximum days for September, any year
+      { "711004", " ", "998", "20041031" },     // maximum days for October, any year
+      { "701104",  "", "002", "19041130" },     // maximum days for November, any year
+      { "711204", " ", "500", "20041231" },     // maximum days for December, any year
+   };
 
    public static TheoryData<String> InvalidLengthValues =>
    [
@@ -145,12 +185,14 @@ public class NoIdentityNumberTestsBase
       var c1 = (11 - (sum1 % 11)) % 11;
       if (c1 == 10)
       {
-         return String.Empty;
+         throw new InvalidOperationException("Invalid checksum");
       }
 
       var sum2 = (5 * d1) + (4 * d2) + (3 * d3) + (2 * d4) + (7 * d5) + (6 * d6) + (5 * i1) + (4 * i2) + (3 * i3) + (2 * c1);
       var c2 = (11 - (sum2 % 11)) % 11;
-      return c2 == 10 ? String.Empty : $"{dateOfBirth}{separator}{individualNumber}{c1}{c2}";
+      return c2 == 10
+         ? throw new InvalidOperationException("Invalid checksum")
+         : $"{dateOfBirth}{separator}{individualNumber}{c1}{c2}";
    }
 
    protected static String GetNormalizedValue(String value)
