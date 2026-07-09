@@ -9,7 +9,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      are not eligible for a permanent identity number (fødselsnummer).
 ///   </para>
 ///   <para>
-///      <b>Note:</b>See <see cref="NoFoedselsnummer"/> for a similar
+///      <b>Note:</b> See <see cref="NoFoedselsnummer"/> for a similar
 ///      identifier (fødselsnummer) issued to permanent residents of Norway and
 ///      <see cref="NoIdentityNumber"/> for a composite type that can represent
 ///      either a fødselsnummer or a D-nummer.
@@ -88,7 +88,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The date of birth (after adjusting for  the +40 D-nummer day
+///               The date of birth (after adjusting for the +40 D-nummer day
 ///               offset and after determining the century from the individual
 ///               number) must be a valid date between 01/01/1854 and
 ///               31/12/2039. Note that the validation specifically does
@@ -106,22 +106,22 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///         <item>
 ///            <term>60055029566</term>
 ///            <description>
-///               unformatted, date of birth = 600550 (actual date of birth =
-///               May 20, 1950), gender = male, check digits = 66
+///               unformatted, date of birth = May 20, 1950), gender = male,
+///               check digits = 66
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>70100567871</term>
 ///            <description>
-///               unformatted, date of birth = 701005 (actual date of birth =
-///               October 30, 2005), gender = female, check digits = 71
+///               unformatted, date of birth = October 30, 2005), gender =
+///               female, check digits = 71
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>530295 34272</term>
 ///            <description>
-///               formatted, date of birth = 530295 (actual date of birth =
-///               February 13, 1995), gender = female, check digits = 72
+///               formatted, date of birth = February 13, 1995), gender =
+///               female, check digits = 72
 ///            </description>
 ///         </item>
 ///      </list>
@@ -132,7 +132,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      fødselsnummer documentation for more detail.
 ///   </para>
 ///   <para>
-///      See https://en.wikipedia.org/wiki/National_identity_number_(Norway) for more info.
+///      See <see href="https://en.wikipedia.org/wiki/National_identity_number_(Norway)">Wikipedia - National_identity_number_(Norway)</see>
+///      more info.
 ///   </para>
 /// </remarks>
 [JsonConverter(typeof(NoDnummerJsonConverter))]
