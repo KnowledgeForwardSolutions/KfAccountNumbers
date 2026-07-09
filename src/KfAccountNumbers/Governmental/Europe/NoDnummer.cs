@@ -9,7 +9,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      are not eligible for a permanent identity number (fødselsnummer).
 ///   </para>
 ///   <para>
-///      <b>Note:</b>See <see cref="NoDnummer"/> for a similar
+///      <b>Note:</b>See <see cref="NoFoedselsnummer"/> for a similar
 ///      identifier (fødselsnummer) issued to permanent residents of Norway and
 ///      <see cref="NoIdentityNumber"/> for a composite type that can represent
 ///      either a fødselsnummer or a D-nummer.
@@ -96,9 +96,9 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            </description>
 ///         </item>
 ///      </list>
-///      Note that the <b>DD</b> portion of the date of birth will be 61-91
-///      because samordningsnummer offsets the day of birth by +60 to
-///      distinguish from personnummer values.
+///      Note that the <b>DD</b> portion of the date of birth will be 41-71
+///      because D-nummer offsets the day of birth by +40 to
+///      distinguish from foedselsnummer values.
 ///   </para>
 ///   <para>
 ///      Example values:
@@ -125,6 +125,11 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            </description>
 ///         </item>
 ///      </list>
+///   </para>
+///   <para>
+///      Note that fødselsnummers use the individual number to determine the
+///      century of birth, but the rules are more complicated. Refer to the
+///      fødselsnummer documentation for more detail.
 ///   </para>
 ///   <para>
 ///      See https://en.wikipedia.org/wiki/National_identity_number_(Norway) for more info.

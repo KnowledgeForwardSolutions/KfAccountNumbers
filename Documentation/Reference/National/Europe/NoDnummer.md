@@ -35,3 +35,5 @@ Temporary Norwegian personal identity number issued to persons who are not eligi
 The first check digit is calculated from the 6-digit date of birth and the 3-digit individual number. The second check digit character is calculated from the 6-digit date of birth, the 3-digit individual number and the first check digit.
 
 The D-nummer +40 day offset is taken into account when creating or validating a value and the actual date is validated, not the offset date. Similarly, the DateOfBirth property will return the actual date and not an offset date.
+
+Note that fødselsnummers use the individual number to determine the century of birth, but the rules are more complicated. Refer to the fødselsnummer documentation for more detail.

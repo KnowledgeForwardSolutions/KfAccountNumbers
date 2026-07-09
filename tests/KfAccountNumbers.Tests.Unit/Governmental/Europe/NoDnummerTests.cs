@@ -248,12 +248,12 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
    [InlineData("541", "")]
    [InlineData("543", "")]
    [InlineData("545", "")]
-   [InlineData("647", "")]     // 5 changed to 6 because of modulus 11 check digits
+   [InlineData("647", "")]    // expected individual number 547 changed to 647 because of check digit constraints
    [InlineData("549", "")]
    [InlineData("541", " ")]
    [InlineData("543", " ")]
    [InlineData("545", " ")]
-   [InlineData("647", " ")]    // 5 changed to 6 because of modulus 11 check digits
+   [InlineData("647", " ")]   // expected individual number 547 changed to 647 because of check digit constraints
    [InlineData("549", " ")]
    public void NoDnummer_Gender_ShouldReturnMale_ForValuesWithOddGenderIndicator(
       String individualNumber,
@@ -271,12 +271,12 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
    [Theory]
    [InlineData("540", "")]
    [InlineData("542", "")]
-   [InlineData("644", "")]
+   [InlineData("644", "")]    // expected individual number 544 changed to 644 because of check digit constraints
    [InlineData("546", "")]
-   [InlineData("548", "")]     // 5 changed to 6 because of modulus 11 check digits
+   [InlineData("548", "")]
    [InlineData("540", " ")]
    [InlineData("542", " ")]
-   [InlineData("644", " ")]    // 5 changed to 6 because of modulus 11 check digits
+   [InlineData("644", " ")]   // expected individual number 544 changed to 644 because of check digit constraints
    [InlineData("546", " ")]
    [InlineData("548", " ")]
    public void NoDnummer_Gender_ShouldReturnFemale_ForValuesWithEvenGenderIndicator(
@@ -300,7 +300,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(ValidDNummerValues))]
-   public void NoDnummer_Value_ShouldReturnValidatedFoedselsnummer(String value)
+   public void NoDnummer_Value_ShouldReturnValidatedDnummer(String value)
    {
       // Arrange.
       var sut = new NoDnummer(value);
@@ -1346,7 +1346,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
    }
 
    [Fact]
-   public void NoDnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenFoedselsnummerIsInvalid()
+   public void NoDnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenValueIsInvalid()
    {
       // Arrange.
       var json = "{\"Dnummer\":\"13039597140\"}";  // Invalid check digits
