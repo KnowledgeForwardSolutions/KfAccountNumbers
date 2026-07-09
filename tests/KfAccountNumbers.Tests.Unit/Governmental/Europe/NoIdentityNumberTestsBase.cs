@@ -5,15 +5,15 @@ namespace KfAccountNumbers.Tests.Unit.Governmental.Europe;
 public class NoIdentityNumberTestsBase
 {
    // https://norske-testdata.no/fnr/ is one source for test fødselsnummers
-   private const String ValidUnformattedFoedselsnummer = "13029597140";          // male, century of birth = 1900s
-   private const String AltValidUnformattedFoedselsnummer = "20050559433";       // female, century of birth = 2000s
-   private const String ValidFormattedFoedselsnummer = "130295 97140";
-   private const String AltValidFormattedFoedselsnummer = "200505-59433";
+   protected const String ValidUnformattedFoedselsnummer = "13029597140";        // male, century of birth = 1900s
+   protected const String AltValidUnformattedFoedselsnummer = "20050559433";     // female, century of birth = 2000s
+   protected const String ValidFormattedFoedselsnummer = "130295 97140";
+   protected const String AltValidFormattedFoedselsnummer = "200505-59433";
 
-   private const String ValidUnformattedDNummer = "60055029566";                 // male, century of birth = 1900s
-   private const String AltValidUnformattedDNummer = "70100567871";              // female, century of birth = 2000s
-   private const String ValidFormattedDNummer = "600550 29566";
-   private const String AltValidFormattedDNummer = "701005-67871";
+   protected const String ValidUnformattedDnummer = "60055029566";               // male, century of birth = 1900s
+   protected const String AltValidUnformattedDnummer = "70100567871";            // female, century of birth = 2000s
+   protected const String ValidFormattedDnummer = "600550 29566";
+   protected const String AltValidFormattedDnummer = "701005-67871";
 
    public static TheoryData<String> ValidFoedselsnummerValues =>
    [
@@ -25,10 +25,10 @@ public class NoIdentityNumberTestsBase
 
    public static TheoryData<String> ValidDNummerValues =>
    [
-      ValidUnformattedDNummer,
-      AltValidUnformattedDNummer,
-      ValidFormattedDNummer,
-      AltValidFormattedDNummer,
+      ValidUnformattedDnummer,
+      AltValidUnformattedDnummer,
+      ValidFormattedDnummer,
+      AltValidFormattedDnummer,
    ];
 
    public static TheoryData<String> ValidSeparators =>
@@ -56,7 +56,7 @@ public class NoIdentityNumberTestsBase
       { "710104",  "", "002", "19040131" },     // maximum days for January, any year
       { "680201", " ", "499", "19010228" },     // maximum days for February, non-leap year
       { "690204",  "", "500", "20040229" },     // maximum days for February, leap year
-      { "690200", " ", "998", "20040229" },     // maximum days for February, leap year (2000 is leap-year)
+      { "690200", " ", "998", "20000229" },     // maximum days for February, leap year (2000 is leap-year)
       { "710304",  "", "001", "19040331" },     // maximum days for March, any year
       { "700404", " ", "499", "19040430" },     // maximum days for April, any year
       { "710504",  "", "501", "20040531" },     // maximum days for May, any year

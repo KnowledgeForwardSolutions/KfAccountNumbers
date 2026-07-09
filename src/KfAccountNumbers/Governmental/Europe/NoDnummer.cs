@@ -1,3 +1,5 @@
+#pragma warning disable IDE0046 // Convert to conditional expression
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -7,7 +9,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      are not eligible for a permanent identity number (fødselsnummer).
 ///   </para>
 ///   <para>
-///      <b>Note:</b>See <see cref="NoFoedselsnummer"/> for a similar
+///      <b>Note:</b>See <see cref="NoDnummer"/> for a similar
 ///      identifier (fødselsnummer) issued to permanent residents of Norway and
 ///      <see cref="NoIdentityNumber"/> for a composite type that can represent
 ///      either a fødselsnummer or a D-nummer.
@@ -128,6 +130,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      See https://en.wikipedia.org/wiki/National_identity_number_(Norway) for more info.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(NoDnummerJsonConverter))]
 public record NoDnummer : NoIdentityNumberBase
 {
    /// <summary>
@@ -197,9 +200,117 @@ public record NoDnummer : NoIdentityNumberBase
    }
 
    /// <summary>
+   ///   Gets the person's date of birth, derived from the first six digits in
+   ///   DDMMYY format and the exact century of birth derived from the
+   ///   individual number.
+   /// </summary>
+   /// <remarks>
+   ///   Note that D-nummer values add 40 to the leading two digits (the DD
+   ///   portion of the DDMMYY date of birth). The date of birth property
+   ///   automatically adjusts for this offset.
+   /// </remarks>
+   public DateOnly DateOfBirth
+   {
+      get
+      {
+#pragma warning disable IDE0008 // Use explicit type
+         var (day, month, year) = GetDayMonthYear(Value, DateOffsetMode.Dnummer);
+#pragma warning restore IDE0008 // Use explicit type
+
+         return new DateOnly(year, month, day);
+      }
+   }
+
+   /// <summary>
+   ///   Gets the person's gender, as indicated by the individual number. Odd
+   ///   numbers = Male; even numbers = Female.
+   /// </summary>
+   public Gender.BinaryGender Gender
+      => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
+
+   /// <summary>
    ///   Gets a string representation of the D-nummer.
    /// </summary>
    public String Value { get; private init; }
+
+   /// <summary>
+   ///   Implicitly converts a <see cref="NoDnummer"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="NoDnummer"/> to convert.
+   /// </param>
+   public static implicit operator String(NoDnummer source)
+      => source?.Value ?? String.Empty;     // Handle null object gracefully by returning empty string
+
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="NoDnummer"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Norwegian D-nummer.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid D-nummer.
+   /// </exception>
+   public static explicit operator NoDnummer(String? value) => new(value);
+
+   /// <summary>
+   ///   Create a new <see cref="NoDnummer"/> using the Result pattern.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Norwegian D-nummer.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{NoDnummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="NoDnummer"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="NoIdentityNumberBase.ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
+   /// </returns>
+   public static CreateResult<NoDnummer, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new NoDnummer(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
+
+   /// <summary>
+   ///   Format the D-nummer using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then the default mask
+   ///   <see cref="NoIdentityNumberBase.DefaultFormatMask"/> will be used
+   ///   instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted D-nummer.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the D-nummer.
+   /// </remarks>
+   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Get a string representation of the D-nummer.
+   /// </summary>
+   /// <returns>
+   ///   The raw D-nummer, without separator characters.
+   /// </returns>
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a
@@ -276,4 +387,23 @@ public record NoDnummer : NoIdentityNumberBase
          Messages.NoDnummerInvalidSeparator,
          value[SeparatorOffset],
          SeparatorOffset);
+}
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
+public class NoDnummerJsonConverter : JsonConverter<NoDnummer>
+{
+   public override NoDnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new NoDnummer(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, NoDnummer value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }

@@ -79,6 +79,11 @@ public abstract record NoIdentityNumberBase
    public const Int32 FormattedLength = 12;
 
    /// <summary>
+   ///   The default mask used to format Norwegian identity numbers.
+   /// </summary>
+   public const String DefaultFormatMask = "______ _____";
+
+   /// <summary>
    ///   Identifies the location of the gender character, measured from the
    ///   end of the value.
    /// </summary>
@@ -92,6 +97,9 @@ public abstract record NoIdentityNumberBase
    // Offsets measured from end of value to avoid needing to account for the
    // presence or absence of a separator.
    private const Int32 IndividualNumberOffset = 5;
+
+   private static readonly Int32[] _c1Weights = [3, 7, 6, 1, 8, 9, 4, 5, 2, 1, 0];
+   private static readonly Int32[] _c2Weights = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2, 1];
 
    /// <summary>
    ///   Defines how date offsets are applied when extracting the date of birth
@@ -115,9 +123,6 @@ public abstract record NoIdentityNumberBase
       Optional,
    }
 
-   private static readonly Int32[] _c1Weights = [3, 7, 6, 1, 8, 9, 4, 5, 2, 1, 0];
-   private static readonly Int32[] _c2Weights = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2, 1];
-
    /// <summary>
    ///   Extract the day, month and year elements of the person's date of birth.
    /// </summary>
@@ -139,7 +144,7 @@ public abstract record NoIdentityNumberBase
       var year = value[4..].ParseTwoDigits();
 
       // Handle date offset such as D-nummer.
-      #pragma warning disable IDE0072 // Add missing cases
+#pragma warning disable IDE0072 // Add missing cases
       var day = dateOffsetMode switch
       {
          DateOffsetMode.Dnummer => unadjustedDay - DNummerDayOffset,
@@ -158,7 +163,6 @@ public abstract record NoIdentityNumberBase
 
       return (day, month, year);
    }
-
 
    /// <summary>
    ///   Given a validated identity number, get the normalized representation
@@ -284,10 +288,10 @@ public abstract record NoIdentityNumberBase
 
    // See https://blog.variant.no/ssns-and-pattern-matching-in-c-9-498f96aa71d4
    // for details for how fødselsnummer birth century is derived.
+#pragma warning disable format
    private static Int32 GetFodselsnummerBirthCentury(
       Int32 year,
       Int32 individualNumber)
-#pragma warning disable format
       => (individualNumber, year) switch
       {
          // Rule 1. 500–749: 1854–1899
@@ -305,7 +309,7 @@ public abstract record NoIdentityNumberBase
          // No rule
          (_, _) => 0,
       };
-   #pragma warning restore format
+#pragma warning restore format
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean IsFormatted(ReadOnlySpan<Char> value)
