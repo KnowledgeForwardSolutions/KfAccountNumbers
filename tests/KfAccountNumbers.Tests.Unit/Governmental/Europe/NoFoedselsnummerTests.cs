@@ -61,9 +61,9 @@ public class NoFoedselsnummerTests
    [Fact]
    public void GetTestValue()
    {
-      var dateOfBirth = "701005";
+      var dateOfBirth = "200505";
       var separator = " ";
-      var individualNumber = "678";
+      var individualNumber = "594";
 
       var value = GetFoedselsnummerWithValidCheckDigits(dateOfBirth, separator, individualNumber);
       var x = value;

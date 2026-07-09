@@ -21,8 +21,8 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      Swedish personnummer and samordningsnummer values are both 11 or 13
-///      character strings. The only difference between the two lengths are
+///      Swedish personnummer and samordningsnummer values can be either 11 or
+///      13 character strings. The only difference between the two lengths are
 ///      the number of digits used to represent the date of birth, either
 ///      six or eight. The format of personnummer and samordningsnummer are
 ///      the same and consist of the following fields/sections:

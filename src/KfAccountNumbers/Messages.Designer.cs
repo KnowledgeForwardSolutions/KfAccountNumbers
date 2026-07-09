@@ -1105,11 +1105,65 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NO Foedselsnummer may not be null, empty or all whitespace characters.
+        ///   Looks up a localized string similar to NO D-nummer formatted for readability with a separator character at character position 6 (zero-based).
         /// </summary>
-        internal static string NoFoedselsnummerEmpty {
+        internal static string NoDnummerFormattedLength {
             get {
-                return ResourceManager.GetString("NoFoedselsnummerEmpty", resourceCulture);
+                return ResourceManager.GetString("NoDnummerFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO D-nummer contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string NoDnummerInvalidCharacter {
+            get {
+                return ResourceManager.GetString("NoDnummerInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO D-nummer must have two valid check digit characters in the trailing (right-most) positions.
+        /// </summary>
+        internal static string NoDnummerInvalidCheckDigits {
+            get {
+                return ResourceManager.GetString("NoDnummerInvalidCheckDigits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO D-nummer requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based).
+        /// </summary>
+        internal static string NoDnummerInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("NoDnummerInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO D-nummer must have length 11 (no separator character) or 12 (separator character).
+        /// </summary>
+        internal static string NoDnummerInvalidLength {
+            get {
+                return ResourceManager.GetString("NoDnummerInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO D-nummer separator character must not be a digit.
+        /// </summary>
+        internal static string NoDnummerInvalidSeparator {
+            get {
+                return ResourceManager.GetString("NoDnummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO D-nummer without a separator character.
+        /// </summary>
+        internal static string NoDnummerUnformattedLength {
+            get {
+                return ResourceManager.GetString("NoDnummerUnformattedLength", resourceCulture);
             }
         }
         

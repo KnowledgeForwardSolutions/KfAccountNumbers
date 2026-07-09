@@ -17,11 +17,11 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      Swedish samordningsnummer values are both 11 or 13 character strings.
-///      The only difference between the two lengths are the number of digits
-///      used to represent the date of birth, either six or eight.
+///      Swedish samordningsnummer values can be either 11 or 13 character
+///      strings. The only difference between the two lengths are the number of
+///      digits used to represent the date of birth, either six or eight.
 ///      Samordningsnummers are structured as YYMMDD-SSSC (or YYYYMMDD-SSSC for
-///      eight-digit date of birth values) with the following elements.
+///      eight-digit date of birth values) with the following elements:
 ///      <list type="bullet">
 ///         <item>
 ///            <term>YYMMDD</term>

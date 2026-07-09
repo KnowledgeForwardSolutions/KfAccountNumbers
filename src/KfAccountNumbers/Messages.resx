@@ -249,9 +249,6 @@
   <data name="NoFoedselsnummerInvalidLength" xml:space="preserve">
     <value>NO Foedselsnummer must have length 11 (no separator character) or 12 (separator character)</value>
   </data>
-  <data name="NoFoedselsnummerEmpty" xml:space="preserve">
-    <value>NO Foedselsnummer may not be null, empty or all whitespace characters</value>
-  </data>
   <data name="NoFoedselsnummerInvalidDateOfBirth" xml:space="preserve">
     <value>NO Foedselsnummer requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based)</value>
   </data>
@@ -626,5 +623,26 @@
   </data>
   <data name="SeIdentityNumberInvalidSeparator" xml:space="preserve">
     <value>SE Identity Number must have a valid separator character (either '-' or '+') in character position 6 (zero-based, YYMMDD format) or character position 8 (zero-based, YYYYMMDD format)</value>
+  </data>
+  <data name="NoDnummerFormattedLength" xml:space="preserve">
+    <value>NO D-nummer formatted for readability with a separator character at character position 6 (zero-based)</value>
+  </data>
+  <data name="NoDnummerUnformattedLength" xml:space="preserve">
+    <value>NO D-nummer without a separator character</value>
+  </data>
+  <data name="NoDnummerInvalidCharacter" xml:space="preserve">
+    <value>NO D-nummer contains a non-digit character where a digit was expected</value>
+  </data>
+  <data name="NoDnummerInvalidCheckDigits" xml:space="preserve">
+    <value>NO D-nummer must have two valid check digit characters in the trailing (right-most) positions</value>
+  </data>
+  <data name="NoDnummerInvalidDateOfBirth" xml:space="preserve">
+    <value>NO D-nummer requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based)</value>
+  </data>
+  <data name="NoDnummerInvalidLength" xml:space="preserve">
+    <value>NO D-nummer must have length 11 (no separator character) or 12 (separator character)</value>
+  </data>
+  <data name="NoDnummerInvalidSeparator" xml:space="preserve">
+    <value>NO D-nummer separator character must not be a digit</value>
   </data>
 </root>

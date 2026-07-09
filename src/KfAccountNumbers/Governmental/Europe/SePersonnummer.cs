@@ -20,7 +20,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      Swedish personnummer values are both 11 or 13 character strings.
+///      Swedish personnummer values can be either 11 or 13 character strings.
 ///      The only difference between the two lengths are the number of digits
 ///      used to represent the date of birth, either six or eight.
 ///      Personnummers are structured as YYMMDD-SSSC (or YYYYMMDD-SSSC for
