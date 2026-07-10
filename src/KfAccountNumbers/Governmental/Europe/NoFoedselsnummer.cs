@@ -57,7 +57,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      When creating a new <see cref="NoFoedselsnummer"/>, the following
-///      valiation rules are applied:
+///      validation rules are applied:
 ///      <list type="bullet">
 ///         <item>
 ///            <description>
@@ -171,7 +171,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      See <see href="https://en.wikipedia.org/wiki/National_identity_number_(Norway)">Wikipedia - National_identity_number_(Norway)</see>
-///      for more info.
+///      for more information.
 ///   </para>
 /// </remarks>
 [JsonConverter(typeof(NoFoedselsnummerJsonConverter))]
@@ -242,11 +242,6 @@ public record NoFoedselsnummer : NoIdentityNumberBase
    ///   DDMMYY format and the exact century of birth derived from the
    ///   individual number.
    /// </summary>
-   /// <remarks>
-   ///   Note that D-nummer values add 40 to the leading two digits (the DD
-   ///   portion of the DDMMYY date of birth). The date of birth property
-   ///   automatically adjusts for this offset.
-   /// </remarks>
    public DateOnly DateOfBirth
    {
       get
@@ -324,6 +319,7 @@ public record NoFoedselsnummer : NoIdentityNumberBase
    ///   Format the fødselsnummer using the supplied <paramref name="mask"/>.
    /// </summary>
    /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
    ///   then the default mask
    ///   <see cref="NoIdentityNumberBase.DefaultFormatMask"/> will be used
    ///   instead.

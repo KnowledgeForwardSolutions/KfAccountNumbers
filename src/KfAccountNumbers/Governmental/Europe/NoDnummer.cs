@@ -56,7 +56,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      of birth and the individual number, i.e. DDMMYY IIICC.
 ///   </para>
 ///   <para>
-///      When creating a new <see cref="NoDnummer"/>, the following valiation
+///      When creating a new <see cref="NoDnummer"/>, the following validation
 ///      rules are applied:
 ///      <list type="bullet">
 ///         <item>
@@ -133,7 +133,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      See <see href="https://en.wikipedia.org/wiki/National_identity_number_(Norway)">Wikipedia - National_identity_number_(Norway)</see>
-///      for more info.
+///      for more information.
 ///   </para>
 /// </remarks>
 [JsonConverter(typeof(NoDnummerJsonConverter))]
