@@ -4,7 +4,7 @@ Temporary Norwegian personal identity number issued to persons who are not eligi
 
 | Element | Description |
 | :------ | :---------- |
-| Class name: | KfAccountNumbers.Governmental.Europe.NoDnummer |
+| Class name: | KfAccountNumbers.National.Europe.NoDnummer |
 | Is composite: | No |
 | Length: | 11 (unformatted), 12 (formatted for readability) |
 | Check digit algorithm: | Weighted modulus 11, with two different sets of weights |

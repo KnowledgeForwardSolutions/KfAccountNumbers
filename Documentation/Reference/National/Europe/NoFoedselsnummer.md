@@ -4,7 +4,7 @@ Norwegian national identity number issued to citizens and long-term residents of
 
 | Element | Description |
 | :------ | :---------- |
-| Class name: | KfAccountNumbers.Governmental.Europe.NoFoedselsnummer |
+| Class name: | KfAccountNumbers.National.Europe.NoFoedselsnummer |
 | Is composite: | No |
 | Length: | 11 (unformatted), 12 (formatted for readability) |
 | Check digit algorithm: | Weighted modulus 11, with two different sets of weights |
