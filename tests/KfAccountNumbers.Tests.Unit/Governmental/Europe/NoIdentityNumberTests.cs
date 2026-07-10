@@ -195,6 +195,36 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
 
    #endregion
 
+   #region IdentifierType Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidFoedselsnummerValues))]
+   public void NoIdentityNumber_IdentifierType_ShouldReturnExpectedIdentifierType_WhenValueIsFoedselsnummer(String value)
+   {
+      // Arrange.
+      var sut = new NoIdentityNumber(value);
+      NoIdentityNumberBase.IdentifierCategory expected = default(NoIdentifierType.Foedselsnummer);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDNummerValues))]
+   public void NoIdentityNumber_IdentifierType_ShouldReturnExpectedIdentifierType_WhenValueIsDnummer(String value)
+   {
+      // Arrange.
+      var sut = new NoIdentityNumber(value);
+      NoIdentityNumberBase.IdentifierCategory expected = default(NoIdentifierType.DNummer);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(expected);
+   }
+
+   #endregion
+
    #region Value Property Tests
    // ==========================================================================
    // ==========================================================================

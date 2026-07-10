@@ -311,6 +311,16 @@ public record NoIdentityNumber : NoIdentityNumberBase
    }
 
    /// <summary>
+   ///   Gets the specific type of identifier that this instance represents.
+   /// </summary>
+   public IdentifierCategory IdentifierType
+      => Value.ParseTwoDigits() switch
+      {
+         <= 31 => default(NoIdentifierType.Foedselsnummer),       // Day 01-31: fødselsnummer
+         _ => default(NoIdentifierType.DNummer),                  // Day 41-71: D-nummer
+      };
+
+   /// <summary>
    ///   Gets a string representation of the Norwegian identity number.
    /// </summary>
    public String Value { get; private init; }
