@@ -196,6 +196,46 @@ public class NoIdentityNumberTestsBase
       "9",
    ];
 
+   public static TheoryData<String, String> FoedselsnummerInvalidDateOfBirthValues = new()
+   {
+      // See ValidDateOfBirthValues above for more info on design of date of birth/individual number pairs.
+
+      // Rule 1 - individual number >= 500 and <= 749 and year >= 54 - century = 1800's
+      { "010153", "500" },       // minimum 6 digit date and minimum individual number - less than minimum valid date
+      { "010153", "749" },       // minimum 6 digit date and maximum individual number - "
+
+      // Rule 2 - individual number < 500, year not considered - century = 1900's
+      // No valid 6 digit dates fall outside valid range
+
+      // Rule 3 - individual number >= 900 and year >= 40 - century = 1900's
+      // No valid 6 digit dates fall outside valid range
+
+      // Rule 4 - individual number >= 500 and year <= 39 - century - 2000's
+      { "010140", "500" },       // minimum 6 digit date and minimum individual number - greater than maximum valid date
+      { "010140", "899" },       // minimum 6 digit date and maximum individual number - "
+
+      // Invalid months
+      { "010004", "500" },       // month = 0
+      { "011304", "500" },       // month = 13
+
+      // Invalid days
+      { "000104", "500" },       // days = 0
+      { "320104", "500" },       // Invalid day of month for January, any year
+      { "290201", "502" },       // Invalid day of for February, non-leap year
+      { "300204", "501" },       // Invalid day of for February, leap year
+      { "300200", "500" },       // Invalid day of for February, leap year (2000 is leap-year)
+      { "320304", "500" },       // Invalid day of for March, any year
+      { "310404", "502" },       // Invalid day of for April, any year
+      { "320504", "500" },       // Invalid day of for May, any year
+      { "310604", "501" },       // Invalid day of for June, any year
+      { "320704", "500" },       // Invalid day of for July, any year
+      { "320804", "500" },       // Invalid day of for August, any year
+      { "310904", "501" },       // Invalid day of for September, any year
+      { "321004", "500" },       // Invalid day of for October, any year
+      { "311104", "500" },       // Invalid day of for November, any year
+      { "321204", "500" },       // Invalid day of for December, any year
+   };
+
    public static TheoryData<String, String> DnummerInvalidDateOfBirthValues = new()
    {
       // Individual number < 500 = 1900's, >= 500 = 2000s.

@@ -645,4 +645,25 @@
   <data name="NoDnummerInvalidSeparator" xml:space="preserve">
     <value>NO D-nummer separator character must not be a digit</value>
   </data>
+  <data name="NoIdentityNumberFormattedLength" xml:space="preserve">
+    <value>NO Identity Number formatted for readability with a separator character at character position 6 (zero-based)</value>
+  </data>
+  <data name="NoIdentityNumberInvalidCharacter" xml:space="preserve">
+    <value>NO Identity Number contains a non-digit character where a digit was expected</value>
+  </data>
+  <data name="NoIdentityNumberInvalidCheckDigits" xml:space="preserve">
+    <value>NO Identity Number must have two valid check digit characters in the trailing (right-most) positions</value>
+  </data>
+  <data name="NoIdentityNumberInvalidDateOfBirth" xml:space="preserve">
+    <value>NO Identity Number requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based)</value>
+  </data>
+  <data name="NoIdentityNumberInvalidLength" xml:space="preserve">
+    <value>NO Identity Number must have length 11 (no separator character) or 12 (separator character)</value>
+  </data>
+  <data name="NoIdentityNumberInvalidSeparator" xml:space="preserve">
+    <value>NO Identity Number separator character must not be a digit</value>
+  </data>
+  <data name="NoIdentityNumberUnformattedLength" xml:space="preserve">
+    <value>NO Identity Number without a separator character</value>
+  </data>
 </root>

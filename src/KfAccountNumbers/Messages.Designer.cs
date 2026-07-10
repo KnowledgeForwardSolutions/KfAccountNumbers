@@ -1231,6 +1231,69 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NO Identity Number formatted for readability with a separator character at character position 6 (zero-based).
+        /// </summary>
+        internal static string NoIdentityNumberFormattedLength {
+            get {
+                return ResourceManager.GetString("NoIdentityNumberFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Identity Number contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string NoIdentityNumberInvalidCharacter {
+            get {
+                return ResourceManager.GetString("NoIdentityNumberInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Identity Number must have two valid check digit characters in the trailing (right-most) positions.
+        /// </summary>
+        internal static string NoIdentityNumberInvalidCheckDigits {
+            get {
+                return ResourceManager.GetString("NoIdentityNumberInvalidCheckDigits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Identity Number requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based).
+        /// </summary>
+        internal static string NoIdentityNumberInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("NoIdentityNumberInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Identity Number must have length 11 (no separator character) or 12 (separator character).
+        /// </summary>
+        internal static string NoIdentityNumberInvalidLength {
+            get {
+                return ResourceManager.GetString("NoIdentityNumberInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Identity Number separator character must not be a digit.
+        /// </summary>
+        internal static string NoIdentityNumberInvalidSeparator {
+            get {
+                return ResourceManager.GetString("NoIdentityNumberInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Identity Number without a separator character.
+        /// </summary>
+        internal static string NoIdentityNumberUnformattedLength {
+            get {
+                return ResourceManager.GetString("NoIdentityNumberUnformattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SE Identity Number contains a non-digit character where a digit was expected.
         /// </summary>
         internal static string SeIdentityNumberInvalidCharacter {

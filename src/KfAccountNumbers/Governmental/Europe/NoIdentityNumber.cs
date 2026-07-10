@@ -1,3 +1,5 @@
+#pragma warning disable IDE0046 // Convert to conditional expression
+
 namespace KfAccountNumbers.Governmental.Europe;
 
 /// <summary>
@@ -151,7 +153,6 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///               gender = male, check digits = 38
 ///            </description>
 ///         </item>
-///      
 ///         <item>
 ///            <term>60055029566</term>
 ///            <description>
@@ -242,4 +243,79 @@ namespace KfAccountNumbers.Governmental.Europe;
 /// </remarks>
 public record NoIdentityNumber : NoIdentityNumberBase
 {
+   /// <summary>
+   ///   Check the <paramref name="value"/> to determine if it contains a
+   ///   valid Norwegian identity number.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Norwegian identity number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="NoIdentityNumberBase.ValidationResult"/> union that
+   ///   indicates if the <paramref name="value"/> passed validation or what
+   ///   validation error was encountered.
+   /// </returns>
+   public static ValidationResult Validate(String? value)
+   {
+      if (String.IsNullOrWhiteSpace(value))
+      {
+         return default(EmptyValue);
+      }
+
+      if (value.Length is not UnformattedLength and not FormattedLength)
+      {
+         return GetInvalidLengthResult(value);
+      }
+
+      // After performing basic checks, validate the check digits because the
+      // most common source of errors will be data entry errors. Then validate
+      // the subcomponents of the value.
+      if (!ValidateCheckDigits(value, out var invalidCharacterPosition))
+      {
+         return invalidCharacterPosition == -1
+            ? GetInvalidChecksumResult()
+            : GetInvalidCharacterResult(value, invalidCharacterPosition);
+      }
+
+      if (!ValidateSeparator(value))
+      {
+         return GetInvalidSeparatorResult(value);
+      }
+
+      if (!ValidateDateOfBirth(value, DateOffsetMode.Optional))
+      {
+         return GetInvalidDateOfBirthResult(value);
+      }
+
+      return default(ValidValue);
+   }
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      ReadOnlySpan<Char> value,
+      Int32 position)
+      => new(Messages.NoIdentityNumberInvalidCharacter, value[position], position);
+
+   private static InvalidChecksum GetInvalidChecksumResult()
+      => new(Messages.NoIdentityNumberInvalidCheckDigits, CheckDigitAlgorithmName);
+
+   private static InvalidLength GetInvalidLengthResult(ReadOnlySpan<Char> value)
+      => new(
+         Messages.NoIdentityNumberInvalidLength,
+         value.Length,
+         [
+            new ValidLengthDefinition(UnformattedLength, Messages.NoIdentityNumberUnformattedLength),
+            new ValidLengthDefinition(FormattedLength, Messages.NoIdentityNumberFormattedLength),
+         ]);
+
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
+      => new(
+         Messages.NoIdentityNumberInvalidDateOfBirth,
+         value[..SeparatorOffset],
+         DateFormatName.DDMMYY);
+
+   private static InvalidSeparator GetInvalidSeparatorResult(ReadOnlySpan<Char> value)
+      => new(
+         Messages.NoIdentityNumberInvalidSeparator,
+         value[SeparatorOffset],
+         SeparatorOffset);
 }
