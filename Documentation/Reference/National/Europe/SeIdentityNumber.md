@@ -6,7 +6,7 @@ A Swedish personnummer is the Swedish national identification number and is issu
 
 | Element | Description |
 | :------ | :---------- |
-| Class name: | SeIdentityNumber |
+| Class name: | KfAccountNumbers.National.Europe.SeIdentityNumber |
 | Is composite: | Yes |
 | Composite subtypes: | SePersonnummer, SeSamordningsnummer |
 | Length: | 11 (short format with 2-digit year), 13 (long format with 4-digit year) |

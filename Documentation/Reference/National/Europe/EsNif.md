@@ -4,7 +4,7 @@ Spanish tax identifier, Número de Identificación Fiscal (NIF).
 
 | Element | Description |
 | :------ | :---------- |
-| Class name: | EsNif |
+| Class name: | KfAccountNumbers.National.Europe.EsNif |
 | Is composite: | No |
 | Length: | 9 unformatted, 10 formatted |
 | Check digit algorithm: | Modulus 23 |

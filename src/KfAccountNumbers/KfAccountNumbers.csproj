@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="Governmental\NorthAmerica\UsSocialSecurityNumber.cs" />
+		<None Include="National\NorthAmerica\UsSocialSecurityNumber.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

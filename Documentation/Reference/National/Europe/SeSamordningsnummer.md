@@ -4,7 +4,7 @@ Coordination number (samordningsnummer) issued by the Swedish tax agency to pers
 
 | Element | Description |
 | :------ | :---------- |
-| Class name: | SeSamordningsnummer |
+| Class name: | KfAccountNumbers.National.Europe.SeSamordningsnummer |
 | Is composite: | No |
 | Length: | 11 (short format with 2-digit year), 13 (long format with 4-digit year) |
 | Check digit algorithm: | Luhn |
