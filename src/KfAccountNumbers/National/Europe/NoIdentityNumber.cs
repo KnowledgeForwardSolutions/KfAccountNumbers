@@ -62,11 +62,13 @@ namespace KfAccountNumbers.National.Europe;
 ///         <item>
 ///            <term>III</term>
 ///            <description>
-///               Three-digit individual number. The first digit indicates the
-///               person's century of birth, with 0-4 = 20th century or
-///               1900-1999 and 5-9 = 21st century or 2000-2099. The last digit
-///               indicates the person's gender, with odd digits assigned to
-///               males and even digits assigned to females.
+///               Three-digit individual number used to distinguish between
+///               persons born on the same date. Also used to determine the
+///               century of the person's birth, though the rules used by
+///               fødselsnummer are different from D-nummer and H-nummer. See
+///               below for more detail.  The last digit indicates the person's
+///               gender, with odd digits assigned to males and even digits
+///               assigned to females.
 ///            </description>
 ///         </item>
 ///         <item>

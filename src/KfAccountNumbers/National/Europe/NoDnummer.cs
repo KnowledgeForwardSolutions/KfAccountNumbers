@@ -106,21 +106,21 @@ namespace KfAccountNumbers.National.Europe;
 ///         <item>
 ///            <term>60055029566</term>
 ///            <description>
-///               unformatted, date of birth = May 20, 1950), gender = male,
+///               unformatted, date of birth = May 20, 1950, gender = male,
 ///               check digits = 66
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>70100567871</term>
 ///            <description>
-///               unformatted, date of birth = October 30, 2005), gender =
+///               unformatted, date of birth = October 30, 2005, gender =
 ///               female, check digits = 71
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>530295 34272</term>
 ///            <description>
-///               formatted, date of birth = February 13, 1995), gender =
+///               formatted, date of birth = February 13, 1995, gender =
 ///               female, check digits = 72
 ///            </description>
 ///         </item>

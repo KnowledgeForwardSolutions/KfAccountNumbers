@@ -31,11 +31,11 @@ namespace KfAccountNumbers.National.Europe;
 ///         <item>
 ///            <term>III</term>
 ///            <description>
-///               Three-digit individual number. The first digit indicates the
-///               person's century of birth (see below for the rules to derive
-///               the century of birth). The last digit indicates the person's
-///               gender, with odd digits assigned to males and even digits
-///               assigned to females.
+///               Three-digit individual number. Also used to determine the
+///               century of the person's birth (see below for the rules to
+///               derive the century of birth). The last digit indicates the
+///               person's gender, with odd digits assigned to males and even
+///               digits assigned to females.
 ///            </description>
 ///         </item>
 ///         <item>

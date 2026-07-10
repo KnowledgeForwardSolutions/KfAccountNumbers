@@ -32,7 +32,7 @@ Temporary Norwegian personal identity number issued to persons who are not eligi
 
 ### Notes
 
-The first check digit is calculated from the preceeding 9 digits (the 6-digit date of birth and the 3-digit individual number). The second check digit character is calculated from the preceeding 10 digits (including the first check digit).
+The first check digit is calculated from the preceding 9 digits (the 6-digit date of birth and the 3-digit individual number). The second check digit character is calculated from the preceding 10 digits (including the first check digit).
 
 The D-nummer's +40 day offset is taken into account when creating or validating a value and the actual date is validated, not the offset date. Similarly, the DateOfBirth property will return the actual date and not an offset date.
 

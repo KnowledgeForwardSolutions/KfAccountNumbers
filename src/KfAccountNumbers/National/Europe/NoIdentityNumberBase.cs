@@ -8,14 +8,15 @@ namespace KfAccountNumbers.National.Europe;
 public abstract record NoIdentityNumberBase
 {
    /// <summary>
-   ///   Discriminated union defining the types of identifier that
-   ///   <see cref="NoFoedselsnummer"/> can represent.
+   ///   Discriminated union defining the types of identifier that Norwegian
+   ///   identity number types in this hierarchy can represent.
    /// </summary>
    public union IdentifierCategory(NoIdentifierType.Foedselsnummer, NoIdentifierType.DNummer) { }
 
    /// <summary>
    ///   Discriminated union defining the possible validation errors that can
-   ///   occur when creating a new <see cref="NoFoedselsnummer"/>.
+   ///   occur when creating a new Norwegian identity number types in this
+   ///   hierarchy.
    /// </summary>
    public union ValidationError(
       EmptyValue,
@@ -29,7 +30,7 @@ public abstract record NoIdentityNumberBase
 
    /// <summary>
    ///   Discriminated union defining the possible results that can occur when
-   ///   validating a <see cref="NoFoedselsnummer"/>.
+   ///   validating Norwegian identity number types in this hierarchy.
    /// </summary>
    public union ValidationResult(
       ValidValue,
@@ -192,7 +193,7 @@ public abstract record NoIdentityNumberBase
    ///   invalid character found, or -1 if no invalid characters were found.
    /// </param>
    /// <returns>
-   ///   <see langword="true"/> if the value has invalid check digits; otherwise
+   ///   <see langword="true"/> if the value has valid check digits; otherwise
    ///   <see langword="false"/>.
    /// </returns>
    protected static Boolean ValidateCheckDigits(

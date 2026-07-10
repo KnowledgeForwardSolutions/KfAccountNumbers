@@ -10,7 +10,7 @@ Norwegian national identity number issued to citizens and long-term residents of
 | Check digit algorithm: | Weighted modulus 11, with two different sets of weights |
 | Allowed characters: | Digits ('0'-'9') |
 | Allowed separator characters: | Typically a space (' '), though any non digit character is allowed |
-| Structure: | ***DDMMYYIIICC*** (unformatted) or ***DDMMYY IIICC*** (formatted), where: <dl><dt>DDMMYY</dt><dd>6-digit date of birth in DDMMYY format.</dd><dt>III</dt><dd>3-digit individual number used to distinguish between persons born on the same date. The first digit indicates the century of the person's birth (see rules below). The last digit indicates the person's gender, with odd numbers = male and even numbers = female</dd><dt>CC</dt><dd>2 weighted modulus 11 check digits, each calculated with different weights</dd></dl> |
+| Structure: | ***DDMMYYIIICC*** (unformatted) or ***DDMMYY IIICC*** (formatted), where: <dl><dt>DDMMYY</dt><dd>6-digit date of birth in DDMMYY format.</dd><dt>III</dt><dd>3-digit individual number used to distinguish between persons born on the same date. Also used to determine the century of the person's birth (see rules below). The last digit indicates the person's gender, with odd numbers = male and even numbers = female</dd><dt>CC</dt><dd>2 weighted modulus 11 check digits, each calculated with different weights</dd></dl> |
 | Example values: | <dl><dt>13029597140</dt><dd>unformatted, date of birth = February 13, 1995, gender = male, check digits = 40</dd><dt>20050559433</dt><dd>unformatted, date of birth = May 20, 2005, gender = female, check digits = 33</dd><dt>130682 27938</dt><dd>formatted, date of birth = June 13, 1982, gender = male, check digits = 38</dd></dl> |
 
 ### Validation rules
@@ -32,7 +32,7 @@ Norwegian national identity number issued to citizens and long-term residents of
 
 ### Notes
 
-The first check digit is calculated from the preceeding 9 digits (the 6-digit date of birth and the 3-digit individual number). The second check digit character is calculated from the preceeding 10 digits (including the first check digit).
+The first check digit is calculated from the preceding 9 digits (the 6-digit date of birth and the 3-digit individual number). The second check digit character is calculated from the preceding 10 digits (including the first check digit).
 
 Fødselsnummers have fairly complex rules for determining the century of birth due to additional requirements being layered upon the individual number element over time. NoFoedselsnummer uses the rules described in this [article](https://blog.variant.no/ssns-and-pattern-matching-in-c-9-498f96aa71d4) published on Medium.com. The rules
 are:

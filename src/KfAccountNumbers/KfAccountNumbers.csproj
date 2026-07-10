@@ -27,8 +27,4 @@
 		<PackageReference Include="CheckDigits.Net" Version="3.1.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Governmental\" />
-	</ItemGroup>
-
 </Project>
