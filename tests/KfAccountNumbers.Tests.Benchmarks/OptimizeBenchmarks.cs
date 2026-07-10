@@ -1,4 +1,4 @@
-using KfAccountNumbers.Governmental.Europe;
+using KfAccountNumbers.National.Europe;
 
 #pragma warning disable IDE0059 // Unnecessary assignment of a value
 #pragma warning disable CA1822 // Mark members as static

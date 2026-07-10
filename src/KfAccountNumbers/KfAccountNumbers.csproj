@@ -20,11 +20,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="Governmental\NorthAmerica\UsSocialSecurityNumber.cs" />
+		<None Include="National\NorthAmerica\UsSocialSecurityNumber.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CheckDigits.Net" Version="3.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Governmental\" />
 	</ItemGroup>
 
 </Project>

@@ -6,10 +6,10 @@ global using CheckDigits.Net;
 
 global using FluentAssertions;
 
-global using KfAccountNumbers.Governmental.Europe;
-global using KfAccountNumbers.Governmental.NorthAmerica;
-global using KfAccountNumbers.Tests.Unit.TestData;
+global using KfAccountNumbers.National.Europe;
+global using KfAccountNumbers.National.NorthAmerica;
 global using KfAccountNumbers.Results;
+global using KfAccountNumbers.Tests.Unit.TestData;
 global using KfAccountNumbers.Utility;
 
 global using Microsoft.Extensions.Time.Testing;
