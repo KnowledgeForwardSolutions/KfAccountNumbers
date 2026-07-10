@@ -88,7 +88,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      When creating a new <see cref="NoIdentityNumber"/>, the following
-///      valiation rules are applied:
+///      validation rules are applied:
 ///      <list type="bullet">
 ///         <item>
 ///            <description>
@@ -188,7 +188,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      number element over time. The rules used by
 ///      <see cref="NoIdentityNumber"/> are taken from
 ///      https://blog.variant.no/ssns-and-pattern-matching-in-c-9-498f96aa71d4.
-///      Because of the overlapping ranges (the individual number 500  matches
+///      Because of the overlapping ranges (the individual number 500 matches
 ///      two different rules), the rules must be evaluated in order to arrive at
 ///      the correct century. The rules are:
 ///      <list type="bullet">
@@ -216,7 +216,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            <term>Rule 4</term>
 ///            <description>
 ///               If the individual number is &gt;= 500 AND the two digit year
-///               is &lt;= 39 then the century =2000.
+///               is &lt;= 39 then the century = 2000.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -238,7 +238,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      See <see href="https://en.wikipedia.org/wiki/National_identity_number_(Norway)">Wikipedia - National_identity_number_(Norway)</see>
-///      more info.
+///      for more info.
 ///   </para>
 /// </remarks>
 [JsonConverter(typeof(NoIdentityNumberJsonConverter))]
@@ -343,7 +343,7 @@ public record NoIdentityNumber : NoIdentityNumberBase
    ///   Gets a string representation of the Norwegian identity number.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
-   ///   <paramref name="value"/> is not a valid D-nummer.
+   ///   <paramref name="value"/> is not a valid identity number.
    /// </exception>
    public static explicit operator NoIdentityNumber(String? value) => new(value);
 

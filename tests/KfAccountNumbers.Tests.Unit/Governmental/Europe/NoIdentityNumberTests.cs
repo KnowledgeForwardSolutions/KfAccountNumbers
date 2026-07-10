@@ -232,7 +232,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDNummerValues))]
-   public void NoIdentityNumber_Value_ShouldReturnValidatedDnummer(String value)
+   public void NoIdentityNumber_Value_ShouldReturnValidatedIdentityNumber(String value)
    {
       // Arrange.
       var sut = new NoIdentityNumber(value);

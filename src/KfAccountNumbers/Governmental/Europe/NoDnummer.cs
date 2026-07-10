@@ -133,7 +133,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///   </para>
 ///   <para>
 ///      See <see href="https://en.wikipedia.org/wiki/National_identity_number_(Norway)">Wikipedia - National_identity_number_(Norway)</see>
-///      more info.
+///      for more info.
 ///   </para>
 /// </remarks>
 [JsonConverter(typeof(NoDnummerJsonConverter))]

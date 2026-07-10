@@ -135,7 +135,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      The century of the date of birth has somewhat complicated rules due to
 ///      several overlapping ranges of years. The rules used in <see cref="NoFoedselsnummer"/>
 ///      are taken from https://blog.variant.no/ssns-and-pattern-matching-in-c-9-498f96aa71d4.
-///      Because of the overlapping ranges (the individual number 500  matches two
+///      Because of the overlapping ranges (the individual number 500 matches two
 ///      different rules), the rules must be evaluated in order to arrive at the
 ///      correct century.  The rules are:
 ///      <list type="bullet">
@@ -163,7 +163,7 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///            <term>Rule 4</term>
 ///            <description>
 ///               If the individual number is &gt;= 500 AND the two digit year
-///               is &lt;= 39 then the century =2000.
+///               is &lt;= 39 then the century = 2000.
 ///            </description>
 ///         </item>
 ///         <item>
