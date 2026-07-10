@@ -252,7 +252,7 @@ public abstract record NoIdentityNumberBase
       // Manual validation is faster than using DateTime.TryParseExact.
 #pragma warning disable IDE0008 // Use explicit type
       var (day, month, year) = GetDayMonthYear(value, dateOffsetMode);
-      #pragma warning restore IDE0008 // Use explicit type
+#pragma warning restore IDE0008 // Use explicit type
 
       if (year is < MinimumValidYearOfBirth or > MaximumValidYearOfBirth)
       {

@@ -68,8 +68,8 @@ public class NoIdentityNumberTestsBase
       { "311299", " ", "499", "19991231" },     // maximum 6 digit date and maximum individual number
 
       // Rule 3 - individual number >= 900 and year >= 40 - century = 1900's
-      { "010140",  "", "900", "19000101" },     // minimum 6 digit date and minimum individual number
-      { "010140",  "", "999", "19000101" },     // minimum 6 digit date and maximum individual number
+      { "010140",  "", "900", "19400101" },     // minimum 6 digit date and minimum individual number
+      { "010140",  "", "999", "19400101" },     // minimum 6 digit date and maximum individual number
       { "311299",  "", "900", "19991231" },     // maximum 6 digit date and minimum individual number
       { "301299",  "", "999", "19991230" },     // maximum 6 digit date and maximum individual number (311299 999 adjusted because of check digits)
       { "311299",  "", "998", "19991231" },     // maximum 6 digit date and maximum individual number  "
@@ -81,19 +81,19 @@ public class NoIdentityNumberTestsBase
       { "311239",  "", "999", "20391231" },     // maximum 6 digit date and maximum individual number
 
       // Month maximum days
-      { "310104",  "", "501", "19040131" },     // maximum days for January, any year
-      { "280201",  "", "234", "19040228" },     // maximum days for February, non-leap year
+      { "310104",  "", "501", "20040131" },     // maximum days for January, any year
+      { "280201",  "", "234", "19010228" },     // maximum days for February, non-leap year
       { "290204",  "", "234", "19040229" },     // maximum days for February, leap year
       { "290200",  "", "500", "20000229" },     // maximum days for February, leap year (2000 is leap-year)
       { "310304",  "", "501", "20040331" },     // maximum days for March, any year
-      { "300404",  "", "499", "19040431" },     // maximum days for April, any year
+      { "300404",  "", "499", "19040430" },     // maximum days for April, any year
       { "310504",  "", "501", "20040531" },     // maximum days for May, any year
-      { "300604",  "", "500", "20040631" },     // maximum days for June, any year
+      { "300604",  "", "500", "20040630" },     // maximum days for June, any year
       { "310704",  "", "501", "20040731" },     // maximum days for July, any year
       { "310804",  "", "501", "20040831" },     // maximum days for August, any year
-      { "300904",  "", "500", "20040931" },     // maximum days for September, any year
+      { "300904",  "", "500", "20040930" },     // maximum days for September, any year
       { "311004",  "", "501", "20041031" },     // maximum days for October, any year
-      { "301104",  "", "499", "19041131" },     // maximum days for November, any year
+      { "301104",  "", "499", "19041130" },     // maximum days for November, any year
       { "311204",  "", "500", "20041231" },     // maximum days for December, any year
    };
 
@@ -294,4 +294,26 @@ public class NoIdentityNumberTestsBase
 
    protected static String GetNormalizedValue(String value)
       => value.Length == 11 ? value : value[..6] + value[7..];
+
+   #region Constants Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void NoIdentityNumberBase_CheckDigitAlgorithmName_ShouldHaveExpectedValue()
+      => NoIdentityNumberBase.CheckDigitAlgorithmName.Should().Be("Weighted Modulus 11");
+
+   [Fact]
+   public void NoIdentityNumberBase_MinimumValidYearOfBirth_ShouldHaveExpectedValue()
+      => NoIdentityNumberBase.MinimumValidYearOfBirth.Should().Be(1854);
+
+   [Fact]
+   public void NoIdentityNumberBase_MaximumValidYearOfBirth_ShouldHaveExpectedValue()
+      => NoIdentityNumberBase.MaximumValidYearOfBirth.Should().Be(2039);
+
+   [Fact]
+   public void NoIdentityNumberBase_DNummerDayOffset_ShouldHaveExpectedValue()
+      => NoIdentityNumberBase.DNummerDayOffset.Should().Be(40);
+
+   #endregion
 }

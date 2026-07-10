@@ -186,11 +186,11 @@ namespace KfAccountNumbers.Governmental.Europe;
 ///      Fødselsnummers have fairly complex rules for determining the century of
 ///      birth due to additional requirements being layered upon the individual
 ///      number element over time. The rules used by
-///      <see cref="NoIdentityNumber"/> are taken from
-///      https://blog.variant.no/ssns-and-pattern-matching-in-c-9-498f96aa71d4.
-///      Because of the overlapping ranges (the individual number 500 matches
-///      two different rules), the rules must be evaluated in order to arrive at
-///      the correct century. The rules are:
+///      <see cref="NoIdentityNumber"/> are taken from this
+///      <see href="https://blog.variant.no/ssns-and-pattern-matching-in-c-9-498f96aa71d4">article</see>
+///      published on Medium.com. Because of the overlapping ranges (the
+///      individual number 500 matches two different rules), the rules must be
+///      evaluated in order to arrive at the correct century. The rules are:
 ///      <list type="bullet">
 ///         <item>
 ///            <term>Rule 1</term>
