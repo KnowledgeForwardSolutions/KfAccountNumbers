@@ -115,7 +115,7 @@ namespace KfAccountNumbers.National.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               If the value has length 12, then character position 6
+///               If the value has length 12, then the character at position 6
 ///               (zero-based) must not be an ASCII digit ('0'-'9')
 ///            </description>
 ///         </item>

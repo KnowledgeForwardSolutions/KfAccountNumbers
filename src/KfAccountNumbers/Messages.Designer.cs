@@ -1231,6 +1231,69 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NO H-nummer formatted for readability with a separator character at character position 6 (zero-based).
+        /// </summary>
+        internal static string NoHnummerFormattedLength {
+            get {
+                return ResourceManager.GetString("NoHnummerFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO H-nummer contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string NoHnummerInvalidCharacter {
+            get {
+                return ResourceManager.GetString("NoHnummerInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO H-nummer must have two valid check digit characters in the trailing (right-most) positions.
+        /// </summary>
+        internal static string NoHnummerInvalidCheckDigits {
+            get {
+                return ResourceManager.GetString("NoHnummerInvalidCheckDigits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO H-nummer requires a valid six digit date of birth (DDMMYY) format in character positions 0-5 (zero-based).
+        /// </summary>
+        internal static string NoHnummerInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("NoHnummerInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO H-nummer must have length 11 (no separator character) or 12 (separator character).
+        /// </summary>
+        internal static string NoHnummerInvalidLength {
+            get {
+                return ResourceManager.GetString("NoHnummerInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO H-nummer separator character must not be a digit.
+        /// </summary>
+        internal static string NoHnummerInvalidSeparator {
+            get {
+                return ResourceManager.GetString("NoHnummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO H-nummer without a separator character.
+        /// </summary>
+        internal static string NoHnummerUnformattedLength {
+            get {
+                return ResourceManager.GetString("NoHnummerUnformattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to NO Identity Number formatted for readability with a separator character at character position 6 (zero-based).
         /// </summary>
         internal static string NoIdentityNumberFormattedLength {

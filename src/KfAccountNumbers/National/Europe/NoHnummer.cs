@@ -4,28 +4,29 @@ namespace KfAccountNumbers.National.Europe;
 
 /// <summary>
 ///   <para>
-///      Strongly typed business object that represents a D-nummer, a temporary
-///      Norwegian personal identity number issued to foreign individuals who
-///      are not eligible for a permanent identity number (fødselsnummer).
+///      Strongly typed business object that represents a H-nummer, a temporary
+///      identity number issued by Norwegian health organizations (such as a
+///      hospital) to persons needing medical assistance and who do not have
+///      either a fødselsnummer or a D-nummer.
 ///   </para>
 ///   <para>
-///      <b>Note:</b> See <see cref="NoFoedselsnummer"/> for a similar
-///      identifier (fødselsnummer) issued to permanent residents of Norway and
-///      <see cref="NoIdentityNumber"/> for a composite type that can represent
-///      either a fødselsnummer or a D-nummer.
+///      <b>Note:</b> See <see cref="NoFoedselsnummer"/> and
+///      <see cref="NoHnummer"/> for a similar identifiers (fødselsnummer,
+///      D-nummer) and <see cref="NoIdentityNumber"/> for a composite type that
+///      can represent either a fødselsnummer, D-nummer or a H-nummer.
 ///   </para>
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A D-nummer is an 11-digit number structured as DDMMYYIIICC, with the
+///      A H-nummer is an 11-digit number structured as DDMMYYIIICC, with the
 ///      following elements:
 ///      <list type="bullet">
 ///         <item>
 ///            <term>DDMMYY</term>
 ///            <description>
-///               The person's date of birth in DDMMYY format. The <b>DD</b>
-///               portion of the date of birth is offset by 40 (i.e. 1-31
-///               becomes 41-71) to distinguish D-nummers from fødselsnummers.
+///               The person's date of birth in DDMMYY format. The <b>MM</b>
+///               portion of the date of birth is offset by 40 (i.e. 1-12
+///               becomes 41-52) to distinguish H-nummers from fødselsnummers.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -56,7 +57,7 @@ namespace KfAccountNumbers.National.Europe;
 ///      of birth and the individual number, i.e. DDMMYY IIICC.
 ///   </para>
 ///   <para>
-///      When creating a new <see cref="NoDnummer"/>, the following validation
+///      When creating a new <see cref="NoHnummer"/>, the following validation
 ///      rules are applied:
 ///      <list type="bullet">
 ///         <item>
@@ -88,7 +89,7 @@ namespace KfAccountNumbers.National.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The date of birth (after adjusting for the +40 D-nummer day
+///               The date of birth (after adjusting for the +40 H-nummer month
 ///               offset and after determining the century from the individual
 ///               number) must be a valid date between 01/01/1854 and
 ///               31/12/2039. Note that the validation specifically does
@@ -101,24 +102,24 @@ namespace KfAccountNumbers.National.Europe;
 ///      Example values:
 ///      <list type="bullet">
 ///         <item>
-///            <term>60055029566</term>
+///            <term>07417942720</term>
 ///            <description>
-///               unformatted, date of birth = May 20, 1950, gender = male,
-///               check digits = 66
+///               unformatted, date of birth = January 7, 1979, gender = male,
+///               check digits = 20
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>70100567871</term>
+///            <term>21501350017</term>
 ///            <description>
-///               unformatted, date of birth = October 30, 2005, gender =
-///               female, check digits = 71
+///               unformatted, date of birth = October 21, 2013, gender =
+///               female, check digits = 17
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>530295 34272</term>
+///            <term>135095 02069</term>
 ///            <description>
-///               formatted, date of birth = February 13, 1995, gender =
-///               female, check digits = 72
+///               formatted, date of birth = October 13, 1995, gender = female,
+///               check digits = 69
 ///            </description>
 ///         </item>
 ///      </list>
@@ -133,14 +134,14 @@ namespace KfAccountNumbers.National.Europe;
 ///      for more information.
 ///   </para>
 /// </remarks>
-[JsonConverter(typeof(NoDnummerJsonConverter))]
-public record NoDnummer : NoIdentityNumberBase
+[JsonConverter(typeof(NoHnummerJsonConverter))]
+public record NoHnummer : NoIdentityNumberBase
 {
    /// <summary>
-   ///   Initializes a new instance of the <see cref="NoDnummer"/> class.
+   ///   Initializes a new instance of the <see cref="NoHnummer"/> class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a D-nummer.
+   ///   String representation of a H-nummer.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
@@ -162,14 +163,14 @@ public record NoDnummer : NoIdentityNumberBase
    ///   <paramref name="value"/> contains an invalid date of birth in
    ///   positions 0-5 (zero-based).
    /// </exception>
-   public NoDnummer(String? value)
+   public NoHnummer(String? value)
       : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="NoDnummer"/> class.
+   ///   Initializes a new instance of the <see cref="NoHnummer"/> class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a D-nummer.
+   ///   String representation of a H-nummer.
    /// </param>
    /// <param name="validationMode">
    ///   Indicates whether the <paramref name="value"/> requires validation.
@@ -179,7 +180,7 @@ public record NoDnummer : NoIdentityNumberBase
    ///   validation when creating a new instance from a value that has
    ///   already been validated.
    /// </remarks>
-   private NoDnummer(String? value, ValidationMode validationMode)
+   private NoHnummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
@@ -208,16 +209,16 @@ public record NoDnummer : NoIdentityNumberBase
    ///   individual number.
    /// </summary>
    /// <remarks>
-   ///   Note that D-nummer values add 40 to the leading two digits (the DD
-   ///   portion of the DDMMYY date of birth). The date of birth property
-   ///   automatically adjusts for this offset.
+   ///   Note that H-nummer values add 40 to the MM portion of the DDMMYY date
+   ///   of birth. The date of birth property automatically adjusts for this
+   ///   offset.
    /// </remarks>
    public DateOnly DateOfBirth
    {
       get
       {
 #pragma warning disable IDE0008 // Use explicit type
-         var (day, month, year) = GetDayMonthYear(Value, DateOffsetMode.Dnummer);
+         var (day, month, year) = GetDayMonthYear(Value, DateOffsetMode.Hnummer);
 #pragma warning restore IDE0008 // Use explicit type
 
          return new DateOnly(year, month, day);
@@ -232,48 +233,48 @@ public record NoDnummer : NoIdentityNumberBase
       => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
 
    /// <summary>
-   ///   Gets a string representation of the D-nummer.
+   ///   Gets a string representation of the H-nummer.
    /// </summary>
    public String Value { get; private init; }
 
    /// <summary>
-   ///   Implicitly converts a <see cref="NoDnummer"/> to a
+   ///   Implicitly converts a <see cref="NoHnummer"/> to a
    ///   <see cref="String"/>, returning an empty string if the source is null.
    /// </summary>
    /// <param name="source">
-   ///   The <see cref="NoDnummer"/> to convert.
+   ///   The <see cref="NoHnummer"/> to convert.
    /// </param>
-   public static implicit operator String(NoDnummer source)
+   public static implicit operator String(NoHnummer source)
       => source?.Value ?? String.Empty;     // Handle null object gracefully by returning empty string
 
    /// <summary>
-   ///   Defines an explicit conversion of a string to a <see cref="NoDnummer"/>.
+   ///   Defines an explicit conversion of a string to a <see cref="NoHnummer"/>.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Norwegian D-nummer.
+   ///   String representation of a Norwegian H-nummer.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
-   ///   <paramref name="value"/> is not a valid D-nummer.
+   ///   <paramref name="value"/> is not a valid H-nummer.
    /// </exception>
-   public static explicit operator NoDnummer(String? value) => new(value);
+   public static explicit operator NoHnummer(String? value) => new(value);
 
    /// <summary>
-   ///   Create a new <see cref="NoDnummer"/> using the Result pattern.
+   ///   Create a new <see cref="NoHnummer"/> using the Result pattern.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Norwegian D-nummer.
+   ///   String representation of a Norwegian H-nummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{NoDnummer, ValidationError}"/>. Will
-   ///   contain the new <see cref="NoDnummer"/> if <paramref name="value"/>
+   ///   A <see cref="CreateResult{NoHnummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="NoHnummer"/> if <paramref name="value"/>
    ///   is valid or a <see cref="NoIdentityNumberBase.ValidationError"/> that
    ///   identifies the validation rule that was failed if
    ///   <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<NoDnummer, ValidationError> Create(String? value)
+   public static CreateResult<NoHnummer, ValidationError> Create(String? value)
       => Validate(value) switch
       {
-         ValidValue => new NoDnummer(value, ValidationMode.BypassValidation),
+         ValidValue => new NoHnummer(value, ValidationMode.BypassValidation),
          EmptyValue emptyValue => (ValidationError)emptyValue,
          InvalidLength invalidLength => (ValidationError)invalidLength,
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
@@ -284,7 +285,7 @@ public record NoDnummer : NoIdentityNumberBase
       };
 
    /// <summary>
-   ///   Format the D-nummer using the supplied <paramref name="mask"/>.
+   ///   Format the H-nummer using the supplied <paramref name="mask"/>.
    /// </summary>
    /// <param name="mask">
    ///   Optional. The mask that specifies the final output. If not supplied
@@ -293,7 +294,7 @@ public record NoDnummer : NoIdentityNumberBase
    ///   instead.
    /// </param>
    /// <returns>
-   ///   A formatted D-nummer.
+   ///   A formatted H-nummer.
    /// </returns>
    /// <exception cref="ArgumentNullException">
    ///   <paramref name="mask"/> is <see langword="null"/>.
@@ -304,24 +305,24 @@ public record NoDnummer : NoIdentityNumberBase
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the D-nummer.
+   ///   details on creating a mask to format the H-nummer.
    /// </remarks>
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
-   ///   Get a string representation of the D-nummer.
+   ///   Get a string representation of the H-nummer.
    /// </summary>
    /// <returns>
-   ///   The raw D-nummer, without separator characters.
+   ///   The raw H-nummer, without separator characters.
    /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a
-   ///   valid Norwegian D-nummer.
+   ///   valid Norwegian H-nummer.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Norwegian D-nummer.
+   ///   String representation of a Norwegian H-nummer.
    /// </param>
    /// <returns>
    ///   A <see cref="NoIdentityNumberBase.ValidationResult"/> union that
@@ -355,7 +356,7 @@ public record NoDnummer : NoIdentityNumberBase
          return GetInvalidSeparatorResult(value);
       }
 
-      if (!ValidateDateOfBirth(value, DateOffsetMode.Dnummer))
+      if (!ValidateDateOfBirth(value, DateOffsetMode.Hnummer))
       {
          return GetInvalidDateOfBirthResult(value);
       }
@@ -366,38 +367,38 @@ public record NoDnummer : NoIdentityNumberBase
    private static InvalidCharacter GetInvalidCharacterResult(
       ReadOnlySpan<Char> value,
       Int32 position)
-      => new(Messages.NoDnummerInvalidCharacter, value[position], position);
+      => new(Messages.NoHnummerInvalidCharacter, value[position], position);
 
    private static InvalidChecksum GetInvalidChecksumResult()
-      => new(Messages.NoDnummerInvalidCheckDigits, CheckDigitAlgorithmName);
+      => new(Messages.NoHnummerInvalidCheckDigits, CheckDigitAlgorithmName);
 
    private static InvalidLength GetInvalidLengthResult(ReadOnlySpan<Char> value)
       => new(
-         Messages.NoDnummerInvalidLength,
+         Messages.NoHnummerInvalidLength,
          value.Length,
          [
-            new ValidLengthDefinition(UnformattedLength, Messages.NoDnummerUnformattedLength),
-            new ValidLengthDefinition(FormattedLength, Messages.NoDnummerFormattedLength),
+            new ValidLengthDefinition(UnformattedLength, Messages.NoHnummerUnformattedLength),
+            new ValidLengthDefinition(FormattedLength, Messages.NoHnummerFormattedLength),
          ]);
 
    private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
       => new(
-         Messages.NoDnummerInvalidDateOfBirth,
+         Messages.NoHnummerInvalidDateOfBirth,
          value[..SeparatorOffset],
          DateFormatName.DDMMYY);
 
    private static InvalidSeparator GetInvalidSeparatorResult(ReadOnlySpan<Char> value)
       => new(
-         Messages.NoDnummerInvalidSeparator,
+         Messages.NoHnummerInvalidSeparator,
          value[SeparatorOffset],
          SeparatorOffset);
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable SA1600 // Elements should be documented
-public class NoDnummerJsonConverter : JsonConverter<NoDnummer>
+public class NoHnummerJsonConverter : JsonConverter<NoHnummer>
 {
-   public override NoDnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   public override NoHnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
       if (reader.TokenType == JsonTokenType.Null)
       {
@@ -405,9 +406,9 @@ public class NoDnummerJsonConverter : JsonConverter<NoDnummer>
       }
 
       var str = reader.GetString();
-      return new NoDnummer(str);
+      return new NoHnummer(str);
    }
 
-   public override void Write(Utf8JsonWriter writer, NoDnummer value, JsonSerializerOptions options)
+   public override void Write(Utf8JsonWriter writer, NoHnummer value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
 }

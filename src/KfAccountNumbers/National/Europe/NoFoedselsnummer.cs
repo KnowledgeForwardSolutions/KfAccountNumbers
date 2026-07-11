@@ -82,7 +82,7 @@ namespace KfAccountNumbers.National.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               If the value has length 12, then character position 6
+///               If the value has length 12, then the character at position 6
 ///               (zero-based) must not be an ASCII digit ('0'-'9')
 ///            </description>
 ///         </item>
@@ -353,7 +353,8 @@ public record NoFoedselsnummer : NoIdentityNumberBase
    ///   valid Norwegian national identity number (fødselsnummer) value.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Norwegian national identity number (fødselsnummer).
+   ///   String representation of a Norwegian national identity number
+   ///   (fødselsnummer).
    /// </param>
    /// <returns>
    ///   A <see cref="NoIdentityNumberBase.ValidationResult"/> union that

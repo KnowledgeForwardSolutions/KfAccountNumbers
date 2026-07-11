@@ -20,7 +20,7 @@ Norwegian national identity number issued to citizens and long-term residents of
 | 2. | The string length must be 11 characters (unformatted) or 12 characters (formatted). | InvalidLength |
 | 3. | All non-separator characters must be ASCII digits ('0'-'9'). | InvalidCharacter |
 | 4. | The trailing two characters must be valid weighted modulus 11 check digits. | InvalidChecksum |
-| 5. | If the value has length 12, then character position 6 (zero-based) must not be an ASCII digit ('0'-'9') | InvalidSeparator |
+| 5. | If the value has length 12, then the character at position 6 (zero-based) must not be an ASCII digit ('0'-'9') | InvalidSeparator |
 | 6. | The date of birth must be a valid date between 01/01/1854 and 31/12/2039 | InvalidDateOfBirth |
 
 ### Additional Properties

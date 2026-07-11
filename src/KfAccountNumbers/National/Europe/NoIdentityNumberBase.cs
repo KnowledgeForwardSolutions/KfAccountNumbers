@@ -119,6 +119,11 @@ public abstract record NoIdentityNumberBase
       Dnummer,
 
       /// <summary>
+      ///   H-nummers adjust the month by removing the +40 month offset.
+      /// </summary>
+      Hnummer,
+
+      /// <summary>
       ///   Date will be adjusted to remove an offset if necessary.
       /// </summary>
       Optional,
@@ -140,27 +145,33 @@ public abstract record NoIdentityNumberBase
       ReadOnlySpan<Char> value,
       DateOffsetMode dateOffsetMode)
    {
-      var unadjustedDay = value.ParseTwoDigits();
-      var month = value[2..].ParseTwoDigits();
-      var year = value[4..].ParseTwoDigits();
+      var baseDay = value.ParseTwoDigits();
+      var baseMonth = value[2..].ParseTwoDigits();
+      var baseYear = value[4..].ParseTwoDigits();
 
-      // Handle date offset such as D-nummer.
-#pragma warning disable IDE0072 // Add missing cases
+      // Handle possible day/month offsets.
+      #pragma warning disable IDE0072 // Add missing cases
       var day = dateOffsetMode switch
       {
-         DateOffsetMode.Dnummer => unadjustedDay - DNummerDayOffset,
-         DateOffsetMode.Optional => unadjustedDay > 31 ? unadjustedDay - DNummerDayOffset : unadjustedDay,
-         _ => unadjustedDay,
+         DateOffsetMode.Dnummer => baseDay - DNummerDayOffset,
+            DateOffsetMode.Optional => baseDay > 31 ? baseDay - DNummerDayOffset : baseDay,
+         _ => baseDay,
+      };
+
+      var month = dateOffsetMode switch
+      {
+         DateOffsetMode.Hnummer => baseMonth - DNummerDayOffset,
+         DateOffsetMode.Optional => baseMonth > 12 ? baseMonth - DNummerDayOffset : baseMonth,
+         _ => baseMonth,
       };
 #pragma warning restore IDE0072 // Add missing cases
 
       // Adjust the year according to the value of the individual number.
-      // See https://blog.variant.no/ssns-and-pattern-matching-in-c-9-498f96aa71d4
-      // for description of the rules used.
       var individualNumber = value[^IndividualNumberOffset..].ParseThreeDigits();
-      year += unadjustedDay <= 31
-         ? GetFodselsnummerBirthCentury(year, individualNumber)
+      var century = baseDay <= 31
+         ? GetFodselsnummerBirthCentury(baseYear, individualNumber)
          : GetDnummerBirthCentury(individualNumber);
+      var year = baseYear + century;
 
       return (day, month, year);
    }

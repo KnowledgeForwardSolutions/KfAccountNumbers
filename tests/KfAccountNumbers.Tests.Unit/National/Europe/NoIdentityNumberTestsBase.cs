@@ -16,6 +16,11 @@ public class NoIdentityNumberTestsBase
    protected const String ValidFormattedDnummer = "600550 29566";
    protected const String AltValidFormattedDnummer = "701005-67871";
 
+   protected const String ValidUnformattedHnummer = "07417942720";               // male, century of birth = 1900s
+   protected const String AltValidUnformattedHnummer = "21501350017";            // female, century of birth = 2000s
+   protected const String ValidFormattedHnummer = "074179 42720";
+   protected const String AltValidFormattedHnummer = "215013-50017";
+
    public static TheoryData<String> ValidFoedselsnummerValues =>
    [
       ValidUnformattedFoedselsnummer,
@@ -24,12 +29,20 @@ public class NoIdentityNumberTestsBase
       AltValidFormattedFoedselsnummer,
    ];
 
-   public static TheoryData<String> ValidDNummerValues =>
+   public static TheoryData<String> ValidDnummerValues =>
    [
       ValidUnformattedDnummer,
       AltValidUnformattedDnummer,
       ValidFormattedDnummer,
       AltValidFormattedDnummer,
+   ];
+
+   public static TheoryData<String> ValidHnummerValues =>
+   [
+      ValidUnformattedHnummer,
+      AltValidUnformattedHnummer,
+      ValidFormattedHnummer,
+      AltValidFormattedHnummer,
    ];
 
    public static TheoryData<String> ValidSeparators =>
@@ -124,6 +137,35 @@ public class NoIdentityNumberTestsBase
       { "711004", " ", "998", "20041031" },     // maximum days for October, any year
       { "701104",  "", "002", "19041130" },     // maximum days for November, any year
       { "711204", " ", "500", "20041231" },     // maximum days for December, any year
+   };
+
+   public static TheoryData<String, String, String, String> HnummerValidDateOfBirthValues = new()
+   {
+      // Date of birth, separator, individual number, expected date
+      { "014100",  "", "002", "19000101" },     // Minimum date that can be represented as a H-nummer
+      { "014100", " ", "497", "19000101" },
+      { "315299",  "", "001", "19991231" },
+      { "315299", " ", "499", "19991231" },
+      { "014100",  "", "500", "20000101" },
+      { "014100", " ", "999", "20000101" },
+      { "315239",  "", "501", "20391231" },     // Maximum date that can be represented as a H-nummer
+      { "315239", " ", "999", "20391231" },
+
+      // Month maximum days
+      { "314104",  "", "002", "19040131" },     // maximum days for January, any year
+      { "284201", " ", "499", "19010228" },     // maximum days for February, non-leap year
+      { "294204",  "", "500", "20040229" },     // maximum days for February, leap year
+      { "294200", " ", "998", "20000229" },     // maximum days for February, leap year (2000 is leap-year)
+      { "314304",  "", "002", "19040331" },     // maximum days for March, any year
+      { "304404", " ", "499", "19040430" },     // maximum days for April, any year
+      { "314504",  "", "501", "20040531" },     // maximum days for May, any year
+      { "304604", " ", "999", "20040630" },     // maximum days for June, any year
+      { "314704",  "", "002", "19040731" },     // maximum days for July, any year
+      { "314804", " ", "499", "19040831" },     // maximum days for August, any year
+      { "304904",  "", "500", "20040930" },     // maximum days for September, any year
+      { "315004", " ", "998", "20041031" },     // maximum days for October, any year
+      { "305104",  "", "003", "19041130" },     // maximum days for November, any year
+      { "315204", " ", "500", "20041231" },     // maximum days for December, any year
    };
 
    public static TheoryData<String> InvalidLengthValues =>
@@ -261,6 +303,33 @@ public class NoIdentityNumberTestsBase
       { "721004", "200" },       // Invalid day of for October, any year
       { "711104", "100" },       // Invalid day of for November, any year
       { "721204", "200" },       // Invalid day of for December, any year
+   };
+
+   public static TheoryData<String, String> HnummerInvalidDateOfBirthValues = new()
+   {
+      // Individual number < 500 = 1900's, >= 500 = 2000s.
+      { "014140", "600" },       // January 1, 2040, > max year 2039
+
+      // Invalid months
+      { "014004", "200" },       // Invalid month = 0
+      { "015304", "500" },       // Invalid month = 13
+
+      // Invalid days
+      { "004104", "102" },       // Invalid day = 0
+      { "324104", "100" },       // Invalid day of month for January, any year
+      { "294201", "100" },       // Invalid day of for February, non-leap year
+      { "304204", "100" },       // Invalid day of for February, leap year
+      { "304200", "501" },       // Invalid day of for February, leap year (2000 is leap-year)
+      { "324304", "500" },       // Invalid day of for March, any year
+      { "314404", "501" },       // Invalid day of for April, any year
+      { "324504", "500" },       // Invalid day of for May, any year
+      { "314604", "500" },       // Invalid day of for June, any year
+      { "324704", "500" },       // Invalid day of for July, any year
+      { "324804", "501" },       // Invalid day of for August, any year
+      { "314904", "101" },       // Invalid day of for September, any year
+      { "325004", "200" },       // Invalid day of for October, any year
+      { "315104", "102" },       // Invalid day of for November, any year
+      { "325204", "200" },       // Invalid day of for December, any year
    };
 
    protected static String GetValueWithValidCheckDigits(
