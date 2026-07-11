@@ -1001,6 +1001,117 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
 
    #endregion
 
+   #region ToDnummer Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidDnummerValues))]
+   public void NoIdentityNumber_ToDnummer_ShouldReturnExpectedResult_WhenValueIsDnummer(String value)
+   {
+      // Arrange.
+      var sut = new NoIdentityNumber(value);
+      var expected = new NoDnummer(value);
+
+      // Act.
+      KfOption<NoDnummer> result = sut.ToDnummer();
+
+      // Assert.
+      result.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidFoedselsnummerValues))]
+   [MemberData(nameof(ValidHnummerValues))]
+   public void NoIdentityNumber_ToDnummer_ShouldReturnExpectedResult_WhenValueIsNotDnummer(String value)
+   {
+      // Arrange.
+      var sut = new NoIdentityNumber(value);
+      var expected = default(None);
+
+      // Act.
+      KfOption<NoDnummer> result = sut.ToDnummer();
+
+      // Assert.
+      result.Value.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region ToFoedselsnummer Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidFoedselsnummerValues))]
+   public void NoIdentityNumber_ToToFoedselsnummer_ShouldReturnExpectedResult_WhenValueIsFoedselsnummer(String value)
+   {
+      // Arrange.
+      var sut = new NoIdentityNumber(value);
+      var expected = new NoFoedselsnummer(value);
+
+      // Act.
+      KfOption<NoFoedselsnummer> result = sut.ToFoedselsnummer();
+
+      // Assert.
+      result.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidHnummerValues))]
+   public void NoIdentityNumber_ToFoedselsnummer_ShouldReturnExpectedResult_WhenValueIsNotFoedselsnummer(String value)
+   {
+      // Arrange.
+      var sut = new NoIdentityNumber(value);
+      var expected = default(None);
+
+      // Act.
+      KfOption<NoFoedselsnummer> result = sut.ToFoedselsnummer();
+
+      // Assert.
+      result.Value.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region ToHnummer Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidHnummerValues))]
+   public void NoIdentityNumber_ToHnummer_ShouldReturnExpectedResult_WhenValueIsHnummer(String value)
+   {
+      // Arrange.
+      var sut = new NoIdentityNumber(value);
+      var expected = new NoHnummer(value);
+
+      // Act.
+      KfOption<NoHnummer> result = sut.ToHnummer();
+
+      // Assert.
+      result.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidFoedselsnummerValues))]
+   [MemberData(nameof(ValidDnummerValues))]
+   public void NoIdentityNumber_ToFoedselsnummer_ShouldReturnExpectedResult_WhenValueIsNotHnummer(String value)
+   {
+      // Arrange.
+      var sut = new NoIdentityNumber(value);
+      var expected = default(None);
+
+      // Act.
+      KfOption<NoHnummer> result = sut.ToHnummer();
+
+      // Assert.
+      result.Value.Should().Be(expected);
+   }
+
+   #endregion
+
    #region ToString Method Tests
    // ==========================================================================
    // ==========================================================================

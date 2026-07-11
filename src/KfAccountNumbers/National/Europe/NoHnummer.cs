@@ -180,7 +180,7 @@ public record NoHnummer : NoIdentityNumberBase
    ///   validation when creating a new instance from a value that has
    ///   already been validated.
    /// </remarks>
-   private NoHnummer(String? value, ValidationMode validationMode)
+   internal NoHnummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {

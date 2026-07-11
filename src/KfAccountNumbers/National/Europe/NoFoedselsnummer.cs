@@ -209,12 +209,18 @@ public record NoFoedselsnummer : NoIdentityNumberBase
    /// <summary>
    ///   Initializes a new instance of the <see cref="NoFoedselsnummer"/> class.
    /// </summary>
+   /// <param name="value">
+   ///   String representation of a fødselsnummer.
+   /// </param>
+   /// <param name="validationMode">
+   ///   Indicates whether the <paramref name="value"/> requires validation.
+   /// </param>
    /// <remarks>
    ///   Private constructor that actually does the work. Supports bypassing
    ///   validation when creating a new instance from a value that has
    ///   already been validated.
    /// </remarks>
-   private NoFoedselsnummer(String? value, ValidationMode validationMode)
+   internal NoFoedselsnummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {

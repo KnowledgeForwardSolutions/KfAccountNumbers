@@ -402,6 +402,48 @@ public record NoIdentityNumber : NoIdentityNumberBase
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
+   ///   Convert this instance to a <see cref="NoDnummer"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{NoDnummer}"/> instance that will contain
+   ///   the <see cref="NoDnummer"/> if this value is a D-nummer;
+   ///   otherwise <see cref="None"/> to indicate that this is not a
+   ///   D-nummer.
+   /// </returns>
+   public KfOption<NoDnummer> ToDnummer()
+      => IdentifierType is NoIdentifierType.Dnummer
+         ? new NoDnummer(Value, ValidationMode.BypassValidation)
+         : default(None);
+
+   /// <summary>
+   ///   Convert this instance to a <see cref="NoFoedselsnummer"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{NoFoedselsnummer}"/> instance that will contain
+   ///   the <see cref="NoFoedselsnummer"/> if this value is a fødselsnummer;
+   ///   otherwise <see cref="None"/> to indicate that this is not a
+   ///   fødselsnummer.
+   /// </returns>
+   public KfOption<NoFoedselsnummer> ToFoedselsnummer()
+      => IdentifierType is NoIdentifierType.Foedselsnummer
+         ? new NoFoedselsnummer(Value, ValidationMode.BypassValidation)
+         : default(None);
+
+   /// <summary>
+   ///   Convert this instance to a <see cref="NoHnummer"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{NoHnummer}"/> instance that will contain
+   ///   the <see cref="NoHnummer"/> if this value is a H-nummer;
+   ///   otherwise <see cref="None"/> to indicate that this is not a
+   ///   H-nummer.
+   /// </returns>
+   public KfOption<NoHnummer> ToHnummer()
+      => IdentifierType is NoIdentifierType.Hnummer
+         ? new NoHnummer(Value, ValidationMode.BypassValidation)
+         : default(None);
+
+   /// <summary>
    ///   Get a string representation of the identity number.
    /// </summary>
    /// <returns>

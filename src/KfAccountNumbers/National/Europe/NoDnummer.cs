@@ -179,7 +179,7 @@ public record NoDnummer : NoIdentityNumberBase
    ///   validation when creating a new instance from a value that has
    ///   already been validated.
    /// </remarks>
-   private NoDnummer(String? value, ValidationMode validationMode)
+   internal NoDnummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
