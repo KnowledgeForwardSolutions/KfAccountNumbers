@@ -82,7 +82,7 @@ namespace KfAccountNumbers.National.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               If the value has length 12, then character position 6
+///               If the value has length 12, then the character at position 6
 ///               (zero-based) must not be an ASCII digit ('0'-'9')
 ///            </description>
 ///         </item>
@@ -96,9 +96,6 @@ namespace KfAccountNumbers.National.Europe;
 ///            </description>
 ///         </item>
 ///      </list>
-///      Note that the <b>DD</b> portion of the date of birth will be 41-71
-///      because D-nummer offsets the day of birth by +40 to
-///      distinguish from foedselsnummer values.
 ///   </para>
 ///   <para>
 ///      Example values:
@@ -182,7 +179,7 @@ public record NoDnummer : NoIdentityNumberBase
    ///   validation when creating a new instance from a value that has
    ///   already been validated.
    /// </remarks>
-   private NoDnummer(String? value, ValidationMode validationMode)
+   internal NoDnummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
@@ -269,8 +266,9 @@ public record NoDnummer : NoIdentityNumberBase
    /// <returns>
    ///   A <see cref="CreateResult{NoDnummer, ValidationError}"/>. Will
    ///   contain the new <see cref="NoDnummer"/> if <paramref name="value"/>
-   ///   is valid or a <see cref="NoIdentityNumberBase.ValidationError"/> that identifies the
-   ///   validation rule that was failed if <paramref name="value"/> is invalid.
+   ///   is valid or a <see cref="NoIdentityNumberBase.ValidationError"/> that
+   ///   identifies the validation rule that was failed if
+   ///   <paramref name="value"/> is invalid.
    /// </returns>
    public static CreateResult<NoDnummer, ValidationError> Create(String? value)
       => Validate(value) switch
@@ -326,9 +324,9 @@ public record NoDnummer : NoIdentityNumberBase
    ///   String representation of a Norwegian D-nummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="NoIdentityNumberBase.ValidationResult"/> union that indicates if the
-   ///   <paramref name="value"/> passed validation or what validation error was
-   ///   encountered.
+   ///   A <see cref="NoIdentityNumberBase.ValidationResult"/> union that
+   ///   indicates if the <paramref name="value"/> passed validation or what
+   ///   validation error was encountered.
    /// </returns>
    public static ValidationResult Validate(String? value)
    {

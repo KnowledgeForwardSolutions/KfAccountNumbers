@@ -45,7 +45,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidDNummerValues))]
+   [MemberData(nameof(ValidDnummerValues))]
    public void NoDnummer_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
@@ -192,6 +192,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoDnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDnummerDateOfBirth(
       String dateOfBirth,
       String separator,
@@ -299,7 +300,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidDNummerValues))]
+   [MemberData(nameof(ValidDnummerValues))]
    public void NoDnummer_Value_ShouldReturnValidatedDnummer(String value)
    {
       // Arrange.
@@ -374,7 +375,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
    }
 
    [Theory]
-   [MemberData(nameof(ValidDNummerValues))]
+   [MemberData(nameof(ValidDnummerValues))]
    public void NoDnummer_ExplicitCastToNoDnummer_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
@@ -518,6 +519,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoDnummer_ExplicitCastToNoDnummer_ShouldThrowKfValidationException_WhenValueHasNonDnummerDateOfBirth(
       String dateOfBirth,
       String separator,
@@ -664,7 +666,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidDNummerValues))]
+   [MemberData(nameof(ValidDnummerValues))]
    public void NoDnummer_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
@@ -809,6 +811,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoDnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasNonDnummerDateOfBirth(
       String dateOfBirth,
       String separator,
@@ -1084,7 +1087,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidDNummerValues))]
+   [MemberData(nameof(ValidDnummerValues))]
    public void NoDnummer_ToString_ShouldReturnExpectedValue(String value)
    {
       // Arrange.
@@ -1101,7 +1104,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidDNummerValues))]
+   [MemberData(nameof(ValidDnummerValues))]
    public void NoDnummer_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
    {
       // Arrange.
@@ -1245,6 +1248,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoDnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasNonDnummerDateOfBirth(
       String dateOfBirth,
       String separator,

@@ -1046,7 +1046,7 @@ public class SeIdentityNumberTests : SeIdentityNumberTestsBase
 
    #endregion
 
-   #region ToPersonnnummer Method Tests
+   #region ToSamordningsnummer Method Tests
    // ==========================================================================
    // ==========================================================================
 

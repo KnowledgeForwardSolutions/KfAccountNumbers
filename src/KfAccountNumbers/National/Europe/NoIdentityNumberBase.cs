@@ -11,7 +11,12 @@ public abstract record NoIdentityNumberBase
    ///   Discriminated union defining the types of identifier that Norwegian
    ///   identity number types in this hierarchy can represent.
    /// </summary>
-   public union IdentifierCategory(NoIdentifierType.Foedselsnummer, NoIdentifierType.DNummer) { }
+   public union IdentifierCategory(
+      NoIdentifierType.Foedselsnummer,
+      NoIdentifierType.Dnummer,
+      NoIdentifierType.Hnummer)
+   {
+   }
 
    /// <summary>
    ///   Discriminated union defining the possible validation errors that can
@@ -57,7 +62,17 @@ public abstract record NoIdentityNumberBase
    ///   In Norwegian identity numbers, a D-nummer is indicated by
    ///   adding 40 to the day component of the date of birth.
    /// </remarks>
-   public const Int32 DNummerDayOffset = 40;
+   public const Int32 DnummerDayOffset = 40;
+
+   /// <summary>
+   ///   Represents the month offset used to distinguish a H-nummer from a
+   ///   fødselsnummer.
+   /// </summary>
+   /// <remarks>
+   ///   In Norwegian identity numbers, a H-nummer is indicated by
+   ///   adding 40 to the month component of the date of birth.
+   /// </remarks>
+   public const Int32 HnummerMonthOffset = 40;
 
    /// <summary>
    ///   The latest year of birth supported by Norwegian identity numbers.
@@ -83,6 +98,18 @@ public abstract record NoIdentityNumberBase
    ///   The default mask used to format Norwegian identity numbers.
    /// </summary>
    public const String DefaultFormatMask = "______ _____";
+
+   /// <summary>
+   ///   Zero-based offset of the first character of the day component of the
+   ///   date of birth.
+   /// </summary>
+   protected const Int32 DayOffset = 0;
+
+   /// <summary>
+   ///   Zero-based offset of the first character of the month component of the
+   ///   date of birth.
+   /// </summary>
+   protected const Int32 MonthOffset = 2;
 
    /// <summary>
    ///   Identifies the location of the gender character, measured from the
@@ -119,6 +146,11 @@ public abstract record NoIdentityNumberBase
       Dnummer,
 
       /// <summary>
+      ///   H-nummers adjust the month by removing the +40 month offset.
+      /// </summary>
+      Hnummer,
+
+      /// <summary>
       ///   Date will be adjusted to remove an offset if necessary.
       /// </summary>
       Optional,
@@ -136,34 +168,44 @@ public abstract record NoIdentityNumberBase
    /// <returns>
    ///   The day, month and year of the person's date of birth.
    /// </returns>
+#pragma warning disable IDE0072 // Add missing cases
    protected static (Int32 Day, Int32 Month, Int32 Year) GetDayMonthYear(
       ReadOnlySpan<Char> value,
       DateOffsetMode dateOffsetMode)
    {
-      var unadjustedDay = value.ParseTwoDigits();
-      var month = value[2..].ParseTwoDigits();
-      var year = value[4..].ParseTwoDigits();
+      var baseDay = value.ParseTwoDigits();
+      var baseMonth = value[2..].ParseTwoDigits();
+      var baseYear = value[4..].ParseTwoDigits();
 
-      // Handle date offset such as D-nummer.
-#pragma warning disable IDE0072 // Add missing cases
+      // Handle possible day/month offsets.
       var day = dateOffsetMode switch
       {
-         DateOffsetMode.Dnummer => unadjustedDay - DNummerDayOffset,
-         DateOffsetMode.Optional => unadjustedDay > 31 ? unadjustedDay - DNummerDayOffset : unadjustedDay,
-         _ => unadjustedDay,
+         DateOffsetMode.Dnummer => baseDay - DnummerDayOffset,
+         DateOffsetMode.Optional => (baseDay is >= 41 and <= 71) ? baseDay - DnummerDayOffset : baseDay,
+         _ => baseDay,
       };
-#pragma warning restore IDE0072 // Add missing cases
+
+      var month = dateOffsetMode switch
+      {
+         DateOffsetMode.Hnummer => baseMonth - HnummerMonthOffset,
+         DateOffsetMode.Optional => (baseMonth is >= 41 and <= 52) ? baseMonth - HnummerMonthOffset : baseMonth,
+         _ => baseMonth,
+      };
 
       // Adjust the year according to the value of the individual number.
-      // See https://blog.variant.no/ssns-and-pattern-matching-in-c-9-498f96aa71d4
-      // for description of the rules used.
       var individualNumber = value[^IndividualNumberOffset..].ParseThreeDigits();
-      year += unadjustedDay <= 31
-         ? GetFodselsnummerBirthCentury(year, individualNumber)
-         : GetDnummerBirthCentury(individualNumber);
+      var century = dateOffsetMode switch
+      {
+         DateOffsetMode.Dnummer or DateOffsetMode.Hnummer => GetDnummerBirthCentury(individualNumber),
+         _ => (baseDay is >= 41 and <= 71) || (baseMonth is >= 41 and <= 52)
+            ? GetDnummerBirthCentury(individualNumber)
+            : GetFodselsnummerBirthCentury(baseYear, individualNumber),
+      };
+      var year = baseYear + century;
 
       return (day, month, year);
    }
+#pragma warning restore IDE0072 // Add missing cases
 
    /// <summary>
    ///   Given a validated identity number, get the normalized representation

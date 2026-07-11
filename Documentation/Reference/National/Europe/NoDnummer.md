@@ -20,7 +20,7 @@ Temporary Norwegian personal identity number issued to persons who are not eligi
 | 2. | The string length must be 11 characters (unformatted) or 12 characters (formatted). | InvalidLength |
 | 3. | All non-separator characters must be ASCII digits ('0'-'9'). | InvalidCharacter |
 | 4. | The trailing two characters must be valid weighted modulus 11 check digits. | InvalidChecksum |
-| 5. | If the value has length 12, then character position 6 (zero-based) must not be an ASCII digit ('0'-'9') | InvalidSeparator |
+| 5. | If the value has length 12, then the character at position 6 (zero-based) must not be an ASCII digit ('0'-'9') | InvalidSeparator |
 | 6. | The date of birth (after adjusting for the +40 D-nummer day offset and after determining the century from the individual number) must be a valid date between 01/01/1854 and 31/12/2039 | InvalidDateOfBirth |
 
 ### Additional Properties

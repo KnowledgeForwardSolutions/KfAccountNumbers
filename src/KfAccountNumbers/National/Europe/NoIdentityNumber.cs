@@ -115,7 +115,7 @@ namespace KfAccountNumbers.National.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               If the value has length 12, then character position 6
+///               If the value has length 12, then the character at position 6
 ///               (zero-based) must not be an ASCII digit ('0'-'9')
 ///            </description>
 ///         </item>
@@ -316,11 +316,14 @@ public record NoIdentityNumber : NoIdentityNumberBase
    ///   Gets the specific type of identifier that this instance represents.
    /// </summary>
    public IdentifierCategory IdentifierType
-      => Value.ParseTwoDigits() switch
+#pragma warning disable format
+      => (Value[DayOffset].ToSingleDigit(), Value[MonthOffset].ToSingleDigit()) switch
       {
-         <= 31 => default(NoIdentifierType.Foedselsnummer),       // Day 01-31: fødselsnummer
-         _ => default(NoIdentifierType.DNummer),                  // Day 41-71: D-nummer
+         (> 3, _) => default(NoIdentifierType.Dnummer),           // Day 41-71: D-nummer
+         (_, > 1) => default(NoIdentifierType.Hnummer),           // Month 41-52: H-nummer
+         _ => default(NoIdentifierType.Foedselsnummer),           // Day 01-31, month 01-12: fødselsnummer
       };
+#pragma warning restore format
 
    /// <summary>
    ///   Gets a string representation of the Norwegian identity number.
@@ -399,6 +402,48 @@ public record NoIdentityNumber : NoIdentityNumberBase
    ///   details on creating a mask to format the identity number.
    /// </remarks>
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Convert this instance to a <see cref="NoDnummer"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{NoDnummer}"/> instance that will contain
+   ///   the <see cref="NoDnummer"/> if this value is a D-nummer;
+   ///   otherwise <see cref="None"/> to indicate that this is not a
+   ///   D-nummer.
+   /// </returns>
+   public KfOption<NoDnummer> ToDnummer()
+      => IdentifierType is NoIdentifierType.Dnummer
+         ? new NoDnummer(Value, ValidationMode.BypassValidation)
+         : default(None);
+
+   /// <summary>
+   ///   Convert this instance to a <see cref="NoFoedselsnummer"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{NoFoedselsnummer}"/> instance that will contain
+   ///   the <see cref="NoFoedselsnummer"/> if this value is a fødselsnummer;
+   ///   otherwise <see cref="None"/> to indicate that this is not a
+   ///   fødselsnummer.
+   /// </returns>
+   public KfOption<NoFoedselsnummer> ToFoedselsnummer()
+      => IdentifierType is NoIdentifierType.Foedselsnummer
+         ? new NoFoedselsnummer(Value, ValidationMode.BypassValidation)
+         : default(None);
+
+   /// <summary>
+   ///   Convert this instance to a <see cref="NoHnummer"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{NoHnummer}"/> instance that will contain
+   ///   the <see cref="NoHnummer"/> if this value is a H-nummer;
+   ///   otherwise <see cref="None"/> to indicate that this is not a
+   ///   H-nummer.
+   /// </returns>
+   public KfOption<NoHnummer> ToHnummer()
+      => IdentifierType is NoIdentifierType.Hnummer
+         ? new NoHnummer(Value, ValidationMode.BypassValidation)
+         : default(None);
 
    /// <summary>
    ///   Get a string representation of the identity number.

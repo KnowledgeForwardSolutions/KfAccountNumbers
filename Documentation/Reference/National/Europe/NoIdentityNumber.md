@@ -14,13 +14,13 @@ A Fh-nummer is similar to a H-nummer, an identifier issued to persons needing me
 | :------ | :---------- |
 | Class name: | KfAccountNumbers.National.Europe.NoIdentityNumber |
 | Is composite: | Yes |
-| Composite subtypes: | NoFoedselsnummer, NoDnummer |
+| Composite subtypes: | NoFoedselsnummer, NoDnummer, NoHnummer |
 | Length: | 11 (unformatted), 12 (formatted for readability) |
 | Check digit algorithm: | Weighted modulus 11, with two different sets of weights |
 | Allowed characters: | Digits ('0'-'9') |
 | Allowed separator characters: | Typically a space (' '), though any non digit character is allowed |
-| Structure: | ***DDMMYYIIICC*** (unformatted) or ***DDMMYY IIICC*** (formatted), where: <dl><dt>DDMMYY</dt><dd>6-digit date of birth in DDMMYY format. Note that the date of birth can be altered by adding different offsets to the day or month to differentiate between different types of identifiers as described above.</dd><dt>III</dt><dd>3-digit individual number used to distinguish between persons born on the same date. Also used to determine the century of the person's birth, though the rules used by fødselsnummer are different from D-nummer and H-nummer. See below for more detail. The last digit indicates the person's gender, with odd numbers = male and even numbers = female</dd><dt>CC</dt><dd>2 weighted modulus 11 check digits, each calculated with different weights</dd></dl> |
-| Example values: | <dl><dt>13029597140</dt><dd>fødselsnummer, unformatted, date of birth = February 13, 1995, gender = male, check digits = 40</dd><dt>20050559433</dt><dd>fødselsnummer, unformatted, date of birth = May 20, 2005, gender = female, check digits = 33</dd><dt>130682 27938</dt><dd>fødselsnummer, formatted, date of birth = June 13, 1982, gender = male, check digits = 38</dd><dt>60055029566</dt><dd>D-nummer, unformatted, date of birth = May 20, 1950, gender = male, check digits = 66</dd><dt>70100567871</dt><dd>D-nummer, unformatted, date of birth = October 30, 2005, gender = female, check digits = 71</dd><dt>530295 34272</dt><dd>D-nummer, formatted, date of birth = February 13, 1995, gender = female, check digits = 72</dd></dl> |
+| Structure: | ***DDMMYYIIICC*** (unformatted) or ***DDMMYY IIICC*** (formatted), where: <dl><dt>DDMMYY</dt><dd>6-digit date of birth in DDMMYY format. Note that the date of birth can be altered by adding different offsets to the day or month to differentiate between different types of identifiers as described above</dd><dt>III</dt><dd>3-digit individual number used to distinguish between persons born on the same date. Also used to determine the century of the person's birth, though the rules used by fødselsnummer are different from D-nummer and H-nummer. See below for more detail. The last digit indicates the person's gender, with odd numbers = male and even numbers = female</dd><dt>CC</dt><dd>2 weighted modulus 11 check digits, each calculated with different weights</dd></dl> |
+| Example values: | <b>Fødselsnummer values:</b><dl><dt>13029597140</dt><dd>unformatted, date of birth = February 13, 1995, gender = male, check digits = 40</dd><dt>20050559433</dt><dd>unformatted, date of birth = May 20, 2005, gender = female, check digits = 33</dd><dt>130682 27938</dt><dd>formatted, date of birth = June 13, 1982, gender = male, check digits = 38</dd></dl><b>D-nummer values:</b><dl><dt>60055029566</dt><dd>unformatted, date of birth = May 20, 1950, gender = male, check digits = 66</dd><dt>70100567871</dt><dd>unformatted, date of birth = October 30, 2005, gender = female, check digits = 71</dd><dt>530295 34272</dt><dd>formatted, date of birth = February 13, 1995, gender = female, check digits = 72</dd></dl><b>H-nummer values:</b><dl><dt>07417942720</dt><dd>unformatted, date of birth = January 7, 1979, gender = male, check digits = 20</dd><dt>21501350017</dt><dd>unformatted, date of birth = October 21, 2013, gender = female, check digits = 17</dd><dt>135095 02069</dt><dd>formatted, date of birth = October 13, 1995, gender = female, check digits = 69</dd></dl> |
 
 ### Validation rules
 | Rule | Description | Error Result Type |
@@ -29,8 +29,8 @@ A Fh-nummer is similar to a H-nummer, an identifier issued to persons needing me
 | 2. | The string length must be 11 characters (unformatted) or 12 characters (formatted). | InvalidLength |
 | 3. | All non-separator characters must be ASCII digits ('0'-'9'). | InvalidCharacter |
 | 4. | The trailing two characters must be valid weighted modulus 11 check digits. | InvalidChecksum |
-| 5. | If the value has length 12, then character position 6 (zero-based) must not be an ASCII digit ('0'-'9') | InvalidSeparator |
-| 6. | If the value is a fødselsnummer or D-nummer, the date of birth (after adjusting for identifier specific offsets and after determining the century from the individual number) must be a valid date between 01/01/1854 and 31/12/2039 | InvalidDateOfBirth |
+| 5. | If the value has length 12, then the character at position 6 (zero-based) must not be an ASCII digit ('0'-'9') | InvalidSeparator |
+| 6. | If the value is a fødselsnummer, D-nummer or H-nummer, the date of birth (after adjusting for identifier specific offsets and after determining the century from the individual number) must be a valid date between 01/01/1854 and 31/12/2039 | InvalidDateOfBirth |
 
 ### Additional Properties
 
@@ -42,14 +42,15 @@ A Fh-nummer is similar to a H-nummer, an identifier issued to persons needing me
 
 | Name | Description |
 | :--- | :---------- |
-| ToFoedselsnummer | Convert this instance to a NoFoedselsnummer |
 | ToDnummer | Convert this instance to a NoDnummer |
+| ToFoedselsnummer | Convert this instance to a NoFoedselsnummer |
+| ToHnummer | Convert this instance to a NoHnummer |
 
 ### Notes
 
 The first check digit is calculated from the preceding 9 digits (the 6-digit date of birth and the 3-digit individual number). The second check digit character is calculated from the preceding 10 digits (including the first check digit).
 
-If the value is a D-nummer, the D-nummer's +40 day offset is taken into account when creating or validating a value and the actual date is validated, not the offset date.
+If the value is a D-nummer, the D-nummer's +40 day offset is taken into account when creating or validating a value and the actual date is validated, not the offset date. Similarly, for H-nummers, the +40 month offset is taken into account when creating or validating a value.
 
 The century of birth is encoded in the individual number and when combined with the 6-digit date of birth can determine an actual date of birth. The rules for determining the century of birth vary by the type of identifier.
 
@@ -62,4 +63,4 @@ are:
 * Rule 4 - If the individual number is >= 500 **AND** the two digit year is <= 39 then the century =2000.
 * Rule 5 - Otherwise invalid. Validation will report an invalid date of birth.
 
-For D-nummers, the first digit of the individual number indicates the century of the person's birth (0-4 = 20th century or 1900-1999 and 5-9 = 21st century or 2000-2099).
+For D-nummers and H-nummers, the first digit of the individual number indicates the century of the person's birth (0-4 = 20th century or 1900-1999 and 5-9 = 21st century or 2000-2099).

@@ -3,7 +3,7 @@ root = true
 # All files
 [*]
 charset = utf-8
-end_of_line = lf
+end_of_line = crlf
 guidelines = 80 dashed, 90 dashed, 100, 120
 indent_style = space
 insert_final_newline = true

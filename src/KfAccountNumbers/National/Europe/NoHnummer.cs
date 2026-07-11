@@ -1,41 +1,42 @@
-// Ignore Spelling: Foedselsnummer Json Nummer
-
-#pragma warning disable IDE0250 // Make struct 'readonly'
 #pragma warning disable IDE0046 // Convert to conditional expression
 
 namespace KfAccountNumbers.National.Europe;
 
 /// <summary>
 ///   <para>
-///      Strongly typed business object that represents a Norwegian national
-///      identity number (fødselsnummer).
+///      Strongly typed business object that represents a H-nummer, a temporary
+///      identity number issued by Norwegian health organizations (such as a
+///      hospital) to persons needing medical assistance and who do not have
+///      either a fødselsnummer or a D-nummer.
 ///   </para>
 ///   <para>
-///      <b>Note:</b> See <see cref="NoDnummer"/> for a similar
-///      identifier (D-nummer) issued to temporary residents of Norway and
-///      <see cref="NoIdentityNumber"/> for a composite type that can represent
-///      either a fødselsnummer or a D-nummer.
+///      <b>Note:</b> See <see cref="NoFoedselsnummer"/> and
+///      <see cref="NoDnummer"/> for a similar identifiers (fødselsnummer,
+///      D-nummer) and <see cref="NoIdentityNumber"/> for a composite type that
+///      can represent either a fødselsnummer, D-nummer or a H-nummer.
 ///   </para>
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A fødselsnummer is an 11-digit number structured as DDMMYYIIICC, with
-///      the following elements:
+///      A H-nummer is an 11-digit number structured as DDMMYYIIICC, with the
+///      following elements:
 ///      <list type="bullet">
 ///         <item>
 ///            <term>DDMMYY</term>
 ///            <description>
-///               The person's date of birth in DDMMYY format.
+///               The person's date of birth in DDMMYY format. The <b>MM</b>
+///               portion of the date of birth is offset by 40 (i.e. 1-12
+///               becomes 41-52) to distinguish H-nummers from fødselsnummers.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>III</term>
 ///            <description>
-///               Three-digit individual number. Also used to determine the
-///               century of the person's birth (see below for the rules to
-///               derive the century of birth). The last digit indicates the
-///               person's gender, with odd digits assigned to males and even
-///               digits assigned to females.
+///               Three-digit individual number. The first digit indicates the
+///               person's century of birth, with 0-4 = 20th century or
+///               1900-1999 and 5-9 = 21st century or 2000-2099. The last digit
+///               indicates the person's gender, with odd digits assigned to
+///               males and even digits assigned to females.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -56,8 +57,8 @@ namespace KfAccountNumbers.National.Europe;
 ///      of birth and the individual number, i.e. DDMMYY IIICC.
 ///   </para>
 ///   <para>
-///      When creating a new <see cref="NoFoedselsnummer"/>, the following
-///      validation rules are applied:
+///      When creating a new <see cref="NoHnummer"/>, the following validation
+///      rules are applied:
 ///      <list type="bullet">
 ///         <item>
 ///            <description>
@@ -88,8 +89,9 @@ namespace KfAccountNumbers.National.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The date of birth (after determining the century from the
-///               individual number) must be a valid date between 01/01/1854 and
+///               The date of birth (after adjusting for the +40 H-nummer month
+///               offset and after determining the century from the individual
+///               number) must be a valid date between 01/01/1854 and
 ///               31/12/2039. Note that the validation specifically does
 ///               <b>NOT</b> check for future dates, only that the date exists.
 ///            </description>
@@ -100,88 +102,46 @@ namespace KfAccountNumbers.National.Europe;
 ///      Example values:
 ///      <list type="bullet">
 ///         <item>
-///            <term>13029597140</term>
+///            <term>07417942720</term>
 ///            <description>
-///               unformatted, date of birth = February 13, 1995, gender = male,
-///               check digits = 40
+///               unformatted, date of birth = January 7, 1979, gender = male,
+///               check digits = 20
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>20050559433</term>
+///            <term>21501350017</term>
 ///            <description>
-///               unformatted, date of birth = May 20, 2005, gender = female,
-///               check digits = 33
+///               unformatted, date of birth = October 21, 2013, gender =
+///               female, check digits = 17
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>130682 27938</term>
+///            <term>135095 02069</term>
 ///            <description>
-///               formatted, date of birth = June 13, 1982, gender = male, check
-///               digits = 38
+///               formatted, date of birth = October 13, 1995, gender = female,
+///               check digits = 69
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
-///      The century of the date of birth has somewhat complicated rules due to
-///      several overlapping ranges of years. The rules used in
-///      <see cref="NoFoedselsnummer"/> are taken from this
-///      <see href="https://blog.variant.no/ssns-and-pattern-matching-in-c-9-498f96aa71d4">article</see>
-///      published on Medium.com. Because of the overlapping ranges (the
-///      individual number 500 matches two different rules), the rules must be
-///      evaluated in order to arrive at the correct century.  The rules are:
-///      <list type="bullet">
-///         <item>
-///            <term>Rule 1</term>
-///            <description>
-///               If the individual number is &gt;= 500 and &lt;= 749 AND the
-///               two digit year is &gt;= 54 then the century = 1800.
-///            </description>
-///         </item>
-///         <item>
-///            <term>Rule 2</term>
-///            <description>
-///               If the individual number is &lt; 500 then the century = 1900.
-///            </description>
-///         </item>
-///         <item>
-///            <term>Rule 3</term>
-///            <description>
-///               If the individual number is &gt;= 900 AND the two digit year
-///               is &gt;= 40 then the century = 1900.
-///            </description>
-///         </item>
-///         <item>
-///            <term>Rule 4</term>
-///            <description>
-///               If the individual number is &gt;= 500 AND the two digit year
-///               is &lt;= 39 then the century = 2000.
-///            </description>
-///         </item>
-///         <item>
-///            <term>Rule 5</term>
-///            <description>
-///               Otherwise invalid. Validation will return invalid date of birth.
-///            </description>
-///         </item>
-///      </list>
-///      According to these rules, the range of valid dates of birth are from
-///      January 1, 1854 to December 31, 2039. A date of birth outside this range,
-///      even if a valid date, will return invalid date of birth.
+///      Note that fødselsnummers use the individual number to determine the
+///      century of birth, but the rules are more complicated. Refer to the
+///      fødselsnummer documentation for more detail.
 ///   </para>
 ///   <para>
 ///      See <see href="https://en.wikipedia.org/wiki/National_identity_number_(Norway)">Wikipedia - National_identity_number_(Norway)</see>
 ///      for more information.
 ///   </para>
 /// </remarks>
-[JsonConverter(typeof(NoFoedselsnummerJsonConverter))]
-public record NoFoedselsnummer : NoIdentityNumberBase
+[JsonConverter(typeof(NoHnummerJsonConverter))]
+public record NoHnummer : NoIdentityNumberBase
 {
    /// <summary>
-   ///   Initializes a new instance of the <see cref="NoFoedselsnummer"/> class.
+   ///   Initializes a new instance of the <see cref="NoHnummer"/> class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a fødselsnummer.
+   ///   String representation of a H-nummer.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
@@ -203,14 +163,14 @@ public record NoFoedselsnummer : NoIdentityNumberBase
    ///   <paramref name="value"/> contains an invalid date of birth in
    ///   positions 0-5 (zero-based).
    /// </exception>
-   public NoFoedselsnummer(String? value)
+   public NoHnummer(String? value)
       : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="NoFoedselsnummer"/> class.
+   ///   Initializes a new instance of the <see cref="NoHnummer"/> class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a fødselsnummer.
+   ///   String representation of a H-nummer.
    /// </param>
    /// <param name="validationMode">
    ///   Indicates whether the <paramref name="value"/> requires validation.
@@ -220,7 +180,7 @@ public record NoFoedselsnummer : NoIdentityNumberBase
    ///   validation when creating a new instance from a value that has
    ///   already been validated.
    /// </remarks>
-   internal NoFoedselsnummer(String? value, ValidationMode validationMode)
+   internal NoHnummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
@@ -248,12 +208,17 @@ public record NoFoedselsnummer : NoIdentityNumberBase
    ///   DDMMYY format and the exact century of birth derived from the
    ///   individual number.
    /// </summary>
+   /// <remarks>
+   ///   Note that H-nummer values add 40 to the MM portion of the DDMMYY date
+   ///   of birth. The date of birth property automatically adjusts for this
+   ///   offset.
+   /// </remarks>
    public DateOnly DateOfBirth
    {
       get
       {
 #pragma warning disable IDE0008 // Use explicit type
-         var (day, month, year) = GetDayMonthYear(Value, DateOffsetMode.Fodselsnummer);
+         var (day, month, year) = GetDayMonthYear(Value, DateOffsetMode.Hnummer);
 #pragma warning restore IDE0008 // Use explicit type
 
          return new DateOnly(year, month, day);
@@ -268,50 +233,48 @@ public record NoFoedselsnummer : NoIdentityNumberBase
       => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
 
    /// <summary>
-   ///   Gets a string representation of the fødselsnummer.
+   ///   Gets a string representation of the H-nummer.
    /// </summary>
    public String Value { get; private init; }
 
    /// <summary>
-   ///   Implicitly converts a <see cref="NoFoedselsnummer"/> to a
+   ///   Implicitly converts a <see cref="NoHnummer"/> to a
    ///   <see cref="String"/>, returning an empty string if the source is null.
    /// </summary>
    /// <param name="source">
-   ///   The <see cref="NoFoedselsnummer"/> to convert.
+   ///   The <see cref="NoHnummer"/> to convert.
    /// </param>
-   public static implicit operator String(NoFoedselsnummer source)
+   public static implicit operator String(NoHnummer source)
       => source?.Value ?? String.Empty;     // Handle null object gracefully by returning empty string
 
    /// <summary>
-   ///   Defines an explicit conversion of a string to a <see cref="NoFoedselsnummer"/>.
+   ///   Defines an explicit conversion of a string to a <see cref="NoHnummer"/>.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Norwegian National Identity Number
-   ///   (fødselsnummer).
+   ///   String representation of a Norwegian H-nummer.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
-   ///   <paramref name="value"/> is not a valid fødselsnummer.
+   ///   <paramref name="value"/> is not a valid H-nummer.
    /// </exception>
-   public static explicit operator NoFoedselsnummer(String? value) => new(value);
+   public static explicit operator NoHnummer(String? value) => new(value);
 
    /// <summary>
-   ///   Create a new <see cref="NoFoedselsnummer"/> using the Result pattern.
+   ///   Create a new <see cref="NoHnummer"/> using the Result pattern.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Norwegian National Identity Number
-   ///   (fødselsnummer).
+   ///   String representation of a Norwegian H-nummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{NoFoedselsnummer, ValidationError}"/>. Will
-   ///   contain the new <see cref="NoFoedselsnummer"/> if <paramref name="value"/>
+   ///   A <see cref="CreateResult{NoHnummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="NoHnummer"/> if <paramref name="value"/>
    ///   is valid or a <see cref="NoIdentityNumberBase.ValidationError"/> that
    ///   identifies the validation rule that was failed if
    ///   <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<NoFoedselsnummer, ValidationError> Create(String? value)
+   public static CreateResult<NoHnummer, ValidationError> Create(String? value)
       => Validate(value) switch
       {
-         ValidValue => new NoFoedselsnummer(value, ValidationMode.BypassValidation),
+         ValidValue => new NoHnummer(value, ValidationMode.BypassValidation),
          EmptyValue emptyValue => (ValidationError)emptyValue,
          InvalidLength invalidLength => (ValidationError)invalidLength,
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
@@ -322,7 +285,7 @@ public record NoFoedselsnummer : NoIdentityNumberBase
       };
 
    /// <summary>
-   ///   Format the fødselsnummer using the supplied <paramref name="mask"/>.
+   ///   Format the H-nummer using the supplied <paramref name="mask"/>.
    /// </summary>
    /// <param name="mask">
    ///   Optional. The mask that specifies the final output. If not supplied
@@ -331,7 +294,7 @@ public record NoFoedselsnummer : NoIdentityNumberBase
    ///   instead.
    /// </param>
    /// <returns>
-   ///   A formatted fødselsnummer.
+   ///   A formatted H-nummer.
    /// </returns>
    /// <exception cref="ArgumentNullException">
    ///   <paramref name="mask"/> is <see langword="null"/>.
@@ -342,25 +305,24 @@ public record NoFoedselsnummer : NoIdentityNumberBase
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the fødselsnummer.
+   ///   details on creating a mask to format the H-nummer.
    /// </remarks>
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
-   ///   Get a string representation of the fødselsnummer.
+   ///   Get a string representation of the H-nummer.
    /// </summary>
    /// <returns>
-   ///   The raw fødselsnummer, without separator characters.
+   ///   The raw H-nummer, without separator characters.
    /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a
-   ///   valid Norwegian national identity number (fødselsnummer) value.
+   ///   valid Norwegian H-nummer.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Norwegian national identity number
-   ///   (fødselsnummer).
+   ///   String representation of a Norwegian H-nummer.
    /// </param>
    /// <returns>
    ///   A <see cref="NoIdentityNumberBase.ValidationResult"/> union that
@@ -394,7 +356,7 @@ public record NoFoedselsnummer : NoIdentityNumberBase
          return GetInvalidSeparatorResult(value);
       }
 
-      if (!ValidateDateOfBirth(value, DateOffsetMode.Fodselsnummer))
+      if (!ValidateDateOfBirth(value, DateOffsetMode.Hnummer))
       {
          return GetInvalidDateOfBirthResult(value);
       }
@@ -405,38 +367,38 @@ public record NoFoedselsnummer : NoIdentityNumberBase
    private static InvalidCharacter GetInvalidCharacterResult(
       ReadOnlySpan<Char> value,
       Int32 position)
-      => new(Messages.NoFoedselsnummerInvalidCharacter, value[position], position);
+      => new(Messages.NoHnummerInvalidCharacter, value[position], position);
 
    private static InvalidChecksum GetInvalidChecksumResult()
-      => new(Messages.NoFoedselsnummerInvalidCheckDigits, CheckDigitAlgorithmName);
+      => new(Messages.NoHnummerInvalidCheckDigits, CheckDigitAlgorithmName);
 
    private static InvalidLength GetInvalidLengthResult(ReadOnlySpan<Char> value)
       => new(
-         Messages.NoFoedselsnummerInvalidLength,
+         Messages.NoHnummerInvalidLength,
          value.Length,
          [
-            new ValidLengthDefinition(UnformattedLength, Messages.NoFoedselsnummerUnformattedLength),
-            new ValidLengthDefinition(FormattedLength, Messages.NoFoedselsnummerFormattedLength),
+            new ValidLengthDefinition(UnformattedLength, Messages.NoHnummerUnformattedLength),
+            new ValidLengthDefinition(FormattedLength, Messages.NoHnummerFormattedLength),
          ]);
 
    private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
       => new(
-         Messages.NoFoedselsnummerInvalidDateOfBirth,
+         Messages.NoHnummerInvalidDateOfBirth,
          value[..SeparatorOffset],
          DateFormatName.DDMMYY);
 
    private static InvalidSeparator GetInvalidSeparatorResult(ReadOnlySpan<Char> value)
       => new(
-         Messages.NoFoedselsnummerInvalidSeparator,
+         Messages.NoHnummerInvalidSeparator,
          value[SeparatorOffset],
          SeparatorOffset);
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable SA1600 // Elements should be documented
-public class NoFoedselsnummerJsonConverter : JsonConverter<NoFoedselsnummer>
+public class NoHnummerJsonConverter : JsonConverter<NoHnummer>
 {
-   public override NoFoedselsnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   public override NoHnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
       if (reader.TokenType == JsonTokenType.Null)
       {
@@ -444,9 +406,9 @@ public class NoFoedselsnummerJsonConverter : JsonConverter<NoFoedselsnummer>
       }
 
       var str = reader.GetString();
-      return new NoFoedselsnummer(str);
+      return new NoHnummer(str);
    }
 
-   public override void Write(Utf8JsonWriter writer, NoFoedselsnummer value, JsonSerializerOptions options)
+   public override void Write(Utf8JsonWriter writer, NoHnummer value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
 }

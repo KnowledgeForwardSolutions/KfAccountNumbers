@@ -15,7 +15,15 @@ public class NoIdentifierType
    /// <summary>
    ///   Identifier issued to foreign individuals not eligible for fødselsnummer.
    ///   Same format as a fødselsnummer, except 40 is added to the day component
-   ///   of the day of birth (i.e. 130585 becomes 530585).
+   ///   of the date of birth (i.e. 130585 becomes 530585).
    /// </summary>
-   public struct DNummer { }
+   public struct Dnummer { }
+
+   /// <summary>
+   ///   Temporary identifier issued by local Norwegian health care
+   ///   organizations to individuals without fødselsnummer or D-nummer. Same
+   ///   format as a fødselsnummer, except 40 is added to the month component of
+   ///   the date of birth (i.e. 130585 becomes 134585).
+   /// </summary>
+   public struct Hnummer { }
 }
