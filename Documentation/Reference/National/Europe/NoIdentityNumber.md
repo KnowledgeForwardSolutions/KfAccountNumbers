@@ -19,7 +19,7 @@ A Fh-nummer is similar to a H-nummer, an identifier issued to persons needing me
 | Check digit algorithm: | Weighted modulus 11, with two different sets of weights |
 | Allowed characters: | Digits ('0'-'9') |
 | Allowed separator characters: | Typically a space (' '), though any non digit character is allowed |
-| Structure: | ***DDMMYYIIICC*** (unformatted) or ***DDMMYY IIICC*** (formatted), where: <dl><dt>DDMMYY</dt><dd>6-digit date of birth in DDMMYY format. Note that the date of birth can be altered by adding different offsets to the day or month to differentiate between different types of identifiers as described above.[^1]</dd><dt>III</dt><dd>3-digit individual number used to distinguish between persons born on the same date. Also used to determine the century of the person's birth, though the rules used by fødselsnummer are different from D-nummer and H-nummer. See below for more detail. The last digit indicates the person's gender, with odd numbers = male and even numbers = female</dd><dt>CC</dt><dd>2 weighted modulus 11 check digits, each calculated with different weights</dd></dl> |
+| Structure: | ***DDMMYYIIICC*** (unformatted) or ***DDMMYY IIICC*** (formatted), where: <dl><dt>DDMMYY</dt><dd>6-digit date of birth in DDMMYY format. Note that the date of birth can be altered by adding different offsets to the day or month to differentiate between different types of identifiers as described above</dd><dt>III</dt><dd>3-digit individual number used to distinguish between persons born on the same date. Also used to determine the century of the person's birth, though the rules used by fødselsnummer are different from D-nummer and H-nummer. See below for more detail. The last digit indicates the person's gender, with odd numbers = male and even numbers = female</dd><dt>CC</dt><dd>2 weighted modulus 11 check digits, each calculated with different weights</dd></dl> |
 | Example values: | <b>Fødselsnummer values:</b><dl><dt>13029597140</dt><dd>unformatted, date of birth = February 13, 1995, gender = male, check digits = 40</dd><dt>20050559433</dt><dd>unformatted, date of birth = May 20, 2005, gender = female, check digits = 33</dd><dt>130682 27938</dt><dd>formatted, date of birth = June 13, 1982, gender = male, check digits = 38</dd></dl><b>D-nummer values:</b><dl><dt>60055029566</dt><dd>unformatted, date of birth = May 20, 1950, gender = male, check digits = 66</dd><dt>70100567871</dt><dd>unformatted, date of birth = October 30, 2005, gender = female, check digits = 71</dd><dt>530295 34272</dt><dd>formatted, date of birth = February 13, 1995, gender = female, check digits = 72</dd></dl><b>H-nummer values:</b><dl><dt>07417942720</dt><dd>unformatted, date of birth = January 7, 1979, gender = male, check digits = 20</dd><dt>21501350017</dt><dd>unformatted, date of birth = October 21, 2013, gender = female, check digits = 17</dd><dt>135095 02069</dt><dd>formatted, date of birth = October 13, 1995, gender = female, check digits = 69</dd></dl> |
 
 ### Validation rules
@@ -47,8 +47,6 @@ A Fh-nummer is similar to a H-nummer, an identifier issued to persons needing me
 | ToHnummer | Convert this instance to a NoHnummer |
 
 ### Notes
-
-[^1]: For D-nummers, +40 is added to the day, so 01-31 becomes 41-71.
 
 The first check digit is calculated from the preceding 9 digits (the 6-digit date of birth and the 3-digit individual number). The second check digit character is calculated from the preceding 10 digits (including the first check digit).
 
