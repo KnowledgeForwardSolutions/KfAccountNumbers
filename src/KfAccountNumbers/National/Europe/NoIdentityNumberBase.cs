@@ -14,7 +14,9 @@ public abstract record NoIdentityNumberBase
    public union IdentifierCategory(
       NoIdentifierType.Foedselsnummer,
       NoIdentifierType.Dnummer,
-      NoIdentifierType.Hnummer) { }
+      NoIdentifierType.Hnummer)
+   {
+   }
 
    /// <summary>
    ///   Discriminated union defining the possible validation errors that can
@@ -98,6 +100,18 @@ public abstract record NoIdentityNumberBase
    public const String DefaultFormatMask = "______ _____";
 
    /// <summary>
+   ///   Zero-based offset of the first character of the day component of the
+   ///   date of birth.
+   /// </summary>
+   protected const Int32 DayOffset = 0;
+
+   /// <summary>
+   ///   Zero-based offset of the first character of the month component of the
+   ///   date of birth.
+   /// </summary>
+   protected const Int32 MonthOffset = 2;
+
+   /// <summary>
    ///   Identifies the location of the gender character, measured from the
    ///   end of the value.
    /// </summary>
@@ -163,11 +177,11 @@ public abstract record NoIdentityNumberBase
       var baseYear = value[4..].ParseTwoDigits();
 
       // Handle possible day/month offsets.
-      #pragma warning disable IDE0072 // Add missing cases
+#pragma warning disable IDE0072 // Add missing cases
       var day = dateOffsetMode switch
       {
          DateOffsetMode.Dnummer => baseDay - DnummerDayOffset,
-            DateOffsetMode.Optional => baseDay > 31 ? baseDay - DnummerDayOffset : baseDay,
+         DateOffsetMode.Optional => baseDay > 31 ? baseDay - DnummerDayOffset : baseDay,
          _ => baseDay,
       };
 

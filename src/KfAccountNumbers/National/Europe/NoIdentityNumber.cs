@@ -316,12 +316,14 @@ public record NoIdentityNumber : NoIdentityNumberBase
    ///   Gets the specific type of identifier that this instance represents.
    /// </summary>
    public IdentifierCategory IdentifierType
-      => (Value.ParseTwoDigits(), Value.AsSpan(2..).ParseTwoDigits()) switch
+#pragma warning disable format
+      => (Value[DayOffset].ToSingleDigit(), Value[MonthOffset].ToSingleDigit()) switch
       {
-         (> 31, _) => default(NoIdentifierType.Dnummer),          // Day 41-71: D-nummer
-         (_, > 12) => default(NoIdentifierType.Hnummer),          // Month 41-52: D-nummer
+         (> 3, _) => default(NoIdentifierType.Dnummer),           // Day 41-71: D-nummer
+         (_, > 1) => default(NoIdentifierType.Hnummer),           // Month 41-52: H-nummer
          _ => default(NoIdentifierType.Foedselsnummer),           // Day 01-31, month 01-12: fødselsnummer
       };
+#pragma warning restore format
 
    /// <summary>
    ///   Gets a string representation of the Norwegian identity number.
