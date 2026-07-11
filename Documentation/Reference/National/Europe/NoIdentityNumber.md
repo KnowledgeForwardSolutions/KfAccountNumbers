@@ -48,7 +48,7 @@ A Fh-nummer is similar to a H-nummer, an identifier issued to persons needing me
 
 ### Notes
 
-[^1] For D-nummers, +40 is added to the day, so 01-31 becomes 41-71.
+[^1]: For D-nummers, +40 is added to the day, so 01-31 becomes 41-71.
 
 The first check digit is calculated from the preceding 9 digits (the 6-digit date of birth and the 3-digit individual number). The second check digit character is calculated from the preceding 10 digits (including the first check digit).
 
