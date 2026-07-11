@@ -330,6 +330,9 @@ public class NoIdentityNumberTestsBase
       { "325004", "200" },       // Invalid day of for October, any year
       { "315104", "102" },       // Invalid day of for November, any year
       { "325204", "200" },       // Invalid day of for December, any year
+
+      // Would fail if fødselsnummer year rules applied
+      { "014150", "900" },       // If interpreted as fødselsnummer, would evaluate to 1950, not 2040 and 1950 is a valid year
    };
 
    protected static String GetValueWithValidCheckDigits(

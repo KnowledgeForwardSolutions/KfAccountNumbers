@@ -1044,7 +1044,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(ValidFoedselsnummerValues))]
-   public void NoIdentityNumber_ToToFoedselsnummer_ShouldReturnExpectedResult_WhenValueIsFoedselsnummer(String value)
+   public void NoIdentityNumber_ToFoedselsnummer_ShouldReturnExpectedResult_WhenValueIsFoedselsnummer(String value)
    {
       // Arrange.
       var sut = new NoIdentityNumber(value);
@@ -1097,7 +1097,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
-   public void NoIdentityNumber_ToFoedselsnummer_ShouldReturnExpectedResult_WhenValueIsNotHnummer(String value)
+   public void NoIdentityNumber_ToHnummer_ShouldReturnExpectedResult_WhenValueIsNotHnummer(String value)
    {
       // Arrange.
       var sut = new NoIdentityNumber(value);

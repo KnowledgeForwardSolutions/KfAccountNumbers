@@ -11,7 +11,7 @@ namespace KfAccountNumbers.National.Europe;
 ///   </para>
 ///   <para>
 ///      <b>Note:</b> See <see cref="NoFoedselsnummer"/> and
-///      <see cref="NoHnummer"/> for a similar identifiers (fødselsnummer,
+///      <see cref="NoDnummer"/> for a similar identifiers (fødselsnummer,
 ///      D-nummer) and <see cref="NoIdentityNumber"/> for a composite type that
 ///      can represent either a fødselsnummer, D-nummer or a H-nummer.
 ///   </para>

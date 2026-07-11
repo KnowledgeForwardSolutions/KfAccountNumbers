@@ -14,7 +14,7 @@ A Fh-nummer is similar to a H-nummer, an identifier issued to persons needing me
 | :------ | :---------- |
 | Class name: | KfAccountNumbers.National.Europe.NoIdentityNumber |
 | Is composite: | Yes |
-| Composite subtypes: | NoFoedselsnummer, NoDnummer |
+| Composite subtypes: | NoFoedselsnummer, NoDnummer, NoHnummer |
 | Length: | 11 (unformatted), 12 (formatted for readability) |
 | Check digit algorithm: | Weighted modulus 11, with two different sets of weights |
 | Allowed characters: | Digits ('0'-'9') |

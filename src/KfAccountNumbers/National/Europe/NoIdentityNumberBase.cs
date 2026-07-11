@@ -168,6 +168,7 @@ public abstract record NoIdentityNumberBase
    /// <returns>
    ///   The day, month and year of the person's date of birth.
    /// </returns>
+#pragma warning disable IDE0072 // Add missing cases
    protected static (Int32 Day, Int32 Month, Int32 Year) GetDayMonthYear(
       ReadOnlySpan<Char> value,
       DateOffsetMode dateOffsetMode)
@@ -177,31 +178,34 @@ public abstract record NoIdentityNumberBase
       var baseYear = value[4..].ParseTwoDigits();
 
       // Handle possible day/month offsets.
-#pragma warning disable IDE0072 // Add missing cases
       var day = dateOffsetMode switch
       {
          DateOffsetMode.Dnummer => baseDay - DnummerDayOffset,
-         DateOffsetMode.Optional => baseDay > 31 ? baseDay - DnummerDayOffset : baseDay,
+         DateOffsetMode.Optional => (baseDay is >= 41 and <= 71) ? baseDay - DnummerDayOffset : baseDay,
          _ => baseDay,
       };
 
       var month = dateOffsetMode switch
       {
          DateOffsetMode.Hnummer => baseMonth - HnummerMonthOffset,
-         DateOffsetMode.Optional => baseMonth > 12 ? baseMonth - HnummerMonthOffset : baseMonth,
+         DateOffsetMode.Optional => (baseMonth is >= 41 and <= 52) ? baseMonth - HnummerMonthOffset : baseMonth,
          _ => baseMonth,
       };
-#pragma warning restore IDE0072 // Add missing cases
 
       // Adjust the year according to the value of the individual number.
       var individualNumber = value[^IndividualNumberOffset..].ParseThreeDigits();
-      var century = baseDay <= 31
-         ? GetFodselsnummerBirthCentury(baseYear, individualNumber)
-         : GetDnummerBirthCentury(individualNumber);
+      var century = dateOffsetMode switch
+      {
+         DateOffsetMode.Dnummer or DateOffsetMode.Hnummer => GetDnummerBirthCentury(individualNumber),
+         _ => (baseDay is >= 41 and <= 71) || (baseMonth is >= 41 and <= 52)
+            ? GetDnummerBirthCentury(individualNumber)
+            : GetFodselsnummerBirthCentury(baseYear, individualNumber),
+      };
       var year = baseYear + century;
 
       return (day, month, year);
    }
+#pragma warning restore IDE0072 // Add missing cases
 
    /// <summary>
    ///   Given a validated identity number, get the normalized representation
