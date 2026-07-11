@@ -47,6 +47,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidHnummerValues))]
    public void NoIdentityNumber_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
@@ -79,6 +80,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
    [MemberData(nameof(DnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoIdentityNumber_Constructor_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
       String dateOfBirth,
       String separator,
@@ -176,6 +178,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(FoedselsnummerInvalidDateOfBirthValues))]
    [MemberData(nameof(DnummerInvalidDateOfBirthValues))]
+   [MemberData(nameof(HnummerInvalidDateOfBirthValues))]
    public void NoIdentityNumber_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
       String dateOfBirth,
       String individualNumber)
@@ -217,7 +220,19 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    {
       // Arrange.
       var sut = new NoIdentityNumber(value);
-      NoIdentityNumberBase.IdentifierCategory expected = default(NoIdentifierType.DNummer);
+      NoIdentityNumberBase.IdentifierCategory expected = default(NoIdentifierType.Dnummer);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidHnummerValues))]
+   public void NoIdentityNumber_IdentifierType_ShouldReturnExpectedIdentifierType_WhenValueIsHnummer(String value)
+   {
+      // Arrange.
+      var sut = new NoIdentityNumber(value);
+      NoIdentityNumberBase.IdentifierCategory expected = default(NoIdentifierType.Hnummer);
 
       // Act/assert.
       sut.IdentifierType.Should().Be(expected);
@@ -232,6 +247,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidHnummerValues))]
    public void NoIdentityNumber_Value_ShouldReturnValidatedIdentityNumber(String value)
    {
       // Arrange.
@@ -308,6 +324,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidHnummerValues))]
    public void NoIdentityNumber_ExplicitCastToNoIdentityNumber_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
@@ -338,6 +355,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
    [MemberData(nameof(DnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoIdentityNumber_ExplicitCastToNoIdentityNumber_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
       String dateOfBirth,
       String separator,
@@ -434,6 +452,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(FoedselsnummerInvalidDateOfBirthValues))]
    [MemberData(nameof(DnummerInvalidDateOfBirthValues))]
+   [MemberData(nameof(HnummerInvalidDateOfBirthValues))]
    public void NoIdentityNumber_ExplicitCastToNoIdentityNumber_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
       String dateOfBirth,
       String individualNumber)
@@ -582,6 +601,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidHnummerValues))]
    public void NoIdentityNumber_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
@@ -612,6 +632,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
    [MemberData(nameof(DnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoIdentityNumber_Create_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
       String dateOfBirth,
       String separator,
@@ -709,6 +730,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(FoedselsnummerInvalidDateOfBirthValues))]
    [MemberData(nameof(DnummerInvalidDateOfBirthValues))]
+   [MemberData(nameof(HnummerInvalidDateOfBirthValues))]
    public void NoIdentityNumber_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasInvalidDateOfBirth(
       String dateOfBirth,
       String individualNumber)
@@ -986,6 +1008,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidHnummerValues))]
    public void NoIdentityNumber_ToString_ShouldReturnExpectedValue(String value)
    {
       // Arrange.
@@ -1004,6 +1027,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidHnummerValues))]
    public void NoIdentityNumber_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
    {
       // Arrange.
@@ -1034,6 +1058,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
    [MemberData(nameof(DnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoIdentityNumber_Validate_ShouldReturnValidationPassed_WhenValueHasValidDateOfBirth(
       String dateOfBirth,
       String separator,
@@ -1130,6 +1155,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(FoedselsnummerInvalidDateOfBirthValues))]
    [MemberData(nameof(DnummerInvalidDateOfBirthValues))]
+   [MemberData(nameof(HnummerInvalidDateOfBirthValues))]
    public void NoIdentityNumber_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidDateOfBirth(
       String dateOfBirth,
       String individualNumber)

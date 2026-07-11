@@ -791,7 +791,7 @@ public class NoHnummerTests : NoIdentityNumberTestsBase
    }
 
    [Theory]
-   [MemberData(nameof(DnummerInvalidDateOfBirthValues))]
+   [MemberData(nameof(HnummerInvalidDateOfBirthValues))]
    public void NoHnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasInvalidDateOfBirth(
       String dateOfBirth,
       String individualNumber)

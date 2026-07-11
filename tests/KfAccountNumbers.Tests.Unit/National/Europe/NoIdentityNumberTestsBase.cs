@@ -381,8 +381,12 @@ public class NoIdentityNumberTestsBase
       => NoIdentityNumberBase.MaximumValidYearOfBirth.Should().Be(2039);
 
    [Fact]
-   public void NoIdentityNumberBase_DNummerDayOffset_ShouldHaveExpectedValue()
-      => NoIdentityNumberBase.DNummerDayOffset.Should().Be(40);
+   public void NoIdentityNumberBase_DnummerDayOffset_ShouldHaveExpectedValue()
+      => NoIdentityNumberBase.DnummerDayOffset.Should().Be(40);
+
+   [Fact]
+   public void NoIdentityNumberBase_HnummerMonthOffset_ShouldHaveExpectedValue()
+      => NoIdentityNumberBase.HnummerMonthOffset.Should().Be(40);
 
    #endregion
 }

@@ -316,10 +316,11 @@ public record NoIdentityNumber : NoIdentityNumberBase
    ///   Gets the specific type of identifier that this instance represents.
    /// </summary>
    public IdentifierCategory IdentifierType
-      => Value.ParseTwoDigits() switch
+      => (Value.ParseTwoDigits(), Value.AsSpan(2..).ParseTwoDigits()) switch
       {
-         <= 31 => default(NoIdentifierType.Foedselsnummer),       // Day 01-31: fødselsnummer
-         _ => default(NoIdentifierType.DNummer),                  // Day 41-71: D-nummer
+         (> 31, _) => default(NoIdentifierType.Dnummer),          // Day 41-71: D-nummer
+         (_, > 12) => default(NoIdentifierType.Hnummer),          // Month 41-52: D-nummer
+         _ => default(NoIdentifierType.Foedselsnummer),           // Day 01-31, month 01-12: fødselsnummer
       };
 
    /// <summary>

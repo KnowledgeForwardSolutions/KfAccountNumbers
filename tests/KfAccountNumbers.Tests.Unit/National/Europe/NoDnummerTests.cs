@@ -192,6 +192,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoDnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDnummerDateOfBirth(
       String dateOfBirth,
       String separator,
@@ -518,6 +519,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoDnummer_ExplicitCastToNoDnummer_ShouldThrowKfValidationException_WhenValueHasNonDnummerDateOfBirth(
       String dateOfBirth,
       String separator,
@@ -809,6 +811,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoDnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasNonDnummerDateOfBirth(
       String dateOfBirth,
       String separator,
@@ -1245,6 +1248,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoDnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasNonDnummerDateOfBirth(
       String dateOfBirth,
       String separator,

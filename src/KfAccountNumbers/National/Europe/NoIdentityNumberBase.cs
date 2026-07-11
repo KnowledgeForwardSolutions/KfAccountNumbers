@@ -11,7 +11,10 @@ public abstract record NoIdentityNumberBase
    ///   Discriminated union defining the types of identifier that Norwegian
    ///   identity number types in this hierarchy can represent.
    /// </summary>
-   public union IdentifierCategory(NoIdentifierType.Foedselsnummer, NoIdentifierType.DNummer) { }
+   public union IdentifierCategory(
+      NoIdentifierType.Foedselsnummer,
+      NoIdentifierType.Dnummer,
+      NoIdentifierType.Hnummer) { }
 
    /// <summary>
    ///   Discriminated union defining the possible validation errors that can
@@ -57,7 +60,17 @@ public abstract record NoIdentityNumberBase
    ///   In Norwegian identity numbers, a D-nummer is indicated by
    ///   adding 40 to the day component of the date of birth.
    /// </remarks>
-   public const Int32 DNummerDayOffset = 40;
+   public const Int32 DnummerDayOffset = 40;
+
+   /// <summary>
+   ///   Represents the month offset used to distinguish a H-nummer from a
+   ///   fødselsnummer.
+   /// </summary>
+   /// <remarks>
+   ///   In Norwegian identity numbers, a H-nummer is indicated by
+   ///   adding 40 to the month component of the date of birth.
+   /// </remarks>
+   public const Int32 HnummerMonthOffset = 40;
 
    /// <summary>
    ///   The latest year of birth supported by Norwegian identity numbers.
@@ -153,15 +166,15 @@ public abstract record NoIdentityNumberBase
       #pragma warning disable IDE0072 // Add missing cases
       var day = dateOffsetMode switch
       {
-         DateOffsetMode.Dnummer => baseDay - DNummerDayOffset,
-            DateOffsetMode.Optional => baseDay > 31 ? baseDay - DNummerDayOffset : baseDay,
+         DateOffsetMode.Dnummer => baseDay - DnummerDayOffset,
+            DateOffsetMode.Optional => baseDay > 31 ? baseDay - DnummerDayOffset : baseDay,
          _ => baseDay,
       };
 
       var month = dateOffsetMode switch
       {
-         DateOffsetMode.Hnummer => baseMonth - DNummerDayOffset,
-         DateOffsetMode.Optional => baseMonth > 12 ? baseMonth - DNummerDayOffset : baseMonth,
+         DateOffsetMode.Hnummer => baseMonth - HnummerMonthOffset,
+         DateOffsetMode.Optional => baseMonth > 12 ? baseMonth - HnummerMonthOffset : baseMonth,
          _ => baseMonth,
       };
 #pragma warning restore IDE0072 // Add missing cases

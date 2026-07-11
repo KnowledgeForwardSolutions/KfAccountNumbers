@@ -194,6 +194,7 @@ public class NoFoedselsnummerTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(DnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonFoedselsnummerDateOfBirth(
       String dateOfBirth,
       String separator,
@@ -520,6 +521,7 @@ public class NoFoedselsnummerTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(DnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldThrowKfValidationException_WhenValueHasNonFoedselsnummerDateOfBirth(
       String dateOfBirth,
       String separator,
@@ -811,6 +813,7 @@ public class NoFoedselsnummerTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(DnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoFoedselsnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasNonFoedselsnummerDateOfBirth(
       String dateOfBirth,
       String separator,
@@ -1248,6 +1251,7 @@ public class NoFoedselsnummerTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(DnummerValidDateOfBirthValues))]
+   [MemberData(nameof(HnummerValidDateOfBirthValues))]
    public void NoFoedselsnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasNonFoedselsnummerDateOfBirth(
       String dateOfBirth,
       String separator,
