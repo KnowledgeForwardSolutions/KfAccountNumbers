@@ -6,8 +6,7 @@ namespace KfAccountNumbers.National.Europe;
 ///   <para>
 ///      Strongly typed business object that represents a H-nummer, a temporary
 ///      identity number issued by Norwegian health organizations (such as a
-///      hospital) to persons needing medical assistance and who do not have
-///      either a fødselsnummer or a D-nummer.
+///      hospital) to unidentified patients or tourists.
 ///   </para>
 ///   <para>
 ///      <b>Note:</b> See <see cref="NoFoedselsnummer"/> and

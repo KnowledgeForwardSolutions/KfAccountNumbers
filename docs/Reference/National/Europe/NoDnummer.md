@@ -1,6 +1,6 @@
 ## NoDnummer
 
-Temporary Norwegian personal identity number issued to persons who are not eligible for a fødselsnummer, the permanent Norwegian identity number.
+Temporary Norwegian personal identity number issued to persons who are not eligible for a fødselsnummer, the permanent Norwegian identity number. The term "D-nummer" originates from the Norwegian Directorate of Sailors, when the primary group of foreign born individuals needing an identifier when paying Norwegian taxes were sailors working on Norwegian ships.
 
 | Element | Description |
 | :------ | :---------- |

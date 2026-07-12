@@ -1,6 +1,6 @@
 ## NoHnummer
 
-Temporary identity number issued by Norwegian health organizations (such as a hospital) to persons needing medical assistance and who do not have either a fødselsnummer or a D-nummer. A H-nummer is unique only within the issuing organization. A H-nummer is distinguished by a +40 offset added to the month component of the date of birth (1-12 becomes 41-52).
+Temporary identity number issued by Norwegian health organizations (such as a hospital) to unidentified patients or tourists. A H-nummer is unique only within the issuing organization. A H-nummer is distinguished by a +40 offset added to the month component of the date of birth (1-12 becomes 41-52).
 
 | Element | Description |
 | :------ | :---------- |
