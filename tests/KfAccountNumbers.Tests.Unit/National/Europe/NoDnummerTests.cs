@@ -825,7 +825,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidHnummerValues))]
    [MemberData(nameof(ValidFhnummerValues))]
-   public void NoDnummer_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueIsNotDnummer(String value)
+   public void NoDnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueIsNotDnummer(String value)
    {
       // Arrange.
       LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
@@ -1258,7 +1258,7 @@ public class NoDnummerTests : NoIdentityNumberTestsBase
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidHnummerValues))]
    [MemberData(nameof(ValidFhnummerValues))]
-   public void NoDnummer_Validate_ShouldReturnInvalidCheckDigits_WhenValueIsNotDnummer(String value)
+   public void NoDnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueIsNotDnummer(String value)
    {
       // Arrange.
       LocalValidationResult expected = GetInvalidDateOfBirthResult(value);

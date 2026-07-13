@@ -27,7 +27,7 @@ namespace KfAccountNumbers.National.Europe;
 ///      the day component of the date of birth (1-31 becomes 41-71).
 ///   </para>
 ///   <para>
-///      A H-nummer (hjelpenummer) is a temporary identifier issued by local \
+///      A H-nummer (hjelpenummer) is a temporary identifier issued by local
 ///      health organizations (such as a hospital) to unidentified patients or
 ///      tourists. A H-nummer is unique only within the issuing organization. A
 ///      H-nummer is distinguished by a +40 offset added to the month component
@@ -462,7 +462,7 @@ public record NoIdentityNumber : NoIdentityNumberBase
    ///   An <see cref="KfOption{NoFhnummer}"/> instance that will contain
    ///   the <see cref="NoFhnummer"/> if this value is a Fh-nummer;
    ///   otherwise <see cref="None"/> to indicate that this is not a
-   ///   H-nummer.
+   ///   Fh-nummer.
    /// </returns>
    public KfOption<NoFhnummer> ToFhnummer()
       => IdentifierType is NoIdentifierType.Fhnummer

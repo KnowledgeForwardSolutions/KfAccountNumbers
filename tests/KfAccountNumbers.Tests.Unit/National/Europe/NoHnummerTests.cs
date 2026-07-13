@@ -517,7 +517,7 @@ public class NoHnummerTests : NoIdentityNumberTestsBase
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
    [MemberData(nameof(ValidFhnummerValues))]
-   public void NoHnummer_ExplicitCastToNoDnummer_ShouldThrowKfValidationException_WhenValueIsNotHnummer(String value)
+   public void NoHnummer_ExplicitCastToNoHnummer_ShouldThrowKfValidationException_WhenValueIsNotHnummer(String value)
    {
       // Arrange.
       LocalValidationError expected = GetInvalidDateOfBirthResult(value);
@@ -805,7 +805,7 @@ public class NoHnummerTests : NoIdentityNumberTestsBase
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
    [MemberData(nameof(ValidFhnummerValues))]
-   public void NoHnummer_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueIsNotHnummer(String value)
+   public void NoHnummer_Create_ShouldReturnInvalidInvalidDateOfBirthValidationResult_WhenValueIsNotHnummer(String value)
    {
       // Arrange.
       LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
@@ -1238,7 +1238,7 @@ public class NoHnummerTests : NoIdentityNumberTestsBase
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
    [MemberData(nameof(ValidFhnummerValues))]
-   public void NoHnummer_Validate_ShouldReturnInvalidCheckDigits_WhenValueIsNotHnummer(String value)
+   public void NoHnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueIsNotHnummer(String value)
    {
       // Arrange.
       LocalValidationResult expected = GetInvalidDateOfBirthResult(value);

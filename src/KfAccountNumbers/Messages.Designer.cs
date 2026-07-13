@@ -1204,7 +1204,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NO Fh-nummer separator character must not be a digit.
+        ///   Looks up a localized string similar to NO Fh-nummer must use 8 or 9 as the leading digit.
         /// </summary>
         internal static string NoFhnummerInvalidPrefix {
             get {
@@ -1213,7 +1213,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to NO Fh-nummer must use 8 or 9 as the leading digit.
+        ///   Looks up a localized string similar to NO Fh-nummer separator character must not be a digit.
         /// </summary>
         internal static string NoFhnummerInvalidSeparator {
             get {

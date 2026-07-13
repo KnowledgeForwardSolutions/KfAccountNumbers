@@ -700,12 +700,12 @@
     <value>NO Fh-nummer must have length 11 (no separator character) or 12 (separator character)</value>
   </data>
   <data name="NoFhnummerInvalidSeparator" xml:space="preserve">
-    <value>NO Fh-nummer must use 8 or 9 as the leading digit</value>
+    <value>NO Fh-nummer separator character must not be a digit</value>
   </data>
   <data name="NoFhnummerUnformattedLength" xml:space="preserve">
     <value>NO Fh-nummer without a separator character</value>
   </data>
   <data name="NoFhnummerInvalidPrefix" xml:space="preserve">
-    <value>NO Fh-nummer separator character must not be a digit</value>
+    <value>NO Fh-nummer must use 8 or 9 as the leading digit</value>
   </data>
 </root>
