@@ -5,38 +5,40 @@ namespace KfAccountNumbers.National.Europe;
 
 /// <summary>
 ///   <para>
-///      Strongly typed business object that represents a H-nummer, a temporary
-///      identity number issued by Norwegian health organizations (such as a
-///      hospital) to unidentified patients or tourists.
+///      Strongly typed business object that represents a Fh-nummer (Felles
+///      Hjelpenummer or Common Help Number). A Fh-nummer is similar to a
+///      Norwegian H-nummer, an identifier issued to persons needing medical
+///      assistance and who do not have a fødselsnummer or a D-nummer such as
+///      tourists, newborns or persons with unknown identities.
 ///   </para>
 ///   <para>
-///      <b>Note:</b> See <see cref="NoFoedselsnummer"/> and
-///      <see cref="NoDnummer"/> for a similar identifiers (fødselsnummer,
-///      D-nummer) and <see cref="NoIdentityNumber"/> for a composite type that
-///      can represent either a fødselsnummer, D-nummer or a H-nummer.
+///      Unlike H-nummers which are issued by a single organization and only
+///      unique within that organization, Fh-nummers are issued by Norsk
+///      Helsenett (the Norwegian Health Network) and are unique across the
+///      entire Norwegian health system. Unlike other Norwegian identity numbers
+///      (fødselsnummer, D-nummer and H-nummer), Fh-nummers do not encode
+///      the person's date of birth or gender and consist of 9 random digits and
+///      two check digits. Fh-nummers are distinguished by an initial digit = 8
+///      or 9.
+///   </para>
+///   <para>
+///      <b>Note:</b> See <see cref="NoFoedselsnummer"/>,
+///      <see cref="NoDnummer"/>, <see cref="NoHnummer"/> for similar
+///      identifiers (fødselsnummer, D-nummer, H-nummer) and
+///      <see cref="NoIdentityNumber"/> for a composite type that
+///      can represent either a fødselsnummer, D-nummer, H-nummer or Fh-nummer.
 ///   </para>
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A H-nummer is an 11-digit number structured as DDMMYYIIICC, with the
+///      A Fh-nummer is an 11-digit number structured as NNNNNNNNNCC, with the
 ///      following elements:
 ///      <list type="bullet">
 ///         <item>
-///            <term>DDMMYY</term>
+///            <term>NNNNNNNNN</term>
 ///            <description>
-///               The person's date of birth in DDMMYY format. The <b>MM</b>
-///               portion of the date of birth is offset by 40 (i.e. 1-12
-///               becomes 41-52) to distinguish H-nummers from fødselsnummers.
-///            </description>
-///         </item>
-///         <item>
-///            <term>III</term>
-///            <description>
-///               Three-digit individual number. The first digit indicates the
-///               person's century of birth, with 0-4 = 20th century or
-///               1900-1999 and 5-9 = 21st century or 2000-2099. The last digit
-///               indicates the person's gender, with odd digits assigned to
-///               males and even digits assigned to females.
+///               9 random digits. The first digit must be 8 or 9 to distinguish
+///               the value from other identifiers like fødselsnummer, etc.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -44,20 +46,20 @@ namespace KfAccountNumbers.National.Europe;
 ///            <description>
 ///               Two separate check digits calculated using a weighted
 ///               modulus 11 algorithm. The first check digit is calculated
-///               for the first nine digits (date of birth and individual
-///               number) and the second check digit is calculated for the date
-///               of birth, individual number and first check digit.
+///               for the first nine digits and the second check digit is
+///               calculated for the first ten digits, includding the first
+///               check digit.
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
 ///      The 11 character value is sometimes formatted for greater readability
-///      by inserting a separator character, generally a space, between the date
-///      of birth and the individual number, i.e. DDMMYY IIICC.
+///      by inserting a separator character, generally a space, at character
+///      position 6 (zero-based), i.e. NNNNNN NNNCC.
 ///   </para>
 ///   <para>
-///      When creating a new <see cref="NoHnummer"/>, the following validation
+///      When creating a new <see cref="NoFhnummer"/>, the following validation
 ///      rules are applied:
 ///      <list type="bullet">
 ///         <item>
@@ -89,11 +91,7 @@ namespace KfAccountNumbers.National.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The date of birth (after adjusting for the +40 H-nummer month
-///               offset and after determining the century from the individual
-///               number) must be a valid date between 01/01/1854 and
-///               31/12/2039. Note that the validation specifically does
-///               <b>NOT</b> check for future dates, only that the date exists.
+///               The leading digit must be 8 or 9.
 ///            </description>
 ///         </item>
 ///      </list>
@@ -102,44 +100,32 @@ namespace KfAccountNumbers.National.Europe;
 ///      Example values:
 ///      <list type="bullet">
 ///         <item>
-///            <term>07417942720</term>
+///            <term>98075450605</term>
 ///            <description>
-///               unformatted, date of birth = January 7, 1979, gender = male,
-///               check digits = 20
+///               unformatted, check digits = 05
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>21501350017</term>
+///            <term>87207009367</term>
 ///            <description>
-///               unformatted, date of birth = October 21, 2013, gender =
-///               female, check digits = 17
+///               unformatted, check digits = 67
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>135095 02069</term>
+///            <term>809390 27371</term>
 ///            <description>
-///               formatted, date of birth = October 13, 1995, gender = female,
-///               check digits = 69
+///               formatted, check digits = 71
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
-///   <para>
-///      Note that fødselsnummers use the individual number to determine the
-///      century of birth, but the rules are more complicated. Refer to the
-///      fødselsnummer documentation for more detail.
-///   </para>
-///   <para>
-///      See <see href="https://en.wikipedia.org/wiki/National_identity_number_(Norway)">Wikipedia - National_identity_number_(Norway)</see>
-///      for more information.
-///   </para>
 /// </remarks>
-[JsonConverter(typeof(NoHnummerJsonConverter))]
-public record NoHnummer : NoIdentityNumberBase
+[JsonConverter(typeof(NoFhnummerJsonConverter))]
+public record NoFhnummer : NoIdentityNumberBase
 {
    /// <summary>
    ///   Discriminated union defining the possible validation errors that can
-   ///   occur when creating a new Norwegian H-nummer.
+   ///   occur when creating a new Norwegian Fh-nummer.
    /// </summary>
    public union ValidationError(
       EmptyValue,
@@ -147,13 +133,13 @@ public record NoHnummer : NoIdentityNumberBase
       InvalidCharacter,
       InvalidChecksum,
       InvalidSeparator,
-      InvalidDateOfBirth)
+      InvalidPrefix)
    {
    }
 
    /// <summary>
    ///   Discriminated union defining the possible results that can occur when
-   ///   validating Norwegian H-nummers.
+   ///   validating Norwegian Fh-nummers.
    /// </summary>
    public union ValidationResult(
       ValidValue,
@@ -162,15 +148,15 @@ public record NoHnummer : NoIdentityNumberBase
       InvalidCharacter,
       InvalidChecksum,
       InvalidSeparator,
-      InvalidDateOfBirth)
+      InvalidPrefix)
    {
    }
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="NoHnummer"/> class.
+   ///   Initializes a new instance of the <see cref="NoFhnummer"/> class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a H-nummer.
+   ///   String representation of a Fh-nummer.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
@@ -189,17 +175,16 @@ public record NoHnummer : NoIdentityNumberBase
    ///   6 (zero-based). Valid separator characters are any non-digit character,
    ///   though space (' ') and dash ('-') are the most common values.
    ///   - or -
-   ///   <paramref name="value"/> contains an invalid date of birth in
-   ///   positions 0-5 (zero-based).
+   ///   <paramref name="value"/> starts with a digit other than 8 or 9.
    /// </exception>
-   public NoHnummer(String? value)
+   public NoFhnummer(String? value)
       : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="NoHnummer"/> class.
+   ///   Initializes a new instance of the <see cref="NoFhnummer"/> class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a H-nummer.
+   ///   String representation of a Fh-nummer.
    /// </param>
    /// <param name="validationMode">
    ///   Indicates whether the <paramref name="value"/> requires validation.
@@ -209,7 +194,7 @@ public record NoHnummer : NoIdentityNumberBase
    ///   validation when creating a new instance from a value that has
    ///   already been validated.
    /// </remarks>
-   internal NoHnummer(String? value, ValidationMode validationMode)
+   internal NoFhnummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
@@ -223,7 +208,7 @@ public record NoHnummer : NoIdentityNumberBase
                InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
                InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
-               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               InvalidPrefix invalidPrefix => new UKfValidationException<ValidationError>(invalidPrefix),
                _ => new UnreachableException("This branch should never be reached"),
             };
          }
@@ -233,88 +218,59 @@ public record NoHnummer : NoIdentityNumberBase
    }
 
    /// <summary>
-   ///   Gets the person's date of birth, derived from the first six digits in
-   ///   DDMMYY format and the exact century of birth derived from the
-   ///   individual number.
-   /// </summary>
-   /// <remarks>
-   ///   Note that H-nummer values add 40 to the MM portion of the DDMMYY date
-   ///   of birth. The date of birth property automatically adjusts for this
-   ///   offset.
-   /// </remarks>
-   public DateOnly DateOfBirth
-   {
-      get
-      {
-#pragma warning disable IDE0008 // Use explicit type
-         var (day, month, year) = GetDayMonthYear(Value, DateOffsetMode.Hnummer);
-#pragma warning restore IDE0008 // Use explicit type
-
-         return new DateOnly(year, month, day);
-      }
-   }
-
-   /// <summary>
-   ///   Gets the person's gender, as indicated by the individual number. Odd
-   ///   numbers = Male; even numbers = Female.
-   /// </summary>
-   public Gender.BinaryGender Gender
-      => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
-
-   /// <summary>
-   ///   Gets a string representation of the H-nummer.
+   ///   Gets a string representation of the Fh-nummer.
    /// </summary>
    public String Value { get; private init; }
 
    /// <summary>
-   ///   Implicitly converts a <see cref="NoHnummer"/> to a
+   ///   Implicitly converts a <see cref="NoFhnummer"/> to a
    ///   <see cref="String"/>, returning an empty string if the source is null.
    /// </summary>
    /// <param name="source">
-   ///   The <see cref="NoHnummer"/> to convert.
+   ///   The <see cref="NoFhnummer"/> to convert.
    /// </param>
-   public static implicit operator String(NoHnummer source)
+   public static implicit operator String(NoFhnummer source)
       => source?.Value ?? String.Empty;     // Handle null object gracefully by returning empty string
 
    /// <summary>
-   ///   Defines an explicit conversion of a string to a <see cref="NoHnummer"/>.
+   ///   Defines an explicit conversion of a string to a <see cref="NoFhnummer"/>.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Norwegian H-nummer.
+   ///   String representation of a Norwegian Fh-nummer.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
-   ///   <paramref name="value"/> is not a valid H-nummer.
+   ///   <paramref name="value"/> is not a valid Fh-nummer.
    /// </exception>
-   public static explicit operator NoHnummer(String? value) => new(value);
+   public static explicit operator NoFhnummer(String? value) => new(value);
 
    /// <summary>
-   ///   Create a new <see cref="NoHnummer"/> using the Result pattern.
+   ///   Create a new <see cref="NoFhnummer"/> using the Result pattern.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Norwegian H-nummer.
+   ///   String representation of a Norwegian Fh-nummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{NoHnummer, ValidationError}"/>. Will
-   ///   contain the new <see cref="NoHnummer"/> if <paramref name="value"/>
+   ///   A <see cref="CreateResult{NoFhnummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="NoFhnummer"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that
    ///   identifies the validation rule that was failed if
    ///   <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<NoHnummer, ValidationError> Create(String? value)
+   public static CreateResult<NoFhnummer, ValidationError> Create(String? value)
       => Validate(value) switch
       {
-         ValidValue => new NoHnummer(value, ValidationMode.BypassValidation),
+         ValidValue => new NoFhnummer(value, ValidationMode.BypassValidation),
          EmptyValue emptyValue => (ValidationError)emptyValue,
          InvalidLength invalidLength => (ValidationError)invalidLength,
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
          InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
          InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
-         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         InvalidPrefix invalidPrefix => (ValidationError)invalidPrefix,
          _ => throw new UnreachableException("This branch should never be reached"),
       };
 
    /// <summary>
-   ///   Format the H-nummer using the supplied <paramref name="mask"/>.
+   ///   Format the Fh-nummer using the supplied <paramref name="mask"/>.
    /// </summary>
    /// <param name="mask">
    ///   Optional. The mask that specifies the final output. If not supplied
@@ -323,7 +279,7 @@ public record NoHnummer : NoIdentityNumberBase
    ///   instead.
    /// </param>
    /// <returns>
-   ///   A formatted H-nummer.
+   ///   A formatted Fh-nummer.
    /// </returns>
    /// <exception cref="ArgumentNullException">
    ///   <paramref name="mask"/> is <see langword="null"/>.
@@ -334,15 +290,15 @@ public record NoHnummer : NoIdentityNumberBase
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the H-nummer.
+   ///   details on creating a mask to format the Fh-nummer.
    /// </remarks>
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
-   ///   Get a string representation of the H-nummer.
+   ///   Get a string representation of the Fh-nummer.
    /// </summary>
    /// <returns>
-   ///   The raw H-nummer, without separator characters.
+   ///   The raw Fh-nummer, without separator characters.
    /// </returns>
    public override String ToString() => Value;
 
@@ -385,9 +341,9 @@ public record NoHnummer : NoIdentityNumberBase
          return GetInvalidSeparatorResult(value);
       }
 
-      if (!ValidateDateOfBirth(value, DateOffsetMode.Hnummer))
+      if (value[0] is not Chars.DigitEight and not Chars.DigitNine)
       {
-         return GetInvalidDateOfBirthResult(value);
+         return GetInvalidPrefixResult(value);
       }
 
       return default(ValidValue);
@@ -396,38 +352,37 @@ public record NoHnummer : NoIdentityNumberBase
    private static InvalidCharacter GetInvalidCharacterResult(
       ReadOnlySpan<Char> value,
       Int32 position)
-      => new(Messages.NoHnummerInvalidCharacter, value[position], position);
+      => new(Messages.NoFhnummerInvalidCharacter, value[position], position);
 
    private static InvalidChecksum GetInvalidChecksumResult()
-      => new(Messages.NoHnummerInvalidCheckDigits, CheckDigitAlgorithmName);
+      => new(Messages.NoFhnummerInvalidCheckDigits, CheckDigitAlgorithmName);
 
    private static InvalidLength GetInvalidLengthResult(ReadOnlySpan<Char> value)
       => new(
-         Messages.NoHnummerInvalidLength,
+         Messages.NoFhnummerInvalidLength,
          value.Length,
          [
-            new ValidLengthDefinition(UnformattedLength, Messages.NoHnummerUnformattedLength),
-            new ValidLengthDefinition(FormattedLength, Messages.NoHnummerFormattedLength),
+            new ValidLengthDefinition(UnformattedLength, Messages.NoFhnummerUnformattedLength),
+            new ValidLengthDefinition(FormattedLength, Messages.NoFhnummerFormattedLength),
          ]);
 
-   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
+   private static InvalidPrefix GetInvalidPrefixResult(String value)
       => new(
-         Messages.NoHnummerInvalidDateOfBirth,
-         value[..SeparatorOffset],
-         DateFormatName.DDMMYY);
+         Messages.NoFhnummerInvalidPrefix,
+         value[0].ToString());
 
    private static InvalidSeparator GetInvalidSeparatorResult(ReadOnlySpan<Char> value)
       => new(
-         Messages.NoHnummerInvalidSeparator,
+         Messages.NoFhnummerInvalidSeparator,
          value[SeparatorOffset],
          SeparatorOffset);
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable SA1600 // Elements should be documented
-public class NoHnummerJsonConverter : JsonConverter<NoHnummer>
+public class NoFhnummerJsonConverter : JsonConverter<NoFhnummer>
 {
-   public override NoHnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   public override NoFhnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
       if (reader.TokenType == JsonTokenType.Null)
       {
@@ -435,9 +390,9 @@ public class NoHnummerJsonConverter : JsonConverter<NoHnummer>
       }
 
       var str = reader.GetString();
-      return new NoHnummer(str);
+      return new NoFhnummer(str);
    }
 
-   public override void Write(Utf8JsonWriter writer, NoHnummer value, JsonSerializerOptions options)
+   public override void Write(Utf8JsonWriter writer, NoFhnummer value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
 }

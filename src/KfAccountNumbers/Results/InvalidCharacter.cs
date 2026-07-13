@@ -1,8 +1,8 @@
 namespace KfAccountNumbers.Results;
 
 /// <summary>
-///   The InvalidCharacter struct represents a validation error indicating that
-///   one or more invalid characters were found in the input value.
+///   Represents a validation error indicating that one or more invalid
+///   characters were found in the input value.
 /// </summary>
 /// <param name="Description">
 ///   Message describing the validation error, indicating that one or more

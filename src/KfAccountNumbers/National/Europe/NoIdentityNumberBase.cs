@@ -1,6 +1,6 @@
-namespace KfAccountNumbers.National.Europe;
-
 #pragma warning disable IDE0250 // Make struct 'readonly'
+
+namespace KfAccountNumbers.National.Europe;
 
 /// <summary>
 ///   Abstract base class for Norwegian personal identity numbers.
@@ -14,37 +14,8 @@ public abstract record NoIdentityNumberBase
    public union IdentifierCategory(
       NoIdentifierType.Foedselsnummer,
       NoIdentifierType.Dnummer,
-      NoIdentifierType.Hnummer)
-   {
-   }
-
-   /// <summary>
-   ///   Discriminated union defining the possible validation errors that can
-   ///   occur when creating a new Norwegian identity number types in this
-   ///   hierarchy.
-   /// </summary>
-   public union ValidationError(
-      EmptyValue,
-      InvalidLength,
-      InvalidCharacter,
-      InvalidChecksum,
-      InvalidSeparator,
-      InvalidDateOfBirth)
-   {
-   }
-
-   /// <summary>
-   ///   Discriminated union defining the possible results that can occur when
-   ///   validating Norwegian identity number types in this hierarchy.
-   /// </summary>
-   public union ValidationResult(
-      ValidValue,
-      EmptyValue,
-      InvalidLength,
-      InvalidCharacter,
-      InvalidChecksum,
-      InvalidSeparator,
-      InvalidDateOfBirth)
+      NoIdentifierType.Hnummer,
+      NoIdentifierType.Fhnummer)
    {
    }
 

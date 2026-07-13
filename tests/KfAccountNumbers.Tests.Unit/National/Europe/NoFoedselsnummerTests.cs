@@ -4,11 +4,11 @@
 
 using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
    KfAccountNumbers.National.Europe.NoFoedselsnummer,
-   KfAccountNumbers.National.Europe.NoIdentityNumberBase.ValidationError>;
-using LocalValidationError = KfAccountNumbers.National.Europe.NoIdentityNumberBase.ValidationError;
+   KfAccountNumbers.National.Europe.NoFoedselsnummer.ValidationError>;
+using LocalValidationError = KfAccountNumbers.National.Europe.NoFoedselsnummer.ValidationError;
 using LocalValidationException = KfAccountNumbers.UKfValidationException<
-   KfAccountNumbers.National.Europe.NoIdentityNumberBase.ValidationError>;
-using LocalValidationResult = KfAccountNumbers.National.Europe.NoIdentityNumberBase.ValidationResult;
+   KfAccountNumbers.National.Europe.NoFoedselsnummer.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.National.Europe.NoFoedselsnummer.ValidationResult;
 
 namespace KfAccountNumbers.Tests.Unit.National.Europe;
 
@@ -193,16 +193,12 @@ public class NoFoedselsnummerTests : NoIdentityNumberTestsBase
    }
 
    [Theory]
-   [MemberData(nameof(DnummerValidDateOfBirthValues))]
-   [MemberData(nameof(HnummerValidDateOfBirthValues))]
-   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonFoedselsnummerDateOfBirth(
-      String dateOfBirth,
-      String separator,
-      String individualNumber,
-      String _)
+   [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidHnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
+   public void NoFoedselsnummer_Constructor_ShouldThrowKfValidationException_WhenValueIsNotFoedselsnummer(String value)
    {
       // Arrange.
-      var value = GetValueWithValidCheckDigits(dateOfBirth, separator, individualNumber);
       LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
@@ -520,16 +516,12 @@ public class NoFoedselsnummerTests : NoIdentityNumberTestsBase
    }
 
    [Theory]
-   [MemberData(nameof(DnummerValidDateOfBirthValues))]
-   [MemberData(nameof(HnummerValidDateOfBirthValues))]
-   public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldThrowKfValidationException_WhenValueHasNonFoedselsnummerDateOfBirth(
-      String dateOfBirth,
-      String separator,
-      String individualNumber,
-      String _)
+   [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidHnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
+   public void NoFoedselsnummer_ExplicitCastToNoFoedselsnummer_ShouldThrowKfValidationException_WhenValueIsNotFoedselsnummer(String value)
    {
       // Arrange.
-      var value = GetValueWithValidCheckDigits(dateOfBirth, separator, individualNumber);
       LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
@@ -812,16 +804,12 @@ public class NoFoedselsnummerTests : NoIdentityNumberTestsBase
    }
 
    [Theory]
-   [MemberData(nameof(DnummerValidDateOfBirthValues))]
-   [MemberData(nameof(HnummerValidDateOfBirthValues))]
-   public void NoFoedselsnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasNonFoedselsnummerDateOfBirth(
-      String dateOfBirth,
-      String separator,
-      String individualNumber,
-      String _)
+   [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidHnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
+   public void NoFoedselsnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueIsNotFoedselsnummer(String value)
    {
       // Arrange.
-      var value = GetValueWithValidCheckDigits(dateOfBirth, separator, individualNumber);
       LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
 
       // Act.
@@ -1250,16 +1238,12 @@ public class NoFoedselsnummerTests : NoIdentityNumberTestsBase
    }
 
    [Theory]
-   [MemberData(nameof(DnummerValidDateOfBirthValues))]
-   [MemberData(nameof(HnummerValidDateOfBirthValues))]
-   public void NoFoedselsnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasNonFoedselsnummerDateOfBirth(
-      String dateOfBirth,
-      String separator,
-      String individualNumber,
-      String _)
+   [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidHnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
+   public void NoFoedselsnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueIsNotFoedselsnummer(String value)
    {
       // Arrange.
-      var value = GetValueWithValidCheckDigits(dateOfBirth, separator, individualNumber);
       LocalValidationResult expected = GetInvalidDateOfBirthResult(value);
 
       // Act.

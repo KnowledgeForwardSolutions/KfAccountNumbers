@@ -44,3 +44,7 @@ are:
 * Rule 5 - Otherwise invalid. Validation will report an invalid date of birth.
 
 The similar temporary identifier, the Norwegian D-nummer, uses much simpler rules to derive the century of birth.
+
+### References
+
+[Wikipedia - National identity number (Norway)](https://en.wikipedia.org/wiki/National_identity_number_%28Norway%29)

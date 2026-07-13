@@ -1,3 +1,4 @@
+#pragma warning disable IDE0250 // Make struct 'readonly'
 #pragma warning disable IDE0046 // Convert to conditional expression
 
 namespace KfAccountNumbers.National.Europe;
@@ -9,10 +10,11 @@ namespace KfAccountNumbers.National.Europe;
 ///      are not eligible for a permanent identity number (fødselsnummer).
 ///   </para>
 ///   <para>
-///      <b>Note:</b> See <see cref="NoFoedselsnummer"/> for a similar
-///      identifier (fødselsnummer) issued to permanent residents of Norway and
+///      <b>Note:</b> See <see cref="NoFoedselsnummer"/>,
+///      <see cref="NoHnummer"/> and <see cref="NoFhnummer"/> for similar
+///      identifiers (fødselsnummer, H-nummer and Fh-nummer) and
 ///      <see cref="NoIdentityNumber"/> for a composite type that can represent
-///      either a fødselsnummer or a D-nummer.
+///      a fødselsnummer, D-nummer, H-nummer or Fh-nummer.
 ///   </para>
 /// </summary>
 /// <remarks>
@@ -136,6 +138,35 @@ namespace KfAccountNumbers.National.Europe;
 [JsonConverter(typeof(NoDnummerJsonConverter))]
 public record NoDnummer : NoIdentityNumberBase
 {
+   /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new Norwegian D-nummer.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating Norwegian D-nummers.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
    /// <summary>
    ///   Initializes a new instance of the <see cref="NoDnummer"/> class.
    /// </summary>
@@ -266,9 +297,8 @@ public record NoDnummer : NoIdentityNumberBase
    /// <returns>
    ///   A <see cref="CreateResult{NoDnummer, ValidationError}"/>. Will
    ///   contain the new <see cref="NoDnummer"/> if <paramref name="value"/>
-   ///   is valid or a <see cref="NoIdentityNumberBase.ValidationError"/> that
-   ///   identifies the validation rule that was failed if
-   ///   <paramref name="value"/> is invalid.
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
    public static CreateResult<NoDnummer, ValidationError> Create(String? value)
       => Validate(value) switch
@@ -324,9 +354,9 @@ public record NoDnummer : NoIdentityNumberBase
    ///   String representation of a Norwegian D-nummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="NoIdentityNumberBase.ValidationResult"/> union that
-   ///   indicates if the <paramref name="value"/> passed validation or what
-   ///   validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
    public static ValidationResult Validate(String? value)
    {
@@ -371,6 +401,12 @@ public record NoDnummer : NoIdentityNumberBase
    private static InvalidChecksum GetInvalidChecksumResult()
       => new(Messages.NoDnummerInvalidCheckDigits, CheckDigitAlgorithmName);
 
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
+      => new(
+         Messages.NoDnummerInvalidDateOfBirth,
+         value[..SeparatorOffset],
+         DateFormatName.DDMMYY);
+
    private static InvalidLength GetInvalidLengthResult(ReadOnlySpan<Char> value)
       => new(
          Messages.NoDnummerInvalidLength,
@@ -379,12 +415,6 @@ public record NoDnummer : NoIdentityNumberBase
             new ValidLengthDefinition(UnformattedLength, Messages.NoDnummerUnformattedLength),
             new ValidLengthDefinition(FormattedLength, Messages.NoDnummerFormattedLength),
          ]);
-
-   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
-      => new(
-         Messages.NoDnummerInvalidDateOfBirth,
-         value[..SeparatorOffset],
-         DateFormatName.DDMMYY);
 
    private static InvalidSeparator GetInvalidSeparatorResult(ReadOnlySpan<Char> value)
       => new(

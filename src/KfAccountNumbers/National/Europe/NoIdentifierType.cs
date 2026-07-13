@@ -2,7 +2,7 @@ namespace KfAccountNumbers.National.Europe;
 
 /// <summary>
 ///   Defines the possible types of identifiers that can be represented with a
-///   <see cref="NoFoedselsnummer"/> object.
+///   <see cref="NoIdentityNumber"/> object.
 /// </summary>
 public class NoIdentifierType
 {
@@ -26,4 +26,13 @@ public class NoIdentifierType
    ///   the date of birth (i.e. 130585 becomes 134585).
    /// </summary>
    public struct Hnummer { }
+
+   /// <summary>
+   ///   Felles Hjelpenummer or Common Help Number. Temporary identifier similar
+   ///   to H-nummer, but issued by Norsk Helsenett (the Norwegian Health
+   ///   Network) and which is unique across the entire Norwegian health system.
+   ///   Fh-nummer is distinguished from other Norwegian identifiers by the
+   ///   leading digit which will be 8 or 9.
+   /// </summary>
+   public struct Fhnummer { }
 }

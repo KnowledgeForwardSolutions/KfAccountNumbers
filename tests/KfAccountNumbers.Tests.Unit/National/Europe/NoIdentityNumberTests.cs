@@ -2,11 +2,11 @@
 
 using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
    KfAccountNumbers.National.Europe.NoIdentityNumber,
-   KfAccountNumbers.National.Europe.NoIdentityNumberBase.ValidationError>;
-using LocalValidationError = KfAccountNumbers.National.Europe.NoIdentityNumberBase.ValidationError;
+   KfAccountNumbers.National.Europe.NoIdentityNumber.ValidationError>;
+using LocalValidationError = KfAccountNumbers.National.Europe.NoIdentityNumber.ValidationError;
 using LocalValidationException = KfAccountNumbers.UKfValidationException<
-   KfAccountNumbers.National.Europe.NoIdentityNumberBase.ValidationError>;
-using LocalValidationResult = KfAccountNumbers.National.Europe.NoIdentityNumberBase.ValidationResult;
+   KfAccountNumbers.National.Europe.NoIdentityNumber.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.National.Europe.NoIdentityNumber.ValidationResult;
 
 namespace KfAccountNumbers.Tests.Unit.National.Europe;
 
@@ -48,6 +48,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
    [MemberData(nameof(ValidHnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
    public void NoIdentityNumber_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
@@ -238,6 +239,18 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
       sut.IdentifierType.Should().Be(expected);
    }
 
+   [Theory]
+   [MemberData(nameof(ValidFhnummerValues))]
+   public void NoIdentityNumber_IdentifierType_ShouldReturnExpectedIdentifierType_WhenValueIsFhnummer(String value)
+   {
+      // Arrange.
+      var sut = new NoIdentityNumber(value);
+      NoIdentityNumberBase.IdentifierCategory expected = default(NoIdentifierType.Fhnummer);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(expected);
+   }
+
    #endregion
 
    #region Value Property Tests
@@ -248,6 +261,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
    [MemberData(nameof(ValidHnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
    public void NoIdentityNumber_Value_ShouldReturnValidatedIdentityNumber(String value)
    {
       // Arrange.
@@ -325,6 +339,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
    [MemberData(nameof(ValidHnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
    public void NoIdentityNumber_ExplicitCastToNoIdentityNumber_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
@@ -602,6 +617,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
    [MemberData(nameof(ValidHnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
    public void NoIdentityNumber_Create_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
@@ -1023,6 +1039,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidHnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
    public void NoIdentityNumber_ToDnummer_ShouldReturnExpectedResult_WhenValueIsNotDnummer(String value)
    {
       // Arrange.
@@ -1031,6 +1048,44 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
 
       // Act.
       KfOption<NoDnummer> result = sut.ToDnummer();
+
+      // Assert.
+      result.Value.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region ToFhnummer Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidFhnummerValues))]
+   public void NoIdentityNumber_ToFhnummer_ShouldReturnExpectedResult_WhenValueIsFhnummer(String value)
+   {
+      // Arrange.
+      var sut = new NoIdentityNumber(value);
+      var expected = new NoFhnummer(value);
+
+      // Act.
+      KfOption<NoFhnummer> result = sut.ToFhnummer();
+
+      // Assert.
+      result.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidFoedselsnummerValues))]
+   [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidHnummerValues))]
+   public void NoIdentityNumber_ToFhnummer_ShouldReturnExpectedResult_WhenValueIsNotFhnummer(String value)
+   {
+      // Arrange.
+      var sut = new NoIdentityNumber(value);
+      var expected = default(None);
+
+      // Act.
+      KfOption<NoFhnummer> result = sut.ToFhnummer();
 
       // Assert.
       result.Value.Should().Be(expected);
@@ -1060,6 +1115,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(ValidDnummerValues))]
    [MemberData(nameof(ValidHnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
    public void NoIdentityNumber_ToFoedselsnummer_ShouldReturnExpectedResult_WhenValueIsNotFoedselsnummer(String value)
    {
       // Arrange.
@@ -1097,6 +1153,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [Theory]
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
    public void NoIdentityNumber_ToHnummer_ShouldReturnExpectedResult_WhenValueIsNotHnummer(String value)
    {
       // Arrange.
@@ -1139,6 +1196,7 @@ public class NoIdentityNumberTests : NoIdentityNumberTestsBase
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
    [MemberData(nameof(ValidHnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
    public void NoIdentityNumber_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
    {
       // Arrange.

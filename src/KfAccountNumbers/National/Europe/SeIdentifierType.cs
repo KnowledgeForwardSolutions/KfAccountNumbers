@@ -2,7 +2,7 @@ namespace KfAccountNumbers.National.Europe;
 
 /// <summary>
 ///   Defines the possible types of identifiers that can be represented with a
-///   <see cref="SePersonnummer"/> object.
+///   <see cref="SeIdentityNumber"/> object.
 /// </summary>
 public class SeIdentifierType
 {

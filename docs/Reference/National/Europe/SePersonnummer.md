@@ -1,17 +1,17 @@
-## SeSamordningsnummer
+## SePersonnummer
 
-Coordination number (samordningsnummer) issued by the Swedish tax agency to persons residing in Sweden for less than 12 months.
+Swedish personal identity number (personnummer) issued by the Swedish tax agency to permanent residents of Sweden (> 12 months).
 
 | Element | Description |
 | :------ | :---------- |
-| Class name: | KfAccountNumbers.National.Europe.SeSamordningsnummer |
+| Class name: | KfAccountNumbers.National.Europe.SePersonnummer |
 | Is composite: | No |
 | Length: | 11 (short format with 2-digit year), 13 (long format with 4-digit year) |
 | Check digit algorithm: | Luhn |
 | Allowed characters: | Digits ('0'-'9') |
 | Allowed separator characters: | Dash ('-') or plus ('+') |
-| Structure: | ***YYMMDD-SSSC*** (short format) or ***YYYYMMDD-SSSC*** (long format), where: <dl><dt>YYMMDD</dt><dd>6-digit date of birth in YYMMDD format</dd><dt>YYYYMMDD</dt><dd>8-digit date of birth in YYYYMMDD format</dd><dt>-</dt><dd>Separator character, either dash ('-') if the person is less than 100 years old or plus ('+') if the person is 100 years or older</dd><dt>SSS</dt><dd>3-digit birth serial number used to distinguish between persons born on the same date. The last digit indicates the person's gender, with odd numbers = male and even numbers = female</dd><dt>C</dt><dd>Luhn algorithm check digit</dd></dl> Note that the <b>DD</b> portion of the date of birth will be 61-91 because samordningsnummer offsets the day of birth by +60 to distinguish from personnummer values. |
-| Example values: | <dl><dt>890261-3283</dt><dd>short format, date of birth 890261 (actual date of birth = 890201), less than 100 years old, gender = female, check digit = 3</dd><dt>19890261-3283</dt><dd>long format, date of birth 19890261 (actual date of birth = 19890201), less than 100 years old, gender = female, check digit = 3</dd><dt>811288+9871</dt><dd>short format, date of birth 811288 (actual date of birth = 811228), greater than 100 years old, gender = male, check digit = 1</dd></dl> |
+| Structure: | ***YYMMDD-SSSC*** (short format) or ***YYYYMMDD-SSSC*** (long format), where: <dl><dt>YYMMDD</dt><dd>6-digit date of birth in YYMMDD format</dd><dt>YYYYMMDD</dt><dd>8-digit date of birth in YYYYMMDD format</dd><dt>-</dt><dd>Separator character, either dash ('-') if the person is less than 100 years old or plus ('+') if the person is 100 years or older</dd><dt>SSS</dt><dd>3-digit birth serial number used to distinguish between persons born on the same date. The last digit indicates the person's gender, with odd numbers = male and even numbers = female</dd><dt>C</dt><dd>Luhn algorithm check digit</dd></dl> |
+| Example values: | <dl><dt>890201-3286</dt><dd>short format, date of birth 890201, less than 100 years old, gender = female, check digit = 6</dd><dt>19890201-3286</dt><dd>long format, date of birth 19890201, less than 100 years old, gender = female, check digit = 6</dd><dt>811228+9874</dt><dd>short format, date of birth 811228, greater than 100 years old, gender = male, check digit = 4</dd></dl> |
 
 ### Validation rules
 | Rule | Description | Error Result Type |
@@ -21,7 +21,7 @@ Coordination number (samordningsnummer) issued by the Swedish tax agency to pers
 | 3. | All non-separator characters must be ASCII digits ('0'-'9'). | InvalidCharacter |
 | 4. | The trailing character must be a valid Luhn algorithm check digit. | InvalidChecksum |
 | 5. | The separator character must follow the date of birth (either 6 or 8 digits) and must be either a dash ('-') or a plus ('+'). | InvalidSeparator |
-| 6. | The date of birth (after adjusting for  the +60 samordningsnummer day offset) must be a valid date between 01/01/1800 and 31/12/2099 | InvalidDateOfBirth |
+| 6. | The date of birth must be a valid date between 01/01/1800 and 31/12/2099 | InvalidDateOfBirth |
 
 ### Additional Properties
 
@@ -41,12 +41,10 @@ Coordination number (samordningsnummer) issued by the Swedish tax agency to pers
 
 The Luhn check digit is calculated using the 6 digits of the YYMMDD date of birth and the 3-digit birth serial number. If the value includes an 8-digit YYYYMMDD date of birth, the leading two digits of the year are ignored.
 
-The samordningsnummer +60 day offset is taken into account when creating or validating a value and the actual date is validated, not the offset date. Similarly, the DateOfBirth property will return the actual date and not an offset date.
-
 The encoded date of birth may not be the person's actual date of birth. If the possible birth serial numbers for a particular date are exhausted, then a nearby date is used instead.
 
 When validating the date of birth of a short format value with a 6-digit date of birth, a century cutoff of 50 is used. Years less than the century cutoff (00-49) are considered to be 2000-2049 and years greater than or equal to the century cutoff (50-99) are considered to be 1950-1999. If the separator character is a plus ('+'), then 100 is subtracted from the year: years 00-49 become 1900-1949 and years 50-99 become 1850-1899.
 
 ### References:
 
-[Wikipedia - Personal identity number (Sweden)](https://en.wikipedia.org/wiki/Personal_identity_number_%28Sweden%29) for more info.
+[Wikipedia - Personal identity number (Sweden)](https://en.wikipedia.org/wiki/Personal_identity_number_%28Sweden%29)

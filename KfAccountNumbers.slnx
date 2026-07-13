@@ -1,4 +1,18 @@
 <Solution>
+  <Folder Name="/docs/" />
+  <Folder Name="/docs/Reference/" />
+  <Folder Name="/docs/Reference/National/" />
+  <Folder Name="/docs/Reference/National/Europe/">
+    <File Path="docs/Reference/National/Europe/EsNif.md" />
+    <File Path="docs/Reference/National/Europe/NoDnummer.md" />
+    <File Path="docs/Reference/National/Europe/NoFhnummer.md" />
+    <File Path="docs/Reference/National/Europe/NoFoedselsnummer.md" />
+    <File Path="docs/Reference/National/Europe/NoHnummer.md" />
+    <File Path="docs/Reference/National/Europe/NoIdentityNumber.md" />
+    <File Path="docs/Reference/National/Europe/SeIdentityNumber.md" />
+    <File Path="docs/Reference/National/Europe/SePersonnummer.md" />
+    <File Path="docs/Reference/National/Europe/SeSamordningsnummer.md" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path="CONTRIBUTING.md" />
