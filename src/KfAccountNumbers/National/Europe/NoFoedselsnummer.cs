@@ -11,10 +11,11 @@ namespace KfAccountNumbers.National.Europe;
 ///      identity number (fødselsnummer).
 ///   </para>
 ///   <para>
-///      <b>Note:</b> See <see cref="NoDnummer"/> for a similar
-///      identifier (D-nummer) issued to temporary residents of Norway and
-///      <see cref="NoIdentityNumber"/> for a composite type that can represent
-///      either a fødselsnummer or a D-nummer.
+///      <b>Note:</b> See <see cref="NoDnummer"/>, <see cref="NoHnummer"/>
+///      and <see cref="NoFhnummer"/> for similar identifiers (D-nummer,
+///      H-nummer, Fh-nummer) and <see cref="NoIdentityNumber"/> for a composite
+///      type that can represent a fødselsnummer, D-nummer, H-nummer or
+///      Fh-nummer.
 ///   </para>
 /// </summary>
 /// <remarks>

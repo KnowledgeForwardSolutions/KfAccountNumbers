@@ -40,15 +40,16 @@ namespace KfAccountNumbers.National.Europe;
 ///      newborns or persons with unknown identities. However, while H-nummers
 ///      are issued by a single organization and only unique within that
 ///      organization, Fh-nummers are issued by Norsk Helsenett (the Norwegian
-///      Health Network) and are unique across the entire Norwegian health s
-///      ystem. Unlike other Norwegian identity numbers, Fh-nummers do not
+///      Health Network) and are unique across the entire Norwegian health
+///      system. Unlike other Norwegian identity numbers, Fh-nummers do not
 ///      encode the person's date of birth or gender and consist of 9 random
 ///      digits and two check digits. Fh-nummers are distinguished by an initial
 ///      digit = 8 or 9.
 ///   </para>
 ///   <para>
-///      See <see cref="NoFoedselsnummer"/> and <see cref="NoIdentityNumber"/>
-///      for types that represent specific identifiers.
+///      See <see cref="NoDnummer"/>, <see cref="NoFhnummer"/>,
+///      <see cref="NoFoedselsnummer"/> and <see cref="NoHnummer"/> for types
+///      that represent specific identifiers.
 ///   </para>
 /// </summary>
 /// <remarks>
@@ -354,12 +355,13 @@ public record NoIdentityNumber : NoIdentityNumberBase
 #pragma warning disable format
       => (Value.ParseTwoDigits(), Value.AsSpan(MonthOffset..).ParseTwoDigits()) switch
       {
+         (>= 1 and <= 31, >= 1 and <= 12) => default(NoIdentifierType.Foedselsnummer),
          (>= 41 and <= 71, >= 1 and <= 12) => default(NoIdentifierType.Dnummer),
          (>= 1 and <= 31, >= 41 and <= 52) => default(NoIdentifierType.Hnummer),
          (>= 80, _) => default(NoIdentifierType.Fhnummer),
-         _ => default(NoIdentifierType.Foedselsnummer),
+         _ => throw new UnreachableException("This branch should never be reached"),
       };
-#pragma warning restore format
+      #pragma warning restore format
 
    /// <summary>
    ///   Gets a string representation of the Norwegian identity number.

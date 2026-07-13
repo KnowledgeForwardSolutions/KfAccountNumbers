@@ -184,7 +184,7 @@ public class NoFhnummerTests : NoIdentityNumberTestsBase
    [MemberData(nameof(ValidFoedselsnummerValues))]
    [MemberData(nameof(ValidDnummerValues))]
    [MemberData(nameof(ValidHnummerValues))]
-   public void NoFhnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasIsNotFhnummer(String value)
+   public void NoFhnummer_Constructor_ShouldThrowKfValidationException_WhenValueIsNotFhnummer(String value)
    {
       // Arrange.
       LocalValidationError expected = GetInvalidPrefixResult(value);
@@ -204,7 +204,7 @@ public class NoFhnummerTests : NoIdentityNumberTestsBase
 
    [Theory]
    [MemberData(nameof(ValidFhnummerValues))]
-   public void NoFhnummer_Value_ShouldReturnValidatedHnummer(String value)
+   public void NoFhnummer_Value_ShouldReturnValidatedFhnummer(String value)
    {
       // Arrange.
       var sut = new NoFhnummer(value);

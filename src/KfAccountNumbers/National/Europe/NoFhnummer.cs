@@ -22,10 +22,11 @@ namespace KfAccountNumbers.National.Europe;
 ///      or 9.
 ///   </para>
 ///   <para>
-///      <b>Note:</b> See <see cref="NoFoedselsnummer"/> and
-///      <see cref="NoDnummer"/> for a similar identifiers (fødselsnummer,
-///      D-nummer) and <see cref="NoIdentityNumber"/> for a composite type that
-///      can represent either a fødselsnummer, D-nummer or a H-nummer.
+///      <b>Note:</b> See <see cref="NoFoedselsnummer"/>,
+///      <see cref="NoDnummer"/>, <see cref="NoHnummer"/> for similar
+///      identifiers (fødselsnummer, D-nummer, H-nummer) and
+///      <see cref="NoIdentityNumber"/> for a composite type that
+///      can represent either a fødselsnummer, D-nummer, H-nummer or Fh-nummer.
 ///   </para>
 /// </summary>
 /// <remarks>
@@ -54,8 +55,8 @@ namespace KfAccountNumbers.National.Europe;
 ///   </para>
 ///   <para>
 ///      The 11 character value is sometimes formatted for greater readability
-///      by inserting a separator character, generally a space, between the date
-///      of birth and the individual number, i.e. NNNNNN NNNCC.
+///      by inserting a separator character, generally a space, at character
+///      position 6 (zero-based), i.e. NNNNNN NNNCC.
 ///   </para>
 ///   <para>
 ///      When creating a new <see cref="NoFhnummer"/>, the following validation
@@ -101,7 +102,7 @@ namespace KfAccountNumbers.National.Europe;
 ///         <item>
 ///            <term>98075450605</term>
 ///            <description>
-///               unformatted, heck digits = 05
+///               unformatted, check digits = 05
 ///            </description>
 ///         </item>
 ///         <item>
@@ -217,7 +218,7 @@ public record NoFhnummer : NoIdentityNumberBase
    }
 
    /// <summary>
-   ///   Gets a string representation of the H-nummer.
+   ///   Gets a string representation of the Fh-nummer.
    /// </summary>
    public String Value { get; private init; }
 

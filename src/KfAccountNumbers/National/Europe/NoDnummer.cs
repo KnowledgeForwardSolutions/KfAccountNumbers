@@ -10,10 +10,11 @@ namespace KfAccountNumbers.National.Europe;
 ///      are not eligible for a permanent identity number (fødselsnummer).
 ///   </para>
 ///   <para>
-///      <b>Note:</b> See <see cref="NoFoedselsnummer"/> for a similar
-///      identifier (fødselsnummer) issued to permanent residents of Norway and
+///      <b>Note:</b> See <see cref="NoFoedselsnummer"/>,
+///      <see cref="NoHnummer"/> and <see cref="NoFhnummer"/> for similar
+///      identifiers (fødselsnummer, H-nummer and Fh-nummer) and
 ///      <see cref="NoIdentityNumber"/> for a composite type that can represent
-///      either a fødselsnummer or a D-nummer.
+///      a fødselsnummer, D-nummer, H-nummer or Fh-nummer.
 ///   </para>
 /// </summary>
 /// <remarks>
