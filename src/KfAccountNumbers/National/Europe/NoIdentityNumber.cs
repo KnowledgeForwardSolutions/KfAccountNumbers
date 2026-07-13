@@ -1,3 +1,4 @@
+#pragma warning disable IDE0250 // Make struct 'readonly'
 #pragma warning disable IDE0046 // Convert to conditional expression
 
 namespace KfAccountNumbers.National.Europe;
@@ -19,25 +20,30 @@ namespace KfAccountNumbers.National.Europe;
 ///   <para>
 ///      A D-nummer serves many of the same purposes of a fødselsnummer, but is
 ///      issued to foreign individuals who are not eligible for a fødselsnummer.
-///      A D-nummer is distinguished by a +40 offset added to the day component
-///      of the date of birth (1-31 becomes 41-71).
+///      The term "D-nummer" originates from the Norwegian Directorate of
+///      Sailors, when the primary group of foreign born individuals needing an
+///      identifier when paying Norwegian taxes were sailors working on
+///      Norwegian ships. A D-nummer is distinguished by a +40 offset added to
+///      the day component of the date of birth (1-31 becomes 41-71).
 ///   </para>
 ///   <para>
-///      A H-nummer is a temporary identifier issued by local health
-///      organizations (such as a hospital) to persons needing medical
-///      assistance and who do not have either a fødselsnummer or a D-nummer. A
-///      H-nummer is unique only within the issuing organization. A H-nummer is
-///      distinguished by a +40 offset added to the month component of the date
-///      of birth (1-12 becomes 41-52).
+///      A H-nummer (hjelpenummer) is a temporary identifier issued by local \
+///      health organizations (such as a hospital) to unidentified patients or
+///      tourists. A H-nummer is unique only within the issuing organization. A
+///      H-nummer is distinguished by a +40 offset added to the month component
+///      of the date of birth (1-12 becomes 41-52).
 ///   </para>
 ///   <para>
-///      A Fh-nummer is similar to a H-nummer, an identifier issued to persons
-///      needing medical assistance and who do not have a fødselsnummer or a
-///      D-nummer. However, while H-nummers are issued by a single organization
-///      and only unique within that organization, Fh-nummers are issued by
-///      Norsk Helsenett (the Norwegian Health Network) and are unique across
-///      the entire Norwegian health system. Fh-nummers do not encode the
-///      person's date of birth or gender and are distinguished by an initial
+///      A Fh-nummer (Felles Hjelpenummer or Common Help Number) is similar to a
+///      H-nummer, an identifier issued to persons needing medical assistance
+///      and who do not have a fødselsnummer or a D-nummer such as tourists,
+///      newborns or persons with unknown identities. However, while H-nummers
+///      are issued by a single organization and only unique within that
+///      organization, Fh-nummers are issued by Norsk Helsenett (the Norwegian
+///      Health Network) and are unique across the entire Norwegian health s
+///      ystem. Unlike other Norwegian identity numbers, Fh-nummers do not
+///      encode the person's date of birth or gender and consist of 9 random
+///      digits and two check digits. Fh-nummers are distinguished by an initial
 ///      digit = 8 or 9.
 ///   </para>
 ///   <para>
@@ -247,6 +253,35 @@ namespace KfAccountNumbers.National.Europe;
 public record NoIdentityNumber : NoIdentityNumberBase
 {
    /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new Norwegian identity number.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating Norwegian identity numbers.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
    ///   Initializes a new instance of the <see cref="NoIdentityNumber"/> class.
    /// </summary>
    /// <param name="value">
@@ -361,9 +396,9 @@ public record NoIdentityNumber : NoIdentityNumberBase
    /// <returns>
    ///   A <see cref="CreateResult{NoIdentityNumber, ValidationError}"/>. Will
    ///   contain the new <see cref="NoIdentityNumber"/> if
-   ///   <paramref name="value"/> is valid or a
-   ///   <see cref="NoIdentityNumberBase.ValidationError"/> that identifies the
-   ///   validation rule that was failed if <paramref name="value"/> is invalid.
+   ///   <paramref name="value"/> is valid or a <see cref="ValidationError"/>
+   ///   that identifies the validation rule that was failed if
+   ///   <paramref name="value"/> is invalid.
    /// </returns>
    public static CreateResult<NoIdentityNumber, ValidationError> Create(String? value)
       => Validate(value) switch
@@ -461,9 +496,9 @@ public record NoIdentityNumber : NoIdentityNumberBase
    ///   String representation of a Norwegian identity number.
    /// </param>
    /// <returns>
-   ///   A <see cref="NoIdentityNumberBase.ValidationResult"/> union that
-   ///   indicates if the <paramref name="value"/> passed validation or what
-   ///   validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
    public static ValidationResult Validate(String? value)
    {
@@ -508,6 +543,12 @@ public record NoIdentityNumber : NoIdentityNumberBase
    private static InvalidChecksum GetInvalidChecksumResult()
       => new(Messages.NoIdentityNumberInvalidCheckDigits, CheckDigitAlgorithmName);
 
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
+      => new(
+         Messages.NoIdentityNumberInvalidDateOfBirth,
+         value[..SeparatorOffset],
+         DateFormatName.DDMMYY);
+
    private static InvalidLength GetInvalidLengthResult(ReadOnlySpan<Char> value)
       => new(
          Messages.NoIdentityNumberInvalidLength,
@@ -516,12 +557,6 @@ public record NoIdentityNumber : NoIdentityNumberBase
             new ValidLengthDefinition(UnformattedLength, Messages.NoIdentityNumberUnformattedLength),
             new ValidLengthDefinition(FormattedLength, Messages.NoIdentityNumberFormattedLength),
          ]);
-
-   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
-      => new(
-         Messages.NoIdentityNumberInvalidDateOfBirth,
-         value[..SeparatorOffset],
-         DateFormatName.DDMMYY);
 
    private static InvalidSeparator GetInvalidSeparatorResult(ReadOnlySpan<Char> value)
       => new(

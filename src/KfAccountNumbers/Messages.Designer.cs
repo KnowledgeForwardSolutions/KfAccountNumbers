@@ -1168,6 +1168,69 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NO Fh-nummer formatted for readability with a separator character at character position 6 (zero-based).
+        /// </summary>
+        internal static string NoFhnummerFormattedLength {
+            get {
+                return ResourceManager.GetString("NoFhnummerFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Fh-nummer contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string NoFhnummerInvalidCharacter {
+            get {
+                return ResourceManager.GetString("NoFhnummerInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Fh-nummer must have two valid check digit characters in the trailing (right-most) positions.
+        /// </summary>
+        internal static string NoFhnummerInvalidCheckDigits {
+            get {
+                return ResourceManager.GetString("NoFhnummerInvalidCheckDigits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Fh-nummer must have length 11 (no separator character) or 12 (separator character).
+        /// </summary>
+        internal static string NoFhnummerInvalidLength {
+            get {
+                return ResourceManager.GetString("NoFhnummerInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Fh-nummer separator character must not be a digit.
+        /// </summary>
+        internal static string NoFhnummerInvalidPrefix {
+            get {
+                return ResourceManager.GetString("NoFhnummerInvalidPrefix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Fh-nummer must use 8 or 9 as the leading digit.
+        /// </summary>
+        internal static string NoFhnummerInvalidSeparator {
+            get {
+                return ResourceManager.GetString("NoFhnummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NO Fh-nummer without a separator character.
+        /// </summary>
+        internal static string NoFhnummerUnformattedLength {
+            get {
+                return ResourceManager.GetString("NoFhnummerUnformattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to NO Foedselsnummer formatted for readability with a separator character at character position 6 (zero-based).
         /// </summary>
         internal static string NoFoedselsnummerFormattedLength {

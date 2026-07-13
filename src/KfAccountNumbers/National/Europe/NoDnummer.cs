@@ -137,6 +137,35 @@ namespace KfAccountNumbers.National.Europe;
 public record NoDnummer : NoIdentityNumberBase
 {
    /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new Norwegian D-nummer.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating Norwegian D-nummers.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
    ///   Initializes a new instance of the <see cref="NoDnummer"/> class.
    /// </summary>
    /// <param name="value">
@@ -371,6 +400,12 @@ public record NoDnummer : NoIdentityNumberBase
    private static InvalidChecksum GetInvalidChecksumResult()
       => new(Messages.NoDnummerInvalidCheckDigits, CheckDigitAlgorithmName);
 
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
+      => new(
+         Messages.NoDnummerInvalidDateOfBirth,
+         value[..SeparatorOffset],
+         DateFormatName.DDMMYY);
+
    private static InvalidLength GetInvalidLengthResult(ReadOnlySpan<Char> value)
       => new(
          Messages.NoDnummerInvalidLength,
@@ -379,12 +414,6 @@ public record NoDnummer : NoIdentityNumberBase
             new ValidLengthDefinition(UnformattedLength, Messages.NoDnummerUnformattedLength),
             new ValidLengthDefinition(FormattedLength, Messages.NoDnummerFormattedLength),
          ]);
-
-   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
-      => new(
-         Messages.NoDnummerInvalidDateOfBirth,
-         value[..SeparatorOffset],
-         DateFormatName.DDMMYY);
 
    private static InvalidSeparator GetInvalidSeparatorResult(ReadOnlySpan<Char> value)
       => new(

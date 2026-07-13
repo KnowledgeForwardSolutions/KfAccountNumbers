@@ -37,3 +37,7 @@ The first check digit is calculated from the preceding 9 digits (the 6-digit dat
 The D-nummer's +40 day offset is taken into account when creating or validating a value and the actual date is validated, not the offset date. Similarly, the DateOfBirth property will return the actual date and not an offset date.
 
 Note that fødselsnummers use the individual number to determine the century of birth, but the rules are more complicated. Refer to the fødselsnummer documentation for more detail.
+
+### References
+
+[Wikipedia - National identity number (Norway)](https://en.wikipedia.org/wiki/National_identity_number_%28Norway%29)

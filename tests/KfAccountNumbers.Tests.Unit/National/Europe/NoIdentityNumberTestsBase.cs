@@ -21,6 +21,11 @@ public class NoIdentityNumberTestsBase
    protected const String ValidFormattedHnummer = "074179 42720";
    protected const String AltValidFormattedHnummer = "215013-50017";
 
+   protected const String ValidUnformattedFhnummer = "98075450605";
+   protected const String AltValidUnformattedFhnummer = "87207009367";
+   protected const String ValidFormattedFhnummer = "980754 50605";
+   protected const String AltValidFormattedFhnummer = "872070-09367";
+
    public static TheoryData<String> ValidFoedselsnummerValues =>
    [
       ValidUnformattedFoedselsnummer,
@@ -43,6 +48,14 @@ public class NoIdentityNumberTestsBase
       AltValidUnformattedHnummer,
       ValidFormattedHnummer,
       AltValidFormattedHnummer,
+   ];
+
+   public static TheoryData<String> ValidFhnummerValues =>
+   [
+      ValidUnformattedFhnummer,
+      AltValidUnformattedFhnummer,
+      ValidFormattedFhnummer,
+      AltValidFormattedFhnummer,
    ];
 
    public static TheoryData<String> ValidSeparators =>

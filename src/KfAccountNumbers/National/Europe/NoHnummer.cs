@@ -1,3 +1,4 @@
+#pragma warning disable IDE0250 // Make struct 'readonly'
 #pragma warning disable IDE0046 // Convert to conditional expression
 
 namespace KfAccountNumbers.National.Europe;
@@ -137,6 +138,35 @@ namespace KfAccountNumbers.National.Europe;
 public record NoHnummer : NoIdentityNumberBase
 {
    /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new Norwegian H-nummer.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating Norwegian H-nummers.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
    ///   Initializes a new instance of the <see cref="NoHnummer"/> class.
    /// </summary>
    /// <param name="value">
@@ -266,7 +296,7 @@ public record NoHnummer : NoIdentityNumberBase
    /// <returns>
    ///   A <see cref="CreateResult{NoHnummer, ValidationError}"/>. Will
    ///   contain the new <see cref="NoHnummer"/> if <paramref name="value"/>
-   ///   is valid or a <see cref="NoIdentityNumberBase.ValidationError"/> that
+   ///   is valid or a <see cref="ValidationError"/> that
    ///   identifies the validation rule that was failed if
    ///   <paramref name="value"/> is invalid.
    /// </returns>
@@ -324,9 +354,9 @@ public record NoHnummer : NoIdentityNumberBase
    ///   String representation of a Norwegian H-nummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="NoIdentityNumberBase.ValidationResult"/> union that
-   ///   indicates if the <paramref name="value"/> passed validation or what
-   ///   validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
    public static ValidationResult Validate(String? value)
    {

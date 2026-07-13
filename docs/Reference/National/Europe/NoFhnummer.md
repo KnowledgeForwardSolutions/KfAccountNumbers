@@ -21,6 +21,7 @@ A Norwegian Fh-nummer (Felles Hjelpenummer or Common Help Number) is similar to 
 | 3. | All non-separator characters must be ASCII digits ('0'-'9'). | InvalidCharacter |
 | 4. | The trailing two characters must be valid weighted modulus 11 check digits. | InvalidChecksum |
 | 5. | If the value has length 12, then the character at position 6 (zero-based) must not be an ASCII digit ('0'-'9') | InvalidSeparator |
+| 6. | The leading digit must be 8 or 9 | InvalidPrefix |
 
 ### Notes
 

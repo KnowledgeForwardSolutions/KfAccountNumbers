@@ -4,11 +4,11 @@
 
 using LocalCreateResult = KfAccountNumbers.Results.CreateResult<
    KfAccountNumbers.National.Europe.NoFoedselsnummer,
-   KfAccountNumbers.National.Europe.NoIdentityNumberBase.ValidationError>;
-using LocalValidationError = KfAccountNumbers.National.Europe.NoIdentityNumberBase.ValidationError;
+   KfAccountNumbers.National.Europe.NoFoedselsnummer.ValidationError>;
+using LocalValidationError = KfAccountNumbers.National.Europe.NoFoedselsnummer.ValidationError;
 using LocalValidationException = KfAccountNumbers.UKfValidationException<
-   KfAccountNumbers.National.Europe.NoIdentityNumberBase.ValidationError>;
-using LocalValidationResult = KfAccountNumbers.National.Europe.NoIdentityNumberBase.ValidationResult;
+   KfAccountNumbers.National.Europe.NoFoedselsnummer.ValidationError>;
+using LocalValidationResult = KfAccountNumbers.National.Europe.NoFoedselsnummer.ValidationResult;
 
 namespace KfAccountNumbers.Tests.Unit.National.Europe;
 

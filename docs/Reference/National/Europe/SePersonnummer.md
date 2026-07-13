@@ -47,4 +47,4 @@ When validating the date of birth of a short format value with a 6-digit date of
 
 ### References:
 
-[Wikipedia - Personal identity number (Sweden)](https://en.wikipedia.org/wiki/Personal_identity_number_%28Sweden%29) for more info.
+[Wikipedia - Personal identity number (Sweden)](https://en.wikipedia.org/wiki/Personal_identity_number_%28Sweden%29)

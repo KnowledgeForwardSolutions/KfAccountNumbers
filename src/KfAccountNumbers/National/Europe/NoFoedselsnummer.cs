@@ -178,6 +178,35 @@ namespace KfAccountNumbers.National.Europe;
 public record NoFoedselsnummer : NoIdentityNumberBase
 {
    /// <summary>
+   ///   Discriminated union defining the possible validation errors that can
+   ///   occur when creating a new Norwegian fødselsnummer.
+   /// </summary>
+   public union ValidationError(
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
+   ///   Discriminated union defining the possible results that can occur when
+   ///   validating Norwegian fødselsnummers.
+   /// </summary>
+   public union ValidationResult(
+      ValidValue,
+      EmptyValue,
+      InvalidLength,
+      InvalidCharacter,
+      InvalidChecksum,
+      InvalidSeparator,
+      InvalidDateOfBirth)
+   {
+   }
+
+   /// <summary>
    ///   Initializes a new instance of the <see cref="NoFoedselsnummer"/> class.
    /// </summary>
    /// <param name="value">
@@ -303,9 +332,9 @@ public record NoFoedselsnummer : NoIdentityNumberBase
    /// </param>
    /// <returns>
    ///   A <see cref="CreateResult{NoFoedselsnummer, ValidationError}"/>. Will
-   ///   contain the new <see cref="NoFoedselsnummer"/> if <paramref name="value"/>
-   ///   is valid or a <see cref="NoIdentityNumberBase.ValidationError"/> that
-   ///   identifies the validation rule that was failed if
+   ///   contain the new <see cref="NoFoedselsnummer"/> if
+   ///   <paramref name="value"/> is valid or a <see cref="ValidationError"/>
+   ///   that identifies the validation rule that was failed if
    ///   <paramref name="value"/> is invalid.
    /// </returns>
    public static CreateResult<NoFoedselsnummer, ValidationError> Create(String? value)
@@ -410,6 +439,12 @@ public record NoFoedselsnummer : NoIdentityNumberBase
    private static InvalidChecksum GetInvalidChecksumResult()
       => new(Messages.NoFoedselsnummerInvalidCheckDigits, CheckDigitAlgorithmName);
 
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
+      => new(
+         Messages.NoFoedselsnummerInvalidDateOfBirth,
+         value[..SeparatorOffset],
+         DateFormatName.DDMMYY);
+
    private static InvalidLength GetInvalidLengthResult(ReadOnlySpan<Char> value)
       => new(
          Messages.NoFoedselsnummerInvalidLength,
@@ -418,12 +453,6 @@ public record NoFoedselsnummer : NoIdentityNumberBase
             new ValidLengthDefinition(UnformattedLength, Messages.NoFoedselsnummerUnformattedLength),
             new ValidLengthDefinition(FormattedLength, Messages.NoFoedselsnummerFormattedLength),
          ]);
-
-   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(String value)
-      => new(
-         Messages.NoFoedselsnummerInvalidDateOfBirth,
-         value[..SeparatorOffset],
-         DateFormatName.DDMMYY);
 
    private static InvalidSeparator GetInvalidSeparatorResult(ReadOnlySpan<Char> value)
       => new(

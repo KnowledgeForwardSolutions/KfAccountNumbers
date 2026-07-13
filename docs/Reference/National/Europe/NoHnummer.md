@@ -1,6 +1,6 @@
 ## NoHnummer
 
-Temporary identity number issued by Norwegian health organizations (such as a hospital) to unidentified patients or tourists. A H-nummer is unique only within the issuing organization. A H-nummer is distinguished by a +40 offset added to the month component of the date of birth (1-12 becomes 41-52).
+Temporary identity number issued by Norwegian health organizations (such as a hospital) to unidentified patients or tourists. A H-nummer (hjelpenummer) is unique only within the issuing organization. A H-nummer is distinguished by a +40 offset added to the month component of the date of birth (1-12 becomes 41-52).
 
 | Element | Description |
 | :------ | :---------- |
@@ -37,3 +37,7 @@ The first check digit is calculated from the preceding 9 digits (the 6-digit dat
 The H-nummer's +40 month offset is taken into account when creating or validating a value and the actual date is validated, not the offset date. Similarly, the DateOfBirth property will return the actual date and not an offset date.
 
 Note that fødselsnummers use the individual number to determine the century of birth, but the rules are more complicated. Refer to the fødselsnummer documentation for more detail.
+
+### References
+
+[Wikipedia - National identity number (Norway)](https://en.wikipedia.org/wiki/National_identity_number_%28Norway%29)
