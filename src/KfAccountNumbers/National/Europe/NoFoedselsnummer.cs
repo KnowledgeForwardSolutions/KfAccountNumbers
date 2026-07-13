@@ -392,9 +392,9 @@ public record NoFoedselsnummer : NoIdentityNumberBase
    ///   (fødselsnummer).
    /// </param>
    /// <returns>
-   ///   A <see cref="NoIdentityNumberBase.ValidationResult"/> union that
-   ///   indicates if the <paramref name="value"/> passed validation or what
-   ///   validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
    public static ValidationResult Validate(String? value)
    {

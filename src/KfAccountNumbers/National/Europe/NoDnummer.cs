@@ -1,3 +1,4 @@
+#pragma warning disable IDE0250 // Make struct 'readonly'
 #pragma warning disable IDE0046 // Convert to conditional expression
 
 namespace KfAccountNumbers.National.Europe;
@@ -295,9 +296,8 @@ public record NoDnummer : NoIdentityNumberBase
    /// <returns>
    ///   A <see cref="CreateResult{NoDnummer, ValidationError}"/>. Will
    ///   contain the new <see cref="NoDnummer"/> if <paramref name="value"/>
-   ///   is valid or a <see cref="NoIdentityNumberBase.ValidationError"/> that
-   ///   identifies the validation rule that was failed if
-   ///   <paramref name="value"/> is invalid.
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
    public static CreateResult<NoDnummer, ValidationError> Create(String? value)
       => Validate(value) switch
@@ -353,9 +353,9 @@ public record NoDnummer : NoIdentityNumberBase
    ///   String representation of a Norwegian D-nummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="NoIdentityNumberBase.ValidationResult"/> union that
-   ///   indicates if the <paramref name="value"/> passed validation or what
-   ///   validation error was encountered.
+   ///   A <see cref="ValidationResult"/> union that indicates if the
+   ///   <paramref name="value"/> passed validation or what validation error was
+   ///   encountered.
    /// </returns>
    public static ValidationResult Validate(String? value)
    {

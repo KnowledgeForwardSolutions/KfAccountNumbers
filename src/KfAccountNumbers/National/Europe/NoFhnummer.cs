@@ -119,6 +119,7 @@ namespace KfAccountNumbers.National.Europe;
 ///      </list>
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(NoFhnummerJsonConverter))]
 public record NoFhnummer : NoIdentityNumberBase
 {
    /// <summary>
@@ -149,6 +150,156 @@ public record NoFhnummer : NoIdentityNumberBase
       InvalidPrefix)
    {
    }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="NoFhnummer"/> class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Fh-nummer.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="value"/> is not length 11 (or 12 if a separator
+   ///   character is used).
+   ///   - or -
+   ///   <paramref name="value"/> contains a non-digit character in
+   ///   any position other than the separator location.
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid weighted modulus
+   ///   11 check digit in one or both trailing positions.
+   ///   - or -
+   ///   <paramref name="value"/> contains a digit character in position
+   ///   6 (zero-based). Valid separator characters are any non-digit character,
+   ///   though space (' ') and dash ('-') are the most common values.
+   ///   - or -
+   ///   <paramref name="value"/> starts with a digit other than 8 or 9.
+   /// </exception>
+   public NoFhnummer(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="NoFhnummer"/> class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Fh-nummer.
+   /// </param>
+   /// <param name="validationMode">
+   ///   Indicates whether the <paramref name="value"/> requires validation.
+   /// </param>
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   internal NoFhnummer(String? value, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
+         {
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               InvalidPrefix invalidPrefix => new UKfValidationException<ValidationError>(invalidPrefix),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
+         }
+      }
+
+      Value = GetNormalizedValue(value!);
+   }
+
+   /// <summary>
+   ///   Gets a string representation of the H-nummer.
+   /// </summary>
+   public String Value { get; private init; }
+
+   /// <summary>
+   ///   Implicitly converts a <see cref="NoFhnummer"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="NoFhnummer"/> to convert.
+   /// </param>
+   public static implicit operator String(NoFhnummer source)
+      => source?.Value ?? String.Empty;     // Handle null object gracefully by returning empty string
+
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="NoFhnummer"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Norwegian Fh-nummer.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid Fh-nummer.
+   /// </exception>
+   public static explicit operator NoFhnummer(String? value) => new(value);
+
+   /// <summary>
+   ///   Create a new <see cref="NoFhnummer"/> using the Result pattern.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Norwegian Fh-nummer.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{NoFhnummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="NoFhnummer"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that
+   ///   identifies the validation rule that was failed if
+   ///   <paramref name="value"/> is invalid.
+   /// </returns>
+   public static CreateResult<NoFhnummer, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new NoFhnummer(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         InvalidPrefix invalidPrefix => (ValidationError)invalidPrefix,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
+
+   /// <summary>
+   ///   Format the Fh-nummer using the supplied <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then the default mask
+   ///   <see cref="NoIdentityNumberBase.DefaultFormatMask"/> will be used
+   ///   instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted Fh-nummer.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the Fh-nummer.
+   /// </remarks>
+   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Get a string representation of the Fh-nummer.
+   /// </summary>
+   /// <returns>
+   ///   The raw Fh-nummer, without separator characters.
+   /// </returns>
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a
@@ -224,4 +375,23 @@ public record NoFhnummer : NoIdentityNumberBase
          Messages.NoFhnummerInvalidSeparator,
          value[SeparatorOffset],
          SeparatorOffset);
+}
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
+public class NoFhnummerJsonConverter : JsonConverter<NoFhnummer>
+{
+   public override NoFhnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new NoFhnummer(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, NoFhnummer value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }

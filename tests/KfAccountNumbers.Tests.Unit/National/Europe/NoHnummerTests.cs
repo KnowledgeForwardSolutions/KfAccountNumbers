@@ -897,7 +897,7 @@ public class NoHnummerTests : NoIdentityNumberTestsBase
       var sut = new NoHnummer(ValidFormattedHnummer);
 
       // Act/assert.
-      sut.Equals(ValidFormattedDnummer).Should().BeFalse();
+      sut.Equals(ValidFormattedHnummer).Should().BeFalse();
    }
 
    [Fact]
