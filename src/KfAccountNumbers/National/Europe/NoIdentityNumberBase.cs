@@ -14,7 +14,8 @@ public abstract record NoIdentityNumberBase
    public union IdentifierCategory(
       NoIdentifierType.Foedselsnummer,
       NoIdentifierType.Dnummer,
-      NoIdentifierType.Hnummer)
+      NoIdentifierType.Hnummer,
+      NoIdentifierType.Fhnummer)
    {
    }
 

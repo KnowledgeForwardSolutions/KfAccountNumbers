@@ -352,11 +352,12 @@ public record NoIdentityNumber : NoIdentityNumberBase
    /// </summary>
    public IdentifierCategory IdentifierType
 #pragma warning disable format
-      => (Value[DayOffset].ToSingleDigit(), Value[MonthOffset].ToSingleDigit()) switch
+      => (Value.ParseTwoDigits(), Value.AsSpan(MonthOffset..).ParseTwoDigits()) switch
       {
-         (> 3, _) => default(NoIdentifierType.Dnummer),           // Day 41-71: D-nummer
-         (_, > 1) => default(NoIdentifierType.Hnummer),           // Month 41-52: H-nummer
-         _ => default(NoIdentifierType.Foedselsnummer),           // Day 01-31, month 01-12: fødselsnummer
+         (>= 41 and <= 71, >= 1 and <= 12) => default(NoIdentifierType.Dnummer),
+         (>= 1 and <= 31, >= 41 and <= 52) => default(NoIdentifierType.Hnummer),
+         (>= 80, _) => default(NoIdentifierType.Fhnummer),
+         _ => default(NoIdentifierType.Foedselsnummer),
       };
 #pragma warning restore format
 
@@ -453,6 +454,20 @@ public record NoIdentityNumber : NoIdentityNumberBase
          : default(None);
 
    /// <summary>
+   ///   Convert this instance to a <see cref="NoFhnummer"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{NoFhnummer}"/> instance that will contain
+   ///   the <see cref="NoFhnummer"/> if this value is a Fh-nummer;
+   ///   otherwise <see cref="None"/> to indicate that this is not a
+   ///   H-nummer.
+   /// </returns>
+   public KfOption<NoFhnummer> ToFhnummer()
+      => IdentifierType is NoIdentifierType.Fhnummer
+         ? new NoFhnummer(Value, ValidationMode.BypassValidation)
+         : default(None);
+
+   /// <summary>
    ///   Convert this instance to a <see cref="NoFoedselsnummer"/>.
    /// </summary>
    /// <returns>
@@ -525,6 +540,12 @@ public record NoIdentityNumber : NoIdentityNumberBase
       if (!ValidateSeparator(value))
       {
          return GetInvalidSeparatorResult(value);
+      }
+
+      if (value[0] is Chars.DigitEight or Chars.DigitNine)
+      {
+         // Value is a valid Fh-nummer, so no further testing necessary.
+         return default(ValidValue);
       }
 
       if (!ValidateDateOfBirth(value, DateOffsetMode.Optional))
