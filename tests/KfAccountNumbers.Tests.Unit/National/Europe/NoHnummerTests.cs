@@ -191,16 +191,12 @@ public class NoHnummerTests : NoIdentityNumberTestsBase
    }
 
    [Theory]
-   [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
-   [MemberData(nameof(DnummerValidDateOfBirthValues))]
-   public void NoHnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonHnummerDateOfBirth(
-      String dateOfBirth,
-      String separator,
-      String individualNumber,
-      String _)
+   [MemberData(nameof(ValidFoedselsnummerValues))]
+   [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
+   public void NoHnummer_Constructor_ShouldThrowKfValidationException_WhenValueIsNotHnummer(String value)
    {
       // Arrange.
-      var value = GetValueWithValidCheckDigits(dateOfBirth, separator, individualNumber);
       LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
@@ -518,16 +514,12 @@ public class NoHnummerTests : NoIdentityNumberTestsBase
    }
 
    [Theory]
-   [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
-   [MemberData(nameof(DnummerValidDateOfBirthValues))]
-   public void NoHnummer_ExplicitCastToNoHnummer_ShouldThrowKfValidationException_WhenValueHasNonHnummerDateOfBirth(
-      String dateOfBirth,
-      String separator,
-      String individualNumber,
-      String _)
+   [MemberData(nameof(ValidFoedselsnummerValues))]
+   [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
+   public void NoHnummer_ExplicitCastToNoDnummer_ShouldThrowKfValidationException_WhenValueIsNotHnummer(String value)
    {
       // Arrange.
-      var value = GetValueWithValidCheckDigits(dateOfBirth, separator, individualNumber);
       LocalValidationError expected = GetInvalidDateOfBirthResult(value);
 
       // Act/assert.
@@ -810,16 +802,12 @@ public class NoHnummerTests : NoIdentityNumberTestsBase
    }
 
    [Theory]
-   [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
-   [MemberData(nameof(DnummerValidDateOfBirthValues))]
-   public void NoHnummer_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasNonHnummerDateOfBirth(
-      String dateOfBirth,
-      String separator,
-      String individualNumber,
-      String _)
+   [MemberData(nameof(ValidFoedselsnummerValues))]
+   [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
+   public void NoHnummer_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueIsNotHnummer(String value)
    {
       // Arrange.
-      var value = GetValueWithValidCheckDigits(dateOfBirth, separator, individualNumber);
       LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
 
       // Act.
@@ -1247,16 +1235,12 @@ public class NoHnummerTests : NoIdentityNumberTestsBase
    }
 
    [Theory]
-   [MemberData(nameof(FoedselsnummerValidDateOfBirthValues))]
-   [MemberData(nameof(DnummerValidDateOfBirthValues))]
-   public void NoHnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasNonHnummerDateOfBirth(
-      String dateOfBirth,
-      String separator,
-      String individualNumber,
-      String _)
+   [MemberData(nameof(ValidFoedselsnummerValues))]
+   [MemberData(nameof(ValidDnummerValues))]
+   [MemberData(nameof(ValidFhnummerValues))]
+   public void NoHnummer_Validate_ShouldReturnInvalidCheckDigits_WhenValueIsNotHnummer(String value)
    {
       // Arrange.
-      var value = GetValueWithValidCheckDigits(dateOfBirth, separator, individualNumber);
       LocalValidationResult expected = GetInvalidDateOfBirthResult(value);
 
       // Act.
