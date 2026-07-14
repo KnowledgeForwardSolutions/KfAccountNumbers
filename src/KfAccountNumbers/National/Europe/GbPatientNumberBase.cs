@@ -184,8 +184,9 @@ public abstract record GbPatientNumberBase
    /// </remarks>
    protected static IdentifierRangeCategory GetIdentifierCategory(ReadOnlySpan<Char> value)
    {
-      var fourthDigitOffset = value.Length == NhsFormattedLength ? 4 : 3;
-      var num = (value.ParseThreeDigits() * 10) + value[fourthDigitOffset].ToSingleDigit();
+      var num = value.Length == NhsFormattedLength
+         ? (value.ParseThreeDigits() * 10) + value[4].ToSingleDigit()
+         : value.ParseFourDigits();
 
       return num switch
       {
