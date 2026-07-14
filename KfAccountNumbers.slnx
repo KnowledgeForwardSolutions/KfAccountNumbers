@@ -4,6 +4,7 @@
   <Folder Name="/docs/Reference/National/" />
   <Folder Name="/docs/Reference/National/Europe/">
     <File Path="docs/Reference/National/Europe/EsNif.md" />
+    <File Path="docs/Reference/National/Europe/ItCodiceFiscale.md" />
     <File Path="docs/Reference/National/Europe/NoDnummer.md" />
     <File Path="docs/Reference/National/Europe/NoFhnummer.md" />
     <File Path="docs/Reference/National/Europe/NoFoedselsnummer.md" />
