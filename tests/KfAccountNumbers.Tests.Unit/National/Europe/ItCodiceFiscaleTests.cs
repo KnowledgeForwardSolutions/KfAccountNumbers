@@ -91,6 +91,7 @@ public class ItCodiceFiscaleTests
 
    public static TheoryData<String> InvalidYearValues =>
    [
+      // Invalid omocodia substitution
       "A1",
       "B2",
       "C3",
@@ -129,6 +130,7 @@ public class ItCodiceFiscaleTests
 
    public static TheoryData<Char> InvalidMonthValues =>
    [
+      // Letter out of range for month indicator
       'F',
       'G',
       'I',
@@ -157,6 +159,8 @@ public class ItCodiceFiscaleTests
       'x',
       'y',
       'z',
+
+      // Month indicator is not digit
       '0',
       '1',
       '2',
@@ -167,6 +171,121 @@ public class ItCodiceFiscaleTests
       '7',
       '8',
       '9',
+   ];
+
+   public static TheoryData<String, Char, String> InvalidDayValues = new()
+   {
+      // Need to include year and month info to test for day > than is valid for month.
+      { "00", 'A', "00" },       // Invalid day = 0
+      { "00", 'A', "LL" },       // Invalid day = 0
+      { "00", 'A', "ll" },       // Invalid day = 0
+      { "00", 'A', "0L" },       // Invalid day = 0
+      { "00", 'A', "l0" },       // Invalid day = 0
+      { "87", 'C', "60" },       // Invalid day = 60
+      { "87", 'C', "99" },       // Invalid day = 99
+      { "87", 'C', "SL" },       // Invalid day = 60
+      { "87", 'C', "VV" },       // Invalid day = 99
+      { "87", 'C', "S0" },       // Invalid day = 60
+      { "87", 'C', "9V" },       // Invalid day = 99
+
+      // Digit day
+      { "04", 'A', "32" },       // Invalid day of month for January, any year, out of bounds for gender = male
+      { "01", 'B', "29" },       // Invalid day of for February, non-leap year
+      { "04", 'B', "30" },       // Invalid day of for February, leap year
+      { "00", 'B', "30" },       // Invalid day of for February, leap year (2000 is leap-year)
+      { "04", 'C', "32" },       // Invalid day of for March, any year
+      { "04", 'D', "31" },       // Invalid day of for April, any year
+      { "04", 'E', "32" },       // Invalid day of for May, any year
+      { "04", 'H', "91" },       // Invalid day of for June, any year, out of bounds for gender = female
+      { "04", 'L', "92" },       // Invalid day of for July, any year
+      { "04", 'M', "92" },       // Invalid day of for August, any year
+      { "04", 'P', "91" },       // Invalid day of for September, any year
+      { "04", 'R', "92" },       // Invalid day of for October, any year
+      { "04", 'S', "91" },       // Invalid day of for November, any year
+      { "04", 'T', "92" },       // Invalid day of for December, any year
+
+      // Omocodia day
+      { "04", 'A', "PN" },       // Invalid day of month for January, any year, out of bounds for gender = male
+      { "01", 'B', "NV" },       // Invalid day of for February, non-leap year
+      { "04", 'B', "Pl" },       // Invalid day of for February, leap year
+      { "00", 'B', "Pl" },       // Invalid day of for February, leap year (2000 is leap-year)
+      { "04", 'C', "pN" },       // Invalid day of for March, any year
+      { "04", 'D', "pM" },       // Invalid day of for April, any year
+      { "04", 'E', "pN" },       // Invalid day of for May, any year
+      { "04", 'H', "VM" },       // Invalid day of for June, any year, out of bounds for gender = female
+      { "04", 'L', "Vn" },       // Invalid day of for July, any year
+      { "04", 'M', "Vn" },       // Invalid day of for August, any year
+      { "04", 'P', "VM" },       // Invalid day of for September, any year
+      { "04", 'R', "vN" },       // Invalid day of for October, any year
+      { "04", 'S', "vM" },       // Invalid day of for November, any year
+      { "04", 'T', "vN" },       // Invalid day of for December, any year
+
+      // Mixed digit and omocodia day
+      { "04", 'A', "3N" },       // Invalid day of month for January, any year, out of bounds for gender = male
+      { "01", 'B', "2V" },       // Invalid day of for February, non-leap year
+      { "04", 'B', "3L" },       // Invalid day of for February, leap year
+      { "00", 'B', "3L" },       // Invalid day of for February, leap year (2000 is leap-year)
+      { "04", 'C', "3n" },       // Invalid day of for March, any year
+      { "04", 'D', "3m" },       // Invalid day of for April, any year
+      { "04", 'E', "3n" },       // Invalid day of for May, any year
+      { "04", 'H', "P1" },       // Invalid day of for June, any year, out of bounds for gender = female
+      { "04", 'L', "P2" },       // Invalid day of for July, any year
+      { "04", 'M', "P2" },       // Invalid day of for August, any year
+      { "04", 'P', "P1" },       // Invalid day of for September, any year
+      { "04", 'R', "v2" },       // Invalid day of for October, any year
+      { "04", 'S', "v1" },       // Invalid day of for November, any year
+      { "04", 'T', "v2" },       // Invalid day of for December, any year
+   };
+
+   public static TheoryData<String> InvalidTownOfBirthValues =>
+   [
+      // Leading digit instead of alpha
+      "0001",
+      "1001",
+      "2001",
+      "3001",
+      "4001",
+      "5001",
+      "6001",
+      "7001",
+      "8001",
+      "9001",
+
+      // Invalid omocodia substitution
+      "AA11",
+      "AB21",
+      "AC31",
+      "A1D4",
+      "A1E5",
+      "A1F6",
+      "A17G",
+      "A18H",
+      "AI11",
+      "AJ11",
+      "AK11",
+      "A1O1",
+      "A1W1",
+      "A1X1",
+      "A11Y",
+      "A11Z",
+      "AAAA",
+      "Aa11",
+      "Ab21",
+      "Ac31",
+      "A1d1",
+      "A1e1",
+      "A1f1",
+      "A11g",
+      "A11h",
+      "Ai11",
+      "Aj11",
+      "Ak11",
+      "A1o1",
+      "A1w1",
+      "A1x1",
+      "A11y",
+      "A11z",
+      "AaaA",
    ];
 
    private static readonly Int32[] _evenCharacterMap = Enumerable.Range('0', 'Z' - '0' + 1)
@@ -241,8 +360,14 @@ public class ItCodiceFiscaleTests
          Messages.ItCodiceFiscaleInvalidCheckCharacter,
          ItCodiceFiscale.CheckDigitAlgorithmName);
 
+   private static InvalidDay GetInvalidDayResult(String value)
+      => new(Messages.ItCodiceFiscaleInvalidDay, value[9..11]);
+
    private static InvalidGivenName GetInvalidGivenNameResult(String value)
       => new(Messages.ItCodiceFiscaleInvalidGivenName, value[3..6]);
+
+   private static InvalidLocationCode GetInvalidLocationCodeResult(String value)
+      => new(Messages.ItCodiceFiscaleInvalidTownOfBirth, value[11..15]);
 
    private static InvalidMonth GetInvalidMonthResult(String value)
       => new(Messages.ItCodiceFiscaleInvalidMonth, value[8..9]);
@@ -398,6 +523,39 @@ public class ItCodiceFiscaleTests
       // Arrange.
       var value = GetValue(month: month);
       LocalValidationResult expected = GetInvalidMonthResult(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDayValues))]
+   public void ItCodiceFiscale_Validate_ShouldReturnInvalidDay_WhenDayIsInvalid(
+      String year,
+      Char month,
+      String day)
+   {
+      // Arrange.
+      var value = GetValue(year: year, month: month, day: day);
+      LocalValidationResult expected = GetInvalidDayResult(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidTownOfBirthValues))]
+   public void ItCodiceFiscale_Validate_ShouldReturnInvalidLocationCode_WhenMonthHasInvalidTownOfBirth(String townOfBirth)
+   {
+      // Arrange.
+      var value = GetValue(townOfBirth: townOfBirth);
+      LocalValidationResult expected = GetInvalidLocationCodeResult(value);
 
       // Act.
       var result = ItCodiceFiscale.Validate(value);

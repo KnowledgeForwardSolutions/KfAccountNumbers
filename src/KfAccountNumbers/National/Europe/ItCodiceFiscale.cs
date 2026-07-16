@@ -286,6 +286,11 @@ public record ItCodiceFiscale
    private static readonly SegmentRange _givenNameRange = new(3, 6);
    private static readonly SegmentRange _yearRange = new(6, 8);
    private const Int32 MonthOffset = 8;
+   private static readonly SegmentRange _dayRange = new(9, 11);
+   private static readonly SegmentRange _townOfBirthRange = new(11, 15);
+
+   // Female gender is inticated by the day of birth incremented by +60.
+   private const Int32 FemaleGenderDayOffset = 60;
 
    /// <summary>
    ///   Gets a string representation of the codice fiscale.
@@ -336,36 +341,17 @@ public record ItCodiceFiscale
          return GetInvalidGivenNameResult(value);
       }
 
-      if (!ValidateYear(value))
+      validationResult = ValidateDateOfBirth(value);
+      if (validationResult is not ValidValue)
       {
-         return GetInvalidYearResult(value);
+         // Could be either InvalidYear, InvalidMonth or InvalidDay.
+         return validationResult;
       }
 
-      if (!ValidateMonth(value))
+      if (!ValidateTownOfBirth(value))
       {
-         return GetInvalidMonthResult(value);
+         return GetInvalidLocationCodeResult(value);
       }
-
-      //if (!ValidateGender(value))
-      //{
-      //   return new InvalidGender(
-      //      Messages.FrInseeNumberInvalidGender,
-      //      value[GenderOffset].ToString());
-      //}
-
-      //if (!ValidateMonth(value))
-      //{
-      //   return new InvalidMonth(
-      //      Messages.FrInseeNumberInvalidMonth,
-      //      GetMonth(value).ToString());
-      //}
-
-      //if (!ValidateDepartment(value))
-      //{
-      //   return new InvalidFrInseeDepartment(
-      //      Messages.FrInseeNumberInvalidDepartment,
-      //      GetDepartmentCode(value));
-      //}
 
       return default(ValidValue);
    }
@@ -388,6 +374,16 @@ public record ItCodiceFiscale
             _ => -1,
          };
 
+   /// <summary>
+   ///   Map a character located at an odd index (one-based) to its integer
+   ///   equivalent for the purposes of calculating the check digit.
+   /// </summary>
+   /// <param name="ch">
+   ///   The character to map.
+   /// </param>
+   /// <returns>
+   ///   The character's integer equivalent for calculating the check digit.
+   /// </returns>
    internal static Int32 MapOddCharacter(Char ch)
       => ch switch
       {
@@ -439,6 +435,9 @@ public record ItCodiceFiscale
    private static InvalidChecksum GetInvalidChecksumResult()
       => new(Messages.ItCodiceFiscaleInvalidCheckCharacter, CheckDigitAlgorithmName);
 
+   private static InvalidDay GetInvalidDayResult(ReadOnlySpan<Char> value)
+      => new(Messages.ItCodiceFiscaleInvalidDay, _dayRange.Extract(value).ToString());
+
    private static InvalidGivenName GetInvalidGivenNameResult(ReadOnlySpan<Char> value)
       => new(Messages.ItCodiceFiscaleInvalidGivenName, _givenNameRange.Extract(value).ToString());
 
@@ -450,6 +449,9 @@ public record ItCodiceFiscale
             new ValidLengthDefinition(IndividualLength, Messages.ItCodiceFiscaleLength),
          ]);
 
+   private static InvalidLocationCode GetInvalidLocationCodeResult(ReadOnlySpan<Char> value)
+      => new(Messages.ItCodiceFiscaleInvalidTownOfBirth, _townOfBirthRange.Extract(value).ToString());
+
    private static InvalidMonth GetInvalidMonthResult(ReadOnlySpan<Char> value)
       => new(Messages.ItCodiceFiscaleInvalidMonth, value[MonthOffset].ToString());
 
@@ -459,16 +461,62 @@ public record ItCodiceFiscale
    private static InvalidYear GetInvalidYearResult(ReadOnlySpan<Char> value)
       => new(Messages.ItCodiceFiscaleInvalidYear, _yearRange.Extract(value).ToString());
 
-   private static Boolean IsValidDigitOrOmocodiaSubstitution(Char ch)
+   private static Int32 GetMonth(Char ch)
       => ch switch
       {
-         >= Chars.DigitZero and <= Chars.DigitNine => true,
-         >= Chars.UpperCaseL and <= Chars.UpperCaseN => true,
-         >= Chars.UpperCaseP and <= Chars.UpperCaseV => true,
-         >= Chars.LowerCaseL and <= Chars.LowerCaseN => true,
-         >= Chars.LowerCaseP and <= Chars.LowerCaseV => true,
-         _ => false,
+         >= Chars.UpperCaseA and <= Chars.UpperCaseE => ch - Chars.UpperCaseA + 1,
+         Chars.UpperCaseH => 6,
+         >= Chars.UpperCaseL and <= Chars.UpperCaseM => ch - Chars.UpperCaseL + 7,
+         Chars.UpperCaseP => 9,
+         >= Chars.UpperCaseR and <= Chars.UpperCaseT => ch - Chars.UpperCaseR + 10,
+         >= Chars.LowerCaseA and <= Chars.LowerCaseE => ch - Chars.LowerCaseA + 1,
+         Chars.LowerCaseH => 6,
+         >= Chars.LowerCaseL and <= Chars.LowerCaseM => ch - Chars.LowerCaseL + 7,
+         Chars.LowerCaseP => 9,
+         >= Chars.LowerCaseR and <= Chars.LowerCaseT => ch - Chars.LowerCaseR + 10,
+         _ => -1,
       };
+
+   /// <summary>
+   ///   Translate a character to its integer equivalent, taking into account
+   ///   possible substitution for omocodia.
+   /// </summary>
+   /// <param name="ch">
+   ///   The character to evaluate.
+   /// </param>
+   /// <returns>
+   ///   An integer value between 0 and 9 or -1 if the character is not a valid
+   ///   omocodia substitution.
+   /// </returns>
+   private static Int32 GetOmocodiaDigit(Char ch)
+      => ch switch
+      {
+         >= Chars.DigitZero and <= Chars.DigitNine => ch.ToSingleDigit(),
+         >= Chars.UpperCaseL and <= Chars.UpperCaseN => ch - Chars.UpperCaseL,
+         >= Chars.UpperCaseP and <= Chars.UpperCaseV => ch - Chars.UpperCaseP + 3,
+         >= Chars.LowerCaseL and <= Chars.LowerCaseN => ch - Chars.LowerCaseL,
+         >= Chars.LowerCaseP and <= Chars.LowerCaseV => ch - Chars.LowerCaseP + 3,
+         _ => -1,
+      };
+
+   private static Int32 GetTwoDigitInteger(ReadOnlySpan<Char> span)
+   {
+      var d1 = GetOmocodiaDigit(span[0]);
+      var d2 = GetOmocodiaDigit(span[1]);
+
+      return d1 > -1 && d2 > -1
+         ? (d1 * 10) + d2
+         : -1;
+   }
+
+   private static (Int32 Year, Int32 Month, Int32 Day) GetYearMonthDay(ReadOnlySpan<Char> value)
+   {
+      var year = GetTwoDigitInteger(_yearRange.Extract(value));
+      var month = GetMonth(value[MonthOffset]);
+      var day = GetTwoDigitInteger(_dayRange.Extract(value));
+
+      return (year, month, day);
+   }
 
    private static ValidationResult ValidateCheckCharacter(ReadOnlySpan<Char> value)
    {
@@ -506,33 +554,51 @@ public record ItCodiceFiscale
          : GetInvalidChecksumResult();
    }
 
-   private static Boolean ValidateMonth(ReadOnlySpan<Char> value)
-      => value[MonthOffset] switch
-      {
-         >= Chars.UpperCaseA and <= Chars.UpperCaseE => true,
-         Chars.UpperCaseH => true,
-         >= Chars.UpperCaseL and <= Chars.UpperCaseM => true,
-         Chars.UpperCaseP => true,
-         >= Chars.UpperCaseR and <= Chars.UpperCaseT => true,
-         >= Chars.LowerCaseA and <= Chars.LowerCaseE => true,
-         Chars.LowerCaseH => true,
-         >= Chars.LowerCaseL and <= Chars.LowerCaseM => true,
-         Chars.LowerCaseP => true,
-         >= Chars.LowerCaseR and <= Chars.LowerCaseT => true,
-         _ => false,
-      };
-
-   private static Boolean ValidateYear(ReadOnlySpan<Char> value)
+   private static ValidationResult ValidateDateOfBirth(ReadOnlySpan<Char> value)
    {
-      ReadOnlySpan<Char> yearSpan = _yearRange.Extract(value);
-      foreach (var ch in yearSpan)
+#pragma warning disable IDE0008 // Use explicit type
+      var (year, month, day) = GetYearMonthDay(value);
+      #pragma warning restore IDE0008 // Use explicit type
+
+      if (year == -1)
       {
-         if (!IsValidDigitOrOmocodiaSubstitution(ch))
-         {
-            return false;
-         }
+         return GetInvalidYearResult(value);
       }
 
-      return true;
+      if (month == -1)
+      {
+         return GetInvalidMonthResult(value);
+      }
+
+      if (day is not (>= 1 and <= 31 or >= 61 and <= 91))
+      {
+         return GetInvalidDayResult(value);
+      }
+
+      // Also check that day is valid for the month.
+      year += 2000;
+      var daysInMonth = DateTime.DaysInMonth(year, month);
+      if (day > 31)
+      {
+         day -= FemaleGenderDayOffset;
+      }
+
+      if (day > daysInMonth)
+      {
+         return GetInvalidDayResult(value);
+      }
+
+      return default(ValidValue);
+   }
+
+   // Only validate format of the town of birth component
+   private static Boolean ValidateTownOfBirth(ReadOnlySpan<Char> value)
+   {
+      ReadOnlySpan<Char> span = _townOfBirthRange.Extract(value);
+
+      return span[0].IsAsciiLetter()
+             && GetOmocodiaDigit(span[1]) != -1
+             && GetOmocodiaDigit(span[2]) != -1
+             && GetOmocodiaDigit(span[3]) != -1;
    }
 }
