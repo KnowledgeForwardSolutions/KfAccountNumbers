@@ -123,6 +123,18 @@ public static class ExtensionMethods
    public static Boolean IsAsciiDigit(this Char ch) => Char.IsAsciiDigit(ch);
 
    /// <summary>
+   ///   Indicates whether a character is categorized as an ASCII letter.
+   /// </summary>
+   /// <param name="ch">
+   ///   The character to evaluate.
+   /// </param>
+   /// <returns>
+   ///   <see langword="true"/> if <paramref name="ch"/> is an ASCII letter;
+   ///   otherwise <see langword="false"/>.
+   /// </returns>
+   public static Boolean IsAsciiLetter(this Char ch) => Char.IsAsciiLetter(ch);
+
+   /// <summary>
    ///   Determines whether the result of converting a single character to an
    ///   integer value is a valid decimal digit in the range 0-9.
    /// </summary>

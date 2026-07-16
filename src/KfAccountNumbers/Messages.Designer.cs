@@ -952,6 +952,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to IT Codice Fiscale contains a non-letter (&apos;A&apos;-&apos;Z&apos;, &apos;a&apos;-&apos;z&apos;) or non-digit character (&apos;0&apos;-&apos;9&apos;).
+        /// </summary>
+        internal static string ItCodiceFiscaleInvalidCharacter {
+            get {
+                return ResourceManager.GetString("ItCodiceFiscaleInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to IT Codice Fiscale check character (character position 14, zero-based) must be a valid modulus 26 check character.
         /// </summary>
         internal static string ItCodiceFiscaleInvalidCheckCharacter {
@@ -975,6 +984,15 @@ namespace KfAccountNumbers {
         internal static string ItCodiceFiscaleInvalidGivenName {
             get {
                 return ResourceManager.GetString("ItCodiceFiscaleInvalidGivenName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IT Codice Fiscale must have length 16.
+        /// </summary>
+        internal static string ItCodiceFiscaleInvalidLength {
+            get {
+                return ResourceManager.GetString("ItCodiceFiscaleInvalidLength", resourceCulture);
             }
         }
         
@@ -1011,15 +1029,6 @@ namespace KfAccountNumbers {
         internal static string ItCodiceFiscaleInvalidYear {
             get {
                 return ResourceManager.GetString("ItCodiceFiscaleInvalidYear", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to IT Codice Fiscale must have length 16.
-        /// </summary>
-        internal static string ItCodiceFiscaleInvalieLength {
-            get {
-                return ResourceManager.GetString("ItCodiceFiscaleInvalieLength", resourceCulture);
             }
         }
         
