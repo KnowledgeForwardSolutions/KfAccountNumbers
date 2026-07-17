@@ -970,7 +970,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IT Codice Fiscale day of birth (character position 9-10, zero-based) must be a valid day between 01-31. The day of birth may be offset by +40 to indicate the female gender and the day of birth may include omocodia letter substitutions.
+        ///   Looks up a localized string similar to IT Codice Fiscale day of birth (character position 9-10, zero-based) must be a valid day between 01-31. The day of birth may be offset by +60 to indicate the female gender and the day of birth may include omocodia letter substitutions.
         /// </summary>
         internal static string ItCodiceFiscaleInvalidDay {
             get {

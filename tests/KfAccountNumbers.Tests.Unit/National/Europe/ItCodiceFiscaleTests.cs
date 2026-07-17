@@ -35,6 +35,164 @@ public class ItCodiceFiscaleTests
       ValidMixedCaseOmocodiaCodiceFiscale,
    ];
 
+   public static TheoryData<String> ValidYearValues =>
+   [
+      "00",
+      "99",
+
+      // Valid omocodia substitutions
+      "L0",
+      "M1",
+      "N2",
+      "P3",
+      "Q4",
+      "R5",
+      "S6",
+      "T7",
+      "U8",
+      "V9",
+      "0l",
+      "1m",
+      "2n",
+      "3p",
+      "4q",
+      "5r",
+      "6s",
+      "7t",
+      "8u",
+      "9v",
+   ];
+
+   public static TheoryData<Char> ValidMonthValues =>
+   [
+      'A',
+      'B',
+      'C',
+      'D',
+      'E',
+      'H',
+      'L',
+      'M',
+      'P',
+      'R',
+      'S',
+      'T',
+      'a',
+      'b',
+      'c',
+      'd',
+      'e',
+      'h',
+      'l',
+      'm',
+      'p',
+      'r',
+      's',
+      't',
+   ];
+
+   public static TheoryData<String, Char, String> ValidDayValues = new()
+   {
+      // Valid omocodia substitutions
+      { "00", 'A', "L1" },
+      { "00", 'A', "M1" },
+      { "00", 'A', "N1" },
+      { "00", 'A', "P1" },
+      { "00", 'A', "1Q" },
+      { "00", 'A', "1R" },
+      { "00", 'A', "1S" },
+      { "00", 'A', "1T" },
+      { "00", 'A', "1U" },
+      { "00", 'A', "1V" },
+      { "00", 'A', "l1" },
+      { "00", 'A', "m1" },
+      { "00", 'A', "n1" },
+      { "00", 'A', "1p" },
+      { "00", 'A', "1q" },
+      { "00", 'A', "1r" },
+      { "00", 'A', "1s" },
+      { "00", 'A', "1t" },
+      { "00", 'A', "1u" },
+      { "00", 'A', "1v" },
+
+      // Digit day
+      { "04", 'A', "31" },       // Valid day of month for January, any year, within of bounds for gender = male
+      { "01", 'B', "28" },       // Valid day of for February, non-leap year
+      { "04", 'B', "29" },       // Valid day of for February, leap year
+      { "00", 'B', "29" },       // Valid day of for February, leap year (2000 is leap-year)
+      { "04", 'C', "31" },       // Valid day of for March, any year
+      { "04", 'D', "30" },       // Valid day of for April, any year
+      { "04", 'E', "31" },       // Valid day of for May, any year
+      { "04", 'H', "90" },       // Valid day of for June, any year, within of bounds for gender = female
+      { "04", 'L', "91" },       // Valid day of for July, any year
+      { "04", 'M', "91" },       // Valid day of for August, any year
+      { "04", 'P', "90" },       // Valid day of for September, any year
+      { "04", 'R', "91" },       // Valid day of for October, any year
+      { "04", 'S', "90" },       // Valid day of for November, any year
+      { "04", 'T', "91" },       // Valid day of for December, any year
+
+      // Omocodia day
+      { "04", 'A', "PM" },       // Valid day of month for January, any year, within of bounds for gender = male
+      { "01", 'B', "NU" },       // Valid day of for February, non-leap year
+      { "04", 'B', "NR" },       // Valid day of for February, leap year
+      { "00", 'B', "NR" },       // Valid day of for February, leap year (2000 is leap-year)
+      { "04", 'C', "pM" },       // Valid day of for March, any year
+      { "04", 'D', "pL" },       // Valid day of for April, any year
+      { "04", 'E', "pM" },       // Valid day of for May, any year
+      { "04", 'H', "VL" },       // Valid day of for June, any year, within of bounds for gender = female
+      { "04", 'L', "Vm" },       // Valid day of for July, any year
+      { "04", 'M', "Vm" },       // Valid day of for August, any year
+      { "04", 'P', "Vl" },       // Valid day of for September, any year
+      { "04", 'R', "vM" },       // Valid day of for October, any year
+      { "04", 'S', "vL" },       // Valid day of for November, any year
+      { "04", 'T', "vM" },       // Valid day of for December, any year
+
+      // Mixed digit and omocodia day
+      { "04", 'A', "3M" },       // Valid day of month for January, any year, within of bounds for gender = male
+      { "01", 'B', "2U" },       // Valid day of for February, non-leap year
+      { "04", 'B', "2R" },       // Valid day of for February, leap year
+      { "00", 'B', "2R" },       // Valid day of for February, leap year (2000 is leap-year)
+      { "04", 'C', "3m" },       // Valid day of for March, any year
+      { "04", 'D', "3l" },       // Valid day of for April, any year
+      { "04", 'E', "3m" },       // Valid day of for May, any year
+      { "04", 'H', "P0" },       // Valid day of for June, any year, within of bounds for gender = female
+      { "04", 'L', "P1" },       // Valid day of for July, any year
+      { "04", 'M', "P1" },       // Valid day of for August, any year
+      { "04", 'P', "P0" },       // Valid day of for September, any year
+      { "04", 'R', "v1" },       // Valid day of for October, any year
+      { "04", 'S', "v0" },       // Valid day of for November, any year
+      { "04", 'T', "v1" },       // Valid day of for December, any year
+   };
+
+   public static TheoryData<String> ValidTownOfBirthValues =>
+   [
+      "A001",
+      "Z404",
+
+      // Valid omocodia substitutions
+      "AL01",
+      "AM11",
+      "AN21",
+      "AP31",
+      "AQ41",
+      "AR51",
+      "AS61",
+      "A1T7",
+      "A1U8",
+      "A1V9",
+      "A10l",
+      "A11m",
+      "A12n",
+      "A13p",
+      "A14q",
+      "A51r",
+      "A61s",
+      "A71t",
+      "A81u",
+      "A91v",
+
+   ];
+
    public static TheoryData<String> InvalidLengthValues =>
    [
       "MRTMTT91D08F205",               // Length 15
@@ -187,6 +345,42 @@ public class ItCodiceFiscaleTests
       { "87", 'C', "VV" },       // Invalid day = 99
       { "87", 'C', "S0" },       // Invalid day = 60
       { "87", 'C', "9V" },       // Invalid day = 99
+
+      // Invalid omocodia substitution
+      { "00", 'A', "A1" },
+      { "00", 'A', "B2" },
+      { "00", 'A', "C3" },
+      { "00", 'A', "D4" },
+      { "00", 'A', "E5" },
+      { "00", 'A', "F6" },
+      { "00", 'A', "G7" },
+      { "00", 'A', "H8" },
+      { "00", 'A', "1I" },
+      { "00", 'A', "1J" },
+      { "00", 'A', "1K" },
+      { "00", 'A', "1O" },
+      { "00", 'A', "1W" },
+      { "00", 'A', "1X" },
+      { "00", 'A', "1Y" },
+      { "00", 'A', "1Z" },
+      { "00", 'A', "AA" },
+      { "00", 'A', "a1" },
+      { "00", 'A', "b2" },
+      { "00", 'A', "c3" },
+      { "00", 'A', "d4" },
+      { "00", 'A', "e5" },
+      { "00", 'A', "f6" },
+      { "00", 'A', "g7" },
+      { "00", 'A', "h8" },
+      { "00", 'A', "1i" },
+      { "00", 'A', "1j" },
+      { "00", 'A', "1k" },
+      { "00", 'A', "1o" },
+      { "00", 'A', "1w" },
+      { "00", 'A', "1x" },
+      { "00", 'A', "1y" },
+      { "00", 'A', "1z" },
+      { "00", 'A', "aa" },
 
       // Digit day
       { "04", 'A', "32" },       // Invalid day of month for January, any year, out of bounds for gender = male
@@ -378,10 +572,6 @@ public class ItCodiceFiscaleTests
    private static InvalidYear GetInvalidYearResult(String value)
       => new(Messages.ItCodiceFiscaleInvalidYear, value[6..8]);
 
-   #region Validate Method Tests
-   // ==========================================================================
-   // ==========================================================================
-
    //[Fact]
    //public void CheckDigitTest()
    //{
@@ -396,11 +586,78 @@ public class ItCodiceFiscaleTests
    //   result.Should().Be(expected);
    //}
 
+   #region Validate Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
    [Theory]
    [MemberData(nameof(ValidCodiceFiscaleValues))]
-   public void ItCodiceFiscale_Validate_ShouldReturnValidationPassed_WhenValueIsValid(String value)
+   public void ItCodiceFiscale_Validate_ShouldReturnValidValue_WhenValueIsValid(String value)
    {
       // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = ItCodiceFiscale.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidYearValues))]
+   public void ItCodiceFiscale_Validate_ShouldReturnValidValue_WhenYearIsValid(String year)
+   {
+      // Arrange.
+      var value = GetValue(year: year);
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = ItCodiceFiscale.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidMonthValues))]
+   public void ItCodiceFiscale_Validate_ShouldReturnValidValue_WhenMonthIsValid(Char month)
+   {
+      // Arrange.
+      var value = GetValue(month: month);
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = ItCodiceFiscale.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDayValues))]
+   public void ItCodiceFiscale_Validate_ShouldReturnValidValue_WhenDayIsValid(
+      String year,
+      Char month,
+      String day)
+   {
+      // Arrange.
+      var value = GetValue(year: year, month: month, day: day);
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = ItCodiceFiscale.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidTownOfBirthValues))]
+   public void ItCodiceFiscale_Validate_ShouldReturnValidValue_WhenTownOfBirthIsValid(String townOfBirth)
+   {
+      // Arrange.
+      var value = GetValue(townOfBirth: townOfBirth);
       LocalValidationResult expected = default(ValidValue);
 
       // Act.

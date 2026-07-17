@@ -727,7 +727,7 @@
     <value>IT Codice Fiscale month of birth (character position 8, zero-based) must be a valid upper-case or lower-case month letter; valid month characters are "ABCDEHLMPRST", where 'A' = January and 'T' = December</value>
   </data>
   <data name="ItCodiceFiscaleInvalidDay" xml:space="preserve">
-    <value>IT Codice Fiscale day of birth (character position 9-10, zero-based) must be a valid day between 01-31. The day of birth may be offset by +40 to indicate the female gender and the day of birth may include omocodia letter substitutions</value>
+    <value>IT Codice Fiscale day of birth (character position 9-10, zero-based) must be a valid day between 01-31. The day of birth may be offset by +60 to indicate the female gender and the day of birth may include omocodia letter substitutions</value>
   </data>
   <data name="ItCodiceFiscaleInvalidTownOfBirth" xml:space="preserve">
     <value>IT Codice Fiscale town of birth (character position 11-15, zero-based) must have the format of a Belifore code (one alphabetic character followed by three digits). The town of birth may include omocodia letter substitutions</value>
