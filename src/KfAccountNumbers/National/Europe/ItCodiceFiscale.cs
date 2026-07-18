@@ -478,7 +478,7 @@ public record ItCodiceFiscale
 
 #pragma warning disable IDE0008 // Use explicit type
       var (twoDigitYear, month, day) = GetYearMonthDay(Value);
-      #pragma warning restore IDE0008 // Use explicit type
+#pragma warning restore IDE0008 // Use explicit type
       var fourDigitYear = centuryCutoff.ToFourDigitYear(twoDigitYear);
       if (day > MaleMaxDay)
       {
