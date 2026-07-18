@@ -1,4 +1,5 @@
 #pragma warning disable IDE0250 // Make struct 'readonly'
+#pragma warning disable IDE0046 // Convert to conditional expression
 
 namespace KfAccountNumbers.National.Europe;
 
@@ -47,11 +48,11 @@ namespace KfAccountNumbers.National.Europe;
 ///         <item>
 ///            <term>LLLL</term>
 ///            <description>
-///               Four-character Belifore code that indicates the person's town
-///               of birth. The code consists of one alphabetic character
-///               followed by three digits. Persons who were born in a foreign
-///               country will have a code starting with Z and a three-digit
-///               code indicating the country of birth.
+///               Four-character Belfiore code that indicates the person's
+///               comune (town) of birth. The code consists of one alphabetic
+///               character followed by three digits. Persons who were born in a
+///               foreign country will have a code starting with Z and a
+///               three-digit code indicating the country of birth.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -135,10 +136,10 @@ namespace KfAccountNumbers.National.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The town of birth, character positions 11-14 (zero-based) must
-///               be an upper-case or lower-case alphabetic character ('A'-'Z',
-///               'a'-'z') followed by three ASCII digits ('0'-'9') the
-///               equivalent Omocodia letter (see below)
+///               The comune of birth, character positions 11-14 (zero-based)
+///               must be an upper-case or lower-case alphabetic character
+///               ('A'-'Z', 'a'-'z') followed by three ASCII digits ('0'-'9')
+///               the equivalent Omocodia letter (see below)
 ///            </description>
 ///         </item>
 ///      </list>
@@ -152,7 +153,7 @@ namespace KfAccountNumbers.National.Europe;
 ///               Matteo Moretti (male), born in Milan on 8 April 1991 (example
 ///               from wikipedia): surname characters = MRT, given name
 ///               characters = MTT, year of birth = 91, month of birth = D, day
-///               of birth = 01, gender = male, town of birth = F205, check
+///               of birth = 01, gender = male, comune of birth = F205, check
 ///               character = J
 ///            </description>
 ///         </item>
@@ -163,7 +164,7 @@ namespace KfAccountNumbers.National.Europe;
 ///               1982, living in Italy (example from wikipedia): surname
 ///               characters = MLL, given name characters = SNT, year of birth =
 ///               82, month of birth = P, day of birth = 65 (actual day of
-///               birth = 25), gender = female, town of birth = Z404, check
+///               birth = 25), gender = female, comune of birth = Z404, check
 ///               character = U
 ///            </description>
 ///         </item>
@@ -173,8 +174,8 @@ namespace KfAccountNumbers.National.Europe;
 ///               example of omocodia with the two right-most digits replaced by
 ///               letter equivalents: surname characters = RSS, given name
 ///               characters = NTN, year of birth = 86, month of birth = H,
-///               day of birth = 08, gender = male, town of birth = G2NS (actual
-///               town of birth = G226), check character = T
+///               day of birth = 08, gender = male, comune of birth = G2NS
+///               (actual comune of birth = G226), check character = T
 ///            </description>
 ///         </item>
 ///      </list>
@@ -188,9 +189,9 @@ namespace KfAccountNumbers.National.Europe;
 ///      uppercase versions of the value.
 ///   </para>
 ///   <para>
-///      <see cref="ItCodiceFiscale"/> does not validate the town of birth (the
-///      Belifore code) against a comprehensive list of valid values (because
-///      the list of values exceeds 8000 entries). ItCodiceFiscale only
+///      <see cref="ItCodiceFiscale"/> does not validate the comune of birth
+///      (the Belfiore code) against a comprehensive list of valid values
+///      (because the list of values exceeds 8000 entries). ItCodiceFiscale only
 ///      validates the format, one alphabetic character followed by three digit
 ///      characters.
 ///   </para>
@@ -208,7 +209,7 @@ namespace KfAccountNumbers.National.Europe;
 ///   <para>
 ///      If a value contains an omocidia substitution, the substituted letters
 ///      are converted to the equivalent digits before validation or retrieving
-///      the BirthYear, Gender or Belifore code.
+///      the BirthYear, Gender or Belfiore code.
 ///   </para>
 ///   <para>
 ///      ItCodiceFiscale uses a custom modulus 26 check digit algorithm. Refer
@@ -274,23 +275,123 @@ public record ItCodiceFiscale
    /// </summary>
    public const Int32 IndividualLength = 16;
 
-   private static readonly Int32[] _evenCharacterMap = Enumerable.Range(Chars.DigitZero, Chars.UpperCaseZ - Chars.DigitZero + 1)
-      .Select(ch => MapEvenCharacter((Char)ch))
-      .ToArray();
+   private static readonly Int32[] _evenCharacterMap = [.. Enumerable.Range(Chars.DigitZero, Chars.UpperCaseZ - Chars.DigitZero + 1).Select(ch => MapEvenCharacter((Char)ch))];
 
-   private static readonly Int32[] _oddCharacterMap = Enumerable.Range(Chars.DigitZero, Chars.UpperCaseZ - Chars.DigitZero + 1)
-      .Select(ch => MapOddCharacter((Char)ch))
-      .ToArray();
+   private static readonly Int32[] _oddCharacterMap = [.. Enumerable.Range(Chars.DigitZero, Chars.UpperCaseZ - Chars.DigitZero + 1).Select(ch => MapOddCharacter((Char)ch))];
 
    private static readonly SegmentRange _surnameRange = new(0, 3);
    private static readonly SegmentRange _givenNameRange = new(3, 6);
    private static readonly SegmentRange _yearRange = new(6, 8);
    private const Int32 MonthOffset = 8;
    private static readonly SegmentRange _dayRange = new(9, 11);
-   private static readonly SegmentRange _townOfBirthRange = new(11, 15);
+   private static readonly SegmentRange _comuneRange = new(11, 15);
 
    // Female gender is inticated by the day of birth incremented by +60.
    private const Int32 FemaleGenderDayOffset = 60;
+
+   private const Int32 FemaleMinDay = 61;
+   private const Int32 FemaleMaxDay = 91;
+   private const Int32 MaleMinDay = 1;
+   private const Int32 MaleMaxDay = 31;
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="ItCodiceFiscale"/> class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of an Italian codice fiscale.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="value"/> is not length 16.
+   ///   - or -
+   ///   <paramref name="value"/> contains a character other than upper-case or
+   ///   lower-case letters ('A'-'Z', 'a'-'z') or ASCII digits ('0'-'9').
+   ///   - or -
+   ///   <paramref name="value"/> has an invalid modulus 26 check character in
+   ///   the trailing (right-most) character position.
+   ///   - or -
+   ///   <paramref name="value"/> contains digit characters ('0'-'9') in the
+   ///   surename positions (0-2, zero-based).
+   ///   - or -
+   ///   <paramref name="value"/> contains digit characters ('0'-'9') in the
+   ///   given name positions (3-5, zero-based).
+   ///   - or -
+   ///   <paramref name="value"/> contains non-digit characters ('0'-'9') or
+   ///   invalid omocodia substitution characters in the year of birth positions
+   ///   (6-7, zero-based).
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid month of birth in
+   ///   character position 8 (zero-based).
+   ///   - or -
+   ///   <paramref name="value"/> contains non-digit characters ('0'-'9') or
+   ///   invalid omocodia substitution characters in the year of birth positions
+   ///   (9-10, zero-based).
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid comune of birth in
+   ///   positions (11-14, zero-based). A valid comune Belfiore code must be a
+   ///   single upper-case or lower-case letter ('A'-'Z', 'a'-'z') followed by
+   ///   three ASCII digit characters ('0'-'9') or their valid omocodia
+   ///   substitution characters.
+   /// </exception>
+   public ItCodiceFiscale(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="ItCodiceFiscale"/> class.
+   /// </summary>
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private ItCodiceFiscale(String? value, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
+         {
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSurname invalidSurname => new UKfValidationException<ValidationError>(invalidSurname),
+               InvalidGivenName invalidGivenName => new UKfValidationException<ValidationError>(invalidGivenName),
+               InvalidYear invalidYear => new UKfValidationException<ValidationError>(invalidYear),
+               InvalidMonth invalidMonth => new UKfValidationException<ValidationError>(invalidMonth),
+               InvalidDay invalidDay => new UKfValidationException<ValidationError>(invalidDay),
+               InvalidLocationCode invalidComune => new UKfValidationException<ValidationError>(invalidComune),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
+         }
+      }
+
+      Value = value!.ToUpperInvariant();
+   }
+
+   /// <summary>
+   ///   Gets the 4-character Belfiore code that identifies the person's comune
+   ///   of birth.
+   /// </summary>
+   public String BelfioreCode => _comuneRange.Extract(Value).ToString();
+
+   /// <summary>
+   ///   Gets the person's gender, as indicated by the day of birth.
+   /// </summary>
+   /// <remarks>
+   ///   Day of birth 1-31 = male, 61-91 = female.
+   /// </remarks>
+   public Gender.BinaryGender Gender
+      => GetTwoDigitInteger(_dayRange.Extract(Value)) switch
+      {
+         >= MaleMinDay and <= MaleMaxDay => default(Gender.Male),
+         >= FemaleMinDay and <= FemaleMaxDay => default(Gender.Female),
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
 
    /// <summary>
    ///   Gets a string representation of the codice fiscale.
@@ -348,7 +449,7 @@ public record ItCodiceFiscale
          return validationResult;
       }
 
-      if (!ValidateTownOfBirth(value))
+      if (!ValidateComune(value))
       {
          return GetInvalidLocationCodeResult(value);
       }
@@ -368,11 +469,11 @@ public record ItCodiceFiscale
    /// </returns>
    internal static Int32 MapEvenCharacter(Char ch)
       => ch switch
-         {
-            var d when d is >= Chars.DigitZero and <= Chars.DigitNine => d - Chars.DigitZero,
-            var c when c is >= Chars.UpperCaseA and <= Chars.UpperCaseZ => c - Chars.UpperCaseA,
-            _ => -1,
-         };
+      {
+         var d when d is >= Chars.DigitZero and <= Chars.DigitNine => d - Chars.DigitZero,
+         var c when c is >= Chars.UpperCaseA and <= Chars.UpperCaseZ => c - Chars.UpperCaseA,
+         _ => -1,
+      };
 
    /// <summary>
    ///   Map a character located at an odd index (one-based) to its integer
@@ -450,7 +551,7 @@ public record ItCodiceFiscale
          ]);
 
    private static InvalidLocationCode GetInvalidLocationCodeResult(ReadOnlySpan<Char> value)
-      => new(Messages.ItCodiceFiscaleInvalidTownOfBirth, _townOfBirthRange.Extract(value).ToString());
+      => new(Messages.ItCodiceFiscaleInvalidComune, _comuneRange.Extract(value).ToString());
 
    private static InvalidMonth GetInvalidMonthResult(ReadOnlySpan<Char> value)
       => new(Messages.ItCodiceFiscaleInvalidMonth, value[MonthOffset].ToString());
@@ -554,11 +655,22 @@ public record ItCodiceFiscale
          : GetInvalidChecksumResult();
    }
 
+   // Only validate format of the comune (town of birth) component
+   private static Boolean ValidateComune(ReadOnlySpan<Char> value)
+   {
+      ReadOnlySpan<Char> span = _comuneRange.Extract(value);
+
+      return span[0].IsAsciiLetter()
+             && GetOmocodiaDigit(span[1]) != -1
+             && GetOmocodiaDigit(span[2]) != -1
+             && GetOmocodiaDigit(span[3]) != -1;
+   }
+
    private static ValidationResult ValidateDateOfBirth(ReadOnlySpan<Char> value)
    {
 #pragma warning disable IDE0008 // Use explicit type
       var (year, month, day) = GetYearMonthDay(value);
-      #pragma warning restore IDE0008 // Use explicit type
+#pragma warning restore IDE0008 // Use explicit type
 
       if (year == -1)
       {
@@ -570,7 +682,8 @@ public record ItCodiceFiscale
          return GetInvalidMonthResult(value);
       }
 
-      if (day is not (>= 1 and <= 31 or >= 61 and <= 91))
+      // Basic check for day in valid range.
+      if (day is not ((>= MaleMinDay and <= MaleMaxDay) or (>= FemaleMinDay and <= FemaleMaxDay)))
       {
          return GetInvalidDayResult(value);
       }
@@ -589,16 +702,5 @@ public record ItCodiceFiscale
       }
 
       return default(ValidValue);
-   }
-
-   // Only validate format of the town of birth component
-   private static Boolean ValidateTownOfBirth(ReadOnlySpan<Char> value)
-   {
-      ReadOnlySpan<Char> span = _townOfBirthRange.Extract(value);
-
-      return span[0].IsAsciiLetter()
-             && GetOmocodiaDigit(span[1]) != -1
-             && GetOmocodiaDigit(span[2]) != -1
-             && GetOmocodiaDigit(span[3]) != -1;
    }
 }

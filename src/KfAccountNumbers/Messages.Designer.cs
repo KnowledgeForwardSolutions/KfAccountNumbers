@@ -970,6 +970,15 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to IT Codice Fiscale comune (town) of birth (character position 11-15, zero-based) must have the format of a Belifore code (one alphabetic character followed by three digits). The town of birth may include omocodia letter substitutions.
+        /// </summary>
+        internal static string ItCodiceFiscaleInvalidComune {
+            get {
+                return ResourceManager.GetString("ItCodiceFiscaleInvalidComune", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to IT Codice Fiscale day of birth (character position 9-10, zero-based) must be a valid day between 01-31. The day of birth may be offset by +60 to indicate the female gender and the day of birth may include omocodia letter substitutions.
         /// </summary>
         internal static string ItCodiceFiscaleInvalidDay {
@@ -1011,15 +1020,6 @@ namespace KfAccountNumbers {
         internal static string ItCodiceFiscaleInvalidSurname {
             get {
                 return ResourceManager.GetString("ItCodiceFiscaleInvalidSurname", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to IT Codice Fiscale town of birth (character position 11-15, zero-based) must have the format of a Belifore code (one alphabetic character followed by three digits). The town of birth may include omocodia letter substitutions.
-        /// </summary>
-        internal static string ItCodiceFiscaleInvalidTownOfBirth {
-            get {
-                return ResourceManager.GetString("ItCodiceFiscaleInvalidTownOfBirth", resourceCulture);
             }
         }
         

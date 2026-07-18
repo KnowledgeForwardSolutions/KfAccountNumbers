@@ -729,8 +729,8 @@
   <data name="ItCodiceFiscaleInvalidDay" xml:space="preserve">
     <value>IT Codice Fiscale day of birth (character position 9-10, zero-based) must be a valid day between 01-31. The day of birth may be offset by +60 to indicate the female gender and the day of birth may include omocodia letter substitutions</value>
   </data>
-  <data name="ItCodiceFiscaleInvalidTownOfBirth" xml:space="preserve">
-    <value>IT Codice Fiscale town of birth (character position 11-15, zero-based) must have the format of a Belifore code (one alphabetic character followed by three digits). The town of birth may include omocodia letter substitutions</value>
+  <data name="ItCodiceFiscaleInvalidComune" xml:space="preserve">
+    <value>IT Codice Fiscale comune (town) of birth (character position 11-15, zero-based) must have the format of a Belifore code (one alphabetic character followed by three digits). The town of birth may include omocodia letter substitutions</value>
   </data>
   <data name="ItCodiceFiscaleInvalidCheckCharacter" xml:space="preserve">
     <value>IT Codice Fiscale check character (character position 14, zero-based) must be a valid modulus 26 check character</value>

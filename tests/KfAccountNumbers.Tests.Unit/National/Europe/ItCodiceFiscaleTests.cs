@@ -164,7 +164,7 @@ public class ItCodiceFiscaleTests
       { "04", 'T', "v1" },       // Valid day of for December, any year
    };
 
-   public static TheoryData<String> ValidTownOfBirthValues =>
+   public static TheoryData<String> ValidComuneValues =>
    [
       "A001",
       "Z404",
@@ -431,7 +431,7 @@ public class ItCodiceFiscaleTests
       { "04", 'T', "v2" },       // Invalid day of for December, any year
    };
 
-   public static TheoryData<String> InvalidTownOfBirthValues =>
+   public static TheoryData<String> InvalidComuneValues =>
    [
       // Leading digit instead of alpha
       "0001",
@@ -482,13 +482,9 @@ public class ItCodiceFiscaleTests
       "AaaA",
    ];
 
-   private static readonly Int32[] _evenCharacterMap = Enumerable.Range('0', 'Z' - '0' + 1)
-      .Select(ch => ItCodiceFiscale.MapEvenCharacter((Char)ch))
-      .ToArray();
+   private static readonly Int32[] _evenCharacterMap = [.. Enumerable.Range('0', 'Z' - '0' + 1).Select(ch => ItCodiceFiscale.MapEvenCharacter((Char)ch))];
 
-   private static readonly Int32[] _oddCharacterMap = Enumerable.Range('0', 'Z' - '0' + 1)
-      .Select(ch => ItCodiceFiscale.MapOddCharacter((Char)ch))
-      .ToArray();
+   private static readonly Int32[] _oddCharacterMap = [.. Enumerable.Range('0', 'Z' - '0' + 1).Select(ch => ItCodiceFiscale.MapOddCharacter((Char)ch))];
 
    private static String GetValue(
       String surname = "ABC",
@@ -496,9 +492,9 @@ public class ItCodiceFiscaleTests
       String year = "83",
       Char month = 'M',
       String day = "26",
-      String townOfBirth = "A123")
+      String comune = "A123")
    {
-      var temp = $"{surname}{givenName}{year}{month}{day}{townOfBirth}";
+      var temp = $"{surname}{givenName}{year}{month}{day}{comune}";
 
       return GetValueWithValidCheckDigit(temp);
    }
@@ -561,7 +557,7 @@ public class ItCodiceFiscaleTests
       => new(Messages.ItCodiceFiscaleInvalidGivenName, value[3..6]);
 
    private static InvalidLocationCode GetInvalidLocationCodeResult(String value)
-      => new(Messages.ItCodiceFiscaleInvalidTownOfBirth, value[11..15]);
+      => new(Messages.ItCodiceFiscaleInvalidComune, value[11..15]);
 
    private static InvalidMonth GetInvalidMonthResult(String value)
       => new(Messages.ItCodiceFiscaleInvalidMonth, value[8..9]);
@@ -585,6 +581,380 @@ public class ItCodiceFiscaleTests
    //   // Assert.
    //   result.Should().Be(expected);
    //}
+
+   #region Check Digit Algorithm Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]   // e e e e e e e e
+   [InlineData("BABABA10B01A101A")]    // BABABA10B01A evaluates to zero, so only the three digits of the comune have any effect on the check digit calculation
+   [InlineData("BABABA10B01A111B")]    // Remainder = 1
+   [InlineData("BABABA10B01A121C")]    // Remainder = 2
+   [InlineData("BABABA10B01A131D")]    // Remainder = 3
+   [InlineData("BABABA10B01A141E")]    // Remainder = 4
+   [InlineData("BABABA10B01A151F")]    // Remainder = 5
+   [InlineData("BABABA10B01A161G")]    // Remainder = 6
+   [InlineData("BABABA10B01A171H")]    // Remainder = 7
+   [InlineData("BABABA10B01A181I")]    // Remainder = 8
+   [InlineData("BABABA10B01A191J")]    // Remainder = 9
+   [InlineData("BABABA10B01A202K")]    // Remainder = 10
+   [InlineData("BABABA10B01A212L")]    // Remainder = 11
+   [InlineData("BABABA10B01A222M")]    // Remainder = 12
+   [InlineData("BABABA10B01A232N")]    // Remainder = 13
+   [InlineData("BABABA10B01A242O")]    // Remainder = 14
+   [InlineData("BABABA10B01A252P")]    // Remainder = 15
+   [InlineData("BABABA10B01A262Q")]    // Remainder = 16
+   [InlineData("BABABA10B01A272R")]    // Remainder = 17
+   [InlineData("BABABA10B01A282S")]    // Remainder = 18
+   [InlineData("BABABA10B01A292T")]    // Remainder = 19
+   [InlineData("BABABA10B01A118U")]    // Remainder = 20
+   [InlineData("BABABA10B01A128V")]    // Remainder = 21
+   [InlineData("BABABA10B01A138W")]    // Remainder = 22
+   [InlineData("BABABA10B01A148X")]    // Remainder = 23
+   [InlineData("BABABA10B01A158Y")]    // Remainder = 24
+   [InlineData("BABABA10B01A168Z")]    // Remainder = 25
+   [InlineData("bababa10b01a101a")]    // bababa10b01a evaluates to zero, so only the three digits of the comune have any effect on the check digit calculation
+   [InlineData("bababa10b01a111b")]    // Remainder = 1
+   [InlineData("bababa10b01a121c")]    // Remainder = 2
+   [InlineData("bababa10b01a131d")]    // Remainder = 3
+   [InlineData("bababa10b01a141e")]    // Remainder = 4
+   [InlineData("bababa10b01a151f")]    // Remainder = 5
+   [InlineData("bababa10b01a161g")]    // Remainder = 6
+   [InlineData("bababa10b01a171h")]    // Remainder = 7
+   [InlineData("bababa10b01a181i")]    // Remainder = 8
+   [InlineData("bababa10b01a191j")]    // Remainder = 9
+   [InlineData("bababa10b01a202k")]    // Remainder = 10
+   [InlineData("bababa10b01a212l")]    // Remainder = 11
+   [InlineData("bababa10b01a222m")]    // Remainder = 12
+   [InlineData("bababa10b01a232n")]    // Remainder = 13
+   [InlineData("bababa10b01a242o")]    // Remainder = 14
+   [InlineData("bababa10b01a252p")]    // Remainder = 15
+   [InlineData("bababa10b01a262q")]    // Remainder = 16
+   [InlineData("bababa10b01a272r")]    // Remainder = 17
+   [InlineData("bababa10b01a282s")]    // Remainder = 18
+   [InlineData("bababa10b01a292t")]    // Remainder = 19
+   [InlineData("bababa10b01a118u")]    // Remainder = 20
+   [InlineData("bababa10b01a128v")]    // Remainder = 21
+   [InlineData("bababa10b01a138w")]    // Remainder = 22
+   [InlineData("bababa10b01a148x")]    // Remainder = 23
+   [InlineData("bababa10b01a158y")]    // Remainder = 24
+   [InlineData("bababa10b01a168z")]    // Remainder = 25
+   public void ItCodiceFiscale_CheckDigitAlgorithm_ShouldValidateAllPossibleCheckDigits(String value)
+   {
+      // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = ItCodiceFiscale.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidCodiceFiscaleValues))]
+   public void ItCodiceFiscale_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = value.ToUpperInvariant();
+
+      // Act.
+      var sut = new ItCodiceFiscale(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidYearValues))]
+   public void ItCodiceFiscale_Constructor_ShouldCreateInstance_WhenYearIsValid(String year)
+   {
+      // Arrange.
+      var value = GetValue(year: year);
+      var expected = value.ToUpperInvariant();
+
+      // Act.
+      var sut = new ItCodiceFiscale(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidMonthValues))]
+   public void ItCodiceFiscale_Constructor_ShouldCreateInstance_WhenMonthIsValid(Char month)
+   {
+      // Arrange.
+      var value = GetValue(month: month);
+      var expected = value.ToUpperInvariant();
+
+      // Act.
+      var sut = new ItCodiceFiscale(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDayValues))]
+   public void ItCodiceFiscale_Constructor_ShouldCreateInstance_WhenDayIsValid(
+      String year,
+      Char month,
+      String day)
+   {
+      // Arrange.
+      var value = GetValue(year: year, month: month, day: day);
+      var expected = value.ToUpperInvariant();
+
+      // Act.
+      var sut = new ItCodiceFiscale(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidComuneValues))]
+   public void ItCodiceFiscale_Constructor_ShouldCreateInstance_WhenComuneIsValid(String comune)
+   {
+      // Arrange.
+      var value = GetValue(comune: comune);
+      var expected = value.ToUpperInvariant();
+
+      // Act.
+      var sut = new ItCodiceFiscale(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void ItCodiceFiscale_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ItCodiceFiscale(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void ItCodiceFiscale_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ItCodiceFiscale(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void ItCodiceFiscale_Constructor_ShouldThrowKfValidationException_WhenValueHasNonAlphanumericCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ItCodiceFiscale(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckCharacterValues))]
+   public void ItCodiceFiscale_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckCharacter(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ItCodiceFiscale(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidNameValues))]
+   public void ItCodiceFiscale_Constructor_ShouldThrowKfValidationException_WhenSurnameHasDigitCharacter(String surname)
+   {
+      // Arrange.
+      var value = GetValue(surname);
+      LocalValidationError expected = GetInvalidSurnameResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ItCodiceFiscale(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidNameValues))]
+   public void ItCodiceFiscale_Constructor_ShouldThrowKfValidationException_WhenGivenNameHasDigitCharacter(String givenName)
+   {
+      // Arrange.
+      var value = GetValue(givenName: givenName);
+      LocalValidationError expected = GetInvalidGivenNameResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ItCodiceFiscale(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidYearValues))]
+   public void ItCodiceFiscale_Constructor_ShouldThrowKfValidationException_WhenYearHasNonOmocodiaSubstitution(String year)
+   {
+      // Arrange.
+      var value = GetValue(year: year);
+      LocalValidationError expected = GetInvalidYearResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ItCodiceFiscale(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidMonthValues))]
+   public void ItCodiceFiscale_Constructor_ShouldThrowKfValidationException_WhenMonthHasInvalidCharacter(Char month)
+   {
+      // Arrange.
+      var value = GetValue(month: month);
+      LocalValidationError expected = GetInvalidMonthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ItCodiceFiscale(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDayValues))]
+   public void ItCodiceFiscale_Constructor_ShouldThrowKfValidationException_WhenDayIsInvalid(
+      String year,
+      Char month,
+      String day)
+   {
+      // Arrange.
+      var value = GetValue(year: year, month: month, day: day);
+      LocalValidationError expected = GetInvalidDayResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ItCodiceFiscale(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidComuneValues))]
+   public void ItCodiceFiscale_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidComune(String comune)
+   {
+      // Arrange.
+      var value = GetValue(comune: comune);
+      LocalValidationError expected = GetInvalidLocationCodeResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ItCodiceFiscale(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region BelfioreCode Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidComuneValues))]
+   public void ItCodiceFiscale_BelfioreCode_ShouldReturnExpectedValue(String comune)
+   {
+      // Arrange.
+      var value = GetValue(comune: comune);
+      var sut = new ItCodiceFiscale(value);
+      var expected = sut.Value[11..15];
+
+      // Act/assert.
+      sut.BelfioreCode.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Gender Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData("01")]
+   [InlineData("31")]
+   [InlineData("LM")]
+   [InlineData("PM")]
+   [InlineData("lm")]
+   [InlineData("pm")]
+   public void ItCodiceFiscale_Gender_ShouldReturnMale_WhenDayIsLessThan32(String day)
+   {
+      // Arrange.
+      var value = GetValue(day: day);
+      var sut = new ItCodiceFiscale(value);
+      Gender.BinaryGender expected = default(Gender.Male);
+
+      // Act/assert.
+      sut.Gender.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [InlineData("61")]
+   [InlineData("91")]
+   [InlineData("SM")]
+   [InlineData("VM")]
+   [InlineData("sm")]
+   [InlineData("vm")]
+   public void ItCodiceFiscale_Gender_ShouldReturnFemale_WhenDayIsGreaterThan60(String day)
+   {
+      // Arrange.
+      var value = GetValue(day: day);
+      var sut = new ItCodiceFiscale(value);
+      Gender.BinaryGender expected = default(Gender.Female);
+
+      // Act/assert.
+      sut.Gender.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
 
    #region Validate Method Tests
    // ==========================================================================
@@ -653,11 +1023,11 @@ public class ItCodiceFiscaleTests
    }
 
    [Theory]
-   [MemberData(nameof(ValidTownOfBirthValues))]
-   public void ItCodiceFiscale_Validate_ShouldReturnValidValue_WhenTownOfBirthIsValid(String townOfBirth)
+   [MemberData(nameof(ValidComuneValues))]
+   public void ItCodiceFiscale_Validate_ShouldReturnValidValue_WhenComuneIsValid(String comune)
    {
       // Arrange.
-      var value = GetValue(townOfBirth: townOfBirth);
+      var value = GetValue(comune: comune);
       LocalValidationResult expected = default(ValidValue);
 
       // Act.
@@ -807,11 +1177,11 @@ public class ItCodiceFiscaleTests
    }
 
    [Theory]
-   [MemberData(nameof(InvalidTownOfBirthValues))]
-   public void ItCodiceFiscale_Validate_ShouldReturnInvalidLocationCode_WhenMonthHasInvalidTownOfBirth(String townOfBirth)
+   [MemberData(nameof(InvalidComuneValues))]
+   public void ItCodiceFiscale_Validate_ShouldReturnInvalidLocationCode_WhenValueHasInvalidComune(String comune)
    {
       // Arrange.
-      var value = GetValue(townOfBirth: townOfBirth);
+      var value = GetValue(comune: comune);
       LocalValidationResult expected = GetInvalidLocationCodeResult(value);
 
       // Act.
