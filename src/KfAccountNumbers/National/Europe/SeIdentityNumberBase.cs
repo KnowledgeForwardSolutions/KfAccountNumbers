@@ -88,6 +88,26 @@ public abstract record SeIdentityNumberBase
    protected const Int32 GenderOffset = 2;
 
    /// <summary>
+   ///   The maximum integer day value for a personnumer.
+   /// </summary>
+   protected const Int32 MaximumPersonnummerDay = 31;
+
+   /// <summary>
+   ///   The maximum integer day value for a samordningsnummer.
+   /// </summary>
+   protected const Int32 MaximumSamordningsnummerDay = 91;
+
+   /// <summary>
+   ///   The minimum integer day value for a personnumer.
+   /// </summary>
+   protected const Int32 MinimumPersonnummerDay = 1;
+
+   /// <summary>
+   ///   The minimum integer day value for a samordningsnummer.
+   /// </summary>
+   protected const Int32 MinimumSamordningsnummerDay = 61;
+
+   /// <summary>
    ///   Century cutoff used when separator character is '+'.
    /// </summary>
    protected static readonly CenturyCutoff TwentithCenturyCutoff = new(currentCentury: 1900);
@@ -168,7 +188,7 @@ public abstract record SeIdentityNumberBase
    ///   The integer day component of the <paramref name="value"/>'s date of
    ///   birth.
    /// </returns>
-   protected static Int32 GetDayOfBirth(ReadOnlySpan<Char> value)
+   protected static Int32 GetDayNumber(ReadOnlySpan<Char> value)
    {
       var offset = value.Length == ShortFormatLength ? 4 : 6;
 

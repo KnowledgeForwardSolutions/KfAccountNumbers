@@ -71,12 +71,6 @@ public abstract record NoIdentityNumberBase
    public const String DefaultFormatMask = "______ _____";
 
    /// <summary>
-   ///   Zero-based offset of the first character of the day component of the
-   ///   date of birth.
-   /// </summary>
-   protected const Int32 DayOffset = 0;
-
-   /// <summary>
    ///   Zero-based offset of the first character of the month component of the
    ///   date of birth.
    /// </summary>
@@ -92,6 +86,60 @@ public abstract record NoIdentityNumberBase
    ///   Zero-based offset of the separator character.
    /// </summary>
    protected const Int32 SeparatorOffset = 6;
+
+   /// <summary>
+   ///   The maximum integer day value for a D-nummer.
+   /// </summary>
+   protected const Int32 MaximumDnummerDay = 71;
+
+   /// <summary>
+   ///   The maximum integer month value for a H-nummer.
+   /// </summary>
+   protected const Int32 MaximumHnummerMonth = 52;
+
+   /// <summary>
+   ///   The maximum integer day value for an identifier that does not apply an
+   ///   offset to the day of birth (fødselsnummer and H-nummer).
+   /// </summary>
+   protected const Int32 MaximumNormalDay = 31;
+
+   /// <summary>
+   ///   The maximum integer month value for an identifier that does not apply
+   ///   an offset to the month of birth (fødselsnummer and D-nummer).
+   /// </summary>
+   protected const Int32 MaximumNormalMonth = 12;
+
+   /// <summary>
+   ///   The minimum integer day value for a D-nummer.
+   /// </summary>
+   protected const Int32 MinimumDnummerDay = 41;
+
+   /// <summary>
+   ///   The minimum integer month value for a H-nummer.
+   /// </summary>
+   protected const Int32 MinimumHnummerMonth = 41;
+
+   /// <summary>
+   ///   The minimum integer month value for a Fh-nummer.
+   /// </summary>
+   /// <remarks>
+   ///   Fh-nummer does not encode a date, but the initial digit must be either
+   ///   8 or 9, thus the leading two digits (which would be the day number for
+   ///   other identifier types) must be 80 or greater.
+   /// </remarks>
+   protected const Int32 MinimumFhnummerDay = 80;
+
+   /// <summary>
+   ///   The minimum integer day value for an identifier that does not apply an
+   ///   offset to the day of birth (fødselsnummer and H-nummer).
+   /// </summary>
+   protected const Int32 MinimumNormalDay = 1;
+
+   /// <summary>
+   ///   The minimum integer month value for an identifier that does not apply
+   ///   an offset to the month of birth (fødselsnummer and H-nummer).
+   /// </summary>
+   protected const Int32 MinimumNormalMonth = 1;
 
    // Offsets measured from end of value to avoid needing to account for the
    // presence or absence of a separator.
@@ -152,14 +200,14 @@ public abstract record NoIdentityNumberBase
       var day = dateOffsetMode switch
       {
          DateOffsetMode.Dnummer => baseDay - DnummerDayOffset,
-         DateOffsetMode.Optional => (baseDay is >= 41 and <= 71) ? baseDay - DnummerDayOffset : baseDay,
+         DateOffsetMode.Optional => IsAdjustedDnummerDay(baseDay) ? baseDay - DnummerDayOffset : baseDay,
          _ => baseDay,
       };
 
       var month = dateOffsetMode switch
       {
          DateOffsetMode.Hnummer => baseMonth - HnummerMonthOffset,
-         DateOffsetMode.Optional => (baseMonth is >= 41 and <= 52) ? baseMonth - HnummerMonthOffset : baseMonth,
+         DateOffsetMode.Optional => IsAdjustedHnummerMonth(baseMonth) ? baseMonth - HnummerMonthOffset : baseMonth,
          _ => baseMonth,
       };
 
@@ -168,7 +216,7 @@ public abstract record NoIdentityNumberBase
       var century = dateOffsetMode switch
       {
          DateOffsetMode.Dnummer or DateOffsetMode.Hnummer => GetDnummerBirthCentury(individualNumber),
-         _ => (baseDay is >= 41 and <= 71) || (baseMonth is >= 41 and <= 52)
+         _ => IsAdjustedDnummerDay(baseDay) || IsAdjustedHnummerMonth(baseMonth)
             ? GetDnummerBirthCentury(individualNumber)
             : GetFodselsnummerBirthCentury(baseYear, individualNumber),
       };
@@ -177,6 +225,36 @@ public abstract record NoIdentityNumberBase
       return (day, month, year);
    }
 #pragma warning restore IDE0072 // Add missing cases
+
+   /// <summary>
+   ///   Extract just the day component of the <paramref name="value"/>'s date
+   ///   of birth.
+   /// </summary>
+   /// <param name="value">
+   ///   The value to process.
+   /// </param>
+   /// <returns>
+   ///   The integer day component of the <paramref name="value"/>'s date of
+   ///   birth.
+   /// </returns>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   protected static Int32 GetDayNumber(ReadOnlySpan<Char> value)
+      => value.ParseTwoDigits();
+
+   /// <summary>
+   ///   Extract just the month component of the <paramref name="value"/>'s date
+   ///   of birth.
+   /// </summary>
+   /// <param name="value">
+   ///   The value to process.
+   /// </param>
+   /// <returns>
+   ///   The integer month component of the <paramref name="value"/>'s date of
+   ///   birth.
+   /// </returns>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   protected static Int32 GetMonthNumber(ReadOnlySpan<Char> value)
+      => value[MonthOffset..].ParseTwoDigits();
 
    /// <summary>
    ///   Given a validated identity number, get the normalized representation
@@ -194,6 +272,82 @@ public abstract record NoIdentityNumberBase
          : String.Concat(
             value.AsSpan(0, SeparatorOffset),
             value.AsSpan(SeparatorOffset + 1));
+
+   /// <summary>
+   ///   Determine if the integer <paramref name="day"/> is within the normal
+   ///   range for D-nummers.
+   /// </summary>
+   /// <param name="day">
+   ///   The integer day value to evaluate.
+   /// </param>
+   /// <returns>
+   ///   <see langword="true"/> if <paramref name="day"/> is within the normal
+   ///   range for D-nummers; otherwise <see langword="false"/>.
+   /// </returns>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   protected static Boolean IsAdjustedDnummerDay(Int32 day)
+      => day is >= MinimumDnummerDay and <= MaximumDnummerDay;
+
+   /// <summary>
+   ///   Determine if the integer <paramref name="month"/> is within the normal
+   ///   range for H-nummers.
+   /// </summary>
+   /// <param name="month">
+   ///   The integer month value to evaluate.
+   /// </param>
+   /// <returns>
+   ///   <see langword="true"/> if <paramref name="month"/> is within the normal
+   ///   range for H-nummers; otherwise <see langword="false"/>.
+   /// </returns>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   protected static Boolean IsAdjustedHnummerMonth(Int32 month)
+      => month is >= MinimumHnummerMonth and <= MaximumHnummerMonth;
+
+   /// <summary>
+   ///   Determine if the 2-digit integer prefix is valid for a Fh-nummer.
+   /// </summary>
+   /// <param name="prefix">
+   ///   The two digit integer prefix of an identifier.
+   /// </param>
+   /// <returns>
+   ///   <see langword="true"/> if <paramref name="prefix"/> is valid for a
+   ///   Fh-nummer; otherwise <see langword="false"/>.
+   /// </returns>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   protected static Boolean IsFhnummerPrefix(Int32 prefix)
+      => prefix >= MinimumFhnummerDay;
+
+   /// <summary>
+   ///   Determine if the integer <paramref name="day"/> is within the normal
+   ///   range for a day without any adjustment.
+   /// </summary>
+   /// <param name="day">
+   ///   The integer day value to evaluate.
+   /// </param>
+   /// <returns>
+   ///   <see langword="true"/> if <paramref name="day"/> is within the normal
+   ///   range for a day without any adjustment; otherwise
+   ///   <see langword="false"/>.
+   /// </returns>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   protected static Boolean IsNormalDay(Int32 day)
+      => day is >= MinimumNormalDay and <= MaximumNormalDay;
+
+   /// <summary>
+   ///   Determine if the integer <paramref name="month"/> is within the normal
+   ///   range for a month without any adjustment.
+   /// </summary>
+   /// <param name="month">
+   ///   The integer month value to evaluate.
+   /// </param>
+   /// <returns>
+   ///   <see langword="true"/> if <paramref name="month"/> is within the normal
+   ///   range for a month without any adjustment; otherwise
+   ///   <see langword="false"/>.
+   /// </returns>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   protected static Boolean IsNormalMonth(Int32 month)
+      => month is >= MinimumNormalMonth and <= MaximumNormalMonth;
 
    /// <summary>
    ///   Determine the <paramref name="value"/> has valid check digits.

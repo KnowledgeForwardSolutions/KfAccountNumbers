@@ -952,6 +952,96 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to IT Codice Fiscale contains a non-letter (&apos;A&apos;-&apos;Z&apos;, &apos;a&apos;-&apos;z&apos;) or non-digit character (&apos;0&apos;-&apos;9&apos;).
+        /// </summary>
+        internal static string ItCodiceFiscaleInvalidCharacter {
+            get {
+                return ResourceManager.GetString("ItCodiceFiscaleInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IT Codice Fiscale check character (character position 15, zero-based) must be a valid modulus 26 check character.
+        /// </summary>
+        internal static string ItCodiceFiscaleInvalidCheckCharacter {
+            get {
+                return ResourceManager.GetString("ItCodiceFiscaleInvalidCheckCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IT Codice Fiscale comune (town) of birth (character position 11-14, zero-based) must have the format of a Belfiore code (one alphabetic character followed by three digits). The town of birth may include omocodia letter substitutions.
+        /// </summary>
+        internal static string ItCodiceFiscaleInvalidComune {
+            get {
+                return ResourceManager.GetString("ItCodiceFiscaleInvalidComune", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IT Codice Fiscale day of birth (character positions 9-10, zero-based) must be a valid day between 01-31 for males or 41-71 (day +40) for females. The day of birth may include omocodia letter substitutions.
+        /// </summary>
+        internal static string ItCodiceFiscaleInvalidDay {
+            get {
+                return ResourceManager.GetString("ItCodiceFiscaleInvalidDay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IT Codice Fiscale given name (character positions 3-5, zero-based) must be upper-case or lower-case letters (&apos;A&apos;-&apos;Z&apos;, &apos;a&apos;-&apos;z&apos;).
+        /// </summary>
+        internal static string ItCodiceFiscaleInvalidGivenName {
+            get {
+                return ResourceManager.GetString("ItCodiceFiscaleInvalidGivenName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IT Codice Fiscale must have length 16.
+        /// </summary>
+        internal static string ItCodiceFiscaleInvalidLength {
+            get {
+                return ResourceManager.GetString("ItCodiceFiscaleInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IT Codice Fiscale month of birth (character position 8, zero-based) must be a valid upper-case or lower-case month letter; valid month characters are &quot;ABCDEHLMPRST&quot;, where &apos;A&apos; = January and &apos;T&apos; = December.
+        /// </summary>
+        internal static string ItCodiceFiscaleInvalidMonth {
+            get {
+                return ResourceManager.GetString("ItCodiceFiscaleInvalidMonth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IT Codice Fiscale surname (character positions 0-2, zero-based) must be upper-case or lower-case letters (&apos;A&apos;-&apos;Z&apos;, &apos;a&apos;-&apos;z&apos;).
+        /// </summary>
+        internal static string ItCodiceFiscaleInvalidSurname {
+            get {
+                return ResourceManager.GetString("ItCodiceFiscaleInvalidSurname", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IT Codice Fiscale year of birth (character positions 6-7, zero-based) must be ASCII digits (&apos;0&apos;-&apos;9&apos;) or their equivalent omocodia letter substitution.
+        /// </summary>
+        internal static string ItCodiceFiscaleInvalidYear {
+            get {
+                return ResourceManager.GetString("ItCodiceFiscaleInvalidYear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IT Codice Fiscale only supports a single length of 16 characters.
+        /// </summary>
+        internal static string ItCodiceFiscaleLength {
+            get {
+                return ResourceManager.GetString("ItCodiceFiscaleLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Month must be between 1 and 12, inclusive.
         /// </summary>
         internal static string MonthOutOfRange {

@@ -314,10 +314,11 @@ public record SeIdentityNumber : SeIdentityNumberBase
    ///   Gets the specific type of identifier that this instance represents.
    /// </summary>
    public IdentifierCategory IdentifierType
-      => Value.AsSpan(6..).ParseTwoDigits() switch
+      => GetDayNumber(Value) switch
       {
-         <= 31 => default(SeIdentifierType.Personnummer),         // Day 01-31: Personnummer
-         _ => default(SeIdentifierType.Samordningsnummer),        // Day 61-91: Samordningsnummer
+         >= MinimumPersonnummerDay and <= MaximumPersonnummerDay => default(SeIdentifierType.Personnummer),                   // Day 01-31: Personnummer
+         >= MinimumSamordningsnummerDay and <= MaximumSamordningsnummerDay => default(SeIdentifierType.Samordningsnummer),    // Day 61-91: Samordningsnummer
+         _ => throw new UnreachableException("This branch should never be reached"),
       };
 
    /// <summary>

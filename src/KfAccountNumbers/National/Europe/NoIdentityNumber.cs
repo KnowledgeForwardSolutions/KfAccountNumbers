@@ -353,12 +353,12 @@ public record NoIdentityNumber : NoIdentityNumberBase
    /// </summary>
    public IdentifierCategory IdentifierType
 #pragma warning disable format
-      => (Value.ParseTwoDigits(), Value.AsSpan(MonthOffset..).ParseTwoDigits()) switch
+      => (GetDayNumber(Value), GetMonthNumber(Value)) switch
       {
-         (>= 1 and <= 31, >= 1 and <= 12) => default(NoIdentifierType.Foedselsnummer),
-         (>= 41 and <= 71, >= 1 and <= 12) => default(NoIdentifierType.Dnummer),
-         (>= 1 and <= 31, >= 41 and <= 52) => default(NoIdentifierType.Hnummer),
-         (>= 80, _) => default(NoIdentifierType.Fhnummer),
+         var (d, m) when IsNormalDay(d) && IsNormalMonth(m) => default(NoIdentifierType.Foedselsnummer),
+         var (d, m) when IsAdjustedDnummerDay(d) && IsNormalMonth(m) => default(NoIdentifierType.Dnummer),
+         var (d, m) when IsNormalDay(d) && IsAdjustedHnummerMonth(m) => default(NoIdentifierType.Hnummer),
+         var (prefix, _) when IsFhnummerPrefix(prefix) => default(NoIdentifierType.Fhnummer),
          _ => throw new UnreachableException("This branch should never be reached"),
       };
       #pragma warning restore format

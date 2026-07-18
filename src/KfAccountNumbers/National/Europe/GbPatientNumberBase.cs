@@ -184,8 +184,9 @@ public abstract record GbPatientNumberBase
    /// </remarks>
    protected static IdentifierRangeCategory GetIdentifierCategory(ReadOnlySpan<Char> value)
    {
-      var fourthDigitOffset = value.Length == NhsFormattedLength ? 4 : 3;
-      var num = (value.ParseThreeDigits() * 10) + value[fourthDigitOffset].ToSingleDigit();
+      var num = value.Length == NhsFormattedLength
+         ? (value.ParseThreeDigits() * 10) + value[4].ToSingleDigit()
+         : value.ParseFourDigits();
 
       return num switch
       {
@@ -348,8 +349,7 @@ public abstract record GbPatientNumberBase
 
       // Treat YY as 20YY for date validation: within 00-99, the only leap-year
       // difference between 19YY and 20YY is YY=00 (1900 is not a leap year;
-      // 2000 is). Since the CenturyCutoff helper treats 00 = 2000, we do the
-      // same here to keep this check consistent with GetDateOfBirth.
+      // 2000 is).
       year += 2000;
 
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);
