@@ -47,7 +47,7 @@ ItCodiceFiscale does not validate the comune of birth (the Belfiore code) agains
 
 While rare, it is possible that two different people can generate the same tax code, a situation referred to as "omocodia" (or "same code"). The Agenzia delle Entrate handles omocodia by progressively replacing digits with a letter equivalent, starting at the right-most digit and progressing leftward until a unique code is generated. After a unique code is generated, the check character is calculated for the unique code. The letter substitutions are "LMNPQRSTUV", where 0 = L and 9 = V. See [CodiceFiscale.expert](https://codicefiscale.expert/en/omocodia) for a full description of the handling of omocodia.
 
-If a value contains an omocidia substitution, the substituted letters are converted to the equivalent digits before validation or retrieving the BirthYear, Gender or Belfiore code.
+If a value contains an omocidia substitution, the substituted letters are converted to the equivalent digits before validation or retrieving the DateOfBirth, Gender or Belfiore code.
 
 ItCodiceFiscale uses a custom modulus 26 check digit algorithm. Refer to the English Wikipedia article below for a full description of the algorithm. The custom algorithm has some weaknesses described in the Italian Wikipedia article below. For example, the algorithm cannot two character jump transpositions (i.e. DEF => FED) nor transpositions of the characters WY (i.e. WY => YW).
 

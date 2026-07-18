@@ -209,7 +209,7 @@ namespace KfAccountNumbers.National.Europe;
 ///   <para>
 ///      If a value contains an omocidia substitution, the substituted letters
 ///      are converted to the equivalent digits before validation or retrieving
-///      the BirthYear, Gender or Belfiore code.
+///      the DateOfBirth, Gender or Belfiore code.
 ///   </para>
 ///   <para>
 ///      ItCodiceFiscale uses a custom modulus 26 check digit algorithm. Refer
