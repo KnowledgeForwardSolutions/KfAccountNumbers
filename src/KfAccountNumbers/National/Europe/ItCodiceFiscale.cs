@@ -461,6 +461,34 @@ public record ItCodiceFiscale
       };
 
    /// <summary>
+   ///   Extracts the date of birth from the codice fiscale.
+   /// </summary>
+   /// <param name="centuryCutoff">
+   ///   Optional. <see cref="CenturyCutoff"/> used to convert the two-digit
+   ///   year in the codice fiscale to a four-digit year. Will default to
+   ///   <see cref="CenturyCutoff.DefaultInstance"/> (with cutoff value of 50)
+   ///   if not supplied.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="DateOnly"/> containing the extracted date of birth.
+   /// </returns>
+   public DateOnly GetDateOfBirth(CenturyCutoff? centuryCutoff = null)
+   {
+      centuryCutoff ??= CenturyCutoff.DefaultInstance;
+
+#pragma warning disable IDE0008 // Use explicit type
+      var (twoDigitYear, month, day) = GetYearMonthDay(Value);
+      #pragma warning restore IDE0008 // Use explicit type
+      var fourDigitYear = centuryCutoff.ToFourDigitYear(twoDigitYear);
+      if (day > MaleMaxDay)
+      {
+         day -= FemaleGenderDayOffset;
+      }
+
+      return new DateOnly(fourDigitYear, month, day);
+   }
+
+   /// <summary>
    ///   Get a string representation of the codice fiscale.
    /// </summary>
    /// <returns>

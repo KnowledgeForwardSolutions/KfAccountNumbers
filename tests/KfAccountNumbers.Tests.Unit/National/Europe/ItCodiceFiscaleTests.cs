@@ -10,9 +10,9 @@ namespace KfAccountNumbers.Tests.Unit.National.Europe;
 
 public class ItCodiceFiscaleTests
 {
-   private const String ValidUpperCaseCodiceFiscale = "MRTMTT91D08F205J";
-   private const String AltValidUpperCaseCodiceFiscale = "MLLSNT82P65Z404U";
-   private const String ValidUpperCaseOmocodiaCodiceFiscale = "RSSNTN86H08G2NST";
+   private const String ValidUpperCaseCodiceFiscale = "MRTMTT91D08F205J";                 // Value from wikipedia
+   private const String AltValidUpperCaseCodiceFiscale = "MLLSNT82P65Z404U";              // Value from wikipedia
+   private const String ValidUpperCaseOmocodiaCodiceFiscale = "RSSNTN86H08G2NST";         // https://www.miocodicefiscale.com/en/ (see link to generate homocody cases)
    private const String AltValidUpperCaseOmocodiaCodiceFiscale = "RSSNTNUSHLUGNNSZ";      // Previous value with all digits replaced by omocodia substitutions
    private const String ValidLowerCaseCodiceFiscale = "mrtmtt91d08f205j";
    private const String AltValidLowerCaseCodiceFiscale = "mllsnt82p65z404u";
@@ -115,6 +115,20 @@ public class ItCodiceFiscaleTests
       { "00", 'A', "1u" },
       { "00", 'A', "1v" },
 
+      // Day min/max bounds
+      { "04", 'R', "01" },       // Male minimum day
+      { "04", 'R', "31" },       // Male maximum day
+      { "04", 'R', "61" },       // Female minimum day
+      { "04", 'R', "91" },       // Female maximum day
+      { "04", 'R', "LM" },       // Male minimum day
+      { "04", 'R', "PM" },       // Male maximum day
+      { "04", 'R', "SM" },       // Female minimum day
+      { "04", 'R', "VM" },       // Female maximum day
+      { "04", 'R', "lm" },       // Male minimum day
+      { "04", 'R', "pm" },       // Male maximum day
+      { "04", 'R', "sm" },       // Female minimum day
+      { "04", 'R', "vm" },       // Female maximum day
+
       // Digit day
       { "04", 'A', "31" },       // Valid day of month for January, any year, within of bounds for gender = male
       { "01", 'B', "28" },       // Valid day of for February, non-leap year
@@ -190,7 +204,6 @@ public class ItCodiceFiscaleTests
       "A71t",
       "A81u",
       "A91v",
-
    ];
 
    public static TheoryData<String> InvalidLengthValues =>
@@ -339,12 +352,15 @@ public class ItCodiceFiscaleTests
       { "00", 'A', "ll" },       // Invalid day = 0
       { "00", 'A', "0L" },       // Invalid day = 0
       { "00", 'A', "l0" },       // Invalid day = 0
-      { "87", 'C', "60" },       // Invalid day = 60
-      { "87", 'C', "99" },       // Invalid day = 99
-      { "87", 'C', "SL" },       // Invalid day = 60
-      { "87", 'C', "VV" },       // Invalid day = 99
-      { "87", 'C', "S0" },       // Invalid day = 60
-      { "87", 'C', "9V" },       // Invalid day = 99
+      { "87", 'C', "32" },       // Invalid day = 32, above male max day
+      { "87", 'C', "60" },       // Invalid day = 60, below female min day
+      { "87", 'C', "92" },       // Invalid day = 92, above female max day
+      { "87", 'C', "PN" },       // Invalid day = 32, above male max day
+      { "87", 'C', "SL" },       // Invalid day = 60, below female min day
+      { "87", 'C', "vN" },       // Invalid day = 92, above female max day
+      { "87", 'C', "3N" },       // Invalid day = 32, above male max day
+      { "87", 'C', "S0" },       // Invalid day = 60, below female min day
+      { "87", 'C', "9n" },       // Invalid day = 92, above female max day
 
       // Invalid omocodia substitution
       { "00", 'A', "A1" },
@@ -533,7 +549,6 @@ public class ItCodiceFiscaleTests
          _ => -1,
       };
 
-
    private static readonly Int32[] _evenCharacterMap = [.. Enumerable.Range('0', 'Z' - '0' + 1).Select(ch => MapEvenCharacter((Char)ch))];
 
    private static readonly Int32[] _oddCharacterMap = [.. Enumerable.Range('0', 'Z' - '0' + 1).Select(ch => MapOddCharacter((Char)ch))];
@@ -624,7 +639,7 @@ public class ItCodiceFiscaleTests
    // ==========================================================================
    // ==========================================================================
 
-   [Theory]   // e e e e e e e e
+   [Theory]
    [InlineData("BABABA10B01A101A")]    // BABABA10B01A evaluates to zero, so only the three digits of the comune have any effect on the check digit calculation
    [InlineData("BABABA10B01A111B")]    // Remainder = 1
    [InlineData("BABABA10B01A121C")]    // Remainder = 2
@@ -1681,6 +1696,105 @@ public class ItCodiceFiscaleTests
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region GetDateOfBirth Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [InlineData("00", 'A', "01", "2000/01/01")]
+   [InlineData("99", 't', "31", "1999/12/31")]
+   [InlineData("00", 'B', "29", "2000/02/29")]
+   [InlineData("50", 'a', "01", "1950/01/01")]
+   [InlineData("49", 'T', "31", "2049/12/31")]
+   [InlineData("00", 'A', "61", "2000/01/01")]
+   [InlineData("99", 't', "91", "1999/12/31")]
+   [InlineData("00", 'B', "89", "2000/02/29")]
+   [InlineData("50", 'a', "61", "1950/01/01")]
+   [InlineData("49", 'T', "91", "2049/12/31")]
+   public void ItCodiceFiscale_GetDateOfBirth_ShouldReturnExpectedValue_WhenCenturyCutoffIsDefault(
+      String year,
+      Char month,
+      String day,
+      String expectedStringDob)
+   {
+      // Arrange.
+      var value = GetValue(year: year, month: month, day: day);
+      var sut = new ItCodiceFiscale(value);
+      var expected = DateOnly.ParseExact(expectedStringDob, "yyyy/MM/dd", CultureInfo.InvariantCulture);
+
+      // Act/assert.
+      sut.GetDateOfBirth().Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("00", 'A', "01",  30, "2000/01/01")]
+   [InlineData("99", 't', "31",  30, "1999/12/31")]
+   [InlineData("00", 'B', "29",  30, "2000/02/29")]
+   [InlineData("30", 'a', "01",  30, "1930/01/01")]
+   [InlineData("29", 'T', "31",  30, "2029/12/31")]
+   [InlineData("00", 'A', "61",  30, "2000/01/01")]
+   [InlineData("99", 't', "91",  30, "1999/12/31")]
+   [InlineData("00", 'B', "89",  30, "2000/02/29")]
+   [InlineData("30", 'a', "61",  30, "1930/01/01")]
+   [InlineData("29", 'T', "91",  30, "2029/12/31")]
+   public void ItCodiceFiscale_GetDateOfBirth_ShouldReturnExpectedValue_WhenCenturyCutoffIsSupplied(
+      String year,
+      Char month,
+      String day,
+      Int32 centuryCutoff,
+      String expectedStringDob)
+   {
+      // Arrange.
+      var value = GetValue(year: year, month: month, day: day);
+      var sut = new ItCodiceFiscale(value);
+      var expected = DateOnly.ParseExact(expectedStringDob, "yyyy/MM/dd", CultureInfo.InvariantCulture);
+
+      // Act/assert.
+      sut.GetDateOfBirth((CenturyCutoff)centuryCutoff).Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("01", 'A', "01", "1901/01/01")]
+   [InlineData("00", 't', "31", "2000/12/31")]
+   [InlineData("01", 'a', "61", "1901/01/01")]
+   [InlineData("00", 'T', "91", "2000/12/31")]
+   public void ItCodiceFiscale_GetDateOfBirth_ShouldReturnExpectedValue_WhenCenturyCutoffIsMinimumValidValue(
+      String year,
+      Char month,
+      String day,
+      String expectedStringDob)
+   {
+      // Arrange.
+      var value = GetValue(year: year, month: month, day: day);
+      var sut = new ItCodiceFiscale(value);
+      var centuryCutoff = 1;
+      var expected = DateOnly.ParseExact(expectedStringDob, "yyyy/MM/dd", CultureInfo.InvariantCulture);
+
+      // Act/assert.
+      sut.GetDateOfBirth((CenturyCutoff)centuryCutoff).Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData("99", 'T', "31", "2099/12/31")]
+   [InlineData("99", 't', "91", "2099/12/31")]
+   public void ItCodiceFiscale_GetDateOfBirth_ShouldReturnExpectedValue_WhenCenturyCutoffIsMaximumValidValue(
+      String year,
+      Char month,
+      String day,
+      String expectedStringDob)
+   {
+      // Arrange.
+      var value = GetValue(year: year, month: month, day: day);
+      var sut = new ItCodiceFiscale(value);
+      var centuryCutoff = 100;
+      var expected = DateOnly.ParseExact(expectedStringDob, "yyyy/MM/dd", CultureInfo.InvariantCulture);
+
+      // Act/assert.
+      sut.GetDateOfBirth((CenturyCutoff)centuryCutoff).Should().Be(expected);
    }
 
    #endregion
