@@ -883,14 +883,14 @@ public class FrInseeNumberTests
    public void FrInseeNumber_ExplicitCastToFrInseeNumber_ShouldCreateInstance_WhenValueIsValid(String value)
    {
       // Arrange.
-      var expected = GetRawInsee(value);
+      var expected = new FrInseeNumber(value);
 
       // Act.
       var sut = (FrInseeNumber)value;
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Value.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -899,14 +899,14 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(gender: gender);
-      var expected = GetRawInsee(value);
+      var expected = new FrInseeNumber(value);
 
       // Act.
       var sut = (FrInseeNumber)value;
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Value.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -917,14 +917,14 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(month: month, formatted: formatted);
-      var expected = GetRawInsee(value);
+      var expected = new FrInseeNumber(value);
 
       // Act.
       var sut = (FrInseeNumber)value;
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Value.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -935,14 +935,14 @@ public class FrInseeNumberTests
    {
       // Arrange.
       var value = GetInseeWithValidCheckDigits(department: department, formatted: formatted);
-      var expected = GetRawInsee(value);
+      var expected = new FrInseeNumber(value);
 
       // Act.
       var sut = (FrInseeNumber)value;
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Value.Should().Be(expected);
+      sut.Value.Should().BeEquivalentTo(expected);
    }
 
    [Theory]

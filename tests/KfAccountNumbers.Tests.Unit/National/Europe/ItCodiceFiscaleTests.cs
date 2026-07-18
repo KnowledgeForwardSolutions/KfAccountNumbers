@@ -568,20 +568,6 @@ public class ItCodiceFiscaleTests
    private static InvalidYear GetInvalidYearResult(String value)
       => new(Messages.ItCodiceFiscaleInvalidYear, value[6..8]);
 
-   //[Fact]
-   //public void CheckDigitTest()
-   //{
-   //   // Arrange.
-   //   var value = "RSSNTNUSHLUGNNS";
-   //   var expected = "RSSNTNUSHLUGNNSZ";
-
-   //   // Act.
-   //   var result = GetValueWithValidCheckDigit(value);
-
-   //   // Assert.
-   //   result.Should().Be(expected);
-   //}
-
    #region Check Digit Algorithm Tests
    // ==========================================================================
    // ==========================================================================
@@ -956,6 +942,788 @@ public class ItCodiceFiscaleTests
 
    #endregion
 
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidCodiceFiscaleValues))]
+   public void ItCodiceFiscale_Value_ShouldReturnValidatedInseeNumber(String value)
+   {
+      // Arrange.
+      var sut = new ItCodiceFiscale(value);
+      var expected = value.ToUpperInvariant();
+
+      // Act/assert.
+      sut.Value.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ItCodiceFiscale_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = ValidUpperCaseCodiceFiscale;
+      var sut = new ItCodiceFiscale(value);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().Be(sut.Value);
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = ValidUpperCaseCodiceFiscale;
+      var sut = new ItCodiceFiscale(value);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().Be(sut.Value);
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      ItCodiceFiscale sut = null!;
+
+      // Act.
+      String str = sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      ItCodiceFiscale sut = null!;
+
+      // Act.
+      var str = (String)sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidCodiceFiscaleValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = new ItCodiceFiscale(value);
+
+      // Act.
+      var sut = (ItCodiceFiscale)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidYearValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldCreateInstance_WhenYearIsValid(String year)
+   {
+      // Arrange.
+      var value = GetValue(year: year);
+      var expected = new ItCodiceFiscale(value);
+
+      // Act.
+      var sut = (ItCodiceFiscale)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidMonthValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldCreateInstance_WhenMonthIsValid(Char month)
+   {
+      // Arrange.
+      var value = GetValue(month: month);
+      var expected = new ItCodiceFiscale(value);
+
+      // Act.
+      var sut = (ItCodiceFiscale)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDayValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldCreateInstance_WhenDayIsValid(
+      String year,
+      Char month,
+      String day)
+   {
+      // Arrange.
+      var value = GetValue(year: year, month: month, day: day);
+      var expected = new ItCodiceFiscale(value);
+
+      // Act.
+      var sut = (ItCodiceFiscale)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidComuneValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldCreateInstance_WhenComuneIsValid(String comune)
+   {
+      // Arrange.
+      var value = GetValue(comune: comune);
+      var expected = new ItCodiceFiscale(value);
+
+      // Act.
+      var sut = (ItCodiceFiscale)value;
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (ItCodiceFiscale)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (ItCodiceFiscale)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldThrowKfValidationException_WhenValueHasNonAlphanumericCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (ItCodiceFiscale)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckCharacterValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldThrowKfValidationException_WhenValueHasInvalidCheckCharacter(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (ItCodiceFiscale)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidNameValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldThrowKfValidationException_WhenSurnameHasDigitCharacter(String surname)
+   {
+      // Arrange.
+      var value = GetValue(surname);
+      LocalValidationError expected = GetInvalidSurnameResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (ItCodiceFiscale)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidNameValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldThrowKfValidationException_WhenGivenNameHasDigitCharacter(String givenName)
+   {
+      // Arrange.
+      var value = GetValue(givenName: givenName);
+      LocalValidationError expected = GetInvalidGivenNameResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (ItCodiceFiscale)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidYearValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldThrowKfValidationException_WhenYearHasNonOmocodiaSubstitution(String year)
+   {
+      // Arrange.
+      var value = GetValue(year: year);
+      LocalValidationError expected = GetInvalidYearResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (ItCodiceFiscale)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidMonthValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldThrowKfValidationException_WhenMonthHasInvalidCharacter(Char month)
+   {
+      // Arrange.
+      var value = GetValue(month: month);
+      LocalValidationError expected = GetInvalidMonthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (ItCodiceFiscale)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDayValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldThrowKfValidationException_WhenDayIsInvalid(
+      String year,
+      Char month,
+      String day)
+   {
+      // Arrange.
+      var value = GetValue(year: year, month: month, day: day);
+      LocalValidationError expected = GetInvalidDayResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (ItCodiceFiscale)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidComuneValues))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldThrowKfValidationException_WhenValueHasInvalidComune(String comune)
+   {
+      // Arrange.
+      var value = GetValue(comune: comune);
+      LocalValidationError expected = GetInvalidLocationCodeResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => (ItCodiceFiscale)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ItCodiceFiscale_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+      var sut2 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+      var sut2 = new ItCodiceFiscale(AltValidUpperCaseCodiceFiscale);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyByCase()
+   {
+      // Arrange.
+      var sut1 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+      var sut2 = new ItCodiceFiscale(ValidLowerCaseCodiceFiscale);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ItCodiceFiscale_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+      var sut2 = new ItCodiceFiscale(AltValidUpperCaseCodiceFiscale);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+      var sut2 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyByCase()
+   {
+      // Arrange.
+      var sut1 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+      var sut2 = new ItCodiceFiscale(ValidLowerCaseCodiceFiscale);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidCodiceFiscaleValues))]
+   public void ItCodiceFiscale_Create_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = new ItCodiceFiscale(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidYearValues))]
+   public void ItCodiceFiscale_Create_ShouldCreateInstance_WhenYearIsValid(String year)
+   {
+      // Arrange.
+      var value = GetValue(year: year);
+      LocalCreateResult expected = new ItCodiceFiscale(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidMonthValues))]
+   public void ItCodiceFiscale_Create_ShouldCreateInstance_WhenMonthIsValid(Char month)
+   {
+      // Arrange.
+      var value = GetValue(month: month);
+      LocalCreateResult expected = new ItCodiceFiscale(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidDayValues))]
+   public void ItCodiceFiscale_Create_ShouldCreateInstance_WhenDayIsValid(
+      String year,
+      Char month,
+      String day)
+   {
+      // Arrange.
+      var value = GetValue(year: year, month: month, day: day);
+      LocalCreateResult expected = new ItCodiceFiscale(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidComuneValues))]
+   public void ItCodiceFiscale_Create_ShouldCreateInstance_WhenComuneIsValid(String comune)
+   {
+      // Arrange.
+      var value = GetValue(comune: comune);
+      LocalCreateResult expected = new ItCodiceFiscale(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void ItCodiceFiscale_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void ItCodiceFiscale_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<LocalValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void ItCodiceFiscale_Create_ShouldThrowKfValidationException_WhenValueHasNonAlphanumericCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckCharacterValues))]
+   public void ItCodiceFiscale_Create_ShouldThrowKfValidationException_WhenValueHasInvalidCheckCharacter(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidNameValues))]
+   public void ItCodiceFiscale_Create_ShouldThrowKfValidationException_WhenSurnameHasDigitCharacter(String surname)
+   {
+      // Arrange.
+      var value = GetValue(surname);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSurnameResult(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidNameValues))]
+   public void ItCodiceFiscale_Create_ShouldThrowKfValidationException_WhenGivenNameHasDigitCharacter(String givenName)
+   {
+      // Arrange.
+      var value = GetValue(givenName: givenName);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidGivenNameResult(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidYearValues))]
+   public void ItCodiceFiscale_Create_ShouldThrowKfValidationException_WhenYearHasNonOmocodiaSubstitution(String year)
+   {
+      // Arrange.
+      var value = GetValue(year: year);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidYearResult(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidMonthValues))]
+   public void ItCodiceFiscale_Create_ShouldThrowKfValidationException_WhenMonthHasInvalidCharacter(Char month)
+   {
+      // Arrange.
+      var value = GetValue(month: month);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidMonthResult(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDayValues))]
+   public void ItCodiceFiscale_Create_ShouldThrowKfValidationException_WhenDayIsInvalid(
+      String year,
+      Char month,
+      String day)
+   {
+      // Arrange.
+      var value = GetValue(year: year, month: month, day: day);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidDayResult(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidComuneValues))]
+   public void ItCodiceFiscale_Create_ShouldThrowKfValidationException_WhenValueHasInvalidComune(String comune)
+   {
+      // Arrange.
+      var value = GetValue(comune: comune);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLocationCodeResult(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ItCodiceFiscale_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+      var sut2 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+      var sut2 = new ItCodiceFiscale(AltValidUpperCaseCodiceFiscale);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+
+      // Act/assert.
+      sut.Equals(ValidUpperCaseCodiceFiscale).Should().BeFalse();
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_Equals_ShouldReturnTrue_WhenValuesDifferOnlyByCase()
+   {
+      // Arrange.
+      var sut1 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+      var sut2 = new ItCodiceFiscale(ValidLowerCaseCodiceFiscale);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ItCodiceFiscale_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+      var sut2 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+      var sut2 = new ItCodiceFiscale(AltValidUpperCaseCodiceFiscale);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyByCase()
+   {
+      // Arrange.
+      var sut1 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+      var sut2 = new ItCodiceFiscale(ValidLowerCaseCodiceFiscale);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // ItCodiceFiscale does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void ItCodiceFiscale_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+      var sut2 = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidCodiceFiscaleValues))]
+   public void ItCodiceFiscale_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new ItCodiceFiscale(value);
+      var expected = value.ToUpperInvariant();
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -1189,6 +1957,103 @@ public class ItCodiceFiscaleTests
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ItCodiceFiscale_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<ItCodiceFiscale>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public ItCodiceFiscale CodiceFiscale { get; set; } = null!;
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { CodiceFiscale = new ItCodiceFiscale(ValidUpperCaseCodiceFiscale) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"CodiceFiscale\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"CodiceFiscale\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.CodiceFiscale.Should().BeNull();
+   }
+
+   [Fact]
+   public void ItCodiceFiscale_JsonDeserialization_ShouldThrowKfValidationException_WhenValueIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"CodiceFiscale\":\"MRTMST91D08F205J\"}";  // Invalid check digits
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion

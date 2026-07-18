@@ -225,6 +225,7 @@ namespace KfAccountNumbers.National.Europe;
 ///      for more information.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(ItCodiceFiscaleJsonConverter))]
 public record ItCodiceFiscale
 {
    /// <summary>
@@ -396,7 +397,69 @@ public record ItCodiceFiscale
    /// <summary>
    ///   Gets a string representation of the codice fiscale.
    /// </summary>
+   /// <remarks>
+   ///   The value is normalized to upper-case.
+   /// </remarks>
    public String Value { get; private init; }
+
+   /// <summary>
+   ///   Implicitly converts a <see cref="ItCodiceFiscale"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="ItCodiceFiscale"/> to convert.
+   /// </param>
+   public static implicit operator String(ItCodiceFiscale source)
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a
+   ///   <see cref="ItCodiceFiscale"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of an Italian codice fiscale.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid codice fiscale value.
+   /// </exception>
+   public static explicit operator ItCodiceFiscale(String? value) => new(value);
+
+   /// <summary>
+   ///   Create a new <see cref="ItCodiceFiscale"/> using the Result pattern.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of an Italian codice fiscale.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{ItCodiceFiscale, ValidationError}"/>. Will
+   ///   contain the new <see cref="ItCodiceFiscale"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
+   /// </returns>
+   public static CreateResult<ItCodiceFiscale, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new ItCodiceFiscale(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSurname invalidSurname => (ValidationError)invalidSurname,
+         InvalidGivenName invalidGivenName => (ValidationError)invalidGivenName,
+         InvalidYear invalidYear => (ValidationError)invalidYear,
+         InvalidMonth invalidMonth => (ValidationError)invalidMonth,
+         InvalidDay invalidDay => (ValidationError)invalidDay,
+         InvalidLocationCode invalidComune => (ValidationError)invalidComune,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
+
+   /// <summary>
+   ///   Get a string representation of the codice fiscale.
+   /// </summary>
+   /// <returns>
+   ///   The codice fiscale value, normalized to upper-case.
+   /// </returns>
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a
@@ -703,4 +766,23 @@ public record ItCodiceFiscale
 
       return default(ValidValue);
    }
+}
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
+public class ItCodiceFiscaleJsonConverter : JsonConverter<ItCodiceFiscale>
+{
+   public override ItCodiceFiscale Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new ItCodiceFiscale(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, ItCodiceFiscale value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }
