@@ -482,9 +482,61 @@ public class ItCodiceFiscaleTests
       "AaaA",
    ];
 
-   private static readonly Int32[] _evenCharacterMap = [.. Enumerable.Range('0', 'Z' - '0' + 1).Select(ch => ItCodiceFiscale.MapEvenCharacter((Char)ch))];
+   private static Int32 MapEvenCharacter(Char ch)
+      => ch switch
+      {
+         var d when d is >= Chars.DigitZero and <= Chars.DigitNine => d - Chars.DigitZero,
+         var c when c is >= Chars.UpperCaseA and <= Chars.UpperCaseZ => c - Chars.UpperCaseA,
+         _ => -1,
+      };
 
-   private static readonly Int32[] _oddCharacterMap = [.. Enumerable.Range('0', 'Z' - '0' + 1).Select(ch => ItCodiceFiscale.MapOddCharacter((Char)ch))];
+   private static Int32 MapOddCharacter(Char ch)
+      => ch switch
+      {
+         // Map from https://en.wikipedia.org/wiki/Italian_fiscal_code
+         '0' => 1,
+         '1' => 0,
+         '2' => 5,
+         '3' => 7,
+         '4' => 9,
+         '5' => 13,
+         '6' => 15,
+         '7' => 17,
+         '8' => 19,
+         '9' => 21,
+         'A' => 1,
+         'B' => 0,
+         'C' => 5,
+         'D' => 7,
+         'E' => 9,
+         'F' => 13,
+         'G' => 15,
+         'H' => 17,
+         'I' => 19,
+         'J' => 21,
+         'K' => 2,
+         'L' => 4,
+         'M' => 18,
+         'N' => 20,
+         'O' => 11,
+         'P' => 3,
+         'Q' => 6,
+         'R' => 8,
+         'S' => 12,
+         'T' => 14,
+         'U' => 16,
+         'V' => 10,
+         'W' => 22,
+         'X' => 25,
+         'Y' => 24,
+         'Z' => 23,
+         _ => -1,
+      };
+
+
+   private static readonly Int32[] _evenCharacterMap = [.. Enumerable.Range('0', 'Z' - '0' + 1).Select(ch => MapEvenCharacter((Char)ch))];
+
+   private static readonly Int32[] _oddCharacterMap = [.. Enumerable.Range('0', 'Z' - '0' + 1).Select(ch => MapOddCharacter((Char)ch))];
 
    private static String GetValue(
       String surname = "ABC",

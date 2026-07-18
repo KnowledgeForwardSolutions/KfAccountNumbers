@@ -128,10 +128,10 @@ namespace KfAccountNumbers.National.Europe;
 ///         <item>
 ///            <description>
 ///               The day of birth, character positions 9-10 (zero-based) must
-///               be two ASCII digits ('0'-'9') the equivalent Omocodia letter
-///               (see below). The integer value must be bettween 01-31 for
-///               males and 61-91 for females. The integer value must also be
-///               valid for the year/month
+///               be two ASCII digits ('0'-'9') or the equivalent Omocodia
+///               letter (see below). The integer value must be between 01-31
+///               for males and 61-91 for females. The integer value must also
+///               be valid for the year/month
 ///            </description>
 ///         </item>
 ///         <item>
@@ -276,10 +276,17 @@ public record ItCodiceFiscale
    /// </summary>
    public const Int32 IndividualLength = 16;
 
-   private static readonly Int32[] _evenCharacterMap = [.. Enumerable.Range(Chars.DigitZero, Chars.UpperCaseZ - Chars.DigitZero + 1).Select(ch => MapEvenCharacter((Char)ch))];
+#pragma warning disable SA1025 // Code should not contain multiple whitespace in a row
+#pragma warning disable format
+   // Pre-computed lookup tables to map characters from '0' to 'Z' to their integer equivalents when validating the check character.
+   // Includes characters between '9' and 'A' to enable simple index calculation by ch - '0'.
+   //                                                   0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  :,  ;,  <,  =,  >,  ?,  @,  A,  B,  C,  D,  E,  F,  G,  H,  I,  J,  K,  L,  M,  N,  O,  P,  Q,  R,  S,  T,  U,  V,  W,  X,  Y,  Z
+   private static readonly Int32[] _evenCharacterMap = [0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, -1, -1, -1, -1, -1, -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25];
+   private static readonly Int32[] _oddCharacterMap =  [1,  0,  5,  7,  9, 13, 15, 17, 19, 21, -1, -1, -1, -1, -1, -1, -1,  1,  0,  5,  7,  9, 13, 15, 17, 19, 21,  2,  4, 18, 20, 11,  3,  6,  8, 12, 14, 16, 10, 22, 25, 24, 23];
+   #pragma warning restore format
+   #pragma warning restore SA1025 // Code should not contain multiple whitespace in a row
 
-   private static readonly Int32[] _oddCharacterMap = [.. Enumerable.Range(Chars.DigitZero, Chars.UpperCaseZ - Chars.DigitZero + 1).Select(ch => MapOddCharacter((Char)ch))];
-
+   // Define regions within the value.
    private static readonly SegmentRange _surnameRange = new(0, 3);
    private static readonly SegmentRange _givenNameRange = new(3, 6);
    private static readonly SegmentRange _yearRange = new(6, 8);
@@ -287,13 +294,13 @@ public record ItCodiceFiscale
    private static readonly SegmentRange _dayRange = new(9, 11);
    private static readonly SegmentRange _comuneRange = new(11, 15);
 
-   // Female gender is inticated by the day of birth incremented by +60.
+   // Female gender is indicated by the day of birth incremented by +60.
    private const Int32 FemaleGenderDayOffset = 60;
 
-   private const Int32 FemaleMinDay = 61;
-   private const Int32 FemaleMaxDay = 91;
    private const Int32 MaleMinDay = 1;
    private const Int32 MaleMaxDay = 31;
+   private const Int32 FemaleMinDay = MaleMinDay + FemaleGenderDayOffset;
+   private const Int32 FemaleMaxDay = MaleMaxDay + FemaleGenderDayOffset;
 
    /// <summary>
    ///   Initializes a new instance of the <see cref="ItCodiceFiscale"/> class.
@@ -520,77 +527,6 @@ public record ItCodiceFiscale
       return default(ValidValue);
    }
 
-   /// <summary>
-   ///   Map a character located at an even index (one-based) to its integer
-   ///   equivalent for the purposes of calculating the check digit.
-   /// </summary>
-   /// <param name="ch">
-   ///   The character to map.
-   /// </param>
-   /// <returns>
-   ///   The character's integer equivalent for calculating the check digit.
-   /// </returns>
-   internal static Int32 MapEvenCharacter(Char ch)
-      => ch switch
-      {
-         var d when d is >= Chars.DigitZero and <= Chars.DigitNine => d - Chars.DigitZero,
-         var c when c is >= Chars.UpperCaseA and <= Chars.UpperCaseZ => c - Chars.UpperCaseA,
-         _ => -1,
-      };
-
-   /// <summary>
-   ///   Map a character located at an odd index (one-based) to its integer
-   ///   equivalent for the purposes of calculating the check digit.
-   /// </summary>
-   /// <param name="ch">
-   ///   The character to map.
-   /// </param>
-   /// <returns>
-   ///   The character's integer equivalent for calculating the check digit.
-   /// </returns>
-   internal static Int32 MapOddCharacter(Char ch)
-      => ch switch
-      {
-         // Map from https://en.wikipedia.org/wiki/Italian_fiscal_code
-         '0' => 1,
-         '1' => 0,
-         '2' => 5,
-         '3' => 7,
-         '4' => 9,
-         '5' => 13,
-         '6' => 15,
-         '7' => 17,
-         '8' => 19,
-         '9' => 21,
-         'A' => 1,
-         'B' => 0,
-         'C' => 5,
-         'D' => 7,
-         'E' => 9,
-         'F' => 13,
-         'G' => 15,
-         'H' => 17,
-         'I' => 19,
-         'J' => 21,
-         'K' => 2,
-         'L' => 4,
-         'M' => 18,
-         'N' => 20,
-         'O' => 11,
-         'P' => 3,
-         'Q' => 6,
-         'R' => 8,
-         'S' => 12,
-         'T' => 14,
-         'U' => 16,
-         'V' => 10,
-         'W' => 22,
-         'X' => 25,
-         'Y' => 24,
-         'Z' => 23,
-         _ => -1,
-      };
-
    private static InvalidCharacter GetInvalidCharacterResult(
       ReadOnlySpan<Char> value,
       Int32 position)
@@ -625,6 +561,7 @@ public record ItCodiceFiscale
    private static InvalidYear GetInvalidYearResult(ReadOnlySpan<Char> value)
       => new(Messages.ItCodiceFiscaleInvalidYear, _yearRange.Extract(value).ToString());
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Int32 GetMonth(Char ch)
       => ch switch
       {
@@ -652,6 +589,7 @@ public record ItCodiceFiscale
    ///   An integer value between 0 and 9 or -1 if the character is not a valid
    ///   omocodia substitution.
    /// </returns>
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Int32 GetOmocodiaDigit(Char ch)
       => ch switch
       {
@@ -663,6 +601,7 @@ public record ItCodiceFiscale
          _ => -1,
       };
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Int32 GetTwoDigitInteger(ReadOnlySpan<Char> span)
    {
       var d1 = GetOmocodiaDigit(span[0]);
@@ -751,7 +690,9 @@ public record ItCodiceFiscale
          return GetInvalidDayResult(value);
       }
 
-      // Also check that day is valid for the month.
+      // Also check that day is valid for the month. Treat YY as 20YY because
+      // within 00-99, the only leap-year difference between 19YY and 20YY is
+      // YY=00 (1900 is not a leap year; 2000 is).
       year += 2000;
       var daysInMonth = DateTime.DaysInMonth(year, month);
       if (day > 31)

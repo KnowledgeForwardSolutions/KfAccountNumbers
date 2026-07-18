@@ -349,8 +349,7 @@ public abstract record GbPatientNumberBase
 
       // Treat YY as 20YY for date validation: within 00-99, the only leap-year
       // difference between 19YY and 20YY is YY=00 (1900 is not a leap year;
-      // 2000 is). Since the CenturyCutoff helper treats 00 = 2000, we do the
-      // same here to keep this check consistent with GetDateOfBirth.
+      // 2000 is).
       year += 2000;
 
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);

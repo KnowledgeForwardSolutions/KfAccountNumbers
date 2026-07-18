@@ -23,7 +23,7 @@ Italian tax identifier assigned to individuals by the Italian tax office, the Ag
 | 6. | The given name characters, positions 3-5 (zero-based), must be upper-case or lower-case alphabetic characters ('A'-'Z', 'a'-'z') | InvalidGivenName |
 | 7. | The year of birth, character positions 6-7 (zero-based), must be ASCII digits ('0'-'9') or the equivalent Omocodia letter (see below). | InvalidYear |
 | 8. | The month of birth, character position 8 (zero-based) must be an upper-case or lower-case alphabetic character. Valid month characters are "ABCDEHLMPRST", where 'A' = January and 'T' = December | InvalidMonth |
-| 9. | The day of birth, character positions 9-10 (zero-based) must be two ASCII digits ('0'-'9') the equivalent Omocodia letter (see below). The integer value must be bettween 01-31 for males and 61-91 for females. The integer value must also be valid for the year/month | InvalidDay |
+| 9. | The day of birth, character positions 9-10 (zero-based) must be two ASCII digits ('0'-'9') the or the equivalent Omocodia letter (see below). The integer value must be between 01-31 for males and 61-91 for females. The integer value must also be valid for the year/month | InvalidDay |
 | 10. | The comune of birth, character positions 11-14 (zero-based) must be an upper-case or lower-case alphabetic character ('A'-'Z', 'a'-'z') followed by three ASCII digits ('0'-'9') the equivalent Omocodia letter (see below) | InvalidLocationCode |
 
 ### Additional Properties
