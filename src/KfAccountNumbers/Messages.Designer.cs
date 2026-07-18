@@ -961,7 +961,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IT Codice Fiscale check character (character position 14, zero-based) must be a valid modulus 26 check character.
+        ///   Looks up a localized string similar to IT Codice Fiscale check character (character position 15, zero-based) must be a valid modulus 26 check character.
         /// </summary>
         internal static string ItCodiceFiscaleInvalidCheckCharacter {
             get {
@@ -970,7 +970,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IT Codice Fiscale comune (town) of birth (character position 11-15, zero-based) must have the format of a Belifore code (one alphabetic character followed by three digits). The town of birth may include omocodia letter substitutions.
+        ///   Looks up a localized string similar to IT Codice Fiscale comune (town) of birth (character position 11-14, zero-based) must have the format of a Belfiore code (one alphabetic character followed by three digits). The town of birth may include omocodia letter substitutions.
         /// </summary>
         internal static string ItCodiceFiscaleInvalidComune {
             get {
@@ -979,7 +979,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IT Codice Fiscale day of birth (character position 9-10, zero-based) must be a valid day between 01-31. The day of birth may be offset by +60 to indicate the female gender and the day of birth may include omocodia letter substitutions.
+        ///   Looks up a localized string similar to IT Codice Fiscale day of birth (character positions 9-10, zero-based) must be a valid day between 01-31 for males or 41-71 (day +40) for females. The day of birth may include omocodia letter substitutions.
         /// </summary>
         internal static string ItCodiceFiscaleInvalidDay {
             get {
@@ -1024,7 +1024,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IT Codice Fiscale year of birth (character positions 6-7, zero-based) must be ASCII digits (&apos;0-&apos;9&apos;) or their equivalent omocodia letter substitution.
+        ///   Looks up a localized string similar to IT Codice Fiscale year of birth (character positions 6-7, zero-based) must be ASCII digits (&apos;0&apos;-&apos;9&apos;) or their equivalent omocodia letter substitution.
         /// </summary>
         internal static string ItCodiceFiscaleInvalidYear {
             get {

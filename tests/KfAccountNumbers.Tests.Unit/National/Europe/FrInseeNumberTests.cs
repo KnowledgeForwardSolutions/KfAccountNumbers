@@ -889,8 +889,7 @@ public class FrInseeNumberTests
       var sut = (FrInseeNumber)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().BeEquivalentTo(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -905,8 +904,7 @@ public class FrInseeNumberTests
       var sut = (FrInseeNumber)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().BeEquivalentTo(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -923,8 +921,7 @@ public class FrInseeNumberTests
       var sut = (FrInseeNumber)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().BeEquivalentTo(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -941,8 +938,7 @@ public class FrInseeNumberTests
       var sut = (FrInseeNumber)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().BeEquivalentTo(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]

@@ -118,16 +118,16 @@ public class ItCodiceFiscaleTests
       // Day min/max bounds
       { "04", 'R', "01" },       // Male minimum day
       { "04", 'R', "31" },       // Male maximum day
-      { "04", 'R', "61" },       // Female minimum day
-      { "04", 'R', "91" },       // Female maximum day
+      { "04", 'R', "41" },       // Female minimum day
+      { "04", 'R', "71" },       // Female maximum day
       { "04", 'R', "LM" },       // Male minimum day
       { "04", 'R', "PM" },       // Male maximum day
-      { "04", 'R', "SM" },       // Female minimum day
-      { "04", 'R', "VM" },       // Female maximum day
+      { "04", 'R', "QM" },       // Female minimum day
+      { "04", 'R', "TM" },       // Female maximum day
       { "04", 'R', "lm" },       // Male minimum day
       { "04", 'R', "pm" },       // Male maximum day
-      { "04", 'R', "sm" },       // Female minimum day
-      { "04", 'R', "vm" },       // Female maximum day
+      { "04", 'R', "qm" },       // Female minimum day
+      { "04", 'R', "tm" },       // Female maximum day
 
       // Digit day
       { "04", 'A', "31" },       // Valid day of month for January, any year, within of bounds for gender = male
@@ -137,13 +137,13 @@ public class ItCodiceFiscaleTests
       { "04", 'C', "31" },       // Valid day of for March, any year
       { "04", 'D', "30" },       // Valid day of for April, any year
       { "04", 'E', "31" },       // Valid day of for May, any year
-      { "04", 'H', "90" },       // Valid day of for June, any year, within of bounds for gender = female
-      { "04", 'L', "91" },       // Valid day of for July, any year
-      { "04", 'M', "91" },       // Valid day of for August, any year
-      { "04", 'P', "90" },       // Valid day of for September, any year
-      { "04", 'R', "91" },       // Valid day of for October, any year
-      { "04", 'S', "90" },       // Valid day of for November, any year
-      { "04", 'T', "91" },       // Valid day of for December, any year
+      { "04", 'H', "70" },       // Valid day of for June, any year, within of bounds for gender = female
+      { "04", 'L', "71" },       // Valid day of for July, any year
+      { "04", 'M', "71" },       // Valid day of for August, any year
+      { "04", 'P', "70" },       // Valid day of for September, any year
+      { "04", 'R', "71" },       // Valid day of for October, any year
+      { "04", 'S', "70" },       // Valid day of for November, any year
+      { "04", 'T', "71" },       // Valid day of for December, any year
 
       // Omocodia day
       { "04", 'A', "PM" },       // Valid day of month for January, any year, within of bounds for gender = male
@@ -153,13 +153,13 @@ public class ItCodiceFiscaleTests
       { "04", 'C', "pM" },       // Valid day of for March, any year
       { "04", 'D', "pL" },       // Valid day of for April, any year
       { "04", 'E', "pM" },       // Valid day of for May, any year
-      { "04", 'H', "VL" },       // Valid day of for June, any year, within of bounds for gender = female
-      { "04", 'L', "Vm" },       // Valid day of for July, any year
-      { "04", 'M', "Vm" },       // Valid day of for August, any year
-      { "04", 'P', "Vl" },       // Valid day of for September, any year
-      { "04", 'R', "vM" },       // Valid day of for October, any year
-      { "04", 'S', "vL" },       // Valid day of for November, any year
-      { "04", 'T', "vM" },       // Valid day of for December, any year
+      { "04", 'H', "TL" },       // Valid day of for June, any year, within of bounds for gender = female
+      { "04", 'L', "Tm" },       // Valid day of for July, any year
+      { "04", 'M', "Tm" },       // Valid day of for August, any year
+      { "04", 'P', "Tl" },       // Valid day of for September, any year
+      { "04", 'R', "tM" },       // Valid day of for October, any year
+      { "04", 'S', "tL" },       // Valid day of for November, any year
+      { "04", 'T', "tM" },       // Valid day of for December, any year
 
       // Mixed digit and omocodia day
       { "04", 'A', "3M" },       // Valid day of month for January, any year, within of bounds for gender = male
@@ -169,13 +169,13 @@ public class ItCodiceFiscaleTests
       { "04", 'C', "3m" },       // Valid day of for March, any year
       { "04", 'D', "3l" },       // Valid day of for April, any year
       { "04", 'E', "3m" },       // Valid day of for May, any year
-      { "04", 'H', "P0" },       // Valid day of for June, any year, within of bounds for gender = female
-      { "04", 'L', "P1" },       // Valid day of for July, any year
-      { "04", 'M', "P1" },       // Valid day of for August, any year
-      { "04", 'P', "P0" },       // Valid day of for September, any year
-      { "04", 'R', "v1" },       // Valid day of for October, any year
-      { "04", 'S', "v0" },       // Valid day of for November, any year
-      { "04", 'T', "v1" },       // Valid day of for December, any year
+      { "04", 'H', "T0" },       // Valid day of for June, any year, within of bounds for gender = female
+      { "04", 'L', "T1" },       // Valid day of for July, any year
+      { "04", 'M', "T1" },       // Valid day of for August, any year
+      { "04", 'P', "T0" },       // Valid day of for September, any year
+      { "04", 'R', "t1" },       // Valid day of for October, any year
+      { "04", 'S', "t0" },       // Valid day of for November, any year
+      { "04", 'T', "t1" },       // Valid day of for December, any year
    };
 
    public static TheoryData<String> ValidComuneValues =>
@@ -222,8 +222,8 @@ public class ItCodiceFiscaleTests
       { "MRTM\u2153T91D08F205J", 4 },     // Non-digit character Unicode fraction 1/3
       { "MRTMT\u00D691D08F205J", 5 },     // Invalid character unicode O with umlaut
       { "MRTMTT\u0BE61D08F205J", 6 },     // Invalid character unicode Tamil digit 0
-      { "MRTMTT9.D08F205J", 7 },          // Non-digit character '.'
-      { "MRTMTT91 08F205J", 8 },          // Non-digit character ' '
+      { "MRTMTT9:D08F205J", 7 },          // Non-digit character ':'
+      { "MRTMTT91;08F205J", 8 },          // Non-digit character ';'
       { "MRTMTT91D^8F205J", 9 },          // Non-digit character '^'
       { "MRTMTT91D0~F205J", 10 },         // Non-digit character '~'
       { "MRTMTT91D08\u2153205J", 11 },    // Non-digit character Unicode fraction 1/3
@@ -231,6 +231,7 @@ public class ItCodiceFiscaleTests
       { "MRTMTT91D08F2\u0BE65J", 13 },    // Invalid character unicode Tamil digit 0
       { "MRTMTT91D08F20.J", 14 },         // Non-digit character '.'
       { "MRTMTT91D08F205 ", 15 },         // Non-digit character ' '
+      { "MRTMTT91D08F205;", 15 },         // Non-digit character ';'
    };
 
    public static TheoryData<String> InvalidCheckCharacterValues =>
@@ -353,14 +354,14 @@ public class ItCodiceFiscaleTests
       { "00", 'A', "0L" },       // Invalid day = 0
       { "00", 'A', "l0" },       // Invalid day = 0
       { "87", 'C', "32" },       // Invalid day = 32, above male max day
-      { "87", 'C', "60" },       // Invalid day = 60, below female min day
-      { "87", 'C', "92" },       // Invalid day = 92, above female max day
+      { "87", 'C', "40" },       // Invalid day = 40, below female min day
+      { "87", 'C', "72" },       // Invalid day = 72, above female max day
       { "87", 'C', "PN" },       // Invalid day = 32, above male max day
-      { "87", 'C', "SL" },       // Invalid day = 60, below female min day
-      { "87", 'C', "vN" },       // Invalid day = 92, above female max day
+      { "87", 'C', "QL" },       // Invalid day = 40, below female min day
+      { "87", 'C', "TN" },       // Invalid day = 72, above female max day
       { "87", 'C', "3N" },       // Invalid day = 32, above male max day
-      { "87", 'C', "S0" },       // Invalid day = 60, below female min day
-      { "87", 'C', "9n" },       // Invalid day = 92, above female max day
+      { "87", 'C', "Q0" },       // Invalid day = 40, below female min day
+      { "87", 'C', "7n" },       // Invalid day = 72, above female max day
 
       // Invalid omocodia substitution
       { "00", 'A', "A1" },
@@ -406,13 +407,13 @@ public class ItCodiceFiscaleTests
       { "04", 'C', "32" },       // Invalid day of for March, any year
       { "04", 'D', "31" },       // Invalid day of for April, any year
       { "04", 'E', "32" },       // Invalid day of for May, any year
-      { "04", 'H', "91" },       // Invalid day of for June, any year, out of bounds for gender = female
-      { "04", 'L', "92" },       // Invalid day of for July, any year
-      { "04", 'M', "92" },       // Invalid day of for August, any year
-      { "04", 'P', "91" },       // Invalid day of for September, any year
-      { "04", 'R', "92" },       // Invalid day of for October, any year
-      { "04", 'S', "91" },       // Invalid day of for November, any year
-      { "04", 'T', "92" },       // Invalid day of for December, any year
+      { "04", 'H', "71" },       // Invalid day of for June, any year, out of bounds for gender = female
+      { "04", 'L', "72" },       // Invalid day of for July, any year
+      { "04", 'M', "72" },       // Invalid day of for August, any year
+      { "04", 'P', "71" },       // Invalid day of for September, any year
+      { "04", 'R', "72" },       // Invalid day of for October, any year
+      { "04", 'S', "71" },       // Invalid day of for November, any year
+      { "04", 'T', "72" },       // Invalid day of for December, any year
 
       // Omocodia day
       { "04", 'A', "PN" },       // Invalid day of month for January, any year, out of bounds for gender = male
@@ -422,13 +423,13 @@ public class ItCodiceFiscaleTests
       { "04", 'C', "pN" },       // Invalid day of for March, any year
       { "04", 'D', "pM" },       // Invalid day of for April, any year
       { "04", 'E', "pN" },       // Invalid day of for May, any year
-      { "04", 'H', "VM" },       // Invalid day of for June, any year, out of bounds for gender = female
-      { "04", 'L', "Vn" },       // Invalid day of for July, any year
-      { "04", 'M', "Vn" },       // Invalid day of for August, any year
-      { "04", 'P', "VM" },       // Invalid day of for September, any year
-      { "04", 'R', "vN" },       // Invalid day of for October, any year
-      { "04", 'S', "vM" },       // Invalid day of for November, any year
-      { "04", 'T', "vN" },       // Invalid day of for December, any year
+      { "04", 'H', "TM" },       // Invalid day of for June, any year, out of bounds for gender = female
+      { "04", 'L', "Tn" },       // Invalid day of for July, any year
+      { "04", 'M', "Tn" },       // Invalid day of for August, any year
+      { "04", 'P', "TM" },       // Invalid day of for September, any year
+      { "04", 'R', "tN" },       // Invalid day of for October, any year
+      { "04", 'S', "tM" },       // Invalid day of for November, any year
+      { "04", 'T', "tN" },       // Invalid day of for December, any year
 
       // Mixed digit and omocodia day
       { "04", 'A', "3N" },       // Invalid day of month for January, any year, out of bounds for gender = male
@@ -438,13 +439,13 @@ public class ItCodiceFiscaleTests
       { "04", 'C', "3n" },       // Invalid day of for March, any year
       { "04", 'D', "3m" },       // Invalid day of for April, any year
       { "04", 'E', "3n" },       // Invalid day of for May, any year
-      { "04", 'H', "P1" },       // Invalid day of for June, any year, out of bounds for gender = female
-      { "04", 'L', "P2" },       // Invalid day of for July, any year
-      { "04", 'M', "P2" },       // Invalid day of for August, any year
-      { "04", 'P', "P1" },       // Invalid day of for September, any year
-      { "04", 'R', "v2" },       // Invalid day of for October, any year
-      { "04", 'S', "v1" },       // Invalid day of for November, any year
-      { "04", 'T', "v2" },       // Invalid day of for December, any year
+      { "04", 'H', "T1" },       // Invalid day of for June, any year, out of bounds for gender = female
+      { "04", 'L', "T2" },       // Invalid day of for July, any year
+      { "04", 'M', "T2" },       // Invalid day of for August, any year
+      { "04", 'P', "T1" },       // Invalid day of for September, any year
+      { "04", 'R', "t2" },       // Invalid day of for October, any year
+      { "04", 'S', "t1" },       // Invalid day of for November, any year
+      { "04", 'T', "t2" },       // Invalid day of for December, any year
    };
 
    public static TheoryData<String> InvalidComuneValues =>
@@ -990,13 +991,13 @@ public class ItCodiceFiscaleTests
    }
 
    [Theory]
-   [InlineData("61")]
-   [InlineData("91")]
-   [InlineData("SM")]
-   [InlineData("VM")]
-   [InlineData("sm")]
-   [InlineData("vm")]
-   public void ItCodiceFiscale_Gender_ShouldReturnFemale_WhenDayIsGreaterThan60(String day)
+   [InlineData("41")]
+   [InlineData("71")]
+   [InlineData("QM")]
+   [InlineData("TM")]
+   [InlineData("qm")]
+   [InlineData("tm")]
+   public void ItCodiceFiscale_Gender_ShouldReturnFemale_WhenDayIsGreaterThan40(String day)
    {
       // Arrange.
       var value = GetValue(day: day);
@@ -1015,7 +1016,7 @@ public class ItCodiceFiscaleTests
 
    [Theory]
    [MemberData(nameof(ValidCodiceFiscaleValues))]
-   public void ItCodiceFiscale_Value_ShouldReturnValidatedInseeNumber(String value)
+   public void ItCodiceFiscale_Value_ShouldReturnValidatedCodiceFiscale(String value)
    {
       // Arrange.
       var sut = new ItCodiceFiscale(value);
@@ -1710,11 +1711,11 @@ public class ItCodiceFiscaleTests
    [InlineData("00", 'B', "29", "2000/02/29")]
    [InlineData("50", 'a', "01", "1950/01/01")]
    [InlineData("49", 'T', "31", "2049/12/31")]
-   [InlineData("00", 'A', "61", "2000/01/01")]
-   [InlineData("99", 't', "91", "1999/12/31")]
-   [InlineData("00", 'B', "89", "2000/02/29")]
-   [InlineData("50", 'a', "61", "1950/01/01")]
-   [InlineData("49", 'T', "91", "2049/12/31")]
+   [InlineData("00", 'A', "41", "2000/01/01")]
+   [InlineData("99", 't', "71", "1999/12/31")]
+   [InlineData("00", 'B', "69", "2000/02/29")]
+   [InlineData("50", 'a', "41", "1950/01/01")]
+   [InlineData("49", 'T', "71", "2049/12/31")]
    public void ItCodiceFiscale_GetDateOfBirth_ShouldReturnExpectedValue_WhenCenturyCutoffIsDefault(
       String year,
       Char month,
@@ -1736,11 +1737,11 @@ public class ItCodiceFiscaleTests
    [InlineData("00", 'B', "29",  30, "2000/02/29")]
    [InlineData("30", 'a', "01",  30, "1930/01/01")]
    [InlineData("29", 'T', "31",  30, "2029/12/31")]
-   [InlineData("00", 'A', "61",  30, "2000/01/01")]
-   [InlineData("99", 't', "91",  30, "1999/12/31")]
-   [InlineData("00", 'B', "89",  30, "2000/02/29")]
-   [InlineData("30", 'a', "61",  30, "1930/01/01")]
-   [InlineData("29", 'T', "91",  30, "2029/12/31")]
+   [InlineData("00", 'A', "41",  30, "2000/01/01")]
+   [InlineData("99", 't', "71",  30, "1999/12/31")]
+   [InlineData("00", 'B', "69",  30, "2000/02/29")]
+   [InlineData("30", 'a', "41",  30, "1930/01/01")]
+   [InlineData("29", 'T', "71",  30, "2029/12/31")]
    public void ItCodiceFiscale_GetDateOfBirth_ShouldReturnExpectedValue_WhenCenturyCutoffIsSupplied(
       String year,
       Char month,
@@ -1760,8 +1761,8 @@ public class ItCodiceFiscaleTests
    [Theory]
    [InlineData("01", 'A', "01", "1901/01/01")]
    [InlineData("00", 't', "31", "2000/12/31")]
-   [InlineData("01", 'a', "61", "1901/01/01")]
-   [InlineData("00", 'T', "91", "2000/12/31")]
+   [InlineData("01", 'a', "41", "1901/01/01")]
+   [InlineData("00", 'T', "71", "2000/12/31")]
    public void ItCodiceFiscale_GetDateOfBirth_ShouldReturnExpectedValue_WhenCenturyCutoffIsMinimumValidValue(
       String year,
       Char month,
@@ -1780,7 +1781,7 @@ public class ItCodiceFiscaleTests
 
    [Theory]
    [InlineData("99", 'T', "31", "2099/12/31")]
-   [InlineData("99", 't', "91", "2099/12/31")]
+   [InlineData("99", 't', "71", "2099/12/31")]
    public void ItCodiceFiscale_GetDateOfBirth_ShouldReturnExpectedValue_WhenCenturyCutoffIsMaximumValidValue(
       String year,
       Char month,

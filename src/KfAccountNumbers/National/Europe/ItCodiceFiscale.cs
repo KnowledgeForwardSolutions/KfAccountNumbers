@@ -130,7 +130,7 @@ namespace KfAccountNumbers.National.Europe;
 ///               The day of birth, character positions 9-10 (zero-based) must
 ///               be two ASCII digits ('0'-'9') or the equivalent Omocodia
 ///               letter (see below). The integer value must be between 01-31
-///               for males and 61-91 for females. The integer value must also
+///               for males and 41-71 for females. The integer value must also
 ///               be valid for the year/month
 ///            </description>
 ///         </item>
@@ -294,8 +294,8 @@ public record ItCodiceFiscale
    private static readonly SegmentRange _dayRange = new(9, 11);
    private static readonly SegmentRange _comuneRange = new(11, 15);
 
-   // Female gender is indicated by the day of birth incremented by +60.
-   private const Int32 FemaleGenderDayOffset = 60;
+   // Female gender is indicated by the day of birth incremented by +40.
+   private const Int32 FemaleGenderDayOffset = 40;
 
    private const Int32 MaleMinDay = 1;
    private const Int32 MaleMaxDay = 31;
@@ -391,7 +391,7 @@ public record ItCodiceFiscale
    ///   Gets the person's gender, as indicated by the day of birth.
    /// </summary>
    /// <remarks>
-   ///   Day of birth 1-31 = male, 61-91 = female.
+   ///   Day of birth 1-31 = male, 41-71 = female.
    /// </remarks>
    public Gender.BinaryGender Gender
       => GetTwoDigitInteger(_dayRange.Extract(Value)) switch
@@ -672,14 +672,20 @@ public record ItCodiceFiscale
 
       var remainder = sum % 26;
       var checkCharacter = Char.ToUpperInvariant(value[^1]);
-      var checkCharacterValue = checkCharacter is >= Chars.DigitZero and <= Chars.UpperCaseZ
-         ? _evenCharacterMap[checkCharacter - Chars.DigitZero]
-         : -1;
-      if (checkCharacterValue == -1)
+
+      // Handle invalid character in check character location.
+      if (!checkCharacter.IsAsciiDigit() && !checkCharacter.IsAsciiLetter())
       {
          return GetInvalidCharacterResult(value, value.Length - 1);
       }
 
+      // While a digit character will not generate an InvalidCharacter result,
+      // digit characters are not allowed as check characters so we specifically
+      // check for and reject them when calculating the check character number
+      // equivalent.
+      var checkCharacterValue = checkCharacter.IsAsciiLetter()
+         ? checkCharacter - Chars.UpperCaseA
+         : -1;
       return checkCharacterValue == remainder
          ? default(ValidValue)
          : GetInvalidChecksumResult();
