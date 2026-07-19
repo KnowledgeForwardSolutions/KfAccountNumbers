@@ -3,6 +3,7 @@
   <Folder Name="/docs/Reference/" />
   <Folder Name="/docs/Reference/National/" />
   <Folder Name="/docs/Reference/National/Europe/">
+    <File Path="docs/Reference/National/Europe/DeSteuerIdNr.md" />
     <File Path="docs/Reference/National/Europe/EsNif.md" />
     <File Path="docs/Reference/National/Europe/ItCodiceFiscale.md" />
     <File Path="docs/Reference/National/Europe/NoDnummer.md" />
