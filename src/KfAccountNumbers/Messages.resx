@@ -525,8 +525,8 @@
   <data name="IsKennitalaUnformattedLength" xml:space="preserve">
     <value>IS Kennitala without a separator character</value>
   </data>
-  <data name="DkPersonnummerFormattedLength" xml:space="preserve">
-    <value>DK Personnummer formatted for readability with a separator character at character position 6 (zero-based)</value>
+  <data name="DeSteuerIdNrFormattedLength" xml:space="preserve">
+    <value>DE Steuer-IdNr formatted for readability with separator characters at character position 2, 6 and 10 (zero-based)</value>
   </data>
   <data name="DkPersonnummerUnformattedLength" xml:space="preserve">
     <value>DK Personnummer without a separator character</value>
@@ -737,5 +737,23 @@
   </data>
   <data name="ItCodiceFiscaleInvalidCharacter" xml:space="preserve">
     <value>IT Codice Fiscale contains a non-letter ('A'-'Z', 'a'-'z') or non-digit character ('0'-'9')</value>
+  </data>
+  <data name="DkPersonnummerFormattedLength" xml:space="preserve">
+    <value>DK Personnummer formatted for readability with a separator character at character position 6 (zero-based)</value>
+  </data>
+  <data name="DeSteuerIdNrUnormattedLength" xml:space="preserve">
+    <value>DE Steuer-IdNr without separator characters</value>
+  </data>
+  <data name="DeSteuerIdNrInvalidCharacter" xml:space="preserve">
+    <value>DE Steuer-IdNr contains a non-digit character where a digit was expected</value>
+  </data>
+  <data name="DeSteuerIdNrInvalidLength" xml:space="preserve">
+    <value>DE Steuer-IdNr must have length 11 (no separator character) or 14 (separator character)</value>
+  </data>
+  <data name="DeSteuerIdNrInvalidSeparator" xml:space="preserve">
+    <value>DE Steuer-IdNr separator character may not be an ASCII digit ('0'-'9'). All separator characters must be the same</value>
+  </data>
+  <data name="DeSteuerIdNrInvalidCheckDigit" xml:space="preserve">
+    <value>DE Steuer-IdNr must have a valid ISO/IEC 7064 MOD 11,10</value>
   </data>
 </root>

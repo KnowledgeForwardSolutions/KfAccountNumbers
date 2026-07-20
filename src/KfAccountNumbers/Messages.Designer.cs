@@ -277,6 +277,60 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to DE Steuer-IdNr formatted for readability with separator characters at character position 2, 6 and 10 (zero-based).
+        /// </summary>
+        internal static string DeSteuerIdNrFormattedLength {
+            get {
+                return ResourceManager.GetString("DeSteuerIdNrFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DE Steuer-IdNr contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string DeSteuerIdNrInvalidCharacter {
+            get {
+                return ResourceManager.GetString("DeSteuerIdNrInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DE Steuer-IdNr must have a valid ISO/IEC 7064 MOD 11,10.
+        /// </summary>
+        internal static string DeSteuerIdNrInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("DeSteuerIdNrInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DE Steuer-IdNr must have length 11 (no separator character) or 14 (separator character).
+        /// </summary>
+        internal static string DeSteuerIdNrInvalidLength {
+            get {
+                return ResourceManager.GetString("DeSteuerIdNrInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DE Steuer-IdNr separator character may not be an ASCII digit (&apos;0&apos;-&apos;9&apos;). All separator characters must be the same.
+        /// </summary>
+        internal static string DeSteuerIdNrInvalidSeparator {
+            get {
+                return ResourceManager.GetString("DeSteuerIdNrInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DE Steuer-IdNr without separator characters.
+        /// </summary>
+        internal static string DeSteuerIdNrUnormattedLength {
+            get {
+                return ResourceManager.GetString("DeSteuerIdNrUnormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DK Personnummer may not be null, empty or all whitespace characters.
         /// </summary>
         internal static string DkPersonnummerEmpty {

@@ -325,6 +325,7 @@ public record CaSocialInsuranceNumber
             _formattedSecondSection.Extract(value),
             _formattedThirdSection.Extract(value));
 
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean IsFormatted(ReadOnlySpan<Char> value) => value.Length == FormattedLength;
 
    // Return the zero-based index of the first non-digit character (excluding

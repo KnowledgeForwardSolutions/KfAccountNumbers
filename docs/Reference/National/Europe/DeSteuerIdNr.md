@@ -7,7 +7,7 @@ German tax identification number (Steuerliche Identifikationsnummer or Steuer-Id
 | Class name: | KfAccountNumbers.National.Europe.DeSteuerIdNr |
 | Is composite: | No |
 | Length: | 11 |
-| Check digit algorithm: | ISO/IEC 7064, MOD 11,10 |
+| Check digit algorithm: | ISO/IEC 7064 MOD 11,10 |
 | Allowed characters: | ASCII digits ('0'-'9') |
 | Allowed separator characters: | Typically a space (' '), though any non digit character is allowed |
 | Structure: | ***DDDDDDDDDDC*** (unformatted) or ***DD DDD DDD DDC*** (formatted), where: <dl><dt>DDDDDDDDDD</dt><dd>Ten random digits</dd><dt>C</dt><dd>Check digit generated using the ISO/IEC 7064, MOD 11,10 algorithm</dd></dl> |
