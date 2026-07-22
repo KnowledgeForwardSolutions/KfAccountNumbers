@@ -14,7 +14,7 @@ public class DeSteuerIdNrTests
    private const String ValidUnformattedSteuerIdNr = "43957380212";
    private const String AltValidUnformattedSteuerIdNr = "25986078148";
    private const String ValidFormattedSteuerIdNr = "43 957 380 212";
-   private const String AltValidFormattedSteuerIdNr = "25 986 078 148";
+   private const String AltValidFormattedSteuerIdNr = "25/986/078/148";
 
    public static TheoryData<String> ValidSteuerIdNrValues =>
    [
@@ -22,6 +22,15 @@ public class DeSteuerIdNrTests
       AltValidUnformattedSteuerIdNr,
       ValidFormattedSteuerIdNr,
       AltValidFormattedSteuerIdNr,
+   ];
+
+   public static TheoryData<Char> ValidSeparators =>
+   [
+      ' ',
+      '-',
+      'A',
+      'z',
+      '/',
    ];
 
    public static TheoryData<String> InvalidLengthValues =>
@@ -84,6 +93,53 @@ public class DeSteuerIdNrTests
       "39-573-802-124",    // 43957380212 with two digit left circular shift error
    ];
 
+   public static TheoryData<String, Int32> InvalidSeparatorValues = new()
+   {
+      // First separator position
+      { "430957 380 212", 2 },
+      { "431957 380 212", 2 },
+      { "432957 380 212", 2 },
+      { "433957 380 212", 2 },
+      { "434957 380 212", 2 },
+      { "435957 380 212", 2 },
+      { "436957 380 212", 2 },
+      { "437957 380 212", 2 },
+      { "438957 380 212", 2 },
+      { "439957 380 212", 2 },
+
+      // Second separator position
+      { "43 9570380 212", 6 },
+      { "43 9571380 212", 6 },
+      { "43 9572380 212", 6 },
+      { "43 9573380 212", 6 },
+      { "43 9574380 212", 6 },
+      { "43 9575380 212", 6 },
+      { "43 9576380 212", 6 },
+      { "43 9577380 212", 6 },
+      { "43 9578380 212", 6 },
+      { "43 9579380 212", 6 },
+
+      // Theird separator position
+      { "43 957 3800212", 10 },
+      { "43 957 3801212", 10 },
+      { "43 957 3802212", 10 },
+      { "43 957 3803212", 10 },
+      { "43 957 3804212", 10 },
+      { "43 957 3805212", 10 },
+      { "43 957 3806212", 10 },
+      { "43 957 3807212", 10 },
+      { "43 957 3808212", 10 },
+      { "43 957 3809212", 10 },
+
+      // Mixed separators
+      { "43 957.380 212", 6 },
+      { "43 957 380-212", 10 },
+      { "43.957/380-212", 6 },
+   };
+
+   private static String GetFormattedValue(String value, Char separator)
+      => value[..2] + separator + value[2..5] + separator + value[5..8] + separator +  value[8..];
+
    private static InvalidCharacter GetInvalidCharacterResult(
       String value,
       Int32 position)
@@ -123,6 +179,21 @@ public class DeSteuerIdNrTests
    public void DeSteuerIdNr_Validate_ShouldReturnValidValue_WhenValueIsValid(String value)
    {
       // Arrange.
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = DeSteuerIdNr.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSeparators))]
+   public void DeSteuerIdNr_Validate_ShouldReturnValidationPassed_WhenValueHasValidSeparator(Char separator)
+   {
+      // Arrange.
+      var value = GetFormattedValue(ValidUnformattedSteuerIdNr, separator: separator);
       LocalValidationResult expected = default(ValidValue);
 
       // Act.
@@ -185,6 +256,22 @@ public class DeSteuerIdNrTests
    {
       // Arrange.
       LocalValidationResult expected = GetInvalidChecksumResult();
+
+      // Act.
+      var result = DeSteuerIdNr.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void DeSteuerIdNr_Validate_ShouldReturnInvalidSeparator_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidSeparatorResult(value, position);
 
       // Act.
       var result = DeSteuerIdNr.Validate(value);

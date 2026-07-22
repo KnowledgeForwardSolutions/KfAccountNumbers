@@ -181,13 +181,10 @@ public record DeSteuerIdNr
             : GetInvalidCharacterResult(value, invalidCharacterOffset);
       }
 
-      //if (!ValidateSeparators(value, out var invalidSeparatorPosition))
-      //{
-      //   return new InvalidSeparator(
-      //      Messages.NlBurgerservicenummerInvalidSeparator,
-      //      value[invalidSeparatorPosition],
-      //      invalidSeparatorPosition);
-      //}
+      if (!ValidateSeparators(value, out var invalidSeparatorPosition))
+      {
+         return GetInvalidSeparatorResult(value, invalidSeparatorPosition);
+      }
 
       return default(ValidValue);
    }
@@ -244,7 +241,7 @@ public record DeSteuerIdNr
    // TODO: Remove this method and replace with call to CheckDigits.Net Iso7064Mod11_10Algorithm once it supports check digit masks
    private static Boolean ValidateMaskedCheckDigit(
       ReadOnlySpan<Char> value,
-      ICheckDigitMask mask)
+      DeSteuerIdNrNumberCheckDigitMask mask)
    {
       const Int32 modulus = 10;
       const Int32 modulusPlus1 = 11;
@@ -286,6 +283,38 @@ public record DeSteuerIdNr
       product += num;
 
       return product % modulus == 1;
+   }
+
+   private static Boolean ValidateSeparators(
+      ReadOnlySpan<Char> value,
+      out Int32 invalidSeparatorOffset)
+   {
+      invalidSeparatorOffset = -1;
+      if (value.Length == UnformattedLength)
+      {
+         return true;
+      }
+
+      var firstSeparator = value[FirstSeparatorOffset];
+      if (firstSeparator.IsAsciiDigit())
+      {
+         invalidSeparatorOffset = FirstSeparatorOffset;
+         return false;
+      }
+
+      if (value[SecondSeparatorOffset] != firstSeparator)
+      {
+         invalidSeparatorOffset = SecondSeparatorOffset;
+         return false;
+      }
+
+      if (value[ThirdSeparatorOffset] != firstSeparator)
+      {
+         invalidSeparatorOffset = ThirdSeparatorOffset;
+         return false;
+      }
+
+      return true;
    }
 }
 
