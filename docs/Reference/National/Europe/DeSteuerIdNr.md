@@ -20,11 +20,11 @@ German tax identification number (Steuerliche Identifikationsnummer or Steuer-Id
 | 2. | The string length must be 11 characters (unformatted) or 14 characters (formatted). | InvalidLength |
 | 3. | All non-separator characters must be ASCII digits ('0'-'9'). | InvalidCharacter |
 | 4. | The trailing character must be a valid ISO/IEC 7064, MOD 11,10 check digit. | InvalidChecksum |
-| 5. | If the value has length 14, then characters at positions 2, 6 and 10 (zero-based) must not be an ASCII digit ('0'-'9') and all separator positions must be the same character | InvalidSeparator |
+| 5. | If the value has length 14, then characters at positions 2, 6 and 10 (zero-based) must not be ASCII digits ('0'-'9') and all separator positions must be the same character | InvalidSeparator |
 
 ### Notes
 
-A Steuer-IdNr does not encode any personanl information.
+A Steuer-IdNr does not encode any personal information.
 
 ### References
 

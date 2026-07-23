@@ -62,8 +62,8 @@ namespace KfAccountNumbers.National.Europe;
 ///         <item>
 ///            <description>
 ///               If the value has length 14, then characters at positions 2, 6
-///               and 10 (zero-based) must not be an ASCII digit ('0'-'9') and
-///               all separator positions must be the same character
+///               and 10 (zero-based) must not be ASCII digits ('0'-'9') and all
+///               separator positions must be the same character
 ///            </description>
 ///         </item>
 ///      </list>
@@ -92,7 +92,7 @@ namespace KfAccountNumbers.National.Europe;
 ///      </list>
 ///   </para>
 ///   <para>
-///      A Steuer-IdNr does not encode any personanl information.
+///      A Steuer-IdNr does not encode any personal information.
 ///   </para>
 ///   <para>
 ///      See <see href="https://de.wikipedia.org/wiki/Steuerliche_Identifikationsnummer">Wikipedia (German) - Steuerliche Identifikationsnummer</see>

@@ -119,7 +119,7 @@ public class DeSteuerIdNrTests
       { "43 9578380 212", 6 },
       { "43 9579380 212", 6 },
 
-      // Theird separator position
+      // Third separator position
       { "43 957 3800212", 10 },
       { "43 957 3801212", 10 },
       { "43 957 3802212", 10 },
