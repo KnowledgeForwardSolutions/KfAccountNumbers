@@ -99,6 +99,7 @@ namespace KfAccountNumbers.National.Europe;
 ///      for more information.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(DeSteuerIdNrJsonConverter))]
 public record DeSteuerIdNr
 {
    /// <summary>
@@ -138,9 +139,168 @@ public record DeSteuerIdNr
    /// </summary>
    public const Int32 FormattedLength = 14;
 
+   /// <summary>
+   ///   The default format to use when formating <see cref="DeSteuerIdNr"/>
+   ///   values.
+   /// </summary>
+   public const String DefaultFormatMask = "__/___/___/___";
+
+   /// <summary>
+   ///   Zero based offset of the first separator.
+   /// </summary>
    internal const Int32 FirstSeparatorOffset = 2;
+
+   /// <summary>
+   ///   Zero based offset of the second separator.
+   /// </summary>
    internal const Int32 SecondSeparatorOffset = 6;
+
+   /// <summary>
+   ///   Zero based offset of the third separator.
+   /// </summary>
    internal const Int32 ThirdSeparatorOffset = 10;
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="DeSteuerIdNr"/>
+   ///   class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a German Steuer-IdNr.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="value"/> is not length 11 (or 14 if separator
+   ///   characters are used).
+   ///   - or -
+   ///   <paramref name="value"/> contains a non-digit character in any position
+   ///   other than the separator locations.
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid ISO/IEC 7064 MOD 11,10
+   ///   check digit in the trailing (right-most) character position.
+   ///   - or -
+   ///   <paramref name="value"/> is 14 characters in length and has an ASCII
+   ///   digit ('0'-'9') in a separator location
+   ///   - or -
+   ///   <paramref name="value"/> is 14 characters in length and has two
+   ///   different separator characters.
+   /// </exception>
+   public DeSteuerIdNr(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="DeSteuerIdNr"/>
+   ///   class.
+   /// </summary>
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private DeSteuerIdNr(String? value, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
+         {
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
+         }
+      }
+
+      Value = GetRawValue(value!);
+   }
+
+   /// <summary>
+   ///   Gets the raw Steuer-IdNr value.
+   /// </summary>
+   public String Value { get; private init; }
+
+   /// <summary>
+   ///   Implicitly converts a <see cref="DeSteuerIdNr"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="DeSteuerIdNr"/> to convert.
+   /// </param>
+   public static implicit operator String(DeSteuerIdNr source)
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="DeSteuerIdNr"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a German Steuer-IdNr.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid Steuer-IdNr.
+   /// </exception>
+   public static explicit operator DeSteuerIdNr(String? value) => new(value);
+
+   /// <summary>
+   ///   Create a new <see cref="DeSteuerIdNr"/> using the Result pattern.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a German Steuer-IdNr.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{DeSteuerIdNr, ValidationError}"/>. Will
+   ///   contain the new <see cref="DeSteuerIdNr"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
+   /// </returns>
+   public static CreateResult<DeSteuerIdNr, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new DeSteuerIdNr(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
+
+   /// <summary>
+   ///   Format the German Steuer-IdNr using the supplied
+   ///   <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then <see cref="DefaultFormatMask"/> will be used instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted German Steuer-IdNr.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="KfAccountNumbers.Utility.ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the German Steuer-IdNr.
+   /// </remarks>
+   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Get a string representation of the German Steuer-IdNr.
+   /// </summary>
+   /// <returns>
+   ///   The raw Steuer-IdNr, without separator characters.
+   /// </returns>
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid
@@ -213,6 +373,15 @@ public record DeSteuerIdNr
          Messages.DeSteuerIdNrInvalidSeparator,
          value[position],
          position);
+
+   private static String GetRawValue(String value)
+      => value.Length == UnformattedLength
+         ? value
+         : String.Concat(
+            value.AsSpan(0, FirstSeparatorOffset),
+            value.AsSpan(FirstSeparatorOffset + 1, 3),
+            value.AsSpan(SecondSeparatorOffset + 1, 3),
+            value.AsSpan(ThirdSeparatorOffset + 1));
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean IsFormatted(ReadOnlySpan<Char> value) => value.Length == FormattedLength;
@@ -320,22 +489,22 @@ public record DeSteuerIdNr
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable SA1600 // Elements should be documented
-//public class DeSteuerIdNrJsonConverter : JsonConverter<DeSteuerIdNr>
-//{
-//   public override DeSteuerIdNr Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-//   {
-//      if (reader.TokenType == JsonTokenType.Null)
-//      {
-//         return null!;
-//      }
+public class DeSteuerIdNrJsonConverter : JsonConverter<DeSteuerIdNr>
+{
+   public override DeSteuerIdNr Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
 
-//      var str = reader.GetString();
-//      return new DeSteuerIdNr(str);
-//   }
+      var str = reader.GetString();
+      return new DeSteuerIdNr(str);
+   }
 
-//   public override void Write(Utf8JsonWriter writer, DeSteuerIdNr value, JsonSerializerOptions options)
-//      => writer.WriteStringValue(value.Value);
-//}
+   public override void Write(Utf8JsonWriter writer, DeSteuerIdNr value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
+}
 
 internal class DeSteuerIdNrNumberCheckDigitMask : ICheckDigitMask
 {
