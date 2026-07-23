@@ -206,6 +206,14 @@ public class ItCodiceFiscaleTests
       "A91v",
    ];
 
+   public static TheoryData<String> UndetectableCheckDigitErrors =>
+   [
+      "MRTTTM91D08F205J",        // MRTMTT91D08F205J with jump transposition error, MTT -> TTM
+      "MRTMTT91D08F502J",        // MRTMTT91D08F205J with jump transposition error, 205 -> 502
+      "RSYWTN86H08G2NSO",        // RSWYTN86H08G2NSO with two character transposition WY -> YW (W maps to the same value in odd or even position (same with Y) so transpositions of the two letters are undetectable
+      "RWYNTN86H08G2NSJ",        // RYWNTN86H08G2NSJ with two character transposition YW -> WY
+   ];
+
    public static TheoryData<String> InvalidLengthValues =>
    [
       "MRTMTT91D08F205",               // Length 15
@@ -794,6 +802,21 @@ public class ItCodiceFiscaleTests
    }
 
    [Theory]
+   [MemberData(nameof(UndetectableCheckDigitErrors))]
+   public void ItCodiceFiscale_Constructor_ShouldCreateInstance_WhenValueHasUndetectableCheckDigitError(String value)
+   {
+      // Arrange.
+      var expected = value.ToUpperInvariant();
+
+      // Act.
+      var sut = new ItCodiceFiscale(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
    [ClassData(typeof(StringNullEmptyWhitespaceValues))]
    public void ItCodiceFiscale_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
    {
@@ -1099,8 +1122,7 @@ public class ItCodiceFiscaleTests
       var sut = (ItCodiceFiscale)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().BeEquivalentTo(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1115,8 +1137,7 @@ public class ItCodiceFiscaleTests
       var sut = (ItCodiceFiscale)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().BeEquivalentTo(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1131,8 +1152,7 @@ public class ItCodiceFiscaleTests
       var sut = (ItCodiceFiscale)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().BeEquivalentTo(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1150,8 +1170,7 @@ public class ItCodiceFiscaleTests
       var sut = (ItCodiceFiscale)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().BeEquivalentTo(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1168,6 +1187,20 @@ public class ItCodiceFiscaleTests
       // Assert.
       sut.Should().NotBeNull();
       sut.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(UndetectableCheckDigitErrors))]
+   public void ItCodiceFiscale_ExplicitCastToItCodiceFiscale_ShouldCreateInstance_WhenValueHasUndetectableCheckDigitError(String value)
+   {
+      // Arrange.
+      var expected = new ItCodiceFiscale(value);
+
+      // Act.
+      var sut = (ItCodiceFiscale)value;
+
+      // Assert.
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1476,6 +1509,20 @@ public class ItCodiceFiscaleTests
    {
       // Arrange.
       var value = GetValue(comune: comune);
+      LocalCreateResult expected = new ItCodiceFiscale(value);
+
+      // Act.
+      var result = ItCodiceFiscale.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(UndetectableCheckDigitErrors))]
+   public void ItCodiceFiscale_Create_ShouldCreateInstance_WhenValueHasUndetectableCheckDigitError(String value)
+   {
+      // Arrange.
       LocalCreateResult expected = new ItCodiceFiscale(value);
 
       // Act.
@@ -1963,6 +2010,20 @@ public class ItCodiceFiscaleTests
    {
       // Arrange.
       var value = GetValue(comune: comune);
+      LocalValidationResult expected = default(ValidValue);
+
+      // Act.
+      var result = ItCodiceFiscale.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(UndetectableCheckDigitErrors))]
+   public void ItCodiceFiscale_Validate_ShouldReturnValidValue_WhenValueHasUndetectableCheckDigitError(String value)
+   {
+      // Arrange.
       LocalValidationResult expected = default(ValidValue);
 
       // Act.
