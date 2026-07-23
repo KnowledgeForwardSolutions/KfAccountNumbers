@@ -1122,8 +1122,7 @@ public class ItCodiceFiscaleTests
       var sut = (ItCodiceFiscale)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().BeEquivalentTo(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1138,8 +1137,7 @@ public class ItCodiceFiscaleTests
       var sut = (ItCodiceFiscale)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().BeEquivalentTo(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1154,8 +1152,7 @@ public class ItCodiceFiscaleTests
       var sut = (ItCodiceFiscale)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().BeEquivalentTo(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1173,8 +1170,7 @@ public class ItCodiceFiscaleTests
       var sut = (ItCodiceFiscale)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().BeEquivalentTo(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]
@@ -1204,8 +1200,7 @@ public class ItCodiceFiscaleTests
       var sut = (ItCodiceFiscale)value;
 
       // Assert.
-      sut.Should().NotBeNull();
-      sut.Value.Should().BeEquivalentTo(expected);
+      sut.Should().BeEquivalentTo(expected);
    }
 
    [Theory]

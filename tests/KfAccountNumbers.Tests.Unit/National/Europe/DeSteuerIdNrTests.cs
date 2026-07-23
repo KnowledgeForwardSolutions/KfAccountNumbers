@@ -75,7 +75,7 @@ public class DeSteuerIdNrTests
    public static TheoryData<String> InvalidCheckDigitValues =>
    [
       "43957389212",       // 43957380212 with single digit transcription error 0 -> 9
-      "43947380212",       // 2608832599 with single digit transcription error 5 -> 4
+      "43947380212",       // 43957380212 with single digit transcription error 5 -> 4
       "25986708148",       // 25986078148 with two digit transposition error 07 -> 70
       "25986087148",       // 25986078148 with two digit transposition error 78 -> 87
       "68223904129",       // 68443904129 with two digit twin error 44 -> 22
@@ -84,7 +84,7 @@ public class DeSteuerIdNrTests
       "39573802124",       // 43957380212 with two digit left circular shift error
 
       "43 957 389 212",    // 43957380212 with single digit transcription error 0 -> 9
-      "43 947 380 212",    // 2608832599 with single digit transcription error 5 -> 4
+      "43 947 380 212",    // 43957380212 with single digit transcription error 5 -> 4
       "25 986 708 148",    // 25986078148 with two digit transposition error 07 -> 70
       "25 986 087 148",    // 25986078148 with two digit transposition error 78 -> 87
       "68-223-904-129",    // 68443904129 with two digit twin error 44 -> 22
@@ -158,7 +158,7 @@ public class DeSteuerIdNrTests
          Messages.DeSteuerIdNrInvalidLength,
          value.Length,
          [
-            new ValidLengthDefinition(DeSteuerIdNr.UnformattedLength, Messages.DeSteuerIdNrUnormattedLength),
+            new ValidLengthDefinition(DeSteuerIdNr.UnformattedLength, Messages.DeSteuerIdNrUnformattedLength),
             new ValidLengthDefinition(DeSteuerIdNr.FormattedLength, Messages.DeSteuerIdNrFormattedLength),
          ]);
 
@@ -295,7 +295,7 @@ public class DeSteuerIdNrTests
 
    [Theory]
    [MemberData(nameof(ValidSteuerIdNrValues))]
-   public void DeSteuerIdNr_Value_ShouldReturnValidatedRijksregisternummer(String value)
+   public void DeSteuerIdNr_Value_ShouldReturnValidatedSteuerIdNr(String value)
    {
       // Arrange.
       var expected = GetRawDeSteuerIdNr(value);
@@ -527,8 +527,8 @@ public class DeSteuerIdNrTests
    public void DeSteuerIdNr_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
    {
       // Arrange.
-      var sut1 = new DeSteuerIdNr(ValidFormattedSteuerIdNr.Replace('.', 'A'));
-      var sut2 = new DeSteuerIdNr(ValidFormattedSteuerIdNr.Replace('.', 'a'));
+      var sut1 = new DeSteuerIdNr(ValidFormattedSteuerIdNr.Replace(' ', 'A'));
+      var sut2 = new DeSteuerIdNr(ValidFormattedSteuerIdNr.Replace(' ', 'a'));
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();

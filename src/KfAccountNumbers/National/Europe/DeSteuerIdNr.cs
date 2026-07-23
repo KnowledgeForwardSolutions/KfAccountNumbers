@@ -140,7 +140,7 @@ public record DeSteuerIdNr
    public const Int32 FormattedLength = 14;
 
    /// <summary>
-   ///   The default format to use when formating <see cref="DeSteuerIdNr"/>
+   ///   The default format to use when formatting <see cref="DeSteuerIdNr"/>
    ///   values.
    /// </summary>
    public const String DefaultFormatMask = "__/___/___/___";
@@ -362,7 +362,7 @@ public record DeSteuerIdNr
          Messages.DeSteuerIdNrInvalidLength,
          value.Length,
          [
-            new ValidLengthDefinition(UnformattedLength, Messages.DeSteuerIdNrUnormattedLength),
+            new ValidLengthDefinition(UnformattedLength, Messages.DeSteuerIdNrUnformattedLength),
             new ValidLengthDefinition(FormattedLength, Messages.DeSteuerIdNrFormattedLength),
          ]);
 

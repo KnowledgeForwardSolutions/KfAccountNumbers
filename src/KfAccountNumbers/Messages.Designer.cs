@@ -295,7 +295,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to DE Steuer-IdNr must have a valid ISO/IEC 7064 MOD 11,10.
+        ///   Looks up a localized string similar to DE Steuer-IdNr must have a valid ISO/IEC 7064 MOD 11,10 check digit.
         /// </summary>
         internal static string DeSteuerIdNrInvalidCheckDigit {
             get {
@@ -324,9 +324,9 @@ namespace KfAccountNumbers {
         /// <summary>
         ///   Looks up a localized string similar to DE Steuer-IdNr without separator characters.
         /// </summary>
-        internal static string DeSteuerIdNrUnormattedLength {
+        internal static string DeSteuerIdNrUnformattedLength {
             get {
-                return ResourceManager.GetString("DeSteuerIdNrUnormattedLength", resourceCulture);
+                return ResourceManager.GetString("DeSteuerIdNrUnformattedLength", resourceCulture);
             }
         }
         

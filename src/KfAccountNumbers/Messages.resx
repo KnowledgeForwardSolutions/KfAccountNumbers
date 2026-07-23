@@ -741,7 +741,7 @@
   <data name="DkPersonnummerFormattedLength" xml:space="preserve">
     <value>DK Personnummer formatted for readability with a separator character at character position 6 (zero-based)</value>
   </data>
-  <data name="DeSteuerIdNrUnormattedLength" xml:space="preserve">
+  <data name="DeSteuerIdNrUnformattedLength" xml:space="preserve">
     <value>DE Steuer-IdNr without separator characters</value>
   </data>
   <data name="DeSteuerIdNrInvalidCharacter" xml:space="preserve">
@@ -754,6 +754,6 @@
     <value>DE Steuer-IdNr separator character may not be an ASCII digit ('0'-'9'). All separator characters must be the same</value>
   </data>
   <data name="DeSteuerIdNrInvalidCheckDigit" xml:space="preserve">
-    <value>DE Steuer-IdNr must have a valid ISO/IEC 7064 MOD 11,10</value>
+    <value>DE Steuer-IdNr must have a valid ISO/IEC 7064 MOD 11,10 check digit</value>
   </data>
 </root>
