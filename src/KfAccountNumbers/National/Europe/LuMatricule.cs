@@ -1,6 +1,8 @@
 #pragma warning disable IDE0250 // Make struct 'readonly'
 #pragma warning disable IDE0046 // Convert to conditional expression
 
+using CheckDigits.Net.Utility;
+
 namespace KfAccountNumbers.National.Europe;
 
 /// <summary>
@@ -235,27 +237,63 @@ public record LuMatricule
       return (year, month, day);
    }
 
+   // Port CheckDigits.Net Luhn and Verhoeff validation into a single method to
+   // perform both validation checks in a single pass.
    private static ValidationResult ValidateCheckDigits(String value)
    {
-      // TODO: Consider local implementation that calculates Luhn and Verhoeff check digits in a single pass.
-      ValidationResult validationResult = ValidateLuhnCheckDigit(value);
-      if (validationResult is not ValidValue)
+      VerhoeffPermutationTable verhoeffPermutationTable = VerhoeffPermutationTable.Instance;
+      VerhoeffMultiplicationTable verhoeffMultiplicationTable = VerhoeffMultiplicationTable.Instance;
+
+      var vC = 0;       // Verhoeff c parameter
+      var vI = 0;       // Verhoeff i parameter
+      //var vP = 0;       // Verhoeff p parameter
+      var luhnSum = 0;
+      var oddPosition = true;
+
+      // Set up the Verhoeff algorithm by processing the Verhoeff check digit.
+      var digit = value[VerhoeffOffset].ToSingleDigit();
+      if (!digit.IsValidDigit())
       {
-         // Could be either InvalidCharacter or InvalidChecksum.
-         return validationResult;
+         return GetInvalidCharacterResult(value, VerhoeffOffset);
       }
 
-      // If Luhn check succeeds, then test Verhoeff.
-      if (!MaskedAlgorithms.Verhoeff.Validate(value, LuMatriculeNumberCheckDigitMask.Instance))
+      var vP = verhoeffPermutationTable[vI % 8, digit];
+      vC = verhoeffMultiplicationTable[vC, vP];
+      vI++;
+
+      // Initialize the Luhn check digit as well.
+      var luhnCheckDigit = value[LuhnOffset].ToSingleDigit();
+      if (!luhnCheckDigit.IsValidDigit())
       {
-         // Consider possible invalid character in Verhoeff check digit location.
-         var verhoeffCheckDigit = value[VerhoeffOffset].ToSingleDigit();
-         return verhoeffCheckDigit.IsValidDigit()
-            ? GetInvalidChecksumResult()
-            : GetInvalidCharacterResult(value, VerhoeffOffset);
+         return GetInvalidCharacterResult(value, LuhnOffset);
       }
 
-      return default(ValidValue);
+      // Process the remaining 11 digits for both Luhn and Verhoeff algorithms.
+      for (var index = LuhnOffset - 1; index >= 0; index--)
+      {
+         digit = value[index].ToSingleDigit();
+         if (!digit.IsValidDigit())
+         {
+            return GetInvalidCharacterResult(value, index);
+         }
+
+         // Luhn intermediate calculations.
+         luhnSum += oddPosition
+            ? digit > 4 ? (digit * 2) - 9 : digit * 2
+            : digit;
+         oddPosition = !oddPosition;
+
+         // Verhoeff intermediate calculations.
+         vP = verhoeffPermutationTable[vI % 8, digit];
+         vC = verhoeffMultiplicationTable[vC, vP];
+         vI++;
+      }
+
+      var calculatedLuhnCheckDigit = (10 - (luhnSum % 10)) % 10;
+
+      return calculatedLuhnCheckDigit == luhnCheckDigit && vC == 0
+         ? default(ValidValue)
+         : GetInvalidChecksumResult();
    }
 
    private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> value)
@@ -271,37 +309,6 @@ public record LuMatricule
       }
 
       return day >= 1 && day <= DateTime.DaysInMonth(year, month);
-   }
-
-   // TODO: Local implementation of Luhn algorithm because CheckDigits.Net does not support check digit anywhere but the trailing character. Should this ever change then remove this method.
-   private static ValidationResult ValidateLuhnCheckDigit(String value)
-   {
-      var sum = 0;
-      var oddPosition = true;
-      for (var index = value.Length - 3; index >= 0; index--) // Normal Luhn algorithm would use Length - 2, but use -3 because check digit is not trailing character
-      {
-         var digit = value[index].ToSingleDigit();
-         if (!digit.IsValidDigit())
-         {
-            return GetInvalidCharacterResult(value, index);
-         }
-
-         sum += oddPosition
-            ? digit > 4 ? (digit * 2) - 9 : digit * 2
-            : digit;
-         oddPosition = !oddPosition;
-      }
-
-      var calculatedCheckDigit = (10 - (sum % 10)) % 10;
-      var checkDigit = value[LuhnOffset].ToSingleDigit();
-      if (!checkDigit.IsValidDigit())
-      {
-         return GetInvalidCharacterResult(value, LuhnOffset);
-      }
-
-      return checkDigit == calculatedCheckDigit
-         ? default(ValidValue)
-         : GetInvalidChecksumResult();
    }
 }
 
@@ -323,16 +330,3 @@ public record LuMatricule
 //   public override void Write(Utf8JsonWriter writer, LuMatricule value, JsonSerializerOptions options)
 //      => writer.WriteStringValue(value.Value);
 //}
-
-internal class LuMatriculeNumberCheckDigitMask : ICheckDigitMask
-{
-   private static readonly Lazy<LuMatriculeNumberCheckDigitMask> _instance =
-      new(() => new LuMatriculeNumberCheckDigitMask());
-
-   public static LuMatriculeNumberCheckDigitMask Instance => _instance.Value;
-
-   public Boolean ExcludeCharacter(Int32 index)
-      => index == LuMatricule.LuhnOffset;
-
-   public Boolean IncludeCharacter(Int32 index) => index != LuMatricule.LuhnOffset;
-}

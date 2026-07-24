@@ -256,7 +256,7 @@ public class LuMatriculeTests
 
    [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]
-   public void SePersonnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidDateOfBirth(String dateOfBirth)
+   public void LuMatricule_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidDateOfBirth(String dateOfBirth)
    {
       // Arrange.
       var value = GetValue(dateOfBirth);
