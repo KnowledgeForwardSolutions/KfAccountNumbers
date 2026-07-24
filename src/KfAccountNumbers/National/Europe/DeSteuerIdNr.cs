@@ -1,8 +1,6 @@
 #pragma warning disable IDE0250 // Make struct 'readonly'
 #pragma warning disable IDE0046 // Convert to conditional expression
 
-using CheckDigits.Net.Utility;
-
 namespace KfAccountNumbers.National.Europe;
 
 /// <summary>
@@ -289,7 +287,7 @@ public record DeSteuerIdNr
    ///   characters.
    /// </exception>
    /// <remarks>
-   ///   <see cref="KfAccountNumbers.Utility.ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
    ///   details on creating a mask to format the German Steuer-IdNr.
    /// </remarks>
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
@@ -425,7 +423,7 @@ public record DeSteuerIdNr
          }
 
          num = value[index].ToSingleDigit();
-         if (num.IsInvalidDigit())
+         if (!num.IsValidDigit())
          {
             return false;
          }
@@ -444,7 +442,7 @@ public record DeSteuerIdNr
       }
 
       num = value[^1].ToSingleDigit();
-      if (num.IsInvalidDigit())
+      if (!num.IsValidDigit())
       {
          return false;
       }

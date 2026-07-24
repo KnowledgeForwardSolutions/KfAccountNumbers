@@ -1006,7 +1006,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IT Codice Fiscale contains a non-letter (&apos;A&apos;-&apos;Z&apos;, &apos;a&apos;-&apos;z&apos;) or non-digit character (&apos;0&apos;-&apos;9&apos;).
+        ///   Looks up a localized string similar to IT Codice Fiscale contains a character that is neither a letter (&apos;A&apos;-&apos;Z&apos;, &apos;a&apos;-&apos;z&apos;) or an ASCII digit (&apos;0&apos;-&apos;9&apos;).
         /// </summary>
         internal static string ItCodiceFiscaleInvalidCharacter {
             get {
@@ -1092,6 +1092,51 @@ namespace KfAccountNumbers {
         internal static string ItCodiceFiscaleLength {
             get {
                 return ResourceManager.GetString("ItCodiceFiscaleLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LU Matricule must consist of only ASCII digits (&apos;0&apos;-&apos;9&apos;).
+        /// </summary>
+        internal static string LuMatriculeInvalidCharacter {
+            get {
+                return ResourceManager.GetString("LuMatriculeInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LU Matricule must contain a valid Luhn algorithm check digit in character position 11 (zero-based) AND a valid Verhoeff algorithm check digit in character position 12 (zero-based).
+        /// </summary>
+        internal static string LuMatriculeInvalidCheckDigits {
+            get {
+                return ResourceManager.GetString("LuMatriculeInvalidCheckDigits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LU Matricule requires a valid date of birth (YYYYMMDD) format in the leading eight digits.
+        /// </summary>
+        internal static string LuMatriculeInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("LuMatriculeInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LU Matricule must have length 13.
+        /// </summary>
+        internal static string LuMatriculeInvalidLength {
+            get {
+                return ResourceManager.GetString("LuMatriculeInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LU Matricule only supports a single length of 13 characters.
+        /// </summary>
+        internal static string LuMatriculeLength {
+            get {
+                return ResourceManager.GetString("LuMatriculeLength", resourceCulture);
             }
         }
         

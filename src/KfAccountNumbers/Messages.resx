@@ -736,7 +736,7 @@
     <value>IT Codice Fiscale check character (character position 15, zero-based) must be a valid modulus 26 check character</value>
   </data>
   <data name="ItCodiceFiscaleInvalidCharacter" xml:space="preserve">
-    <value>IT Codice Fiscale contains a non-letter ('A'-'Z', 'a'-'z') or non-digit character ('0'-'9')</value>
+    <value>IT Codice Fiscale contains a character that is neither a letter ('A'-'Z', 'a'-'z') or an ASCII digit ('0'-'9')</value>
   </data>
   <data name="DkPersonnummerFormattedLength" xml:space="preserve">
     <value>DK Personnummer formatted for readability with a separator character at character position 6 (zero-based)</value>
@@ -755,5 +755,20 @@
   </data>
   <data name="DeSteuerIdNrInvalidCheckDigit" xml:space="preserve">
     <value>DE Steuer-IdNr must have a valid ISO/IEC 7064 MOD 11,10 check digit</value>
+  </data>
+  <data name="LuMatriculeLength" xml:space="preserve">
+    <value>LU Matricule only supports a single length of 13 characters</value>
+  </data>
+  <data name="LuMatriculeInvalidCharacter" xml:space="preserve">
+    <value>LU Matricule must consist of only ASCII digits ('0'-'9')</value>
+  </data>
+  <data name="LuMatriculeInvalidCheckDigits" xml:space="preserve">
+    <value>LU Matricule must contain a valid Luhn algorithm check digit in character position 11 (zero-based) AND a valid Verhoeff algorithm check digit in character position 12 (zero-based)</value>
+  </data>
+  <data name="LuMatriculeInvalidDateOfBirth" xml:space="preserve">
+    <value>LU Matricule requires a valid date of birth (YYYYMMDD) format in the leading eight digits</value>
+  </data>
+  <data name="LuMatriculeInvalidLength" xml:space="preserve">
+    <value>LU Matricule must have length 13</value>
   </data>
 </root>
