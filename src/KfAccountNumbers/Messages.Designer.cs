@@ -1006,7 +1006,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to IT Codice Fiscale contains a character that is neither a letter (&apos;A&apos;-&apos;Z&apos;, &apos;a&apos;-&apos;z&apos;) or an ASCII digit (&apos;0&apos;-&apos;9&apos;).
+        ///   Looks up a localized string similar to IT Codice Fiscale contains a character that is neither a letter (&apos;A&apos;-&apos;Z&apos;, &apos;a&apos;-&apos;z&apos;) nor an ASCII digit (&apos;0&apos;-&apos;9&apos;).
         /// </summary>
         internal static string ItCodiceFiscaleInvalidCharacter {
             get {

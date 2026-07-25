@@ -736,7 +736,7 @@
     <value>IT Codice Fiscale check character (character position 15, zero-based) must be a valid modulus 26 check character</value>
   </data>
   <data name="ItCodiceFiscaleInvalidCharacter" xml:space="preserve">
-    <value>IT Codice Fiscale contains a character that is neither a letter ('A'-'Z', 'a'-'z') or an ASCII digit ('0'-'9')</value>
+    <value>IT Codice Fiscale contains a character that is neither a letter ('A'-'Z', 'a'-'z') nor an ASCII digit ('0'-'9')</value>
   </data>
   <data name="DkPersonnummerFormattedLength" xml:space="preserve">
     <value>DK Personnummer formatted for readability with a separator character at character position 6 (zero-based)</value>

@@ -434,6 +434,11 @@ public record LuMatricule
       var (year, month, day) = GetYearMonthDay(value);
 #pragma warning restore IDE0008 // Use explicit type
 
+      if (year < 1)
+      {
+         return false;
+      }
+
       if (month is < 1 or > 12)
       {
          return false;

@@ -92,6 +92,9 @@ public class LuMatriculeTests
    public static TheoryData<String> InvalidDateOfBirthValues =>
    [
       // Invalid month
+      "00000101",          // Invalid year (too low)
+
+      // Invalid month
       "19010001",          // Invalid month (too low)
       "20011301",          // Invalid month (too high)
 
@@ -965,7 +968,7 @@ public class LuMatriculeTests
    }
 
    [Fact]
-   public void LuMatricule_JsonDeserialization_ShouldThrowKfValidationException_WhenRijksregisternummerIsInvalid()
+   public void LuMatricule_JsonDeserialization_ShouldThrowKfValidationException_WhenMatriculeIsInvalid()
    {
       // Arrange.
       var json = "{\"Matricule\":\"1970090900163\"}";  // Invalid checksum

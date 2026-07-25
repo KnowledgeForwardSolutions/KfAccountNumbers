@@ -1173,7 +1173,7 @@ public class DeSteuerIdNrTests
    }
 
    [Fact]
-   public void DeSteuerIdNr_JsonDeserialization_ShouldThrowKfValidationException_WhenRijksregisternummerIsInvalid()
+   public void DeSteuerIdNr_JsonDeserialization_ShouldThrowKfValidationException_WhenSteuerIdNrIsInvalid()
    {
       // Arrange.
       var json = "{\"SteuerIdNr\":\"43957389212\"}";  // Invalid checksum
