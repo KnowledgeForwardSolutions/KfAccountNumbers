@@ -332,7 +332,7 @@ public class ChSozialversicherungsnummerTests
 
    [Theory]
    [MemberData(nameof(ValidValues))]
-   public void ChSozialversicherungsnummer_Value_ShouldReturnValidatedSteuerIdNr(String value)
+   public void ChSozialversicherungsnummer_Value_ShouldReturnValidatedSozialversicherungsnummer(String value)
    {
       // Arrange.
       var expected = GetRawChSozialversicherungsnummer(value);
@@ -434,7 +434,7 @@ public class ChSozialversicherungsnummerTests
    }
 
    [Theory]
-   [MemberData(nameof(ValidValues))]
+   [MemberData(nameof(UndetectableCheckDigitErrors))]
    public void ChSozialversicherungsnummer_ExplicitCastToChSozialversicherungsnummer_ShouldCreateInstance_WhenValueHasUndetectableCheckDigitError(String value)
    {
       // Arrange.
@@ -581,8 +581,8 @@ public class ChSozialversicherungsnummerTests
    public void ChSozialversicherungsnummer_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
    {
       // Arrange.
-      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
-      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', '-'));
+      var sut1 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer.Replace('.', '-'));
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -592,8 +592,8 @@ public class ChSozialversicherungsnummerTests
    public void ChSozialversicherungsnummer_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
    {
       // Arrange.
-      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'A'));
-      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'a'));
+      var sut1 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer.Replace('.', 'A'));
+      var sut2 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer.Replace('.', 'a'));
 
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();
@@ -642,8 +642,8 @@ public class ChSozialversicherungsnummerTests
    public void ChSozialversicherungsnummer_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
    {
       // Arrange.
-      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
-      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', '-'));
+      var sut1 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer.Replace('.', '-'));
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -653,8 +653,8 @@ public class ChSozialversicherungsnummerTests
    public void ChSozialversicherungsnummer_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
    {
       // Arrange.
-      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'A'));
-      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'a'));
+      var sut1 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer.Replace('.', 'A'));
+      var sut2 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer.Replace('.', 'a'));
 
       // Act/assert.
       (sut1 != sut2).Should().BeFalse();
@@ -844,8 +844,8 @@ public class ChSozialversicherungsnummerTests
    public void ChSozialversicherungsnummer_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
    {
       // Arrange.
-      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
-      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', '-'));
+      var sut1 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer.Replace('.', '-'));
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -855,8 +855,8 @@ public class ChSozialversicherungsnummerTests
    public void ChSozialversicherungsnummer_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
    {
       // Arrange.
-      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'A'));
-      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'a'));
+      var sut1 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer.Replace('.', 'A'));
+      var sut2 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer.Replace('.', 'a'));
 
       // Act/assert.
       sut1.Equals(sut2).Should().BeTrue();
@@ -1004,8 +1004,8 @@ public class ChSozialversicherungsnummerTests
    public void ChSozialversicherungsnummer_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
    {
       // Arrange.
-      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
-      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', '-'));
+      var sut1 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer.Replace('.', '-'));
 
       // Act.
       var hash1 = sut1.GetHashCode();
@@ -1019,8 +1019,8 @@ public class ChSozialversicherungsnummerTests
    public void ChSozialversicherungsnummer_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
    {
       // Arrange.
-      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'A'));
-      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'a'));
+      var sut1 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer.Replace('.', 'A'));
+      var sut2 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer.Replace('.', 'a'));
 
       // Act.
       var hash1 = sut1.GetHashCode();

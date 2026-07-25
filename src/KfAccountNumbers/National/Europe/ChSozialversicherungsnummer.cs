@@ -145,7 +145,7 @@ public record ChSozialversicherungsnummer
    public const Int32 FormattedLength = 16;
 
    /// <summary>
-   ///   The names of the check digit algorithm used by
+   ///   The name of the check digit algorithm used by
    ///   <see cref="ChSozialversicherungsnummer"/>.
    /// </summary>
    public const String CheckDigitAlgorithmName = "EAN-13";
