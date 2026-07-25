@@ -149,7 +149,7 @@ public record LuMatricule
    public const Int32 ValidLength = 13;
 
    /// <summary>
-   ///   The names of the two check digits algorithms used by
+   ///   The names of the two check digit algorithms used by
    ///   <see cref="LuMatricule"/>.
    /// </summary>
    public const String CheckDigitAlgorithmNames = "Luhn, Verhoeff";

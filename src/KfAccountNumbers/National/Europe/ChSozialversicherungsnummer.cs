@@ -145,7 +145,7 @@ public record ChSozialversicherungsnummer
    public const Int32 FormattedLength = 16;
 
    /// <summary>
-   ///   The names of the check digits algorithm used by
+   ///   The names of the check digit algorithm used by
    ///   <see cref="ChSozialversicherungsnummer"/>.
    /// </summary>
    public const String CheckDigitAlgorithmName = "EAN-13";
@@ -254,7 +254,7 @@ public record ChSozialversicherungsnummer
    ///   String representation of a Sozialversicherungsnummer.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
-   ///   <paramref name="value"/> is not a valid Steuer-IdNr.
+   ///   <paramref name="value"/> is not a valid Sozialversicherungsnummer.
    /// </exception>
    public static explicit operator ChSozialversicherungsnummer(String? value) => new(value);
 
