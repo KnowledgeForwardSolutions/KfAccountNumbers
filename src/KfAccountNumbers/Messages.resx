@@ -771,4 +771,25 @@
   <data name="LuMatriculeInvalidLength" xml:space="preserve">
     <value>LU Matricule must have length 13</value>
   </data>
+  <data name="ChSozialversicherungsnummerFormattedLength" xml:space="preserve">
+    <value>CH Sozialversicherungsnummer formatted for readability with separator characters at character position 3, 8 and 13 (zero-based)</value>
+  </data>
+  <data name="ChSozialversicherungsnummerUnformattedLength" xml:space="preserve">
+    <value>CH Sozialversicherungsnummer without separator characters</value>
+  </data>
+  <data name="ChSozialversicherungsnummerInvalidCharacter" xml:space="preserve">
+    <value>CH Sozialversicherungsnummer contains a non-digit character where a digit was expected</value>
+  </data>
+  <data name="ChSozialversicherungsnummerInvalidLength" xml:space="preserve">
+    <value>CH Sozialversicherungsnummer must have length 13 (without separator characters) or 16 (with separator characters)</value>
+  </data>
+  <data name="ChSozialversicherungsnummerInvalidCheckDigit" xml:space="preserve">
+    <value>CH Sozialversicherungsnummer must have a valid EAN-13 check digit</value>
+  </data>
+  <data name="ChSozialversicherungsnummerInvalidSeparator" xml:space="preserve">
+    <value>CH Sozialversicherungsnummer separator character may not be an ASCII digit ('0'-'9'). All separator characters must be the same</value>
+  </data>
+  <data name="ChSozialversicherungsnummerInvalidPrefix" xml:space="preserve">
+    <value>CH Sozialversicherungsnummer must start with "756"</value>
+  </data>
 </root>

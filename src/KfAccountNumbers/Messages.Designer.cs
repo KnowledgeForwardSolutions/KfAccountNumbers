@@ -214,6 +214,69 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CH Sozialversicherungsnummer formatted for readability with separator characters at character position 3, 8 and 13 (zero-based).
+        /// </summary>
+        internal static string ChSozialversicherungsnummerFormattedLength {
+            get {
+                return ResourceManager.GetString("ChSozialversicherungsnummerFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CH Sozialversicherungsnummer contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string ChSozialversicherungsnummerInvalidCharacter {
+            get {
+                return ResourceManager.GetString("ChSozialversicherungsnummerInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CH Sozialversicherungsnummer must have a valid EAN-13 check digit.
+        /// </summary>
+        internal static string ChSozialversicherungsnummerInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("ChSozialversicherungsnummerInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CH Sozialversicherungsnummer must have length 13 (without separator characters) or 16 (with separator characters).
+        /// </summary>
+        internal static string ChSozialversicherungsnummerInvalidLength {
+            get {
+                return ResourceManager.GetString("ChSozialversicherungsnummerInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CH Sozialversicherungsnummer must start with &quot;756&quot;.
+        /// </summary>
+        internal static string ChSozialversicherungsnummerInvalidPrefix {
+            get {
+                return ResourceManager.GetString("ChSozialversicherungsnummerInvalidPrefix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CH Sozialversicherungsnummer separator character may not be an ASCII digit (&apos;0&apos;-&apos;9&apos;). All separator characters must be the same.
+        /// </summary>
+        internal static string ChSozialversicherungsnummerInvalidSeparator {
+            get {
+                return ResourceManager.GetString("ChSozialversicherungsnummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CH Sozialversicherungsnummer without separator characters.
+        /// </summary>
+        internal static string ChSozialversicherungsnummerUnformattedLength {
+            get {
+                return ResourceManager.GetString("ChSozialversicherungsnummerUnformattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CreateResult Failure error may not be null.
         /// </summary>
         internal static string CreateResultErrorNull {
