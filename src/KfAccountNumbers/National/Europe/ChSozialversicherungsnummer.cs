@@ -102,6 +102,7 @@ namespace KfAccountNumbers.National.Europe;
 ///      for more information.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(ChSozialversicherungsnummerJsonConverter))]
 public record ChSozialversicherungsnummer
 {
    /// <summary>
@@ -169,6 +170,151 @@ public record ChSozialversicherungsnummer
    ///   Zero based offset of the third separator.
    /// </summary>
    internal const Int32 ThirdSeparatorOffset = 13;
+
+   /// <summary>
+   ///   Initializes a new instance of the
+   ///   <see cref="ChSozialversicherungsnummer"/> class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Sozialversicherungsnummer.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="value"/> is not length 13 (or 16 if separator
+   ///   characters are used).
+   ///   - or -
+   ///   <paramref name="value"/> contains a non-digit character in any position
+   ///   other than the separator locations.
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid EAN-13 check digit in the
+   ///   trailing (right-most) character position.
+   ///   - or -
+   ///   <paramref name="value"/> is 16 characters in length and has an ASCII
+   ///   digit ('0'-'9') in a separator location.
+   ///   - or -
+   ///   <paramref name="value"/> does not start with the characters "756".
+   /// </exception>
+   public ChSozialversicherungsnummer(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Initializes a new instance of the
+   ///   <see cref="ChSozialversicherungsnummer"/> class.
+   /// </summary>
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private ChSozialversicherungsnummer(String? value, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
+         {
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               InvalidPrefix invalidPrefix => new UKfValidationException<ValidationError>(invalidPrefix),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
+         }
+      }
+
+      Value = GetRawValue(value!);
+   }
+
+   /// <summary>
+   ///   Gets the raw Sozialversicherungsnummer value.
+   /// </summary>
+   public String Value { get; private init; }
+
+   /// <summary>
+   ///   Implicitly converts a <see cref="ChSozialversicherungsnummer"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="ChSozialversicherungsnummer"/> to convert.
+   /// </param>
+   public static implicit operator String(ChSozialversicherungsnummer source)
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a
+   ///   <see cref="ChSozialversicherungsnummer"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Sozialversicherungsnummer.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid Steuer-IdNr.
+   /// </exception>
+   public static explicit operator ChSozialversicherungsnummer(String? value) => new(value);
+
+   /// <summary>
+   ///   Create a new <see cref="ChSozialversicherungsnummer"/> using the Result
+   ///   pattern.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Sozialversicherungsnummer.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{ChSozialversicherungsnummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="ChSozialversicherungsnummer"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
+   /// </returns>
+   public static CreateResult<ChSozialversicherungsnummer, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new ChSozialversicherungsnummer(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         InvalidPrefix invalidPrefix => (ValidationError)invalidPrefix,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
+
+   /// <summary>
+   ///   Format the Sozialversicherungsnummer using the supplied
+   ///   <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then <see cref="DefaultFormatMask"/> will be used instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted Sozialversicherungsnummer.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the Sozialversicherungsnummer.
+   /// </remarks>
+   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Get a string representation of the Sozialversicherungsnummer.
+   /// </summary>
+   /// <returns>
+   ///   The raw Sozialversicherungsnummer, without separator characters.
+   /// </returns>
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid
@@ -252,6 +398,15 @@ public record ChSozialversicherungsnummer
          value[position],
          position);
 
+   private static String GetRawValue(String value)
+      => value.Length == UnformattedLength
+         ? value
+         : String.Concat(
+            value.AsSpan(0, FirstSeparatorOffset),
+            value.AsSpan(FirstSeparatorOffset + 1, 4),
+            value.AsSpan(SecondSeparatorOffset + 1, 4),
+            value.AsSpan(ThirdSeparatorOffset + 1));
+
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
    private static Boolean IsFormatted(ReadOnlySpan<Char> value) => value.Length == FormattedLength;
 
@@ -318,22 +473,22 @@ public record ChSozialversicherungsnummer
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable SA1600 // Elements should be documented
-//public class ChSozialversicherungsnummerJsonConverter : JsonConverter<ChSozialversicherungsnummer>
-//{
-//   public override ChSozialversicherungsnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-//   {
-//      if (reader.TokenType == JsonTokenType.Null)
-//      {
-//         return null!;
-//      }
+public class ChSozialversicherungsnummerJsonConverter : JsonConverter<ChSozialversicherungsnummer>
+{
+   public override ChSozialversicherungsnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
 
-//      var str = reader.GetString();
-//      return new ChSozialversicherungsnummer(str);
-//   }
+      var str = reader.GetString();
+      return new ChSozialversicherungsnummer(str);
+   }
 
-//   public override void Write(Utf8JsonWriter writer, ChSozialversicherungsnummer value, JsonSerializerOptions options)
-//      => writer.WriteStringValue(value.Value);
-//}
+   public override void Write(Utf8JsonWriter writer, ChSozialversicherungsnummer value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
+}
 
 internal class ChSozialversicherungsnummerNumberCheckDigitMask : ICheckDigitMask
 {

@@ -179,7 +179,7 @@ public record DeSteuerIdNr
    ///   check digit in the trailing (right-most) character position.
    ///   - or -
    ///   <paramref name="value"/> is 14 characters in length and has an ASCII
-   ///   digit ('0'-'9') in a separator location
+   ///   digit ('0'-'9') in a separator location.
    ///   - or -
    ///   <paramref name="value"/> is 14 characters in length and has two
    ///   different separator characters.

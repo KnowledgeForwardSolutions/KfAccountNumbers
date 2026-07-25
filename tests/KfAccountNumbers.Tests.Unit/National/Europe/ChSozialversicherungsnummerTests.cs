@@ -13,7 +13,7 @@ public class ChSozialversicherungsnummerTests
    private const String ValidUnformattedSozialversicherungsnummer = "7560850652826";           // From https://teaddict.net/swiss-ssn.html
    private const String AltValidUnformattedSozialversicherungsnummer = "7568814300998";
    private const String ValidFormattedSozialversicherungsnummer = "756.0850.6528.26";
-   private const String AltValidFormattedSozialversicherungsnummer = "756.8814.3009.98";
+   private const String AltValidFormattedSozialversicherungsnummer = "756-8814-3009-98";
 
    public static TheoryData<String> ValidValues =>
    [
@@ -183,6 +183,895 @@ public class ChSozialversicherungsnummerTests
          ? value
          : value[..3] + value[4..8] + value[9..13] + value[14..];
 
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void ChSozialversicherungsnummer_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawChSozialversicherungsnummer(value);
+
+      // Act.
+      var sut = new ChSozialversicherungsnummer(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSeparators))]
+   public void ChSozialversicherungsnummer_Constructor_ShouldCreateInstance_WhenValueHasValidSeparator(Char separator)
+   {
+      // Arrange.
+      var value = GetFormattedValue(ValidUnformattedSozialversicherungsnummer, separator: separator);
+      var expected = GetRawChSozialversicherungsnummer(value);
+
+      // Act.
+      var sut = new ChSozialversicherungsnummer(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(UndetectableCheckDigitErrors))]
+   public void ChSozialversicherungsnummer_Constructor_ShouldCreateInstance_WhenValueHasUndetectableCheckDigitError(String value)
+   {
+      // Arrange.
+      var expected = GetRawChSozialversicherungsnummer(value);
+
+      // Act.
+      var sut = new ChSozialversicherungsnummer(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void ChSozialversicherungsnummer_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ChSozialversicherungsnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void ChSozialversicherungsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ChSozialversicherungsnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void ChSozialversicherungsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ChSozialversicherungsnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void ChSozialversicherungsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ChSozialversicherungsnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void ChSozialversicherungsnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ChSozialversicherungsnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidPrefixValues))]
+   public void ChSozialversicherungsnummer_Constructor_ShouldThrowKfValidationException_WhenValueDoesNotStartWith756(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidPrefixResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new ChSozialversicherungsnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void ChSozialversicherungsnummer_Value_ShouldReturnValidatedSteuerIdNr(String value)
+   {
+      // Arrange.
+      var expected = GetRawChSozialversicherungsnummer(value);
+      var sut = new ChSozialversicherungsnummer(value);
+
+      // Act/assert.
+      sut.Value.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ChSozialversicherungsnummer_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = ValidUnformattedSozialversicherungsnummer;
+      var sut = new ChSozialversicherungsnummer(value);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().Be(sut.Value);
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = ValidUnformattedSozialversicherungsnummer;
+      var sut = new ChSozialversicherungsnummer(value);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().Be(sut.Value);
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      ChSozialversicherungsnummer sut = null!;
+
+      // Act.
+      String str = sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      ChSozialversicherungsnummer sut = null!;
+
+      // Act.
+      var str = (String)sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void ChSozialversicherungsnummer_ExplicitCastToChSozialversicherungsnummer_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = new ChSozialversicherungsnummer(value);
+
+      // Act.
+      var sut = (ChSozialversicherungsnummer)value;
+
+      // Assert.
+      sut.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSeparators))]
+   public void ChSozialversicherungsnummer_ExplicitCastToChSozialversicherungsnummer_ShouldCreateInstance_WhenValueHasValidSeparator(Char separator)
+   {
+      // Arrange.
+      var value = GetFormattedValue(ValidUnformattedSozialversicherungsnummer, separator: separator);
+      var expected = new ChSozialversicherungsnummer(value);
+
+      // Act.
+      var sut = (ChSozialversicherungsnummer)value;
+
+      // Assert.
+      sut.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void ChSozialversicherungsnummer_ExplicitCastToChSozialversicherungsnummer_ShouldCreateInstance_WhenValueHasUndetectableCheckDigitError(String value)
+   {
+      // Arrange.
+      var expected = new ChSozialversicherungsnummer(value);
+
+      // Act.
+      var sut = (ChSozialversicherungsnummer)value;
+
+      // Assert.
+      sut.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void ChSozialversicherungsnummer_ExplicitCastToChSozialversicherungsnummer_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (ChSozialversicherungsnummer)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void ChSozialversicherungsnummer_ExplicitCastToChSozialversicherungsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (ChSozialversicherungsnummer)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void ChSozialversicherungsnummer_ExplicitCastToChSozialversicherungsnummer_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacterWhereDigitExpected(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (ChSozialversicherungsnummer)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void ChSozialversicherungsnummer_ExplicitCastToChSozialversicherungsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (ChSozialversicherungsnummer)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void ChSozialversicherungsnummer_ExplicitCastToChSozialversicherungsnummer_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (ChSozialversicherungsnummer)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidPrefixValues))]
+   public void ChSozialversicherungsnummer_ExplicitCastToChSozialversicherungsnummer_ShouldThrowKfValidationException_WhenValueDoesNotStartWith756(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidPrefixResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (ChSozialversicherungsnummer)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ChSozialversicherungsnummer_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(AltValidUnformattedSozialversicherungsnummer);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_EqualityOperator_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 13 and 16 character versions for same person should still be equal.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', '-'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_EqualityOperator_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'A'));
+      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'a'));
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ChSozialversicherungsnummer_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(AltValidUnformattedSozialversicherungsnummer);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_InequalityOperator_ShouldReturnFalse_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 13 and 16 character versions for same person should still be equal.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', '-'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_InequalityOperator_ShouldReturnFalse_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'A'));
+      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'a'));
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void ChSozialversicherungsnummer_Create_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = new ChSozialversicherungsnummer(value);
+
+      // Act.
+      var result = ChSozialversicherungsnummer.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidSeparators))]
+   public void ChSozialversicherungsnummer_Create_ShouldCreateInstance_WhenValueHasValidSeparator(Char separator)
+   {
+      // Arrange.
+      var value = GetFormattedValue(ValidUnformattedSozialversicherungsnummer, separator: separator);
+      LocalCreateResult expected = new ChSozialversicherungsnummer(value);
+
+      // Act.
+      var result = ChSozialversicherungsnummer.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(UndetectableCheckDigitErrors))]
+   public void ChSozialversicherungsnummer_Create_ShouldCreateInstance_WhenValueHasUndetectableCheckDigitError(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = new ChSozialversicherungsnummer(value);
+
+      // Act.
+      var result = ChSozialversicherungsnummer.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void ChSozialversicherungsnummer_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
+
+      // Act.
+      var result = ChSozialversicherungsnummer.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void ChSozialversicherungsnummer_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
+
+      // Act.
+      var result = ChSozialversicherungsnummer.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<LocalValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void ChSozialversicherungsnummer_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacterWhereDigitExpected(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
+
+      // Act.
+      var result = ChSozialversicherungsnummer.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void ChSozialversicherungsnummer_Create_ShouldReturnInvalidChecksumValidationResult_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
+
+      // Act.
+      var result = ChSozialversicherungsnummer.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void ChSozialversicherungsnummer_Create_ShouldReturnInvalidSeparatorValidationResult_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidSeparatorResult(value, position);
+
+      // Act.
+      var result = ChSozialversicherungsnummer.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidPrefixValues))]
+   public void ChSozialversicherungsnummer_Create_ShouldReturnInvalidPrefixValidationResult_WhenValueDoesNotStartWith756(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidPrefixResult(value);
+
+      // Act.
+      var result = ChSozialversicherungsnummer.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ChSozialversicherungsnummer_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(AltValidUnformattedSozialversicherungsnummer);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_Equals_ShouldReturnTrue_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 13 and 16 character versions for same person should still be equal.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', '-'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_Equals_ShouldReturnTrue_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'A'));
+      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'a'));
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+
+      // Act/assert.
+      sut.Equals(ValidUnformattedSozialversicherungsnummer).Should().BeFalse();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Format Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ChSozialversicherungsnummer_Format_ShouldReturnExpectedString_WhenDefaultMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer);
+      var expected = ValidFormattedSozialversicherungsnummer;
+
+      // Act.
+      var str = sut.Format();
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_Format_ShouldReturnExpectedString_WhenCustomMaskIsUsed()
+   {
+      // Arrange.
+      var sut = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var mask = "_____________";
+      var expected = ValidUnformattedSozialversicherungsnummer;
+
+      // Act.
+      var str = sut.Format(mask);
+
+      // Assert.
+      str.Should().Be(expected);
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_Format_ShouldThrowArgumentNullException_WhenMaskIsNull()
+   {
+      // Arrange.
+      var sut = new ChSozialversicherungsnummer(AltValidFormattedSozialversicherungsnummer);
+      String mask = null!;
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = sut.Format(mask))
+         .Should()
+         .ThrowExactly<ArgumentNullException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(Messages.FormatMaskEmpty + "*");
+   }
+
+   [Theory]
+   [InlineData("")]
+   [InlineData("\t")]
+   public void ChSozialversicherungsnummer_Format_ShouldThrowArgumentException_WhenMaskIsEmpty(String mask)
+   {
+      // Arrange.
+      var sut = new ChSozialversicherungsnummer(AltValidFormattedSozialversicherungsnummer);
+      var expectedMessage = Messages.FormatMaskEmpty + "*";
+      var act = () => _ = sut.Format(mask);
+
+      // Act/assert.
+      act.Should().ThrowExactly<ArgumentException>()
+         .WithParameterName(nameof(mask))
+         .WithMessage(expectedMessage);
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ChSozialversicherungsnummer_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(AltValidUnformattedSozialversicherungsnummer);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_GetHashCode_ShouldBeConsistent_WhenValuesHaveDifferentLengths()
+   {
+      // Arrange. 13 and 16 character versions for same person should still be equal.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidFormattedSozialversicherungsnummer);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparators()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', '-'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_GetHashCode_ShouldBeConsistent_WhenValuesDifferOnlyBySeparatorCase()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'A'));
+      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer.Replace('.', 'a'));
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // ChSozialversicherungsnummer does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void ChSozialversicherungsnummer_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+      var sut2 = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void ChSozialversicherungsnummer_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new ChSozialversicherungsnummer(value);
+      var expected = GetRawChSozialversicherungsnummer(value);
+
+      // Act/assert.
+      sut.ToString().Should().Be(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -319,6 +1208,103 @@ public class ChSozialversicherungsnummerTests
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ChSozialversicherungsnummer_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<ChSozialversicherungsnummer>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new ChSozialversicherungsnummer(AltValidFormattedSozialversicherungsnummer);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public ChSozialversicherungsnummer Sozialversicherungsnummer { get; set; } = null!;
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { Sozialversicherungsnummer = new ChSozialversicherungsnummer(ValidUnformattedSozialversicherungsnummer) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"Sozialversicherungsnummer\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"Sozialversicherungsnummer\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.Sozialversicherungsnummer.Should().BeNull();
+   }
+
+   [Fact]
+   public void ChSozialversicherungsnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenSozialversicherungsnummerIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"Sozialversicherungsnummer\":\"7560850653826\"}";  // Invalid checksum
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion

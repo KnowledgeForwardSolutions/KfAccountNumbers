@@ -680,7 +680,7 @@ public class DeSteuerIdNrTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void DeSteuerIdNr_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigit(String value)
+   public void DeSteuerIdNr_Create_ShouldReturnInvalidChecksumValidationResult_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
       LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
