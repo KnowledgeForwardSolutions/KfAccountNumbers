@@ -259,7 +259,7 @@ public class DeSteuerIdNrTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void DeSteuerIdNr_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
+   public void DeSteuerIdNr_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
       LocalValidationError expected = GetInvalidChecksumResult();
@@ -445,7 +445,7 @@ public class DeSteuerIdNrTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void DeSteuerIdNr_ExplicitCastToDeSteuerIdNr_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
+   public void DeSteuerIdNr_ExplicitCastToDeSteuerIdNr_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
       LocalValidationError expected = GetInvalidChecksumResult();
@@ -680,7 +680,7 @@ public class DeSteuerIdNrTests
 
    [Theory]
    [MemberData(nameof(InvalidCheckDigitValues))]
-   public void DeSteuerIdNr_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigits(String value)
+   public void DeSteuerIdNr_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigit(String value)
    {
       // Arrange.
       LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();

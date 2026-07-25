@@ -115,6 +115,7 @@ namespace KfAccountNumbers.National.Europe;
 ///      for more information.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(LuMatriculeJsonConverter))]
 public record LuMatricule
 {
    /// <summary>
@@ -163,6 +164,138 @@ public record LuMatricule
    private const Int32 DayOffset = 6;
    private const Int32 MonthOffset = 4;
    private const Int32 VerhoeffOffset = 12;
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="LuMatricule"/>
+   ///   class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Luxembourg matricule..
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="value"/> is not length 13.
+   ///   - or -
+   ///   <paramref name="value"/> contains a non-digit character in any
+   ///   position.
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid Luhn check digit in
+   ///   character position 11 (zero-based) or an invalid Verhoeff check digit
+   ///   in character position 12 (zero-based).
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid date of birth (YYYYMMDD
+   ///   format) in the leading eight digits.
+   /// </exception>
+   public LuMatricule(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="LuMatricule"/>
+   ///   class.
+   /// </summary>
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private LuMatricule(String? value, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
+         {
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
+         }
+      }
+
+      Value = value!;
+   }
+
+   /// <summary>
+   ///   Gets the person's date of birth, derived from the first eight digits in
+   ///   YYYYMMDD format.
+   /// </summary>
+   public DateOnly DateOfBirth
+   {
+      get
+      {
+#pragma warning disable IDE0008 // Use explicit type
+         var (year, month, day) = GetYearMonthDay(Value);
+#pragma warning restore IDE0008 // Use explicit type
+
+         return new DateOnly(year, month, day);
+      }
+   }
+
+   /// <summary>
+   ///   Gets the raw matricule value.
+   /// </summary>
+   public String Value { get; private init; }
+
+   /// <summary>
+   ///   Implicitly converts a <see cref="LuMatricule"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="LuMatricule"/> to convert.
+   /// </param>
+   public static implicit operator String(LuMatricule source)
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a
+   ///   <see cref="LuMatricule"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Luxembourg matricule.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid matricule.
+   /// </exception>
+   public static explicit operator LuMatricule(String? value) => new(value);
+
+   /// <summary>
+   ///   Create a new <see cref="LuMatricule"/> using the Result pattern.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Luxembourg matricule.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{LuMatricule, ValidationError}"/>. Will
+   ///   contain the new <see cref="LuMatricule"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
+   /// </returns>
+   public static CreateResult<LuMatricule, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new LuMatricule(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
+
+   /// <summary>
+   ///   Get a string representation of the Luxembourg matricule.
+   /// </summary>
+   /// <returns>
+   ///   The Luxembourg matricule.
+   /// </returns>
+   public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid
@@ -244,12 +377,6 @@ public record LuMatricule
       VerhoeffPermutationTable verhoeffPermutationTable = VerhoeffPermutationTable.Instance;
       VerhoeffMultiplicationTable verhoeffMultiplicationTable = VerhoeffMultiplicationTable.Instance;
 
-      var vC = 0;       // Verhoeff c parameter
-      var vI = 0;       // Verhoeff i parameter
-      //var vP = 0;       // Verhoeff p parameter
-      var luhnSum = 0;
-      var oddPosition = true;
-
       // Set up the Verhoeff algorithm by processing the Verhoeff check digit.
       var digit = value[VerhoeffOffset].ToSingleDigit();
       if (!digit.IsValidDigit())
@@ -257,6 +384,8 @@ public record LuMatricule
          return GetInvalidCharacterResult(value, VerhoeffOffset);
       }
 
+      var vC = 0;       // Verhoeff c parameter
+      var vI = 0;       // Verhoeff i parameter
       var vP = verhoeffPermutationTable[vI % 8, digit];
       vC = verhoeffMultiplicationTable[vC, vP];
       vI++;
@@ -269,6 +398,8 @@ public record LuMatricule
       }
 
       // Process the remaining 11 digits for both Luhn and Verhoeff algorithms.
+      var luhnSum = 0;
+      var oddPosition = true;
       for (var index = LuhnOffset - 1; index >= 0; index--)
       {
          digit = value[index].ToSingleDigit();
@@ -301,7 +432,7 @@ public record LuMatricule
       // Manual validation is faster than using DateTime.TryParseExact.
 #pragma warning disable IDE0008 // Use explicit type
       var (year, month, day) = GetYearMonthDay(value);
-      #pragma warning restore IDE0008 // Use explicit type
+#pragma warning restore IDE0008 // Use explicit type
 
       if (month is < 1 or > 12)
       {
@@ -314,19 +445,19 @@ public record LuMatricule
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable SA1600 // Elements should be documented
-//public class LuMatriculeJsonConverter : JsonConverter<LuMatricule>
-//{
-//   public override LuMatricule Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-//   {
-//      if (reader.TokenType == JsonTokenType.Null)
-//      {
-//         return null!;
-//      }
+public class LuMatriculeJsonConverter : JsonConverter<LuMatricule>
+{
+   public override LuMatricule Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
 
-//      var str = reader.GetString();
-//      return new LuMatricule(str);
-//   }
+      var str = reader.GetString();
+      return new LuMatricule(str);
+   }
 
-//   public override void Write(Utf8JsonWriter writer, LuMatricule value, JsonSerializerOptions options)
-//      => writer.WriteStringValue(value.Value);
-//}
+   public override void Write(Utf8JsonWriter writer, LuMatricule value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
+}

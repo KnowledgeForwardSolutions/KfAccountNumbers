@@ -158,6 +158,618 @@ public class LuMatriculeTests
       return $"{temp}{luhn}{verhoeff}";
    }
 
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void LuMatricule_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Act.
+      var sut = new LuMatricule(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(value);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidteDateOfBirthValues))]
+   public void LuMatricule_Constructor_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
+      String dateOfBirth,
+      String _)
+   {
+      // Act.
+      var value = GetValue(dateOfBirth);
+      var sut = new LuMatricule(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(value);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void LuMatricule_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new LuMatricule(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void LuMatricule_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new LuMatricule(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void LuMatricule_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new LuMatricule(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void LuMatricule_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new LuMatricule(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void LuMatricule_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(String dateOfBirth)
+   {
+      // Arrange.
+      var value = GetValue(dateOfBirth);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new LuMatricule(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region DateOfBirth Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidteDateOfBirthValues))]
+   public void LuMatricule_DateOfBirth_ShouldReturnExpectedValue(
+      String dateOfBirth,
+      String expectedString)
+   {
+      // Arrange.
+      var value = GetValue(dateOfBirth);
+      var sut = new LuMatricule(value);
+      var expected = DateOnly.ParseExact(
+         expectedString,
+         "yyyyMMdd",
+         CultureInfo.InvariantCulture);
+
+      // Act/assert.
+      sut.DateOfBirth.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void LuMatricule_Value_ShouldReturnValidatedMatricule(String value)
+   {
+      // Arrange.
+      var sut = new LuMatricule(value);
+
+      // Act/assert.
+      sut.Value.Should().Be(value);
+   }
+
+   #endregion
+
+   #region Conversion Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void LuMatricule_ImplicitToStringConversion_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = ValidMatricule;
+      var sut = new LuMatricule(value);
+
+      // Act.
+      String str = sut;
+
+      // Assert.
+      str.Should().Be(sut.Value);
+   }
+
+   [Fact]
+   public void LuMatricule_CastToString_ShouldReturnExpectedValue_WhenValueIsNotNull()
+   {
+      // Arrange.
+      var value = ValidMatricule;
+      var sut = new LuMatricule(value);
+
+      // Act.
+      var str = (String)sut;
+
+      // Assert.
+      str.Should().Be(sut.Value);
+   }
+
+   [Fact]
+   public void LuMatricule_ImplicitToStringConversion_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      LuMatricule sut = null!;
+
+      // Act.
+      String str = sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Fact]
+   public void LuMatricule_CastToString_ShouldReturnEmptyString_WhenValueIsNull()
+   {
+      // Arrange.
+      LuMatricule sut = null!;
+
+      // Act.
+      var str = (String)sut;
+
+      // Act/assert.
+      str.Should().NotBeNull();
+      str.Should().BeEmpty();
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void LuMatricule_ExplicitCastToLuMatricule_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = new LuMatricule(value);
+
+      // Act.
+      var sut = (LuMatricule)value;
+
+      // Assert.
+      sut.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidteDateOfBirthValues))]
+   public void LuMatricule_ExplicitCastToLuMatricule_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
+      String dateOfBirth,
+      String _)
+   {
+      // Arrange.
+      var value = GetValue(dateOfBirth);
+      var expected = new LuMatricule(value);
+
+      // Act.
+      var sut = (LuMatricule)value;
+
+      // Assert.
+      sut.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void LuMatricule_ExplicitCastToLuMatricule_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (LuMatricule)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void LuMatricule_ExplicitCastToLuMatricule_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (LuMatricule)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void LuMatricule_ExplicitCastToLuMatricule_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (LuMatricule)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void LuMatricule_ExplicitCastToLuMatricule_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (LuMatricule)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void LuMatricule_ExplicitCastToLuMatricule_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(String dateOfBirth)
+   {
+      // Arrange.
+      var value = GetValue(dateOfBirth);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => _ = (LuMatricule)value)
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Equality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void LuMatricule_EqualityOperator_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new LuMatricule(ValidMatricule);
+      var sut2 = new LuMatricule(ValidMatricule);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void LuMatricule_EqualityOperator_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new LuMatricule(ValidMatricule);
+      var sut2 = new LuMatricule(AltValidMatricule);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Inequality Operator Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void LuMatricule_InequalityOperator_ShouldReturnTrue_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new LuMatricule(ValidMatricule);
+      var sut2 = new LuMatricule(AltValidMatricule);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void LuMatricule_InequalityOperator_ShouldReturnFalse_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new LuMatricule(ValidMatricule);
+      var sut2 = new LuMatricule(ValidMatricule);
+
+      // Act/assert.
+      (sut1 != sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region Create Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void LuMatricule_Create_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = new LuMatricule(value);
+
+      // Act.
+      var result = LuMatricule.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidteDateOfBirthValues))]
+   public void LuMatricule_Create_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
+      String dateOfBirth,
+      String _)
+   {
+      // Arrange.
+      var value = GetValue(dateOfBirth);
+      LocalCreateResult expected = new LuMatricule(value);
+
+      // Act.
+      var result = LuMatricule.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void LuMatricule_Create_ShouldReturnEmptyValidationResult_WhenValueIsEmpty(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)default(EmptyValue);
+
+      // Act.
+      var result = LuMatricule.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void LuMatricule_Create_ShouldReturnInvalidLengthValidationResult_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidLengthResult(value);
+
+      // Act.
+      var result = LuMatricule.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected, options => options                         // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+         .ComparingByMembers<LocalCreateResult>()
+         .ComparingByMembers<LocalValidationError>()
+         .ComparingByMembers<ValidLengthDefinition>()
+         .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void LuMatricule_Create_ShouldReturnInvalidCharacterValidationResult_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidCharacterResult(value, position);
+
+      // Act.
+      var result = LuMatricule.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void LuMatricule_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidCheckDigits(String value)
+   {
+      // Arrange.
+      LocalCreateResult expected = (LocalValidationError)GetInvalidChecksumResult();
+
+      // Act.
+      var result = LuMatricule.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDateOfBirthValues))]
+   public void LuMatricule_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidDateOfBirth(String dateOfBirth)
+   {
+      // Arrange.
+      var value = GetValue(dateOfBirth);
+      LocalCreateResult expected = (LocalValidationError)GetInvalidDateOfBirthResult(value);
+
+      // Act.
+      var result = LuMatricule.Create(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Equals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void LuMatricule_Equals_ShouldReturnTrue_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new LuMatricule(ValidMatricule);
+      var sut2 = new LuMatricule(ValidMatricule);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeTrue();
+   }
+
+   [Fact]
+   public void LuMatricule_Equals_ShouldReturnFalse_WhenValuesAreNotEqual()
+   {
+      // Arrange.
+      var sut1 = new LuMatricule(ValidMatricule);
+      var sut2 = new LuMatricule(AltValidMatricule);
+
+      // Act/assert.
+      sut1.Equals(sut2).Should().BeFalse();
+   }
+
+   [Fact]
+   public void LuMatricule_Equals_ShouldReturnFalse_WhenComparedToDifferentType()
+   {
+      // Arrange.
+      var sut = new LuMatricule(ValidMatricule);
+
+      // Act/assert.
+      sut.Equals(ValidMatricule).Should().BeFalse();
+   }
+
+   [Fact]
+   public void LuMatricule_Equals_ShouldReturnFalse_WhenComparedWithNull()
+   {
+      // Arrange.
+      var sut = new LuMatricule(ValidMatricule);
+
+      // Act/assert.
+      sut.Equals(null).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region GetHashCode Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void LuMatricule_GetHashCode_ShouldBeConsistent_WhenValuesAreEqual()
+   {
+      // Arrange.
+      var sut1 = new LuMatricule(ValidMatricule);
+      var sut2 = new LuMatricule(ValidMatricule);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().Be(hash2);
+   }
+
+   [Fact]
+   public void LuMatricule_GetHashCode_ShouldReturnDifferentValues_WhenValuesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new LuMatricule(ValidMatricule);
+      var sut2 = new LuMatricule(AltValidMatricule);
+
+      // Act.
+      var hash1 = sut1.GetHashCode();
+      var hash2 = sut2.GetHashCode();
+
+      // Assert.
+      hash1.Should().NotBe(hash2);
+   }
+
+   #endregion
+
+   #region ReferenceEquals Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   // LuMatricule does not override Object.ReferenceEquals, so this test just
+   // confirms that two different instances with the same value are not
+   // considered reference equal.
+
+   [Fact]
+   public void LuMatricule_ObjectReferenceEquals_ShouldReturnFalse_WhenValuesAreEqualButInstancesAreDifferent()
+   {
+      // Arrange.
+      var sut1 = new LuMatricule(ValidMatricule);
+      var sut2 = new LuMatricule(ValidMatricule);
+
+      // Act/assert.
+      (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
+      ReferenceEquals(sut1, sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToString Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidValues))]
+   public void LuMatricule_ToString_ShouldReturnExpectedValue(String value)
+   {
+      // Arrange.
+      var sut = new LuMatricule(value);
+
+      // Act/assert.
+      sut.ToString().Should().Be(sut.Value);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
@@ -267,6 +879,103 @@ public class LuMatriculeTests
 
       // Assert.
       result.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
+   #region Json Serialization Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void LuMatricule_JsonSerialization_ShouldRoundTripSuccessfully()
+   {
+      // Arrange.
+      var sut = new LuMatricule(ValidMatricule);
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+      var result = JsonSerializer.Deserialize<LuMatricule>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(sut);
+   }
+
+   [Fact]
+   public void LuMatricule_JsonSerialization_ShouldSerializeAsStringInsteadOfObject()
+   {
+      // Arrange.
+      var sut = new LuMatricule(ValidMatricule);
+      var expected = sut.Value;
+
+      // Act.
+      var json = JsonSerializer.Serialize(sut);
+
+      // Assert.
+      json.Should().Be($"\"{expected}\"");  // Simple string, not object
+   }
+
+   public class Foo
+   {
+      public LuMatricule Matricule { get; set; } = null!;
+   }
+
+   [Fact]
+   public void LuMatricule_JsonSerialization_ShouldDeserializeComplexObject()
+   {
+      // Arrange.
+      var foo = new Foo { Matricule = new LuMatricule(ValidMatricule) };
+      var json = JsonSerializer.Serialize(foo);
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result.Should().BeEquivalentTo(foo);
+   }
+
+   [Fact]
+   public void LuMatricule_JsonSerialization_ShouldSerializeNullGracefully()
+   {
+      // Arrange.
+      var expected = /*lang=json,strict*/ "{\"Matricule\":null}";
+      var foo = new Foo();
+
+      // Act.
+      var json = JsonSerializer.Serialize(foo);
+
+      // Assert.
+      json.Should().Be(expected);
+   }
+
+   [Fact]
+   public void LuMatricule_JsonDeserialization_ShouldDeserializeNullGracefully()
+   {
+      // Arrange.
+      var json = "{\"Matricule\":null}";
+
+      // Act.
+      var result = JsonSerializer.Deserialize<Foo>(json);
+
+      // Assert.
+      result.Should().NotBeNull();
+      result!.Matricule.Should().BeNull();
+   }
+
+   [Fact]
+   public void LuMatricule_JsonDeserialization_ShouldThrowKfValidationException_WhenRijksregisternummerIsInvalid()
+   {
+      // Arrange.
+      var json = "{\"Matricule\":\"1970090900163\"}";  // Invalid checksum
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => JsonSerializer.Deserialize<Foo>(json))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
    }
 
    #endregion
