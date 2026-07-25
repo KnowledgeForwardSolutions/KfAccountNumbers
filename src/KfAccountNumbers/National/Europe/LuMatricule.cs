@@ -170,7 +170,7 @@ public record LuMatricule
    ///   class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Luxembourg matricule..
+   ///   String representation of a Luxembourg matricule.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all

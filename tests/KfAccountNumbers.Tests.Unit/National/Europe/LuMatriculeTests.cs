@@ -21,7 +21,7 @@ public class LuMatriculeTests
       AltValidMatricule,
    ];
 
-   public static TheoryData<String, String> ValidteDateOfBirthValues = new()
+   public static TheoryData<String, String> ValidDateOfBirthValues = new()
    {
       // Century boundary values
       { "18000101", "18000101" },      // January 1, 1800
@@ -175,7 +175,7 @@ public class LuMatriculeTests
    }
 
    [Theory]
-   [MemberData(nameof(ValidteDateOfBirthValues))]
+   [MemberData(nameof(ValidDateOfBirthValues))]
    public void LuMatricule_Constructor_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
       String dateOfBirth,
       String _)
@@ -272,7 +272,7 @@ public class LuMatriculeTests
    // ==========================================================================
 
    [Theory]
-   [MemberData(nameof(ValidteDateOfBirthValues))]
+   [MemberData(nameof(ValidDateOfBirthValues))]
    public void LuMatricule_DateOfBirth_ShouldReturnExpectedValue(
       String dateOfBirth,
       String expectedString)
@@ -383,7 +383,7 @@ public class LuMatriculeTests
    }
 
    [Theory]
-   [MemberData(nameof(ValidteDateOfBirthValues))]
+   [MemberData(nameof(ValidDateOfBirthValues))]
    public void LuMatricule_ExplicitCastToLuMatricule_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
       String dateOfBirth,
       String _)
@@ -552,7 +552,7 @@ public class LuMatriculeTests
    }
 
    [Theory]
-   [MemberData(nameof(ValidteDateOfBirthValues))]
+   [MemberData(nameof(ValidDateOfBirthValues))]
    public void LuMatricule_Create_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
       String dateOfBirth,
       String _)
@@ -632,7 +632,7 @@ public class LuMatriculeTests
 
    [Theory]
    [MemberData(nameof(InvalidDateOfBirthValues))]
-   public void LuMatricule_Create_ShouldReturnInvalidCheckDigitsValidationResult_WhenValueHasInvalidDateOfBirth(String dateOfBirth)
+   public void LuMatricule_Create_ShouldReturnInvalidDateOfBirthValidationResult_WhenValueHasInvalidDateOfBirth(String dateOfBirth)
    {
       // Arrange.
       var value = GetValue(dateOfBirth);
@@ -789,7 +789,7 @@ public class LuMatriculeTests
    }
 
    [Theory]
-   [MemberData(nameof(ValidteDateOfBirthValues))]
+   [MemberData(nameof(ValidDateOfBirthValues))]
    public void LuMatricule_Validate_ShouldReturnValidValue_WhenValueHasValidDateOfBirth(
       String dateOfBirth,
       String _)
