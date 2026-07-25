@@ -4,37 +4,42 @@
 namespace KfAccountNumbers.National.Europe;
 
 /// <summary>
-///   Strongly typed business object that represents a German identification
-///   number (Steuerliche Identifikationsnummer or Steuer-IdNr).
+///   Strongly typed business object that represents a Swiss Social Security
+///   Number (Sozialversicherungsnummer or Neue AVH Nummer).
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A Steuer-IdNr is an 11-digit number structured as DDDDDDDDDDC, with the
-///      following elements:
+///      A Sozialversicherungsnummer is an 13-digit number structured as
+///      756XXXXXXXXXY , with the following elements:
 ///      <list type="bullet">
 ///         <item>
-///            <term>DDDDDDDDDD</term>
+///            <term>756</term>
 ///            <description>
-///               Ten random digits.
+///               Constant "756", the ISO 3166-1 code for Switzerland
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>C</term>
+///            <term>XXXXXXXXX</term>
 ///            <description>
-///               Check digit generated using the ISO/IEC 7064, MOD 11,10
-///               algorithm.
+///               Nine random digits.
+///            </description>
+///         </item>
+///         <item>
+///            <term>Y</term>
+///            <description>
+///               Check digit generated using the EAN-13 algorithm.
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
-///      The 11 character value is sometimes formatted for greater readability
-///      by inserting a separator character, generally a space, at positions 2,
-///      6 and 10 (zero-based), i.e. DD DDD DDD DDC.
+///      The 13 character value is often formatted for greater readability by
+///      inserting a separator character, generally a period ('.'), at positions
+///      3, 8 and 13 (zero-based), i.e. 756.XXXX.XXXX.XY.
 ///   </para>
 ///   <para>
-///      When creating a new <see cref="DeSteuerIdNr"/>, the following validation
-///      rules are applied:
+///      When creating a new <see cref="ChSozialversicherungsnummer"/>, the
+///      following validation rules are applied:
 ///      <list type="bullet">
 ///         <item>
 ///            <description>
@@ -43,7 +48,8 @@ namespace KfAccountNumbers.National.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The string must be either 11 or 14 characters long.
+///               The string must be 13 characters long (unformatted) or 16
+///               characters long (formatted for readability).
 ///            </description>
 ///         </item>
 ///         <item>
@@ -53,15 +59,19 @@ namespace KfAccountNumbers.National.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The trailing character must be a valid ISO/IEC 7064 MOD 11,10
-///               check digit.
+///               The trailing character must be a valid EAN-13 check digit.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               If the value has length 14, then characters at positions 2, 6
-///               and 10 (zero-based) must not be ASCII digits ('0'-'9') and all
-///               separator positions must be the same character
+///               If the value has length 16, then characters at positions 3, 8
+///               and 13 (zero-based) must not be ASCII digits ('0'-'9') and all
+///               separator positions must be the same character.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
+///               The leading three characters must be "756".
 ///            </description>
 ///         </item>
 ///      </list>
@@ -70,52 +80,48 @@ namespace KfAccountNumbers.National.Europe;
 ///      Example values:
 ///      <list type="bullet">
 ///         <item>
-///            <term>43957380212</term>
+///            <term>7560850652826</term>
 ///            <description>
-///               unformatted
+///               unformatted, check digit = 6
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>25 986 078 148</term>
+///            <term>756.8814.3009.98</term>
 ///            <description>
-///               formatted
-///            </description>
-///         </item>
-///         <item>
-///            <term>91 215 743 612</term>
-///            <description>
-///               formatted
+///               formatted, check digit = 8
 ///            </description>
 ///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
-///      A Steuer-IdNr does not encode any personal information.
+///      A Sozialversicherungsnummer does not encode any personal information.
 ///   </para>
 ///   <para>
-///      See <see href="https://de.wikipedia.org/wiki/Steuerliche_Identifikationsnummer">Wikipedia (German) - Steuerliche Identifikationsnummer</see>
+///      See <see href="https://en.wikipedia.org/wiki/National_identification_number#Switzerland">Wikipedia - National identification number - Switzerland</see>
+///      and <see href="https://de.wikipedia.org/wiki/Sozialversicherungsnummer#Versichertennummer">Wikipedia (German) - Sozialversicherungsnummer</see>
 ///      for more information.
 ///   </para>
 /// </remarks>
-[JsonConverter(typeof(DeSteuerIdNrJsonConverter))]
-public record DeSteuerIdNr
+[JsonConverter(typeof(ChSozialversicherungsnummerJsonConverter))]
+public record ChSozialversicherungsnummer
 {
    /// <summary>
    ///   Discriminated union defining the possible validation errors that can
-   ///   occur when creating a new German Steuer-IdNr.
+   ///   occur when creating a new Sozialversicherungsnummer.
    /// </summary>
    public union ValidationError(
       EmptyValue,
       InvalidLength,
       InvalidCharacter,
       InvalidChecksum,
-      InvalidSeparator)
+      InvalidSeparator,
+      InvalidPrefix)
    {
    }
 
    /// <summary>
    ///   Discriminated union defining the possible results that can occur when
-   ///   validating German Steuer-IdNrs.
+   ///   validating Sozialversicherungsnummer.
    /// </summary>
    public union ValidationResult(
       ValidValue,
@@ -123,80 +129,86 @@ public record DeSteuerIdNr
       InvalidLength,
       InvalidCharacter,
       InvalidChecksum,
-      InvalidSeparator)
+      InvalidSeparator,
+      InvalidPrefix)
    {
    }
 
    /// <summary>
-   ///   The valid length of an unformatted German Steuer-IdNr.
+   ///   The valid length of an unformatted Sozialversicherungsnummer.
    /// </summary>
-   public const Int32 UnformattedLength = 11;
+   public const Int32 UnformattedLength = 13;
 
    /// <summary>
-   ///   The valid length of a formatted German Steuer-IdNr.
+   ///   The valid length of a formatted Sozialversicherungsnummer.
    /// </summary>
-   public const Int32 FormattedLength = 14;
+   public const Int32 FormattedLength = 16;
 
    /// <summary>
-   ///   The default format to use when formatting <see cref="DeSteuerIdNr"/>
-   ///   values.
+   ///   The name of the check digit algorithm used by
+   ///   <see cref="ChSozialversicherungsnummer"/>.
    /// </summary>
-   public const String DefaultFormatMask = "__/___/___/___";
+   public const String CheckDigitAlgorithmName = "EAN-13";
+
+   /// <summary>
+   ///   The default format to use when formatting
+   ///   <see cref="ChSozialversicherungsnummer"/> values.
+   /// </summary>
+   public const String DefaultFormatMask = "___.____.____.__";
 
    /// <summary>
    ///   Zero based offset of the first separator.
    /// </summary>
-   internal const Int32 FirstSeparatorOffset = 2;
+   internal const Int32 FirstSeparatorOffset = 3;
 
    /// <summary>
    ///   Zero based offset of the second separator.
    /// </summary>
-   internal const Int32 SecondSeparatorOffset = 6;
+   internal const Int32 SecondSeparatorOffset = 8;
 
    /// <summary>
    ///   Zero based offset of the third separator.
    /// </summary>
-   internal const Int32 ThirdSeparatorOffset = 10;
+   internal const Int32 ThirdSeparatorOffset = 13;
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="DeSteuerIdNr"/>
-   ///   class.
+   ///   Initializes a new instance of the
+   ///   <see cref="ChSozialversicherungsnummer"/> class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a German Steuer-IdNr.
+   ///   String representation of a Sozialversicherungsnummer.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
    ///   whitespace characters.
    ///   - or -
-   ///   <paramref name="value"/> is not length 11 (or 14 if separator
+   ///   <paramref name="value"/> is not length 13 (or 16 if separator
    ///   characters are used).
    ///   - or -
    ///   <paramref name="value"/> contains a non-digit character in any position
    ///   other than the separator locations.
    ///   - or -
-   ///   <paramref name="value"/> contains an invalid ISO/IEC 7064 MOD 11,10
-   ///   check digit in the trailing (right-most) character position.
+   ///   <paramref name="value"/> contains an invalid EAN-13 check digit in the
+   ///   trailing (right-most) character position.
    ///   - or -
-   ///   <paramref name="value"/> is 14 characters in length and has an ASCII
+   ///   <paramref name="value"/> is 16 characters in length and has an ASCII
    ///   digit ('0'-'9') in a separator location.
    ///   - or -
-   ///   <paramref name="value"/> is 14 characters in length and has two
-   ///   different separator characters.
+   ///   <paramref name="value"/> does not start with the characters "756".
    /// </exception>
-   public DeSteuerIdNr(String? value)
+   public ChSozialversicherungsnummer(String? value)
       : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="DeSteuerIdNr"/>
-   ///   class.
+   ///   Initializes a new instance of the
+   ///   <see cref="ChSozialversicherungsnummer"/> class.
    /// </summary>
    /// <remarks>
    ///   Private constructor that actually does the work. Supports bypassing
    ///   validation when creating a new instance from a value that has
    ///   already been validated.
    /// </remarks>
-   private DeSteuerIdNr(String? value, ValidationMode validationMode)
+   private ChSozialversicherungsnummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
@@ -210,6 +222,7 @@ public record DeSteuerIdNr
                InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
                InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
                InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               InvalidPrefix invalidPrefix => new UKfValidationException<ValidationError>(invalidPrefix),
                _ => new UnreachableException("This branch should never be reached"),
             };
          }
@@ -219,57 +232,60 @@ public record DeSteuerIdNr
    }
 
    /// <summary>
-   ///   Gets the raw Steuer-IdNr value.
+   ///   Gets the raw Sozialversicherungsnummer value.
    /// </summary>
    public String Value { get; private init; }
 
    /// <summary>
-   ///   Implicitly converts a <see cref="DeSteuerIdNr"/> to a
+   ///   Implicitly converts a <see cref="ChSozialversicherungsnummer"/> to a
    ///   <see cref="String"/>, returning an empty string if the source is null.
    /// </summary>
    /// <param name="source">
-   ///   The <see cref="DeSteuerIdNr"/> to convert.
+   ///   The <see cref="ChSozialversicherungsnummer"/> to convert.
    /// </param>
-   public static implicit operator String(DeSteuerIdNr source)
+   public static implicit operator String(ChSozialversicherungsnummer source)
       => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
 
    /// <summary>
-   ///   Defines an explicit conversion of a string to a <see cref="DeSteuerIdNr"/>.
+   ///   Defines an explicit conversion of a string to a
+   ///   <see cref="ChSozialversicherungsnummer"/>.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a German Steuer-IdNr.
+   ///   String representation of a Sozialversicherungsnummer.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
-   ///   <paramref name="value"/> is not a valid Steuer-IdNr.
+   ///   <paramref name="value"/> is not a valid Sozialversicherungsnummer.
    /// </exception>
-   public static explicit operator DeSteuerIdNr(String? value) => new(value);
+   public static explicit operator ChSozialversicherungsnummer(String? value) => new(value);
 
    /// <summary>
-   ///   Create a new <see cref="DeSteuerIdNr"/> using the Result pattern.
+   ///   Create a new <see cref="ChSozialversicherungsnummer"/> using the Result
+   ///   pattern.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a German Steuer-IdNr.
+   ///   String representation of a Sozialversicherungsnummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{DeSteuerIdNr, ValidationError}"/>. Will
-   ///   contain the new <see cref="DeSteuerIdNr"/> if <paramref name="value"/>
+   ///   A <see cref="CreateResult{ChSozialversicherungsnummer, ValidationError}"/>. Will
+   ///   contain the new <see cref="ChSozialversicherungsnummer"/> if <paramref name="value"/>
    ///   is valid or a <see cref="ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<DeSteuerIdNr, ValidationError> Create(String? value)
+   public static CreateResult<ChSozialversicherungsnummer, ValidationError> Create(String? value)
       => Validate(value) switch
       {
-         ValidValue => new DeSteuerIdNr(value, ValidationMode.BypassValidation),
+         ValidValue => new ChSozialversicherungsnummer(value, ValidationMode.BypassValidation),
          EmptyValue emptyValue => (ValidationError)emptyValue,
          InvalidLength invalidLength => (ValidationError)invalidLength,
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
          InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
          InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         InvalidPrefix invalidPrefix => (ValidationError)invalidPrefix,
          _ => throw new UnreachableException("This branch should never be reached"),
       };
 
    /// <summary>
-   ///   Format the German Steuer-IdNr using the supplied
+   ///   Format the Sozialversicherungsnummer using the supplied
    ///   <paramref name="mask"/>.
    /// </summary>
    /// <param name="mask">
@@ -277,7 +293,7 @@ public record DeSteuerIdNr
    ///   then <see cref="DefaultFormatMask"/> will be used instead.
    /// </param>
    /// <returns>
-   ///   A formatted German Steuer-IdNr.
+   ///   A formatted Sozialversicherungsnummer.
    /// </returns>
    /// <exception cref="ArgumentNullException">
    ///   <paramref name="mask"/> is <see langword="null"/>.
@@ -288,24 +304,24 @@ public record DeSteuerIdNr
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the German Steuer-IdNr.
+   ///   details on creating a mask to format the Sozialversicherungsnummer.
    /// </remarks>
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
-   ///   Get a string representation of the German Steuer-IdNr.
+   ///   Get a string representation of the Sozialversicherungsnummer.
    /// </summary>
    /// <returns>
-   ///   The raw Steuer-IdNr, without separator characters.
+   ///   The raw Sozialversicherungsnummer, without separator characters.
    /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a valid
-   ///   German Steuer-IdNr.
+   ///   Sozialversicherungsnummer.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a German Steuer-IdNr.
+   ///   String representation of a Sozialversicherungsnummer.
    /// </param>
    /// <returns>
    ///   A <see cref="ValidationResult"/> union that indicates if the
@@ -328,8 +344,8 @@ public record DeSteuerIdNr
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
       var validCheckDigit = IsFormatted(value)
-         ? ValidateMaskedCheckDigit(value, DeSteuerIdNrNumberCheckDigitMask.Instance)
-         : Algorithms.Iso7064Mod11_10.Validate(value);
+         ? MaskedAlgorithms.Modulus10_13.Validate(value, ChSozialversicherungsnummerNumberCheckDigitMask.Instance)
+         : Algorithms.Modulus10_13.Validate(value);
       if (!validCheckDigit)
       {
          // Either invalid check digit or invalid character encountered.
@@ -344,31 +360,41 @@ public record DeSteuerIdNr
          return GetInvalidSeparatorResult(value, invalidSeparatorPosition);
       }
 
+      if (!ValidatePrefix(value))
+      {
+         return GetInvalidPrefixResult(value);
+      }
+
       return default(ValidValue);
    }
 
    private static InvalidCharacter GetInvalidCharacterResult(
       ReadOnlySpan<Char> value,
       Int32 position)
-      => new(Messages.DeSteuerIdNrInvalidCharacter, value[position], position);
+      => new(Messages.ChSozialversicherungsnummerInvalidCharacter, value[position], position);
 
    private static InvalidChecksum GetInvalidChecksumResult()
-      => new(Messages.DeSteuerIdNrInvalidCheckDigit, Algorithms.Iso7064Mod11_10.AlgorithmName);
+      => new(Messages.ChSozialversicherungsnummerInvalidCheckDigit, CheckDigitAlgorithmName);
 
    private static InvalidLength GetInvalidLengthResult(ReadOnlySpan<Char> value)
       => new(
-         Messages.DeSteuerIdNrInvalidLength,
+         Messages.ChSozialversicherungsnummerInvalidLength,
          value.Length,
          [
-            new ValidLengthDefinition(UnformattedLength, Messages.DeSteuerIdNrUnformattedLength),
-            new ValidLengthDefinition(FormattedLength, Messages.DeSteuerIdNrFormattedLength),
+            new ValidLengthDefinition(UnformattedLength, Messages.ChSozialversicherungsnummerUnformattedLength),
+            new ValidLengthDefinition(FormattedLength, Messages.ChSozialversicherungsnummerFormattedLength),
          ]);
+
+   private static InvalidPrefix GetInvalidPrefixResult(ReadOnlySpan<Char> value)
+      => new(
+         Messages.ChSozialversicherungsnummerInvalidPrefix,
+         value[..3].ToString());
 
    private static InvalidSeparator GetInvalidSeparatorResult(
       ReadOnlySpan<Char> value,
       Int32 position)
       => new(
-         Messages.DeSteuerIdNrInvalidSeparator,
+         Messages.ChSozialversicherungsnummerInvalidSeparator,
          value[position],
          position);
 
@@ -377,8 +403,8 @@ public record DeSteuerIdNr
          ? value
          : String.Concat(
             value.AsSpan(0, FirstSeparatorOffset),
-            value.AsSpan(FirstSeparatorOffset + 1, 3),
-            value.AsSpan(SecondSeparatorOffset + 1, 3),
+            value.AsSpan(FirstSeparatorOffset + 1, 4),
+            value.AsSpan(SecondSeparatorOffset + 1, 4),
             value.AsSpan(ThirdSeparatorOffset + 1));
 
    [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -396,7 +422,7 @@ public record DeSteuerIdNr
             continue;
          }
 
-         if (!value[index].IsAsciiDigit())
+         if (!Char.IsAsciiDigit(value[index]))
          {
             return index;
          }
@@ -405,51 +431,11 @@ public record DeSteuerIdNr
       return -1;
    }
 
-   // TODO: Remove this method and replace with call to CheckDigits.Net Iso7064Mod11_10Algorithm once it supports check digit masks
-   private static Boolean ValidateMaskedCheckDigit(
-      ReadOnlySpan<Char> value,
-      DeSteuerIdNrNumberCheckDigitMask mask)
+   private static Boolean ValidatePrefix(ReadOnlySpan<Char> value)
    {
-      const Int32 modulus = 10;
-      const Int32 modulusPlus1 = 11;
+      const String requiredPrefix = "756";
 
-      var product = modulus;
-      Int32 num;
-      for (var index = 0; index < value.Length - 1; index++)
-      {
-         if (mask.ExcludeCharacter(index))
-         {
-            continue;
-         }
-
-         num = value[index].ToSingleDigit();
-         if (!num.IsValidDigit())
-         {
-            return false;
-         }
-
-         product += num;
-         if (product > modulus)
-         {
-            product -= modulus;
-         }
-
-         product *= 2;
-         if (product >= modulusPlus1)
-         {
-            product -= modulusPlus1;
-         }
-      }
-
-      num = value[^1].ToSingleDigit();
-      if (!num.IsValidDigit())
-      {
-         return false;
-      }
-
-      product += num;
-
-      return product % modulus == 1;
+      return value[..3].Equals(requiredPrefix, StringComparison.Ordinal);
    }
 
    private static Boolean ValidateSeparators(
@@ -487,9 +473,9 @@ public record DeSteuerIdNr
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable SA1600 // Elements should be documented
-public class DeSteuerIdNrJsonConverter : JsonConverter<DeSteuerIdNr>
+public class ChSozialversicherungsnummerJsonConverter : JsonConverter<ChSozialversicherungsnummer>
 {
-   public override DeSteuerIdNr Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   public override ChSozialversicherungsnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
       if (reader.TokenType == JsonTokenType.Null)
       {
@@ -497,22 +483,22 @@ public class DeSteuerIdNrJsonConverter : JsonConverter<DeSteuerIdNr>
       }
 
       var str = reader.GetString();
-      return new DeSteuerIdNr(str);
+      return new ChSozialversicherungsnummer(str);
    }
 
-   public override void Write(Utf8JsonWriter writer, DeSteuerIdNr value, JsonSerializerOptions options)
+   public override void Write(Utf8JsonWriter writer, ChSozialversicherungsnummer value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
 }
 
-internal class DeSteuerIdNrNumberCheckDigitMask : ICheckDigitMask
+internal class ChSozialversicherungsnummerNumberCheckDigitMask : ICheckDigitMask
 {
-   private static readonly Lazy<DeSteuerIdNrNumberCheckDigitMask> _instance =
-      new(() => new DeSteuerIdNrNumberCheckDigitMask());
+   private static readonly Lazy<ChSozialversicherungsnummerNumberCheckDigitMask> _instance =
+      new(() => new ChSozialversicherungsnummerNumberCheckDigitMask());
 
-   public static DeSteuerIdNrNumberCheckDigitMask Instance => _instance.Value;
+   public static ChSozialversicherungsnummerNumberCheckDigitMask Instance => _instance.Value;
 
    public Boolean ExcludeCharacter(Int32 index)
-      => index is DeSteuerIdNr.FirstSeparatorOffset or DeSteuerIdNr.SecondSeparatorOffset or DeSteuerIdNr.ThirdSeparatorOffset;
+      => index is ChSozialversicherungsnummer.FirstSeparatorOffset or ChSozialversicherungsnummer.SecondSeparatorOffset or ChSozialversicherungsnummer.ThirdSeparatorOffset;
 
    public Boolean IncludeCharacter(Int32 index) => !ExcludeCharacter(index);
 }

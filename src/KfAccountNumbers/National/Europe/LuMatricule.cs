@@ -1,8 +1,6 @@
 #pragma warning disable IDE0250 // Make struct 'readonly'
 #pragma warning disable IDE0046 // Convert to conditional expression
 
-using CheckDigits.Net.Utility;
-
 namespace KfAccountNumbers.National.Europe;
 
 /// <summary>
@@ -151,7 +149,7 @@ public record LuMatricule
    public const Int32 ValidLength = 13;
 
    /// <summary>
-   ///   The names of the two check digits algorithms used by
+   ///   The names of the two check digit algorithms used by
    ///   <see cref="LuMatricule"/>.
    /// </summary>
    public const String CheckDigitAlgorithmNames = "Luhn, Verhoeff";
@@ -374,8 +372,10 @@ public record LuMatricule
    // perform both validation checks in a single pass.
    private static ValidationResult ValidateCheckDigits(String value)
    {
-      VerhoeffPermutationTable verhoeffPermutationTable = VerhoeffPermutationTable.Instance;
-      VerhoeffMultiplicationTable verhoeffMultiplicationTable = VerhoeffMultiplicationTable.Instance;
+      CheckDigits.Net.Utility.VerhoeffPermutationTable verhoeffPermutationTable =
+         CheckDigits.Net.Utility.VerhoeffPermutationTable.Instance;
+      CheckDigits.Net.Utility.VerhoeffMultiplicationTable verhoeffMultiplicationTable =
+         CheckDigits.Net.Utility.VerhoeffMultiplicationTable.Instance;
 
       // Set up the Verhoeff algorithm by processing the Verhoeff check digit.
       var digit = value[VerhoeffOffset].ToSingleDigit();
