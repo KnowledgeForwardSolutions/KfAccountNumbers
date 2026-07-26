@@ -32,10 +32,10 @@ property and reject it if the date is in the future.
 
 # Namespace Hierarchy
 
-KfAccountNumbers groups business objects into two broad categories: Commercial and Governmental. The Commercial namespace will contain common types (such as credit card numbers) that are international in scope. The Governmental namespace will contain types for account numbers issued by government authorities (such as US Social Security Numbers, etc.). The Governmental namespace is further subdivided by continent (Africa, Asia, Australia, Europe, North America and South America). The types are named using the two letter ISO country code and the account number name (ex. UsSocialSecurityNumber).
+KfAccountNumbers groups business objects into two broad categories: Commercial and National. The Commercial namespace will contain common types (such as credit card numbers) that are international in scope. The National namespace will contain types for account numbers issued by national authorities (such as US Social Security Numbers, etc.). The National namespace is further subdivided by continent (Africa, Asia, Australia, Europe, North America and South America). The types are named using the two letter ISO country code and the account number name (ex. UsSocialSecurityNumber).
 
 * Commercial (future)
-* Governmental
+* National
 	- Africa (future)
 	- Asia (future)
 	- Australia (future)
@@ -47,11 +47,21 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 		- [FrInseeNumber](#frinseenumber)
 		- [Gb National Health Service Patient Numbers (GbChiNumber, GbHcNumber, GbNhsNumber, GbPatientNumber)](#gb-national-health-service-patient-numbers-gbchinumber-gbhcnumber-gbnhsnumber-gbpatientnumber)
 		- [GbNationalInsuranceNumber](#gbnationalinsurancenumber)
+		- [Germany - DeSteuerIdNr - tax identification number](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/DeSteuerIdNr.md)
 		- [IePpsNumber](#ieppsnumber)
 		- [IsKennitala](#iskennitala)
+		- [Italy - ItCodiceFiscale - tax identification number](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/ItCodiceFiscale.md)
+		- [Luxembourg - LuMatricule - national identification number](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/LuMatricule.md)
 		- [NlBurgerservicenummer](#nlburgerservicenummer)
-		- [NoFoedselsnummer](#nofoedselsnummer) 
-		- [SePersonnummer](#sepersonnummer)
+		- [Norway - NoDnummer - non-resident identifier](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/NoDnummer.md)
+		- [Norway - NoFhnummer - Felles Hjelpenummer or Common Help Number](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/NoFhnummer.md)
+		- [Norway - NoFoedselsnummer - citizen/permanent resident identifier](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/NoFoedselsnummer.md)
+		- [Norway - NoHnummer - temporary help number](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/NoHnummer.md)
+		- [Norway - NoIdentityNumber - composite type, any of NoFoedselsnummer, NoDnummer, NoHnummer or NoFhnummer](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/NoIdentityNumber.md)
+		- [Sweden - SeIdentityNumber - composite type, SePersonnummer or SeSamordningsnummer](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/SeIdentityNumber.md)
+		- [Sweden - SePersonnummer - permanent resident identifier](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/SePersonnummer.md)
+		- [Sweden - SeSamordningsnummer - non-resident identifier](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/SeSamordningsnummer.md)
+		- [Switzerland - ChSozialversicherungsnummer - social security number](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/ChSozialversicherungsnummer.md)
 	- NorthAmerica
 		- [CaSocialInsuranceNumber](#casocialinsurancenumber) 
 		- [MxCurp](#mxcurp)
