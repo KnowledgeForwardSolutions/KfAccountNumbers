@@ -1,34 +1,26 @@
 # KfAccountNumbers
 
-KfAccountNumbers is a collection of strongly typed business objects for a wide range of government
-and commercial account numbers (ex. US Social Security Number, UK National Insurance Number, etc.).
+KfAccountNumbers is a collection of strongly typed business objects for a wide range of government and commercial account numbers (ex. US Social Security Number, UK National Insurance Number, etc.).
 
 The business objects in KfAccountNumbers all have the following capabilities:
 
 * A constructor that accepts a string representation of the account number. The constructor will throw an exception if the string value is invalid.
-* A static Validate method that accepts a string representation of the account number and that returns an enum value that indicates if the string value is valid or the validation rule for the account number that was failed.
-* A static Create method that accepts a string representation of the account number and that uses the result pattern to return either an instance of the account number business object or an enum value that indicates the validation rule that was failed.
+* A static Validate method that accepts a string representation of the account number and that returns an discriminated union value that indicates if the string value is valid or the validation rule for the account number that was failed.
+* A static Create method that accepts a string representation of the account number and that uses the result pattern to return either an instance of the account number business object or an discriminated union value that indicates the validation rule that was failed.
 * Implicit conversion to string and explicit conversion from string.
 
-If the business object represents an account number that has a defined format (ex. US Social Security
-Number, etc.), the constructor, Create and Validate methods and explicit string to business object
-operator will accept either a string that consists of only the characters in the account number or a
-string that includes format characters (ex. dashes, spaces, etc.) in the appropriate places. The
-business object will also implement a Format method that returns a string representation of the
-account number with the appropriate format characters in the appropriate places.
+If the business object represents an account number that has a defined format (ex. US Social Security Number, etc.), the constructor, Create and Validate methods and explicit string to business object operator will accept either a string that consists of only the characters in the account number or a string that includes format characters (ex. dashes, spaces, etc.) in the appropriate places. The business object will also implement a Format method that returns a string representation of the account number with the appropriate format characters in the appropriate places.
 
-If the business object represents an account number that normally has no formatting other than the
-raw characters of the account number then the business object constructor, Create and Validate methods
-and explicit string to business object operator will only accept strings that consist of the raw
-characters of the account number. Nor will the business object implement a Format method since there
-is no formatting to be done.
+If the business object represents an account number that normally has no formatting other than the raw characters of the account number then the business object constructor, Create and Validate methods and explicit string to business object operator will only accept strings that consist of the raw characters of the account number. Nor will the business object implement a Format method since there is no formatting to be done.
 
-Note that many of the national identifiers supported by KfAccountNumbers embed the person's date of
-birth in the identifier. KfAccountNumbers will always validate these dates, but only that the date
-exists, and specifically will **NOT** check for future dates. This is to prevent any of the
-business objects being required to be aware of the current date/time. If preventing future dates is
-a business requirement then you should perform your own validation of the business object's DateOfBirth
-property and reject it if the date is in the future.
+Note that many of the national identifiers supported by KfAccountNumbers embed the person's date of birth in the identifier. KfAccountNumbers will always validate these dates, but only that the date exists, and specifically will **NOT** check for future dates. This is to prevent any of the business objects being required to be aware of the current date/time. If preventing future dates is a business requirement then you should perform your own validation of the business object's DateOfBirth property and reject it if the date is in the future.
+
+## Composite Types
+Many countries issue multiple identifiers that are structurally similar and have a similar purpose, but are issued to different categories. For example, a country may issue multiple tax identifiers, one type to citizens and permanent residents and a different, but structurally similar type, to non-residents (such as Swedish personnummer/samordningsnummer, and Norwegian fødselsnummer/D-nummer). In these cases, KfAccountNumbers has specific types for individual identifiers as well as a composite type that can represent any of the similar types. In the case of Sweden, KfAccountNumbers has individual types for personnummer and samordningsnummer and a composite type, SeIdentityNumber, which can represent either a personnummer or a samordningsnummer.
+
+Composite types will have an IdentifierType property which will identify the specific type it contains and will also contain `ToXyzType` methods which allow the conversion of the composite type to a more specific type (eg. `SeIdentityNumber.ToPersonnummer`).
+
+Composite types are intended for scenarios where any of the discrete types would be valid. For example, a DTO representing a hospital admit record that contains the patient's national identifier. Instead of having a field for citizens and another field for non-residents, a single composite field could represent either type of identifier.
 
 # Namespace Hierarchy
 
@@ -40,6 +32,7 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Asia (future)
 	- Australia (future)
 	- Europe
+		- [Belgium - Bisnummer - non-resident identifier](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/BeBisnummer.md)
 		- [BeRijksregisternummer](#berijksregisternummer) 
 		- [DkPersonnummer](#dkpersonnummer)
 		- [EsNif](#esnif)
@@ -136,7 +129,7 @@ Example values:
 * 17110804680 - rijksregisternummer, date of birth November 11, 2017, gender = female, check digit calculation 97 - (2171108046 mod 97) = 97 - 17 = 80
 * 40 00 00 955-79 - rijksregisternummer, date of birth incomplete, year of birth = 1940, gender = male, check digit calculation 97 - (400000955 mod 97) = 97 - 18 = 79
 * 00 00 01 003-64 - rijksregisternummer, date of birth unknown, gender = male, check digit calculation 97 - (000001003 mod 97) = 97 - 33 = 64
-* 17.51.08-046.40 - BIS number, date of birth November 11, 1917, gender = female, check digit calculation 97 - (175108046 mod 97) = 97 - 57 = 40
+* 17.51.08-046.40 - BIS number, date of birth November 8, 1917, gender = female, check digit calculation 97 - (175108046 mod 97) = 97 - 57 = 40
 * 09 20 00 002 65 - BIS number, date of birth incomplete, year of birth 2009, gender unknown, check digit calculation 97 - (2092000002 mod 97) = 97 - 32 = 65
 
 See [Wikipedia (French) - Numéro de registre national](https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_registre_national)

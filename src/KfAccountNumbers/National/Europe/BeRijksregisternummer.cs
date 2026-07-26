@@ -189,7 +189,7 @@ namespace KfAccountNumbers.National.Europe;
 ///         <item>
 ///            <term>17.51.08-046.40</term>
 ///            <description>
-///               BIS number, date of birth November 11, 1917, gender = female,
+///               BIS number, date of birth November 8, 1917, gender = female,
 ///               check digit calculation 97 - (175108046 mod 97) = 97 - 57 = 40
 ///            </description>
 ///         </item>
