@@ -6,6 +6,7 @@ A BIS number (bis-nummer or numéro bis) is the identifier issued to non-residen
 | :------ | :---------- |
 | Class name: | KfAccountNumbers.National.Europe.BeBisnummer |
 | Is composite: | No |
+| Composite parent: | BeIdentityNumber |
 | Length: | 11 (unformatted), 15 (formatted for readability) |
 | Check digit algorithm: | Modulus 97 |
 | Allowed characters: | Digits ('0'-'9') |

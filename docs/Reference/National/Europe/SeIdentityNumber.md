@@ -8,7 +8,7 @@ A Swedish personnummer is the Swedish national identification number and is issu
 | :------ | :---------- |
 | Class name: | KfAccountNumbers.National.Europe.SeIdentityNumber |
 | Is composite: | Yes |
-| Composite subtypes: | SePersonnummer, SeSamordningsnummer |
+| Composite subtypes: | [SePersonnummer](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/SePersonnummer.md), [SeSamordningsnummer](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/SeSamordningsnummer.md) |
 | Length: | 11 (short format with 2-digit year), 13 (long format with 4-digit year) |
 | Check digit algorithm: | Luhn |
 | Allowed characters: | Digits ('0'-'9') |

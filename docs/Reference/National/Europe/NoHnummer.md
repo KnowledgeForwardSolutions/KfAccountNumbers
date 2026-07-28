@@ -6,6 +6,7 @@ Temporary identity number issued by Norwegian health organizations (such as a ho
 | :------ | :---------- |
 | Class name: | KfAccountNumbers.National.Europe.NoHnummer |
 | Is composite: | No |
+| Composite parent: | [NoIdentityNumber](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/NoIdentityNumber.md), composite type, any of NoFoedselsnummer, NoDnummer, NoHnummer or NoFhnummer |
 | Length: | 11 (unformatted), 12 (formatted for readability) |
 | Check digit algorithm: | Weighted modulus 11, with two different sets of weights |
 | Allowed characters: | Digits ('0'-'9') |
