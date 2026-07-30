@@ -41,7 +41,7 @@ The date of birth can be adjusted in a variety of ways:
   month and year (for example, 40.00.00-955.69).
 * If there are too many people with incomplete dates of birth for a particular year than can be represented by a three digit sequence number (i.e. more than 499 males with incomplete dates of birth for the year 1940), then 01 is used for the day of birth and the sequence number rolls over to 001 (ex. 40.00.01-001.33). (Note that `BeBisnummer` does not enforce an upper limit on the day component in cases of rollover, though multiple rollovers in a single year should be rare.)
 * If the person's date of birth is unknown, then the constant 00.00.01 is used.
-* As noted above, BIS-nummers apply an offset to the month component of the date of birth to distinguish them from rijksregisternummers. If the person's gender is known when the BIS-nummer is issued, then **40** is added to the month; Otherwise **20** is added to the month.
+* As noted above, BIS-nummers apply an offset to the month component of the date of birth to distinguish them from rijksregisternummers. If the person's gender is known when the BIS-nummer is issued, then **40** is added to the month; otherwise **20** is added to the month to indicate unknown gender.
 
 For cases of a person with an incomplete or unknown date of birth, `BeBisnummer`
 stacks the appropriate rules. For example, 87.40.00-023.47 would be the BIS number for a person with an incomplete date of birth born in 1987.
