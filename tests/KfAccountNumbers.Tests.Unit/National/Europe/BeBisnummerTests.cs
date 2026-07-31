@@ -354,7 +354,7 @@ public class BeBisnummerTests : BeIdentityNumberBaseTests
 
    [Theory]
    [MemberData(nameof(ValidBisnummerValues))]
-   public void BeBisnummer_Value_ShouldReturnValidatedRijksregisternummer(String value)
+   public void BeBisnummer_Value_ShouldReturnValidatedBisnummer(String value)
    {
       // Arrange.
       var sut = new BeBisnummer(value);

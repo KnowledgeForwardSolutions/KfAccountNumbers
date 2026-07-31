@@ -17,7 +17,7 @@ namespace KfAccountNumbers.National.Europe;
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A Belgian BIS-nummer is an 11-digit numbers, structured as YYMMDDXXXCC,
+///      A Belgian BIS-nummer is an 11-digit number, structured as YYMMDDXXXCC,
 ///      with the following elements:
 ///      <list type="bullet">
 ///         <item>
@@ -209,7 +209,7 @@ public record BeBisnummer : BeIdentityNumberBase
    ///   <paramref name="value"/> is 15 characters in length and has
    ///   an ASCII digit character ('0'-'9') in a separator location.
    ///   - or -
-   ///   <paramref name="value"/> contains in invalid sequence number.
+   ///   <paramref name="value"/> contains an invalid sequence number.
    ///   - or -
    ///   <paramref name="value"/> contains an invalid date of birth in
    ///   the leading (left-most) six digits.
