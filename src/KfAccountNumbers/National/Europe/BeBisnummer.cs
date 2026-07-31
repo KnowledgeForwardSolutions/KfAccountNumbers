@@ -1,4 +1,4 @@
-#pragma warning disable IDE0250 // Make struct 'readonly'
+#pragma warning disable IDE0046 // Convert to conditional expression
 
 namespace KfAccountNumbers.National.Europe;
 
@@ -226,21 +226,15 @@ public record BeBisnummer : BeIdentityNumberBase
          return GetInvalidSeparatorResult(value, invalidSeparatorPosition);
       }
 
-      //if (!ValidateSequenceNumber(value))
-      //{
-      //   return new InvalidBeRijksregisternummerSequenceNumber(
-      //      Messages.BeRijksregisternummerInvalidSequenceNumber,
-      //      isFormatted ? value[9..12] : value[6..9]);
-      //}
+      if (!ValidateSequenceNumber(value))
+      {
+         return GetInvalidSequenceNumberResult(value);
+      }
 
-      //if (!ValidateDateOfBirth(value))
-      //{
-      //   var dateOfBirthLength = isFormatted ? 8 : 6;
-      //   return new InvalidDateOfBirth(
-      //      Messages.BeRijksregisternummerInvalidDateOfBirth,
-      //      value[..dateOfBirthLength],
-      //      DateFormatName.YYMMDD);
-      //}
+      if (!ValidateDateOfBirth(value, DateOffsetMode.Bisnummer))
+      {
+         return GetInvalidDateOfBirthResult(value);
+      }
 
       return default(ValidValue);
    }
@@ -279,6 +273,5 @@ public record BeBisnummer : BeIdentityNumberBase
    private static InvalidSequenceNumber GetInvalidSequenceNumberResult(ReadOnlySpan<Char> value)
       => new(
          Messages.BeBisnummerInvalidSequenceNumber,
-         IsFormatted(value) ? value[6..9].ToString() : value[9..12].ToString());
-
+         IsFormatted(value) ? value[9..12].ToString() : value[6..9].ToString());
 }

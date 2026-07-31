@@ -121,7 +121,7 @@ public class BeIdentityNumberBaseTests
       FormattedBisnummerRolloverDobUnknownGender,
    ];
 
-   public static TheoryData<Int32, Int32, Boolean> ValidSequenceNumberBoundaryValues = new()
+   public static TheoryData<Int32, Int32, Boolean> ValidRijksregisternummerSequenceNumberBoundaryValues = new()
    {
       // Unformatted values
       { 1965,   1, false },      // Sequence number lower bound
@@ -134,6 +134,33 @@ public class BeIdentityNumberBaseTests
       { 1965, 998, true },
       { 2010,   1, true },
       { 2010, 998, true },
+   };
+
+   public static TheoryData<Int32, Int32, Int32, Boolean> ValidBisnummerSequenceNumberBoundaryValues = new()
+   {
+      // Unformatted values
+      { 1965, 41,   1, false },  // Sequence number lower bound
+      { 1965, 41, 998, false },  // Sequence number upper bound
+      { 2010, 41,   1, false },
+      { 2010, 41, 998, false },
+
+      // Formatted values
+      { 1965, 41,   1, true },
+      { 1965, 41, 998, true },
+      { 2010, 41,   1, true },
+      { 2010, 41, 998, true },
+
+      // Unformatted values, unknown gender
+      { 1965, 21,   1, false },
+      { 1965, 21, 998, false },
+      { 2010, 21,   1, false },
+      { 2010, 21, 998, false },
+
+      // Formatted values, unknown gender
+      { 1965, 21,   1, true },
+      { 1965, 21, 998, true },
+      { 2010, 21,   1, true },
+      { 2010, 21, 998, true },
    };
 
    public static TheoryData<Int32, Int32, Int32, Boolean> ValidRijksregisternummerDateOfBirthValues = new()
@@ -162,6 +189,11 @@ public class BeIdentityNumberBaseTests
 
       // rijksregisternummers, incomplete/unknown dates of birth
       { 1950,  0,  0, false },   // Incomplete date of birth, only year known
+      {    0,  7,  0, false },   // Incomplete date of birth, only month known
+      {    0,  0, 23, false },   // Incomplete date of birth, only day known
+      { 2001,  6,  0, false },   // Incomplete date of birth, only year/month known
+      { 1962,  0, 14, false },   // Incomplete date of birth, only year/day known
+      {    0,  5, 15, false },   // Incomplete date of birth, only month/day known
       { 2010,  0,  1, false },   // Incomplete date of birth, with rollover for too many incomplete dates of birth for known year
       {    0,  0,  1, false },   // Unknown date of birth
 
@@ -189,7 +221,12 @@ public class BeIdentityNumberBaseTests
 
       // rijksregisternummers, incomplete/unknown dates of birth
       { 1950,  0,  0, true },    // Incomplete date of birth, only year known
-      { 2010,  0,  1, true },    // Incomplete date of birth,  with rollover for too many incomplete dates of birth for known year
+      {    0,  7,  0, true },    // Incomplete date of birth, only month known
+      {    0,  0, 23, true },    // Incomplete date of birth, only day known
+      { 2001,  6,  0, true },    // Incomplete date of birth, only year/month known
+      { 1962,  0, 14, true },    // Incomplete date of birth, only year/day known
+      {    0,  5, 15, true },    // Incomplete date of birth, only month/day known
+      { 2010,  0,  1, true },    // Incomplete date of birth, with rollover for too many incomplete dates of birth for known year
       {    0,  0,  1, true },    // Unknown date of birth
    };
 
@@ -219,7 +256,12 @@ public class BeIdentityNumberBaseTests
 
       // BIS-nummers, incomplete/unknown dates of birth
       { 1950, 40,  0, false },   // Incomplete date of birth, only year known
-      { 2010, 40,  1, false },   // Incomplete date of birth,  with rollover for too many incomplete dates of birth for known year
+      {    0, 47,  0, false },   // Incomplete date of birth, only month known
+      {    0, 40, 23, false },   // Incomplete date of birth, only day known
+      { 2001, 46,  0, false },   // Incomplete date of birth, only year/month known
+      { 1962, 40, 14, false },   // Incomplete date of birth, only year/day known
+      {    0, 45, 15, false },   // Incomplete date of birth, only month/day known
+      { 2010, 40,  1, false },   // Incomplete date of birth, with rollover for too many incomplete dates of birth for known year
       {    0, 40,  1, false },   // Unknown date of birth
 
       // BIS-nummers, unknown gender, year boundaries, false = unformatted
@@ -246,7 +288,12 @@ public class BeIdentityNumberBaseTests
 
       // BIS-nummers, unknown gender, incomplete/unknown dates of birth
       { 1950, 20,  0, false },   // Incomplete date of birth, only year known
-      { 2010, 20,  1, false },   // Incomplete date of birth,  with rollover for too many incomplete dates of birth for known year
+      {    0, 27,  0, false },   // Incomplete date of birth, only month known
+      {    0, 20, 23, false },   // Incomplete date of birth, only day known
+      { 2001, 26,  0, false },   // Incomplete date of birth, only year/month known
+      { 1962, 20, 14, false },   // Incomplete date of birth, only year/day known
+      {    0, 25, 15, false },   // Incomplete date of birth, only month/day known
+      { 2010, 20,  1, false },   // Incomplete date of birth, with rollover for too many incomplete dates of birth for known year
       {    0, 20,  1, false },   // Unknown date of birth
 
       // BIS-nummers, year boundaries, true = formatted
@@ -272,9 +319,14 @@ public class BeIdentityNumberBaseTests
       { 2004, 52, 31, true },    // maximum days for December, any year
 
       // BIS-nummers, incomplete/unknown dates of birth
-      { 1950, 40,  0, true },    // Incomplete date of birth, only year known
-      { 2010, 40,  1, true },    // Incomplete date of birth,  with rollover for too many incomplete dates of birth for known year
-      {    0, 40,  1, true },    // Unknown date of birth
+      { 1950, 40,  0, true },   // Incomplete date of birth, only year known
+      {    0, 47,  0, true },   // Incomplete date of birth, only month known
+      {    0, 40, 23, true },   // Incomplete date of birth, only day known
+      { 2001, 46,  0, true },   // Incomplete date of birth, only year/month known
+      { 1962, 40, 14, true },   // Incomplete date of birth, only year/day known
+      {    0, 45, 15, true },   // Incomplete date of birth, only month/day known
+      { 2010, 40,  1, true },   // Incomplete date of birth, with rollover for too many incomplete dates of birth for known year
+      {    0, 40,  1, true },   // Unknown date of birth
 
       // BIS-nummers, unknown gender, year boundaries, true = formatted
       { 1900, 21,  1, true },    // January 1, 1900
@@ -299,9 +351,14 @@ public class BeIdentityNumberBaseTests
       { 2004, 32, 31, true },    // maximum days for December, any year
 
       // BIS-nummers, unknown gender, incomplete/unknown dates of birth
-      { 1950, 20,  0, true },    // Incomplete date of birth, only year known
-      { 2010, 20,  1, true },    // Incomplete date of birth,  with rollover for too many incomplete dates of birth for known year
-      {    0, 20,  1, true },    // Unknown date of birth
+      { 1950, 20,  0, true },   // Incomplete date of birth, only year known
+      {    0, 27,  0, true },   // Incomplete date of birth, only month known
+      {    0, 20, 23, true },   // Incomplete date of birth, only day known
+      { 2001, 26,  0, true },   // Incomplete date of birth, only year/month known
+      { 1962, 20, 14, true },   // Incomplete date of birth, only year/day known
+      {    0, 25, 15, true },   // Incomplete date of birth, only month/day known
+      { 2010, 20,  1, true },   // Incomplete date of birth, with rollover for too many incomplete dates of birth for known year
+      {    0, 20,  1, true },   // Unknown date of birth
    };
 
    public static TheoryData<String> InvalidLengthValues =>
@@ -421,4 +478,149 @@ public class BeIdentityNumberBaseTests
       { "85.07.30-033928", 12 },
    };
 
+   public static TheoryData<String> InvalidRijksregisternummerSequenceNumberValues =>
+   [
+      "17110800097",          // 1917
+      "17110899968",          // 1917
+      "17.11.08-000.97",      // 1917
+      "17.11.08-999.68",      // 1917
+      "17110800029",          // 2017
+      "17110899997",          // 2017
+      "17.11.08-000.29",      // 2017
+      "17.11.08-999.97",      // 2017
+   ];
+
+   public static TheoryData<String> InvalidBisnummerSequenceNumberValues =>
+   [
+      "17510800086",          // 1917
+      "17510899957",          // 1917
+      "17.51.08-000.86",      // 1917
+      "17.51.08-999.57",      // 1917
+      "17510800018",          // 2017
+      "17510899986",          // 2017
+      "17.51.08-000.18",      // 2017
+      "17.51.08-999.86",      // 2017
+      "17310800043",          // 1917
+      "17310899914",          // 1917
+      "17.31.08-000.43",      // 1917
+      "17.31.08-999.14",      // 1917
+      "17310800072",          // 2017
+      "17310899943",          // 2017
+      "17.31.08-000.72",      // 2017
+      "17.31.08-999.43",      // 2017
+   ];
+
+   public static TheoryData<Int32, Int32, Int32, Boolean> InvalidRijksregisternummerDateOfBirthValues = new()
+   {
+      // Unformatted
+      {    0,  0,  0, false },      // Unknown date of birth requires non-zero day
+      { 1904, 13, 31, false },      // month = 13
+      { 1904,  1, 32, false },      // Invalid day of month for January, any year
+      { 1901,  2, 29, false },      // Invalid day of for February, non-leap year
+      { 1904,  2, 30, false },      // Invalid day of for February, leap year
+      { 1904,  2, 30, false },      // Invalid day of for February, leap year (2000 is leap-year)
+      { 1904,  3, 32, false },      // Invalid day of for March, any year
+      { 1904,  4, 31, false },      // Invalid day of for April, any year
+      { 1904,  5, 32, false },      // Invalid day of for May, any year
+      { 2004,  6, 31, false },      // Invalid day of for June, any year
+      { 2004,  7, 32, false },      // Invalid day of for July, any year
+      { 2004,  8, 32, false },      // Invalid day of for August, any year
+      { 2004,  9, 31, false },      // Invalid day of for September, any year
+      { 2004, 10, 32, false },      // Invalid day of for October, any year
+      { 2004, 11, 31, false },      // Invalid day of for November, any year
+      { 2004, 12, 32, false },      // Invalid day of for December, any year
+
+      // Formatted
+      {    0,  0,  0, true },       // Unknown date of birth requires non-zero day
+      { 1904, 13, 31, true },       // month = 13
+      { 1904,  1, 32, true },       // Invalid day of month for January, any year
+      { 1901,  2, 29, true },       // Invalid day of for February, non-leap year
+      { 1904,  2, 30, true },       // Invalid day of for February, leap year
+      { 1904,  2, 30, true },       // Invalid day of for February, leap year (2000 is leap-year)
+      { 1904,  3, 32, true },       // Invalid day of for March, any year
+      { 1904,  4, 31, true },       // Invalid day of for April, any year
+      { 1904,  5, 32, true },       // Invalid day of for May, any year
+      { 2004,  6, 31, true },       // Invalid day of for June, any year
+      { 2004,  7, 32, true },       // Invalid day of for July, any year
+      { 2004,  8, 32, true },       // Invalid day of for August, any year
+      { 2004,  9, 31, true },       // Invalid day of for September, any year
+      { 2004, 10, 32, true },       // Invalid day of for October, any year
+      { 2004, 11, 31, true },       // Invalid day of for November, any year
+      { 2004, 12, 32, true },       // Invalid day of for December, any year
+   };
+
+   public static TheoryData<Int32, Int32, Int32, Boolean> InvalidBisnummerDateOfBirthValues = new()
+   {
+      // Unformatted
+      {    0, 40,  0, false },      // Unknown date of birth requires non-zero day
+      { 1904, 53, 31, false },      // month = 13
+      { 1904, 41, 32, false },      // Invalid day of month for January, any year
+      { 1901, 42, 29, false },      // Invalid day of for February, non-leap year
+      { 1904, 42, 30, false },      // Invalid day of for February, leap year
+      { 1904, 42, 30, false },      // Invalid day of for February, leap year (2000 is leap-year)
+      { 1904, 43, 32, false },      // Invalid day of for March, any year
+      { 1904, 44, 31, false },      // Invalid day of for April, any year
+      { 1904, 45, 32, false },      // Invalid day of for May, any year
+      { 2004, 46, 31, false },      // Invalid day of for June, any year
+      { 2004, 47, 32, false },      // Invalid day of for July, any year
+      { 2004, 48, 32, false },      // Invalid day of for August, any year
+      { 2004, 49, 31, false },      // Invalid day of for September, any year
+      { 2004, 50, 32, false },      // Invalid day of for October, any year
+      { 2004, 51, 31, false },      // Invalid day of for November, any year
+      { 2004, 52, 32, false },      // Invalid day of for December, any year
+
+      // Unformatted, unknown gender
+      {    0, 20,  0, false },      // Unknown date of birth requires non-zero day
+      { 1904, 33, 31, false },      // month = 13
+      { 1904, 21, 32, false },      // Invalid day of month for January, any year
+      { 1901, 22, 29, false },      // Invalid day of for February, non-leap year
+      { 1904, 22, 30, false },      // Invalid day of for February, leap year
+      { 1904, 22, 30, false },      // Invalid day of for February, leap year (2000 is leap-year)
+      { 1904, 23, 32, false },      // Invalid day of for March, any year
+      { 1904, 24, 31, false },      // Invalid day of for April, any year
+      { 1904, 25, 32, false },      // Invalid day of for May, any year
+      { 2004, 26, 31, false },      // Invalid day of for June, any year
+      { 2004, 27, 32, false },      // Invalid day of for July, any year
+      { 2004, 28, 32, false },      // Invalid day of for August, any year
+      { 2004, 29, 31, false },      // Invalid day of for September, any year
+      { 2004, 30, 32, false },      // Invalid day of for October, any year
+      { 2004, 31, 31, false },      // Invalid day of for November, any year
+      { 2004, 32, 32, false },      // Invalid day of for December, any year
+
+      // Formatted
+      {    0, 40,  0, true },       // Unknown date of birth requires non-zero day
+      { 1904, 53, 31, true },       // month = 13
+      { 1904, 41, 32, true },       // Invalid day of month for January, any year
+      { 1901, 42, 29, true },       // Invalid day of for February, non-leap year
+      { 1904, 42, 30, true },       // Invalid day of for February, leap year
+      { 1904, 42, 30, true },       // Invalid day of for February, leap year (2000 is leap-year)
+      { 1904, 43, 32, true },       // Invalid day of for March, any year
+      { 1904, 44, 31, true },       // Invalid day of for April, any year
+      { 1904, 45, 32, true },       // Invalid day of for May, any year
+      { 2004, 46, 31, true },       // Invalid day of for June, any year
+      { 2004, 47, 32, true },       // Invalid day of for July, any year
+      { 2004, 48, 32, true },       // Invalid day of for August, any year
+      { 2004, 49, 31, true },       // Invalid day of for September, any year
+      { 2004, 50, 32, true },       // Invalid day of for October, any year
+      { 2004, 51, 31, true },       // Invalid day of for November, any year
+      { 2004, 52, 32, true },       // Invalid day of for December, any year
+
+      // Formatted, unknown gender
+      {    0, 20,  0, true },       // Unknown date of birth requires non-zero day
+      { 1904, 33, 31, true },       // month = 13
+      { 1904, 21, 32, true },       // Invalid day of month for January, any year
+      { 1901, 22, 29, true },       // Invalid day of for February, non-leap year
+      { 1904, 22, 30, true },       // Invalid day of for February, leap year
+      { 1904, 22, 30, true },       // Invalid day of for February, leap year (2000 is leap-year)
+      { 1904, 23, 32, true },       // Invalid day of for March, any year
+      { 1904, 24, 31, true },       // Invalid day of for April, any year
+      { 1904, 25, 32, true },       // Invalid day of for May, any year
+      { 2004, 26, 31, true },       // Invalid day of for June, any year
+      { 2004, 27, 32, true },       // Invalid day of for July, any year
+      { 2004, 28, 32, true },       // Invalid day of for August, any year
+      { 2004, 29, 31, true },       // Invalid day of for September, any year
+      { 2004, 30, 32, true },       // Invalid day of for October, any year
+      { 2004, 31, 31, true },       // Invalid day of for November, any year
+      { 2004, 32, 32, true },       // Invalid day of for December, any year
+   };
 }

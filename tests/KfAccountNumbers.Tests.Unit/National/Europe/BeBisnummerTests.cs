@@ -67,15 +67,17 @@ public class BeBisnummerTests : BeIdentityNumberBaseTests
    }
 
    [Theory]
-   [MemberData(nameof(ValidSequenceNumberBoundaryValues))]
+   [MemberData(nameof(ValidBisnummerSequenceNumberBoundaryValues))]
    public void BeBisnummer_Validate_ShouldReturnValidationPassed_WhenValueHasValidSequenceNumber(
       Int32 year,
+      Int32 month,
       Int32 sequenceNumber,
       Boolean formatted)
    {
       // Arrange.
       var value = GetValueWithValidCheckDigits(
          year,
+         month,
          sequenceNumber: sequenceNumber,
          formatted: formatted);
       LocalValidationResult expected = default(ValidValue);
@@ -175,6 +177,58 @@ public class BeBisnummerTests : BeIdentityNumberBaseTests
    {
       // Arrange.
       LocalValidationResult expected = GetInvalidSeparatorResult(value, position);
+
+      // Act.
+      var result = BeBisnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidBisnummerSequenceNumberValues))]
+   public void BeBisnummer_Validate_ShouldReturnInvalidSequenceNumber_WhenValueHasInvalidSequenceNumber(String value)
+   {
+      // Arrange.
+      LocalValidationResult expected = GetInvalidSequenceNumberResult(value);
+
+      // Act.
+      var result = BeBisnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidBisnummerDateOfBirthValues))]
+   public void BeBisnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasInvalidDateOfBirth(
+      Int32 year,
+      Int32 month,
+      Int32 day,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetValueWithValidCheckDigits(year, month, day, formatted: formatted);
+      LocalValidationResult expected = GetInvalidDateOfBirthResult(value);
+
+      // Act.
+      var result = BeBisnummer.Validate(value);
+
+      // Assert.
+      result.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidRijksregisternummerDateOfBirthValues))]
+   public void BeBisnummer_Validate_ShouldReturnInvalidDateOfBirth_WhenValueHasValidRijksregisternummerDateOfBirth(
+      Int32 year,
+      Int32 month,
+      Int32 day,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetValueWithValidCheckDigits(year, month, day, formatted: formatted);
+      LocalValidationResult expected = GetInvalidDateOfBirthResult(value);
 
       // Act.
       var result = BeBisnummer.Validate(value);

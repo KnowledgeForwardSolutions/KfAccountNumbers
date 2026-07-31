@@ -1,3 +1,5 @@
+#pragma warning disable IDE0250 // Make struct 'readonly'
+
 namespace KfAccountNumbers.National.Europe;
 
 /// <summary>
@@ -91,6 +93,9 @@ public abstract record BeIdentityNumberBase
    private const Int32 Separator3Offset = 8;
    private const Int32 Separator4Offset = 12;
 
+   private const Int32 MinValidSequence = 1;
+   private const Int32 MaxValidSequence = 998;
+
    private static readonly Int32[] _separatorOffsets =
    [
       Separator1Offset,
@@ -103,6 +108,85 @@ public abstract record BeIdentityNumberBase
    private const Int32 GenderOffset = 3;
    private const Int32 CheckDigit1Offset = 2;
    private const Int32 CheckDigit2Offset = 1;
+
+   /// <summary>
+   ///   Defines how date offsets are applied when extracting the date of birth
+   ///   from a value.
+   /// </summary>
+   protected enum DateOffsetMode
+   {
+      /// <summary>
+      ///   Rijksregisternummers never adjust the date.
+      /// </summary>
+      Rijksregisternummer = 0,
+
+      /// <summary>
+      ///   Bisnummers adjust the day by removing the +20/+40 month offset.
+      /// </summary>
+      Bisnummer,
+
+      /// <summary>
+      ///   Date will be adjusted to remove an offset if necessary.
+      /// </summary>
+      Optional,
+   }
+
+   /// <summary>
+   ///   Extract the year, month and day elements of the person's date of birth.
+   /// </summary>
+   /// <param name="value">
+   ///   The value being processed.
+   /// </param>
+   /// <param name="dateOffsetMode">
+   ///   Defines how date offsets should be handled.
+   /// </param>
+   /// <returns>
+   ///   The year, month and day of the person's date of birth.
+   /// </returns>
+   protected static (Int32 Year, Int32 Month, Int32 Day) GetYearMonthDay(
+      ReadOnlySpan<Char> value,
+      DateOffsetMode dateOffsetMode)
+   {
+      var fieldWidth = value.Length == UnformattedLength ? 2 : 3;
+      var year = value.ParseTwoDigits();
+
+      var fieldStart = fieldWidth;
+      var month = value[fieldStart..].ParseTwoDigits();
+
+      fieldStart += fieldWidth;
+      var day = value[fieldStart..].ParseTwoDigits();
+
+      fieldStart += fieldWidth;
+      var sequenceNumber = value[fieldStart..].ParseThreeDigits();
+
+      // Apply BIS-nummer offsets if necessary.
+      var effectiveMonth = (dateOffsetMode, month) switch
+      {
+         // Bisnummer always applies an offset.
+         (DateOffsetMode.Bisnummer, _) => month >= BisNummerMonthOffset
+            ? month - BisNummerMonthOffset
+            : month - BisNummerUnknownGenderMonthOffset,
+
+         // Optional may apply an offset.
+         (DateOffsetMode.Optional, > BisNummerMonthOffset) => month - BisNummerMonthOffset,
+         (DateOffsetMode.Optional, > BisNummerUnknownGenderMonthOffset) => month - BisNummerUnknownGenderMonthOffset,
+
+         // Otherwise leave unchanged.
+         _ => month,
+      };
+
+      // Add the century to the year.
+      // Already parsed the individual elements, combine to use in checksum calculation.
+      var total = sequenceNumber + (day * 1000) + (month * 100000) + (year * 10000000);
+      var checksum = value[^2..].ParseTwoDigits();
+      var century = (97 - (total % 97)) == checksum
+         ? 1900
+         : 2000;
+
+      year += century;
+
+      return (year, effectiveMonth, day);
+   }
 
    /// <summary>
    ///   Determine if the value contains format characters.
@@ -189,7 +273,59 @@ public abstract record BeIdentityNumberBase
    }
 
    /// <summary>
-   ///   Determine the <paramref name="value"/> has valid separator characters
+   ///   Determine if <paramref name="value"/> has a valid date of birth.
+   /// </summary>
+   /// <param name="value">
+   ///   The value to check.
+   /// </param>
+   /// <param name="dateOffsetMode">
+   ///   Defines how date offsets should be handled.
+   /// </param>
+   /// <returns>
+   ///   <see langword="true"/> if <paramref name="value"/> has a valid date of
+   ///   birth; otherwise <see langword="false"/>.
+   /// </returns>
+   protected static Boolean ValidateDateOfBirth(
+      ReadOnlySpan<Char> value,
+      DateOffsetMode dateOffsetMode)
+   {
+#pragma warning disable IDE0008 // Use explicit type
+      var (year, month, day) = GetYearMonthDay(value, dateOffsetMode);
+#pragma warning restore IDE0008 // Use explicit type
+
+      if (year is < MinimumValidYearOfBirth or > MaximumValidYearOfBirth)
+      {
+         // Should be impossible to ever reach this point because of the check
+         // digit calcuations, but return false out of abundance of caution and
+         // to avoid throwing an exception.
+         return false;
+      }
+
+      if (month is < 0 or > 12)
+      {
+         return false;
+      }
+
+#pragma warning disable format
+      var maxDay = (year, month) switch
+      {
+         (> 0, > 0) => DateTime.DaysInMonth(year, month),
+         (0, > 0) => DateTime.DaysInMonth(2000, month),        // Year unknown, assume leap year
+         _ => 31,
+      };
+#pragma warning restore format
+      if (day > maxDay)
+      {
+         return false;
+      }
+
+      // Final sanity check. Must have at least one non-zero element. Even an
+      // unknown date of birth will default to YYMMDD of 000001.
+      return year % 100 != 0 || month != 0 || day != 0;
+   }
+
+   /// <summary>
+   ///   Determine if <paramref name="value"/> has valid separator characters.
    /// </summary>
    /// <param name="value">
    ///   The value to check.
@@ -225,4 +361,21 @@ public abstract record BeIdentityNumberBase
       return true;
    }
 
+   /// <summary>
+   ///   Determine if <paramref name="value"/> has a valid sequence number.
+   /// </summary>
+   /// <param name="value">
+   ///   The value to check.
+   /// </param>
+   /// <returns>
+   ///   <see langword="true"/> if <paramref name="value"/> has a valid sequence
+   ///   number; otherwise <see langword="false"/>.
+   /// </returns>
+   protected static Boolean ValidateSequenceNumber(ReadOnlySpan<Char> value)
+   {
+      var offsetFromEnd = IsFormatted(value) ? 6 : 5;
+      var sequenceNumber = value[^offsetFromEnd..].ParseThreeDigits();
+
+      return sequenceNumber is >= MinValidSequence and <= MaxValidSequence;
+   }
 }
