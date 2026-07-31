@@ -132,6 +132,51 @@ public abstract record BeIdentityNumberBase
    }
 
    /// <summary>
+   ///   Given a validated identity number, get the internal representation
+   ///   which strips out any separator characters.
+   /// </summary>
+   /// <param name="value">
+   ///   The validated identity number.
+   /// </param>
+   /// <returns>
+   ///   The normalized identity number.
+   /// </returns>
+   protected static String GetNormalizedValue(String value)
+   {
+      if (value.Length == UnformattedLength)
+      {
+         return value;
+      }
+
+      var buffer = ArrayPool<Char>.Shared.Rent(UnformattedLength);
+      try
+      {
+         ReadOnlySpan<Char> source = value.AsSpan();
+         var span = new Span<Char>(buffer);
+
+         ReadOnlySpan<Int32> segmentLengths = [2, 2, 2, 3, 2];
+         var sourceOffset = 0;
+         var targetOffset = 0;
+         foreach (var length in segmentLengths)
+         {
+            ReadOnlySpan<Char> sourceSpan = source[sourceOffset..(sourceOffset + length)];
+            Span<Char> targetSpan = span[targetOffset..(targetOffset + length)];
+
+            sourceSpan.CopyTo(targetSpan);
+
+            sourceOffset += length + 1;
+            targetOffset += length;
+         }
+
+         return span[..UnformattedLength].ToString();
+      }
+      finally
+      {
+         ArrayPool<Char>.Shared.Return(buffer);
+      }
+   }
+
+   /// <summary>
    ///   Extract the year, month and day elements of the person's date of birth.
    /// </summary>
    /// <param name="value">

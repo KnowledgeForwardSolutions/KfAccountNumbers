@@ -96,6 +96,11 @@ namespace KfAccountNumbers.National.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
+///               The sequence number may not be 000 or 999.
+///            </description>
+///         </item>
+///         <item>
+///            <description>
 ///               The date of birth, after deriving the century of birth from
 ///               the check sum and taking into account the BIS number offset,
 ///               must be a valid date between January 1, 1900 and December 31,
@@ -103,11 +108,6 @@ namespace KfAccountNumbers.National.Europe;
 ///               <b>OR</b> the date of birth may use zeros to indicate that
 ///               some or all of the person's date of birth is unknown (see
 ///               below for more details).
-///            </description>
-///         </item>
-///         <item>
-///            <description>
-///               The sequence number may not be 000 or 999.
 ///            </description>
 ///         </item>
 ///      </list>
@@ -185,6 +185,75 @@ namespace KfAccountNumbers.National.Europe;
 /// </remarks>
 public record BeBisnummer : BeIdentityNumberBase
 {
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="BeBisnummer"/>
+   ///   class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a BIS-nummer.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="value"/> is not length 11 (or 15 if separator
+   ///   characters are used).
+   ///   - or -
+   ///   <paramref name="value"/> contains a non-digit character in
+   ///   any position other than the separator locations.
+   ///   - or -
+   ///   <paramref name="value"/> has invalid modulus 97 check digit
+   ///   characters in the trailing (right-most) character positions.
+   ///   - or -
+   ///   <paramref name="value"/> is 15 characters in length and has
+   ///   an ASCII digit character ('0'-'9') in a separator location.
+   ///   - or -
+   ///   <paramref name="value"/> contains in invalid sequence number.
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid date of birth in
+   ///   the leading (left-most) six digits.
+   /// </exception>
+   public BeBisnummer(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="BeBisnummer"/>
+   ///   class.
+   /// </summary>
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private BeBisnummer(String? value, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
+         {
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               InvalidSequenceNumber invalidSequenceNumber => new UKfValidationException<ValidationError>(invalidSequenceNumber),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
+         }
+      }
+
+      Value = GetNormalizedValue(value!);
+   }
+
+   /// <summary>
+   ///   Gets the raw BIS-nummer value.
+   /// </summary>
+   public String Value { get; private init; }
+
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a
    ///   valid Belgian BIS-nummer.

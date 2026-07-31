@@ -48,6 +48,200 @@ public class BeBisnummerTests : BeIdentityNumberBaseTests
          value.Length == 11 ? value[..6] : value[..8],
          DateFormatName.YYMMDD);
 
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidBisnummerValues))]
+   public void BeBisnummer_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetRawValue(value);
+
+      // Act.
+      var sut = new BeBisnummer(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidBisnummerSequenceNumberBoundaryValues))]
+   public void BeBisnummer_Constructor_ShouldCreateInstance_WhenValueHasValidSerialNumber(
+      Int32 year,
+      Int32 month,
+      Int32 sequenceNumber,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetValueWithValidCheckDigits(
+         year,
+         month,
+         sequenceNumber: sequenceNumber,
+         formatted: formatted);
+      var expected = GetRawValue(value);
+
+      // Act.
+      var sut = new BeBisnummer(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidBisnummerDateOfBirthValues))]
+   public void BeBisnummer_Constructor_ShouldCreateInstance_WhenValueHasValidDateOfBirth(
+      Int32 year,
+      Int32 month,
+      Int32 day,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetValueWithValidCheckDigits(year, month, day, formatted: formatted);
+      var expected = GetRawValue(value);
+
+      // Act.
+      var sut = new BeBisnummer(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void BeBisnummer_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new BeBisnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidLengthValues))]
+   public void BeBisnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new BeBisnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCharacterValues))]
+   public void BeBisnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasNonDigitCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new BeBisnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidCheckDigitValues))]
+   public void BeBisnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigits(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new BeBisnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidSeparatorValues))]
+   public void BeBisnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new BeBisnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidBisnummerSequenceNumberValues))]
+   public void BeBisnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSequenceNumber(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSequenceNumberResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new BeBisnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidBisnummerDateOfBirthValues))]
+   public void BeBisnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidDateOfBirth(
+      Int32 year,
+      Int32 month,
+      Int32 day,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetValueWithValidCheckDigits(year, month, day, formatted: formatted);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new BeBisnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidRijksregisternummerDateOfBirthValues))]
+   public void BeBisnummer_Constructor_ShouldThrowKfValidationException_WhenValueHasValidRijksregisternummerDateOfBirth(
+      Int32 year,
+      Int32 month,
+      Int32 day,
+      Boolean formatted)
+   {
+      // Arrange.
+      var value = GetValueWithValidCheckDigits(year, month, day, formatted: formatted);
+      LocalValidationError expected = GetInvalidDateOfBirthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new BeBisnummer(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
