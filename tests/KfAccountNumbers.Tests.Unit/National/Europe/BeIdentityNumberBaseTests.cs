@@ -3,45 +3,45 @@ namespace KfAccountNumbers.Tests.Unit.National.Europe;
 public class BeIdentityNumberBaseTests
 {
    // Valid number variations
-   private const String ValidUnformattedRijksregisternummer = "87092100294";                 // Unformatted rijksregisternummer, DOB September 21, 1987, female
-   private const String AltValidUnformattedRijksregisternummer = "05031101702";              // Unformatted rijksregisternummer, DOB March 11, 2005, male
-   private const String UnformattedRijksregisternummerUnknownDob = "00000118576";            // Unformatted rijksregisternummer, DOB unknown, male
-   private const String UnformattedRijksregisternummerYearOnlyDob = "55000007612";           // Unformatted rijksregisternummer, DOB 1955 day/month unknown, female
-   private const String UnformattedRijksregisternummerYearMonthOnlyDob = "20070003377";      // Unformatted rijksregisternummer, DOB July 2020, day unknown, male
-   private const String UnformattedRijksregisternummerYearDayOnlyDob = "94001300428";        // Unformatted rijksregisternummer, DOB 1994, month unknown, day = 13, female
-   private const String UnformattedRijksregisternummerRolloverDob = "00000200136";           // Unformatted rijksregisternummer, DOB unknown with rollover, gender = male
+   protected const String ValidUnformattedRijksregisternummer = "87092100294";               // Unformatted rijksregisternummer, DOB September 21, 1987, female
+   protected const String AltValidUnformattedRijksregisternummer = "05031101702";            // Unformatted rijksregisternummer, DOB March 11, 2005, male
+   protected const String UnformattedRijksregisternummerUnknownDob = "00000118576";          // Unformatted rijksregisternummer, DOB unknown, male
+   protected const String UnformattedRijksregisternummerYearOnlyDob = "55000007612";         // Unformatted rijksregisternummer, DOB 1955 day/month unknown, female
+   protected const String UnformattedRijksregisternummerYearMonthOnlyDob = "20070003377";    // Unformatted rijksregisternummer, DOB July 2020, day unknown, male
+   protected const String UnformattedRijksregisternummerYearDayOnlyDob = "94001300428";      // Unformatted rijksregisternummer, DOB 1994, month unknown, day = 13, female
+   protected const String UnformattedRijksregisternummerRolloverDob = "00000200136";         // Unformatted rijksregisternummer, DOB unknown with rollover, gender = male
 
-   private const String ValidFormattedRijksregisternummer = "87.09.21-002.94";               // Formatted rijksregisternummer, DOB September 21, 1987, female
-   private const String AltValidFormattedRijksregisternummer = "05.03.11-017.02";            // Formatted rijksregisternummer, DOB March 11, 2005, male
-   private const String FormattedRijksregisternummerUnknownDob = "00.00.01-185.76";          // Formatted rijksregisternummer, DOB unknown, male
-   private const String FormattedRijksregisternummerYearOnlyDob = "55.00.00-076.12";         // Formatted rijksregisternummer, DOB 1955 day/month unknown, female
-   private const String FormattedRijksregisternummerYearMonthOnlyDob = "20.07.00-033.77";    // Formatted rijksregisternummer, DOB July 2020, day unknown, male
-   private const String FormattedRijksregisternummerYearDayOnlyDob = "94.00.13-004.28";      // Formatted rijksregisternummer, DOB 1994, month unknown, day = 13, female
-   private const String FormattedRijksregisternummerRolloverDob = "00.00.02-001.36";         // Formatted rijksregisternummer, DOB unknown with rollover, gender = male
+   protected const String ValidFormattedRijksregisternummer = "87.09.21-002.94";             // Formatted rijksregisternummer, DOB September 21, 1987, female
+   protected const String AltValidFormattedRijksregisternummer = "05.03.11-017.02";          // Formatted rijksregisternummer, DOB March 11, 2005, male
+   protected const String FormattedRijksregisternummerUnknownDob = "00.00.01-185.76";        // Formatted rijksregisternummer, DOB unknown, male
+   protected const String FormattedRijksregisternummerYearOnlyDob = "55.00.00-076.12";       // Formatted rijksregisternummer, DOB 1955 day/month unknown, female
+   protected const String FormattedRijksregisternummerYearMonthOnlyDob = "20.07.00-033.77";  // Formatted rijksregisternummer, DOB July 2020, day unknown, male
+   protected const String FormattedRijksregisternummerYearDayOnlyDob = "94.00.13-004.28";    // Formatted rijksregisternummer, DOB 1994, month unknown, day = 13, female
+   protected const String FormattedRijksregisternummerRolloverDob = "00.00.02-001.36";       // Formatted rijksregisternummer, DOB unknown with rollover, gender = male
 
-   private const String ValidUnformattedBisnummer = "87492100283";                           // Unformatted BIS-nummer, DOB September 21, 1987, female
-   private const String AltValidUnformattedBisnummer = "05431101788";                        // Unformatted BIS-nummer, DOB March 11, 2005, male
-   private const String UnformattedBisnummerUnknownDob = "00400118565";                      // Unformatted BIS-nummer, DOB unknown, male
-   private const String UnformattedBisnummerYearOnlyDob = "55400007601";                     // Unformatted BIS-nummer, DOB 1955 day/month unknown, female
-   private const String UnformattedBisnummerYearMonthOnlyDob = "20470003366";                // Unformatted BIS-nummer, DOB July 2020, day unknown, male
-   private const String UnformattedBisnummerYearDayOnlyDob = "94401300417";                  // Unformatted BIS-nummer, DOB 1994, month unknown, day = 13, female
-   private const String UnformattedBisnummerRolloverDob = "00400200125";                     // Unformatted BIS-nummer, DOB unknown with rollover, gender = male
-   private const String UnformattedBisnummerUnknownGender = "12310100179";                   // Unformatted BIS-nummer, DOB November 1, 2012, gender unknown
-   private const String UnformattedBisnummerPartialDobUnknownGender = "34200000276";         // Unformatted BIS-nummer, DOB 1934, day/month unknown, gender unknown
-   private const String UnformattedBisnummerUnknownDobUnknownGender = "00200108327";         // Unformatted BIS-nummer, DOB unknown, gender unknown
-   private const String UnformattedBisnummerRolloverDobUnknownGender = "00200200179";        // Unformatted BIS-nummer, DOB unknown with rollover, gender unknown
+   protected  const String ValidUnformattedBisnummer = "87492100283";                        // Unformatted BIS-nummer, DOB September 21, 1987, female
+   protected  const String AltValidUnformattedBisnummer = "05431101788";                     // Unformatted BIS-nummer, DOB March 11, 2005, male
+   protected  const String UnformattedBisnummerUnknownDob = "00400118565";                   // Unformatted BIS-nummer, DOB unknown, male
+   protected  const String UnformattedBisnummerYearOnlyDob = "55400007601";                  // Unformatted BIS-nummer, DOB 1955 day/month unknown, female
+   protected  const String UnformattedBisnummerYearMonthOnlyDob = "20470003366";             // Unformatted BIS-nummer, DOB July 2020, day unknown, male
+   protected  const String UnformattedBisnummerYearDayOnlyDob = "94401300417";               // Unformatted BIS-nummer, DOB 1994, month unknown, day = 13, female
+   protected  const String UnformattedBisnummerRolloverDob = "00400200125";                  // Unformatted BIS-nummer, DOB unknown with rollover, gender = male
+   protected  const String UnformattedBisnummerUnknownGender = "12310100179";                // Unformatted BIS-nummer, DOB November 1, 2012, gender unknown
+   protected  const String UnformattedBisnummerPartialDobUnknownGender = "34200000276";      // Unformatted BIS-nummer, DOB 1934, day/month unknown, gender unknown
+   protected  const String UnformattedBisnummerUnknownDobUnknownGender = "00200108327";      // Unformatted BIS-nummer, DOB unknown, gender unknown
+   protected  const String UnformattedBisnummerRolloverDobUnknownGender = "00200200179";     // Unformatted BIS-nummer, DOB unknown with rollover, gender unknown
 
-   private const String ValidFormattedBisnummer = "87.49.21-002.83";                         // Formatted BIS-nummer, DOB September 21, 1987, female
-   private const String AltValidFormattedBisnummer = "05.43.11-017.88";                      // Formatted BIS-nummer, DOB March 11, 2005, male
-   private const String FormattedBisnummerUnknownDob = "00.40.01-185.65";                    // Formatted BIS-nummer, DOB unknown, male
-   private const String FormattedBisnummerYearOnlyDob = "55.40.00-076.01";                   // Formatted BIS-nummer, DOB 1955 day/month unknown, female
-   private const String FormattedBisnummerYearMonthOnlyDob = "20.47.00-033.66";              // Formatted BIS-nummer, DOB July 2020, day unknown, male
-   private const String FormattedBisnummerYearDayOnlyDob = "94.40.13-004.17";                // Formatted BIS-nummer, DOB 1994, month unknown, day = 13, female
-   private const String FormattedBisnummerRolloverDob = "00.40.02-001.25";                   // Formatted BIS-nummer, DOB unknown with rollover, gender = male
-   private const String FormattedBisnummerUnknownGender = "12.31.01-001.79";                 // Formatted BIS-nummer, DOB November 1, 2012, gender unknown
-   private const String FormattedBisnummerPartialDobUnknownGender = "34.20.00-002.76";       // Formatted BIS-nummer, DOB 1934, day/month unknown, gender unknown
-   private const String FormattedBisnummerUnknownDobUnknownGender = "00.20.01-083.27";       // Formatted BIS-nummer, DOB unknown, gender unknown
-   private const String FormattedBisnummerRolloverDobUnknownGender = "00.20.02-001.79";      // Formatted BIS-nummer, DOB unknown with rollover, gender unknown
+   protected const String ValidFormattedBisnummer = "87.49.21-002.83";                       // Formatted BIS-nummer, DOB September 21, 1987, female
+   protected const String AltValidFormattedBisnummer = "05.43.11-017.88";                    // Formatted BIS-nummer, DOB March 11, 2005, male
+   protected const String FormattedBisnummerUnknownDob = "00.40.01-185.65";                  // Formatted BIS-nummer, DOB unknown, male
+   protected const String FormattedBisnummerYearOnlyDob = "55.40.00-076.01";                 // Formatted BIS-nummer, DOB 1955 day/month unknown, female
+   protected const String FormattedBisnummerYearMonthOnlyDob = "20.47.00-033.66";            // Formatted BIS-nummer, DOB July 2020, day unknown, male
+   protected const String FormattedBisnummerYearDayOnlyDob = "94.40.13-004.17";              // Formatted BIS-nummer, DOB 1994, month unknown, day = 13, female
+   protected const String FormattedBisnummerRolloverDob = "00.40.02-001.25";                 // Formatted BIS-nummer, DOB unknown with rollover, gender = male
+   protected const String FormattedBisnummerUnknownGender = "12.31.01-001.79";               // Formatted BIS-nummer, DOB November 1, 2012, gender unknown
+   protected const String FormattedBisnummerPartialDobUnknownGender = "34.20.00-002.76";     // Formatted BIS-nummer, DOB 1934, day/month unknown, gender unknown
+   protected const String FormattedBisnummerUnknownDobUnknownGender = "00.20.01-083.27";     // Formatted BIS-nummer, DOB unknown, gender unknown
+   protected const String FormattedBisnummerRolloverDobUnknownGender = "00.20.02-001.79";    // Formatted BIS-nummer, DOB unknown with rollover, gender unknown
 
    protected static String GetRawValue(String value)
       => value.Length == 11

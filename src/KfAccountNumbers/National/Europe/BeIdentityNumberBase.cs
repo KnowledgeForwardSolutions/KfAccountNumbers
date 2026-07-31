@@ -65,6 +65,11 @@ public abstract record BeIdentityNumberBase
    public const String CheckDigitAlgorithmName = "Modulus 97";
 
    /// <summary>
+   ///   The default format to use when formatting Belgian identity numbers.
+   /// </summary>
+   public const String DefaultFormatMask = "__.__.__-___.__";
+
+   /// <summary>
    ///   The latest year of birth supported by rijksregisternummer and
    ///   BIS-nummer values.
    /// </summary>
@@ -88,6 +93,11 @@ public abstract record BeIdentityNumberBase
    /// </summary>
    public const Int32 FormattedLength = 15;
 
+   /// <summary>
+   ///   Index (measured from the end of the value) of the gender indicator.
+   /// </summary>
+   protected const Int32 GenderOffset = 3;
+
    private const Int32 Separator1Offset = 2;
    private const Int32 Separator2Offset = 5;
    private const Int32 Separator3Offset = 8;
@@ -105,7 +115,6 @@ public abstract record BeIdentityNumberBase
    ];
 
    // These items are measured from the end of the value.
-   private const Int32 GenderOffset = 3;
    private const Int32 CheckDigit1Offset = 2;
    private const Int32 CheckDigit2Offset = 1;
 
