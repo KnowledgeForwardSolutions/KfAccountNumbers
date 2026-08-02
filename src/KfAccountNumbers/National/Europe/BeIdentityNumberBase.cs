@@ -222,8 +222,8 @@ public abstract record BeIdentityNumberBase
             : month - BisNummerUnknownGenderMonthOffset,
 
          // Optional may apply an offset.
-         (DateOffsetMode.Optional, > BisNummerMonthOffset) => month - BisNummerMonthOffset,
-         (DateOffsetMode.Optional, > BisNummerUnknownGenderMonthOffset) => month - BisNummerUnknownGenderMonthOffset,
+         (DateOffsetMode.Optional, >= BisNummerMonthOffset) => month - BisNummerMonthOffset,
+         (DateOffsetMode.Optional, >= BisNummerUnknownGenderMonthOffset) => month - BisNummerUnknownGenderMonthOffset,
 
          // Otherwise leave unchanged.
          _ => month,

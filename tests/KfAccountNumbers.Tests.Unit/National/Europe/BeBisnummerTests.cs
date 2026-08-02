@@ -778,7 +778,7 @@ public class BeBisnummerTests : BeIdentityNumberBaseTests
    [MemberData(nameof(ValidBisnummerSequenceNumberBoundaryValues))]
    public void BeBisnummer_Create_ShouldCreateInstance_WhenValueHasValidSequenceNumber(
       Int32 year,
-      Int32 month, 
+      Int32 month,
       Int32 sequenceNumber,
       Boolean formatted)
    {

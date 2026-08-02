@@ -813,4 +813,28 @@
   <data name="BeBisnummerUnformattedLength" xml:space="preserve">
     <value>BE BIS-rnummer without separator characters (YYMMDDXXXCC)</value>
   </data>
+  <data name="BeIdentityNumberFormattedLength" xml:space="preserve">
+    <value>BE Identity Number formatted as YY.MM.DD-XXX.CC</value>
+  </data>
+  <data name="BeIdentityNumberInvalidCharacter" xml:space="preserve">
+    <value>BE Identity Number contains a non-digit character where a digit was expected</value>
+  </data>
+  <data name="BeIdentityNumberInvalidCheckDigits" xml:space="preserve">
+    <value>BE Identity Number must have a valid modulus 97 check sum in the two trailing (right-most) character positions</value>
+  </data>
+  <data name="BeIdentityNumberInvalidDateOfBirth" xml:space="preserve">
+    <value>BE Identity Number must have a valid date of birth in YYMMDD format as the leading (left-most) digits</value>
+  </data>
+  <data name="BeIdentityNumberInvalidSeparator" xml:space="preserve">
+    <value>BE Identity Number with length 15 may not have digit characters (0-9) in character positions 2, 5, 8 or 12 (zero-based)</value>
+  </data>
+  <data name="BeIdentityNumberInvalidSequenceNumber" xml:space="preserve">
+    <value>BE Identity Number sequence number may not be '000' or '999'</value>
+  </data>
+  <data name="BeIdentityNumberUnformattedLength" xml:space="preserve">
+    <value>BE Identity Number without separator characters (YYMMDDXXXCC)</value>
+  </data>
+  <data name="BeIdentityNumberInvalidLength" xml:space="preserve">
+    <value>BE Identity Number must have length 11 (without separator characters) or 15 (with separator characters)</value>
+  </data>
 </root>

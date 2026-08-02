@@ -121,19 +121,19 @@ public class BeIdentityNumberBaseTests
       FormattedBisnummerRolloverDobUnknownGender,
    ];
 
-   public static TheoryData<Int32, Int32, Boolean> ValidRijksregisternummerSequenceNumberBoundaryValues = new()
+   public static TheoryData<Int32, Int32, Int32, Boolean> ValidRijksregisternummerSequenceNumberBoundaryValues = new()
    {
       // Unformatted values
-      { 1965,   1, false },      // Sequence number lower bound
-      { 1965, 998, false },      // Sequence number upper bound
-      { 2010,   1, false },
-      { 2010, 998, false },
+      { 1965, 1,   1, false },   // Sequence number lower bound
+      { 1965, 1, 998, false },   // Sequence number upper bound
+      { 2010, 1,   1, false },
+      { 2010, 1, 998, false },
 
       // Formatted values
-      { 1965,   1, true },
-      { 1965, 998, true },
-      { 2010,   1, true },
-      { 2010, 998, true },
+      { 1965, 1,   1, true },
+      { 1965, 1, 998, true },
+      { 2010, 1,   1, true },
+      { 2010, 1, 998, true },
    };
 
    public static TheoryData<Int32, Int32, Int32, Boolean> ValidBisnummerSequenceNumberBoundaryValues = new()

@@ -52,7 +52,7 @@ The date of birth can be adjusted in a variety of ways:
 * If the person's date of birth is unknown, then the constant 00.00.01 is used.
 * As noted above, BIS-nummers apply an offset to the month component of the date of birth to distinguish them from rijksregisternummers. If the person's gender is known when the BIS-nummer is issued, then **40** is added to the month; otherwise **20** is added to the month to indicate unknown gender.
 
-For cases of a person with an incomplete or unknown date of birth, `BeBisnummer` stacks the appropriate rules. For example, 87.40.00-023.47 would be the BIS number for a person with an incomplete date of birth born in 1987.
+For cases of a BIS-nummer for a person with an incomplete or unknown date of birth, `BeIdentityNumber` stacks the appropriate rules. For example, 87.40.00-023.47 would be the BIS number for a person with an incomplete date of birth born in 1987.
 
 ### References
 
