@@ -8,7 +8,7 @@ BIS-nummers apply an offset to the month portion of the date of birth element to
 | :------ | :---------- |
 | Class name: | KfAccountNumbers.National.Europe.BeBisnummer |
 | Is composite: | No |
-| Composite parent: | BeIdentityNumber |
+| Composite parent: | [BeIdentityNumber](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/BeIdentityNumber.md) |
 | Length: | 11 (unformatted), 15 (formatted for readability) |
 | Check digit algorithm: | Modulus 97 |
 | Allowed characters: | Digits ('0'-'9') |
@@ -25,7 +25,7 @@ BIS-nummers apply an offset to the month portion of the date of birth element to
 | 4. | The two trailing (right-most) characters must be a valid modulus 97 check sum (taking into account the possibility of a person born in the year 2000 or later). | InvalidChecksum |
 | 5. | If the value has length 15, then the characters at positions 2, 5, 8 and 12 (zero-based) must not be ASCII digits ('0'-'9') | InvalidSeparator |
 | 6. | The date of birth, after deriving the century of birth from the check sum and taking into account the BIS number offset, must be a valid date between January 1, 1900 and December 31, 2099. <br><b>OR</b><br> The date of birth may use zeros to indicate that some or all of the person's date of birth is unknown (see below for more details). | InvalidDateOfBirth |
-| 7. | The sequence number may not be 000 or 999. | InvalidBeRijksregisternummerSequenceNumber |
+| 7. | The sequence number may not be 000 or 999. | InvaliSequenceNumber |
 
 ### Additional Properties
 
@@ -37,14 +37,12 @@ BIS-nummers apply an offset to the month portion of the date of birth element to
 ### Notes
 
 The date of birth can be adjusted in a variety of ways:
-* If the person's date of birth is incomplete, then the two digit year is used and zeros are used for
-  month and year (for example, 40.00.00-955.69).
+* If the person's date of birth is incomplete, then the two digit year is used and zeros are used for   month and day (for example, 40.00.00-955.69).
 * If there are too many people with incomplete dates of birth for a particular year than can be represented by a three digit sequence number (i.e. more than 499 males with incomplete dates of birth for the year 1940), then 01 is used for the day of birth and the sequence number rolls over to 001 (ex. 40.00.01-001.33). (Note that `BeBisnummer` does not enforce an upper limit on the day component in cases of rollover, though multiple rollovers in a single year should be rare.)
 * If the person's date of birth is unknown, then the constant 00.00.01 is used.
 * As noted above, BIS-nummers apply an offset to the month component of the date of birth to distinguish them from rijksregisternummers. If the person's gender is known when the BIS-nummer is issued, then **40** is added to the month; otherwise **20** is added to the month to indicate unknown gender.
 
-For cases of a person with an incomplete or unknown date of birth, `BeBisnummer`
-stacks the appropriate rules. For example, 87.40.00-023.47 would be the BIS number for a person with an incomplete date of birth born in 1987.
+For cases of a person with an incomplete or unknown date of birth, `BeBisnummer` stacks the appropriate rules. For example, 87.40.00-023.47 would be the BIS number for a person with an incomplete date of birth born in 1987.
 
 ### References
 
