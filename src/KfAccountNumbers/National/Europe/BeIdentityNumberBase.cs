@@ -8,6 +8,11 @@ namespace KfAccountNumbers.National.Europe;
 public abstract record BeIdentityNumberBase
 {
    /// <summary>
+   ///   Discriminated union defining the types of Belgian identity numbers.
+   /// </summary>
+   public union IdentifierCategory(BeIdentifierType.Rijksregisternummer, BeIdentifierType.BisNummer) { }
+
+   /// <summary>
    ///   Discriminated union defining the possible validation errors that can
    ///   occur when creating a new Belgian identity number.
    /// </summary>

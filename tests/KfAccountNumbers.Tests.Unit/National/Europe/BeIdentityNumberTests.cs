@@ -347,6 +347,55 @@ public class BeIdentityNumberTests : BeIdentityNumberBaseTests
 
    #endregion
 
+   #region IdentifierType Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidRijksregisternummerValues))]
+   public void BeIdentityNumber_IdentifierType_ShouldReturnExpectedIdentifierType_WhenValueIsRijksregisternummer(String value)
+   {
+      // Arrange.
+      var sut = new BeIdentityNumber(value);
+      BeIdentityNumberBase.IdentifierCategory expected = default(BeIdentifierType.Rijksregisternummer);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidBisnummerValues))]
+   public void BeIdentityNumber_IdentifierType_ShouldReturnExpectedIdentifierType_WhenValueIsBisnummer(String value)
+   {
+      // Arrange.
+      var sut = new BeIdentityNumber(value);
+      BeIdentityNumberBase.IdentifierCategory expected = default(BeIdentifierType.BisNummer);
+
+      // Act/assert.
+      sut.IdentifierType.Should().Be(expected);
+   }
+
+   #endregion
+
+   #region Value Property Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidRijksregisternummerValues))]
+   [MemberData(nameof(ValidBisnummerValues))]
+   public void BeIdentityNumber_Value_ShouldReturnValidatedBisnummer(String value)
+   {
+      // Arrange.
+      var sut = new BeIdentityNumber(value);
+      var expected = GetRawValue(value);
+
+      // Act/assert.
+      sut.Value.Should().Be(expected);
+   }
+
+   #endregion
+
    #region Conversion Operator Tests
    // ==========================================================================
    // ==========================================================================
@@ -1159,6 +1208,42 @@ public class BeIdentityNumberTests : BeIdentityNumberBaseTests
       // Act/assert.
       (sut1 == sut2).Should().BeTrue();                         // Value equality should be true
       ReferenceEquals(sut1, sut2).Should().BeFalse();
+   }
+
+   #endregion
+
+   #region ToBisnummer Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidBisnummerValues))]
+   public void BeIdentityNumber_ToBisnummer_ShouldReturnExpectedResult_WhenValueIsBisnummer(String value)
+   {
+      // Arrange.
+      var sut = new BeIdentityNumber(value);
+      var expected = new BeBisnummer(value);
+
+      // Act.
+      KfOption<BeBisnummer> result = sut.ToBisnummer();
+
+      // Assert.
+      result.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidRijksregisternummerValues))]
+   public void BeIdentityNumber_ToBisnummer_ShouldReturnExpectedResult_WhenValueIsNotBisnummer(String value)
+   {
+      // Arrange.
+      var sut = new BeIdentityNumber(value);
+      var expected = default(None);
+
+      // Act.
+      KfOption<BeBisnummer> result = sut.ToBisnummer();
+
+      // Assert.
+      result.Value.Should().Be(expected);
    }
 
    #endregion

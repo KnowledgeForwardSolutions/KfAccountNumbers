@@ -218,15 +218,20 @@ public record BeBisnummer : BeIdentityNumberBase
       : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="BeBisnummer"/>
-   ///   class.
+   ///   Initializes a new instance of the <see cref="BeBisnummer"/> class.
    /// </summary>
+   /// <param name="value">
+   ///   String representation of a BIS-nummer.
+   /// </param>
+   /// <param name="validationMode">
+   ///   Indicates whether the <paramref name="value"/> requires validation.
+   /// </param>
    /// <remarks>
    ///   Private constructor that actually does the work. Supports bypassing
    ///   validation when creating a new instance from a value that has
    ///   already been validated.
    /// </remarks>
-   private BeBisnummer(String? value, ValidationMode validationMode)
+   internal BeBisnummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {

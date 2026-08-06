@@ -327,6 +327,19 @@ public record BeIdentityNumber : BeIdentityNumberBase
    }
 
    /// <summary>
+   ///   Gets the type of Belgian identifier represented by the current value.
+   /// </summary>
+   /// <remarks>
+   ///   The month component of the date of birth determines the identifier
+   ///   type. BIS-nummers add an offset (either 20 or 40) to the month so month
+   ///   values greater than 12 indicate that the identifier is a BIS-nummer.
+   /// </remarks>
+   public IdentifierCategory IdentifierType
+      => Value.AsSpan(2..).ParseTwoDigits() > 12
+         ? default(BeIdentifierType.BisNummer)
+         : default(BeIdentifierType.Rijksregisternummer);
+
+   /// <summary>
    ///   Gets the normalized Belgian identity number (without separator
    ///   characters).
    /// </summary>
@@ -403,6 +416,22 @@ public record BeIdentityNumber : BeIdentityNumberBase
    ///   details on creating a mask to format the identity number.
    /// </remarks>
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Convert this instance to a <see cref="BeBisnummer"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{BeBisnummer}"/> instance that will contain
+   ///   the <see cref="BeBisnummer"/> if this value is a BIS-nummer;
+   ///   otherwise <see cref="None"/> to indicate that this is not a
+   ///   BIS-nummer.
+   /// </returns>
+   public KfOption<BeBisnummer> ToBisnummer()
+      => IdentifierType is BeIdentifierType.BisNummer
+         ? new BeBisnummer(Value, ValidationMode.BypassValidation)
+         : default(None);
+
+   // TODO: Add ToRijksregisternummer method when BeRijksregisternummer is updated
 
    /// <summary>
    ///   Get a string representation of the Belgian identity number.
@@ -507,11 +536,11 @@ public record BeIdentityNumber : BeIdentityNumberBase
 #pragma warning disable SA1600 // Elements should be documented
 public class BeIdentityNumberJsonConverter : JsonConverter<BeIdentityNumber>
 {
-   public override BeIdentityNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   public override BeIdentityNumber? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
       if (reader.TokenType == JsonTokenType.Null)
       {
-         return null!;
+         return null;
       }
 
       var str = reader.GetString();
