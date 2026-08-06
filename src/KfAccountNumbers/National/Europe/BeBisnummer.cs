@@ -368,7 +368,7 @@ public record BeBisnummer : BeIdentityNumberBase
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
    ///   details on creating a mask to format the BIS-nummer.
    /// </remarks>
-   public String Format(String mask = "__.__.__-___.__") => Value.FormatWithMask(mask);
+   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
    ///   Get a string representation of the BIS-nummer.

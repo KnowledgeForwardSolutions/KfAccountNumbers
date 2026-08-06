@@ -215,8 +215,203 @@ namespace KfAccountNumbers.National.Europe;
 ///      for more info.
 ///   </para>
 /// </remarks>
+[JsonConverter(typeof(BeIdentityNumberJsonConverter))]
 public record BeIdentityNumber : BeIdentityNumberBase
 {
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="BeIdentityNumber"/>
+   ///   class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Belgian identity number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="value"/> is not length 11 (or 15 if separator
+   ///   characters are used).
+   ///   - or -
+   ///   <paramref name="value"/> contains a non-digit character in
+   ///   any position other than the separator locations.
+   ///   - or -
+   ///   <paramref name="value"/> has invalid modulus 97 check digit
+   ///   characters in the trailing (right-most) character positions.
+   ///   - or -
+   ///   <paramref name="value"/> is 15 characters in length and has
+   ///   an ASCII digit character ('0'-'9') in a separator location.
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid sequence number.
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid date of birth in
+   ///   the leading (left-most) six digits.
+   /// </exception>
+   public BeIdentityNumber(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="BeIdentityNumber"/>
+   ///   class.
+   /// </summary>
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private BeIdentityNumber(String? value, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
+         {
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               InvalidSequenceNumber invalidSequenceNumber => new UKfValidationException<ValidationError>(invalidSequenceNumber),
+               InvalidDateOfBirth invalidDateOfBirth => new UKfValidationException<ValidationError>(invalidDateOfBirth),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
+         }
+      }
+
+      Value = GetNormalizedValue(value!);
+   }
+
+   /// <summary>
+   ///   Gets the person's date of birth, derived from the first six digits in
+   ///   YYMMDD format and the exact century of birth derived from the check
+   ///   digits.
+   /// </summary>
+   public DateResult DateOfBirth
+   {
+      get
+      {
+#pragma warning disable IDE0008 // Use explicit type
+         var (year, month, day) = GetYearMonthDay(Value, DateOffsetMode.Optional);
+#pragma warning restore IDE0008 // Use explicit type
+
+         return new DateResult(
+            year > 0 ? year : null,
+            month > 0 ? month : null,
+            day > 0 ? day : null);
+      }
+   }
+
+   /// <summary>
+   ///   Gets an <see cref="KfOption{TS}"/> that indicates the
+   ///   person's gender, as indicated by the sequence number (and the month
+   ///   offset). May be <see cref="None"/> in the case of a BIS-nummer with an
+   ///   unknown gender.
+   /// </summary>
+   public KfOption<Gender.BinaryGender> Gender
+   {
+      get
+      {
+         ReadOnlySpan<Char> span = Value.AsSpan();
+
+         // Check for BIS-nummer with unknown gender.
+         var num = span[2..].ParseTwoDigits();
+         if (num is >= 20 and <= 32)
+         {
+            return default(None);
+         }
+
+         Gender.BinaryGender gender = Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
+         return gender;
+      }
+   }
+
+   /// <summary>
+   ///   Gets the normalized Belgian identity number (without separator
+   ///   characters).
+   /// </summary>
+   public String Value { get; private init; }
+
+   /// <summary>
+   ///   Implicitly converts a <see cref="BeIdentityNumber"/> to a
+   ///   <see cref="String"/>, returning an empty string if the source is null.
+   /// </summary>
+   /// <param name="source">
+   ///   The <see cref="BeIdentityNumber"/> to convert.
+   /// </param>
+   public static implicit operator String(BeIdentityNumber source)
+      => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
+
+   /// <summary>
+   ///   Defines an explicit conversion of a string to a <see cref="BeIdentityNumber"/>.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Belgian identity number.
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is not a valid Belgian identity number.
+   /// </exception>
+   public static explicit operator BeIdentityNumber(String? value) => new(value);
+
+   /// <summary>
+   ///   Create a new <see cref="BeIdentityNumber"/> using the Result pattern.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Belgian identity number.
+   /// </param>
+   /// <returns>
+   ///   A <see cref="CreateResult{BeIdentityNumber, ValidationError}"/>. Will
+   ///   contain the new <see cref="BeIdentityNumber"/> if <paramref name="value"/>
+   ///   is valid or a <see cref="BeIdentityNumberBase.ValidationError"/> that identifies the
+   ///   validation rule that was failed if <paramref name="value"/> is invalid.
+   /// </returns>
+   public static CreateResult<BeIdentityNumber, ValidationError> Create(String? value)
+      => Validate(value) switch
+      {
+         ValidValue => new BeIdentityNumber(value, ValidationMode.BypassValidation),
+         EmptyValue emptyValue => (ValidationError)emptyValue,
+         InvalidLength invalidLength => (ValidationError)invalidLength,
+         InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
+         InvalidChecksum invalidChecksum => (ValidationError)invalidChecksum,
+         InvalidSeparator invalidSeparator => (ValidationError)invalidSeparator,
+         InvalidSequenceNumber invalidSequenceNumber => (ValidationError)invalidSequenceNumber,
+         InvalidDateOfBirth invalidDateOfBirth => (ValidationError)invalidDateOfBirth,
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
+
+   /// <summary>
+   ///   Format the Belgian identity number using the supplied
+   ///   <paramref name="mask"/>.
+   /// </summary>
+   /// <param name="mask">
+   ///   Optional. The mask that specifies the final output. If not supplied
+   ///   then <see cref="BeIdentityNumberBase.DefaultFormatMask"/> will be used
+   ///   instead.
+   /// </param>
+   /// <returns>
+   ///   A formatted Belgian identity number.
+   /// </returns>
+   /// <exception cref="ArgumentNullException">
+   ///   <paramref name="mask"/> is <see langword="null"/>.
+   /// </exception>
+   /// <exception cref="ArgumentException">
+   ///   <paramref name="mask"/> is <see cref="String.Empty"/> or all whitespace
+   ///   characters.
+   /// </exception>
+   /// <remarks>
+   ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
+   ///   details on creating a mask to format the identity number.
+   /// </remarks>
+   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
+
+   /// <summary>
+   ///   Get a string representation of the Belgian identity number.
+   /// </summary>
+   /// <returns>
+   ///   The normalized Belgian identity number, without separator characters.
+   /// </returns>
+   public override String ToString() => Value;
+
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a
    ///   valid Belgian identity number.
@@ -306,4 +501,23 @@ public record BeIdentityNumber : BeIdentityNumberBase
       => new(
          Messages.BeIdentityNumberInvalidSequenceNumber,
          IsFormatted(value) ? value[9..12].ToString() : value[6..9].ToString());
+}
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1600 // Elements should be documented
+public class BeIdentityNumberJsonConverter : JsonConverter<BeIdentityNumber>
+{
+   public override BeIdentityNumber Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   {
+      if (reader.TokenType == JsonTokenType.Null)
+      {
+         return null!;
+      }
+
+      var str = reader.GetString();
+      return new BeIdentityNumber(str);
+   }
+
+   public override void Write(Utf8JsonWriter writer, BeIdentityNumber value, JsonSerializerOptions options)
+      => writer.WriteStringValue(value.Value);
 }
