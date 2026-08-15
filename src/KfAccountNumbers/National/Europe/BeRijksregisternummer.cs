@@ -203,7 +203,8 @@ namespace KfAccountNumbers.National.Europe;
 ///      </list>
 ///   </para>
 ///   <para>
-///      See https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_registre_national (French) for more info.
+///      See <see href="https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_registre_national">Wikipedia (French) - Numéro de registre national</see>
+///      for more info.
 ///   </para>
 /// </remarks>
 [JsonConverter(typeof(BeRijksregisternummerJsonConverter))]

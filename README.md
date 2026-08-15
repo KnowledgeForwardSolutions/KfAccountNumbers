@@ -16,7 +16,7 @@ If the business object represents an account number that normally has no formatt
 Note that many of the national identifiers supported by KfAccountNumbers embed the person's date of birth in the identifier. KfAccountNumbers will always validate these dates, but only that the date exists, and specifically will **NOT** check for future dates. This is to prevent any of the business objects being required to be aware of the current date/time. If preventing future dates is a business requirement then you should perform your own validation of the business object's DateOfBirth property and reject it if the date is in the future.
 
 ## Composite Types
-Many countries issue multiple identifiers that are structurally similar and have a similar purpose, but are issued to different categories. For example, a country may issue multiple tax identifiers, one type to citizens and permanent residents and a different, but structurally similar type, to non-residents (such as Swedish personnummer/samordningsnummer, and Norwegian fødselsnummer/D-nummer). In these cases, KfAccountNumbers has specific types for individual identifiers as well as a composite type that can represent any of the similar types. In the case of Sweden, KfAccountNumbers has individual types for personnummer and samordningsnummer and a composite type, SeIdentityNumber, which can represent either a personnummer or a samordningsnummer.
+Many countries issue multiple identifiers that are structurally similar and have a similar purpose, but are issued to different categories. For example, a country may issue multiple tax identifiers, one type to citizens and permanent residents and a different, but structurally similar type, to non-residents (such as Swedish personnummer/samordningsnummer, and Norwegian fødselsnummer/D-nummer). In these cases, KfAccountNumbers provides specific types for individual identifiers as well as a composite type that can represent any of the similar types. In the case of Sweden, KfAccountNumbers has individual types for personnummer and samordningsnummer and a composite type, SeIdentityNumber, which can represent either a personnummer or a samordningsnummer.
 
 Composite types will have an IdentifierType property which will identify the specific type it contains and will also contain `ToXyzType` methods which allow the conversion of the composite type to a more specific type (eg. `SeIdentityNumber.ToPersonnummer`).
 
@@ -32,8 +32,9 @@ KfAccountNumbers groups business objects into two broad categories: Commercial a
 	- Asia (future)
 	- Australia (future)
 	- Europe
-		- [Belgium - Bisnummer - non-resident identifier](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/BeBisnummer.md)
-		- [BeRijksregisternummer](#berijksregisternummer) 
+		- [Belgium - BeBisnummer - non-resident identifier](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/BeBisnummer.md)
+		- [Belgium - BeIdentityNumber - composite type, BeRijksregisternummer or BeBisnummer](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/BeIdentityNumber.md)
+		- [Belgium - BeRijksregisternummer - permanent resident identifier](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/BeRijksregisternummer.md) 
 		- [DkPersonnummer](#dkpersonnummer)
 		- [EsNif](#esnif)
 		- [FiHenkilotunnus](#fihenkilotunnus)
