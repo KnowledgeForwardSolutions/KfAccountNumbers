@@ -1,27 +1,25 @@
-// Ignore Spelling: Json Nummer Rijksregisternummer
-
-#pragma warning disable IDE0250 // Make struct 'readonly'
 #pragma warning disable IDE0046 // Convert to conditional expression
-#pragma warning disable SA1025 // Code should not contain multiple whitespace in a row
 
 namespace KfAccountNumbers.National.Europe;
 
 /// <summary>
-///   Strongly typed business object that represents a Belgian
-///   rijksregisternummer or a Belgian BIS-nummer (for non-residents).
+///   Strongly typed business object that represents a Belgian National Register
+///   Number (Rijksregisternummer in Dutch, Numéro de registre national in
+///   French), a unique identifier assigned to all persons (Belgian citizens and
+///   foreign residents) who are registered in Belgium's National Register
+///   (Rijksregister/Registre national).
 /// </summary>
 /// <remarks>
 ///   <para>
-///      Rijksregisternummer and BIS-nummer both are 11-digit numbers,
-///      structured as YYMMDDXXXCC, with the following elements.
+///      A rijksregisternummer is an 11-digit number, structured as YYMMDDXXXCC,
+///      with the following elements:
 ///      <list type="bullet">
 ///         <item>
 ///            <term>YYMMDD</term>
 ///            <description>
-///               The person's date of birth in YYMMDD format. A BIS number is
-///               differentiated from a rijksregisternummer by the addition of a
-///               constant value (40 or 20, see below) to the month component of
-///               the date of birth.
+///               The person's date of birth in YYMMDD format. The date of birth
+///               may be unknown/incomplete and in that case zeros are used in
+///               place of the unknown elements.
 ///            </description>
 ///         </item>
 ///         <item>
@@ -90,8 +88,8 @@ namespace KfAccountNumbers.National.Europe;
 ///         <item>
 ///            <description>
 ///               The date of birth, after deriving the century of birth from
-///               the check sum and taking into account the BIS number offset,
-///               must be a valid date between January 1, 1900 and December 31,
+///               the check sum, must be a valid date between January 1, 1900
+///               and December 31,
 ///               2099.
 ///               <b>OR</b> the date of birth may use zeros to indicate that
 ///               some or all of the person's date of birth is unknown (see
@@ -134,19 +132,6 @@ namespace KfAccountNumbers.National.Europe;
 ///               00.00.01 is used.
 ///            </description>
 ///         </item>
-///         <item>
-///            <description>
-///               As noted above, if the value is a BIS number then 40 is added
-///               to the month component of the date of birth.
-///            </description>
-///         </item>
-///         <item>
-///            <description>
-///               If the value is a BIS number <b>AND</b> the person's gender is
-///               unknown at the time the number is issued then <b>20</b> is
-///               added to the month component of the date of birth.
-///            </description>
-///         </item>
 ///      </list>
 ///   </para>
 ///   <para>
@@ -159,45 +144,27 @@ namespace KfAccountNumbers.National.Europe;
 ///      Example values:
 ///      <list type="bullet">
 ///         <item>
-///            <term>85.07.30-033.28</term>
+///            <term>87092100294</term>
 ///            <description>
-///               Rijksregisternummer, date of birth July 30, 1985, gender = male,
-///               check digit calculation 97 - (850730033 mod 97) = 97 - 69 = 28
+///               unformatted, date of birth September 21, 1987,
+///               gender = female, check digit calculation
+///               97 - (870921002 mod 97) = 97 - 3 = 94
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>17110804680</term>
+///            <term>05.03.11-017.02</term>
 ///            <description>
-///               Rijksregisternummer, date of birth November 11, 2017, gender = female,
-///               check digit calculation 97 - (2171108046 mod 97) = 97 - 17 = 80
+///               formatted, date of birth March 11, 2005,
+///               gender = male, check digit calculation 97 - (050311017 mod 97)
+///               = 97 - 95 = 2
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>40 00 00 955-79</term>
+///            <term>455000007612</term>
 ///            <description>
-///               Rijksregisternummer, date of birth incomplete, year of birth = 1940,
-///               gender = male, check digit calculation 97 - (400000955 mod 97) = 97 - 18 = 79
-///            </description>
-///         </item>
-///         <item>
-///            <term>00 00 01 003-64</term>
-///            <description>
-///               Rijksregisternummer, date of birth unknown, gender = male,
-///               check digit calculation 97 - (000001003 mod 97) = 97 - 33 = 64
-///            </description>
-///         </item>
-///         <item>
-///            <term>17.51.08-046.40</term>
-///            <description>
-///               BIS number, date of birth November 8, 1917, gender = female,
-///               check digit calculation 97 - (175108046 mod 97) = 97 - 57 = 40
-///            </description>
-///         </item>
-///         <item>
-///            <term>09 20 00 002 65</term>
-///            <description>
-///              BIS number, date of birth incomplete, year of birth 2009, gender unknown,
-///              check digit calculation 97 - (2092000002 mod 97) = 97 - 32 = 65
+///               unformatted, date of birth 1955, day/month unknown,
+///               gender = female, check digit calculation
+///               97 - (550000076 mod 97) = 97 - 85 = 12
 ///            </description>
 ///         </item>
 ///      </list>
@@ -208,110 +175,14 @@ namespace KfAccountNumbers.National.Europe;
 ///   </para>
 /// </remarks>
 [JsonConverter(typeof(BeRijksregisternummerJsonConverter))]
-public record BeRijksregisternummer
+public record BeRijksregisternummer : BeIdentityNumberBase
 {
-   /// <summary>
-   ///   Discriminated union defining the types of identifier that
-   ///   <see cref="BeRijksregisternummer"/> can represent.
-   /// </summary>
-   public union IdentifierCategory(BeIdentifierType.Rijksregisternummer, BeIdentifierType.BisNummer) { }
-
-   /// <summary>
-   ///   Discriminated union defining the possible validation errors that can
-   ///   occur when creating a new <see cref="BeRijksregisternummer"/>.
-   /// </summary>
-   public union ValidationError(
-      EmptyValue,
-      InvalidLength,
-      InvalidCharacter,
-      InvalidChecksum,
-      InvalidSeparator,
-      InvalidSequenceNumber,
-      InvalidDateOfBirth)
-   {
-   }
-
-   /// <summary>
-   ///   Discriminated union defining the possible results that can occur when
-   ///   validating a <see cref="BeRijksregisternummer"/>.
-   /// </summary>
-   public union ValidationResult(
-      ValidValue,
-      EmptyValue,
-      InvalidLength,
-      InvalidCharacter,
-      InvalidChecksum,
-      InvalidSeparator,
-      InvalidSequenceNumber,
-      InvalidDateOfBirth)
-   {
-   }
-
-   /// <summary>
-   ///   Represents the month offset used to distinguish BIS-nummers from
-   ///   rijksregisternummers when the person's gender is known.
-   /// </summary>
-   /// <remarks>
-   ///   In Belgian identity numbers, a BIS-nummer is indicated by
-   ///   adding a constant to the month component of the date of birth.
-   /// </remarks>
-   public const Int32 BisNummerMonthOffset = 40;
-
-   /// <summary>
-   ///   Represents the month offset used to distinguish BIS-nummers from
-   ///   rijksregisternummers when the person's gender is unknown.
-   /// </summary>
-   /// <remarks>
-   ///   In Belgian identity numbers, a BIS-nummer is indicated by
-   ///   adding a constant to the month component of the date of birth.
-   /// </remarks>
-   public const Int32 BisNummerUnknownGenderMonthOffset = 20;
-
-   /// <summary>
-   ///   The name of the check digit algorithm used by rijksregisternummer
-   ///   values.
-   /// </summary>
-   public const String CheckDigitAlgorithmName = "Modulus 97";
-
-   /// <summary>
-   ///   The latest year of birth supported by
-   ///   <see cref="BeRijksregisternummer"/>.
-   /// </summary>
-   public const Int32 MaximumValidYearOfBirth = 2099;
-
-   /// <summary>
-   ///   The earliest year of birth supported by
-   ///   <see cref="BeRijksregisternummer"/>.
-   /// </summary>
-   public const Int32 MinimumValidYearOfBirth = 1900;
-
-   private const Int32 UnformattedLength = 11;
-   private const Int32 FormattedLength = 15;
-
-   private const Int32 Separator1Offset = 2;
-   private const Int32 Separator2Offset = 5;
-   private const Int32 Separator3Offset = 8;
-   private const Int32 Separator4Offset = 12;
-
-   private static readonly Int32[] _separatorOffsets =
-   [
-      Separator1Offset,
-      Separator2Offset,
-      Separator3Offset,
-      Separator4Offset
-   ];
-
-   // These items are measured from the end of the value.
-   private const Int32 GenderOffset = 3;
-   private const Int32 CheckDigit1Offset = 2;
-   private const Int32 CheckDigit2Offset = 1;
-
    /// <summary>
    ///   Initializes a new instance of the <see cref="BeRijksregisternummer"/>
    ///   class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Belgian rijksregisternummer.
+   ///   String representation of a BIS-nummer.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
@@ -329,6 +200,8 @@ public record BeRijksregisternummer
    ///   <paramref name="value"/> is 15 characters in length and has
    ///   an ASCII digit character ('0'-'9') in a separator location.
    ///   - or -
+   ///   <paramref name="value"/> contains an invalid sequence number.
+   ///   - or -
    ///   <paramref name="value"/> contains an invalid date of birth in
    ///   the leading (left-most) six digits.
    /// </exception>
@@ -336,15 +209,20 @@ public record BeRijksregisternummer
       : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="BeRijksregisternummer"/>
-   ///   class.
+   ///   Initializes a new instance of the <see cref="BeRijksregisternummer"/> class.
    /// </summary>
+   /// <param name="value">
+   ///   String representation of a BIS-nummer.
+   /// </param>
+   /// <param name="validationMode">
+   ///   Indicates whether the <paramref name="value"/> requires validation.
+   /// </param>
    /// <remarks>
    ///   Private constructor that actually does the work. Supports bypassing
    ///   validation when creating a new instance from a value that has
    ///   already been validated.
    /// </remarks>
-   private BeRijksregisternummer(String? value, ValidationMode validationMode)
+   internal BeRijksregisternummer(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
@@ -365,7 +243,7 @@ public record BeRijksregisternummer
          }
       }
 
-      Value = GetRawValue(value!);
+      Value = GetNormalizedValue(value!);
    }
 
    /// <summary>
@@ -378,59 +256,25 @@ public record BeRijksregisternummer
       get
       {
 #pragma warning disable IDE0008 // Use explicit type
-         var (year, month, day) = GetYearMonthDay(Value);
-#pragma warning restore IDE0008 // Use explicit type
+         var (year, month, day) = GetYearMonthDay(Value, DateOffsetMode.Rijksregisternummer);
+         #pragma warning restore IDE0008 // Use explicit type
 
-#pragma warning disable format
-         return (year, month, day) switch
-         {
-            (> 0, > 0, > 0) => new DateResult(year, month, day),
-            (> 0, 0, _) => new DateResult(year),
-            _ => new DateResult(),
-         };
-#pragma warning restore format
+         return new DateResult(
+            year > 0 ? year : null,
+            month > 0 ? month : null,
+            day > 0 ? day : null);
       }
    }
 
    /// <summary>
-   ///   Gets an <see cref="KfOption{TS}"/> that indicates the
-   ///   person's gender, as indicated by the sequence number (and in the case
-   ///   of a BIS-nummer, the month offset). May be <see cref="None"/> in the
-   ///   case of a BIS-nummer with an unknown gender.
+   ///   Gets the person's gender, as indicated by the sequence number.
    /// </summary>
-   public KfOption<Gender.BinaryGender> Gender
-   {
-      get
-      {
-         ReadOnlySpan<Char> span = Value.AsSpan();
-
-         // Check for BIS-nummer with unknown gender.
-         var num = span[2..].ParseTwoDigits();
-         if (num is >= 20 and <= 32)
-         {
-            return default(None);
-         }
-
-         Gender.BinaryGender gender = Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
-         return gender;
-      }
-   }
+   public Gender.BinaryGender Gender
+      => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
 
    /// <summary>
-   ///   Gets the type of Belgian identifier represented by the current value.
-   /// </summary>
-   /// <remarks>
-   ///   The month component of the date of birth determines the identifier type.
-   ///   BIS-nummers add an offset (either 20 or 40) to the month so month values
-   ///   greater than 12 indicate that the identifier is a BIS-nummer.
-   /// </remarks>
-   public IdentifierCategory IdentifierType
-      => Value.AsSpan(2..).ParseTwoDigits() > 12
-         ? default(BeIdentifierType.BisNummer)
-         : default(BeIdentifierType.Rijksregisternummer);
-
-   /// <summary>
-   ///   Gets the raw rijksregisternummer value.
+   ///   Gets the normalized rijksregiseternummer value (without separator
+   ///   characters).
    /// </summary>
    public String Value { get; private init; }
 
@@ -464,7 +308,7 @@ public record BeRijksregisternummer
    /// <returns>
    ///   A <see cref="CreateResult{BeRijksregisternummer, ValidationError}"/>. Will
    ///   contain the new <see cref="BeRijksregisternummer"/> if <paramref name="value"/>
-   ///   is valid or a <see cref="ValidationError"/> that identifies the
+   ///   is valid or a <see cref="BeIdentityNumberBase.ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
    public static CreateResult<BeRijksregisternummer, ValidationError> Create(String? value)
@@ -482,14 +326,16 @@ public record BeRijksregisternummer
       };
 
    /// <summary>
-   ///   Format the rijksregisternummer using the supplied <paramref name="mask"/>.
+   ///   Format the rijksregiseternummer using the supplied
+   ///   <paramref name="mask"/>.
    /// </summary>
    /// <param name="mask">
    ///   Optional. The mask that specifies the final output. If not supplied
-   ///   then the default mask "__.__.__-___.__" will be used instead.
+   ///   then <see cref="BeIdentityNumberBase.DefaultFormatMask"/> will be used
+   ///   instead.
    /// </param>
    /// <returns>
-   ///   A formatted rijksregisternummer.
+   ///   A formatted Belgian rijksregiseternummer.
    /// </returns>
    /// <exception cref="ArgumentNullException">
    ///   <paramref name="mask"/> is <see langword="null"/>.
@@ -500,15 +346,15 @@ public record BeRijksregisternummer
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the rijksregisternummer.
+   ///   details on creating a mask to format the rijksregiseternummer.
    /// </remarks>
-   public String Format(String mask = "__.__.__-___.__") => Value.FormatWithMask(mask);
+   public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
-   ///   Get a string representation of the rijksregisternummer.
+   ///   Get a string representation of the rijksregiseternummer.
    /// </summary>
    /// <returns>
-   ///   The raw rijksregisternummer, without separator characters.
+   ///   The normalized rijksregiseternummer, without separator characters.
    /// </returns>
    public override String ToString() => Value;
 
@@ -520,9 +366,9 @@ public record BeRijksregisternummer
    ///   String representation of a Belgian rijksregisternummer.
    /// </param>
    /// <returns>
-   ///   A <see cref="ValidationResult"/> union that indicates if the
-   ///   <paramref name="value"/> passed validation or what validation error was
-   ///   encountered.
+   ///   A <see cref="BeIdentityNumberBase.ValidationResult"/> union that
+   ///   indicates if the <paramref name="value"/> passed validation or what
+   ///   validation error was encountered.
    /// </returns>
    public static ValidationResult Validate(String? value)
    {
@@ -533,261 +379,73 @@ public record BeRijksregisternummer
 
       if (value.Length is not UnformattedLength and not FormattedLength)
       {
-         return new InvalidLength(
-            Messages.BeRijksregisternummerInvalidLength,
-            value.Length,
-            GetValidLengthDefinitions());
+         return GetInvalidLengthResult(value);
       }
 
       // After performing basic checks, validate the check digits because the
       // most common source of errors will be data entry errors. Then validate
       // the subcomponents of the value.
-      ValidationResult validationResult = ValidateCheckDigits(value);
-      if (validationResult is not ValidValue)
+      if (!ValidateCheckDigits(value, out var invalidCharacterPosition))
       {
          // Could be either InvalidCharacter or InvalidCheckDigit.
-         return validationResult;
+         return invalidCharacterPosition == -1
+            ? GetInvalidChecksumResult()
+            : GetInvalidCharacterResult(value, invalidCharacterPosition);
       }
 
-      var isFormatted = IsFormatted(value);
       if (!ValidateSeparators(value, out var invalidSeparatorPosition))
       {
-         return new InvalidSeparator(
-            Messages.BeRijksregisternummerInvalidSeparator,
-            value[invalidSeparatorPosition],
-            invalidSeparatorPosition);
+         return GetInvalidSeparatorResult(value, invalidSeparatorPosition);
       }
 
       if (!ValidateSequenceNumber(value))
       {
-         return new InvalidSequenceNumber(
-            Messages.BeRijksregisternummerInvalidSequenceNumber,
-            isFormatted ? value[9..12] : value[6..9]);
+         return GetInvalidSequenceNumberResult(value);
       }
 
-      if (!ValidateDateOfBirth(value))
+      if (!ValidateDateOfBirth(value, DateOffsetMode.Rijksregisternummer))
       {
-         var dateOfBirthLength = isFormatted ? 8 : 6;
-         return new InvalidDateOfBirth(
-            Messages.BeRijksregisternummerInvalidDateOfBirth,
-            value[..dateOfBirthLength],
-            DateFormatName.YYMMDD);
+         return GetInvalidDateOfBirthResult(value);
       }
 
       return default(ValidValue);
    }
 
-   /// <summary>
-   ///   Gets an array of details about valid lengths accepted for a
-   ///   rijksregisternummer.
-   /// </summary>
-   /// <returns>
-   ///   An array of <see cref="ValidLengthDefinition"/>s.
-   /// </returns>
-   internal static ValidLengthDefinition[] GetValidLengthDefinitions()
-      =>
-      [
-         new ValidLengthDefinition(UnformattedLength, Messages.BeRijksregisternummerUnformattedLength),
-         new ValidLengthDefinition(FormattedLength, Messages.BeRijksregisternummerFormattedLength),
-      ];
-
    private static InvalidCharacter GetInvalidCharacterResult(
       ReadOnlySpan<Char> value,
       Int32 position)
+      => new(Messages.BeRijksregisternummerInvalidCharacter, value[position], position);
+
+   private static InvalidChecksum GetInvalidChecksumResult()
+      => new(Messages.BeRijksregisternummerInvalidCheckDigits, CheckDigitAlgorithmName);
+
+   private static InvalidDateOfBirth GetInvalidDateOfBirthResult(ReadOnlySpan<Char> value)
       => new(
-         Messages.BeRijksregisternummerInvalidCharacter,
+         Messages.BeRijksregisternummerInvalidDateOfBirth,
+         IsFormatted(value) ? value[..8].ToString() : value[..6].ToString(),
+         DateFormatName.YYMMDD);
+
+   private static InvalidLength GetInvalidLengthResult(ReadOnlySpan<Char> value)
+      => new(
+         Messages.BeRijksregisternummerInvalidLength,
+         value.Length,
+         [
+            new ValidLengthDefinition(UnformattedLength, Messages.BeRijksregisternummerUnformattedLength),
+            new ValidLengthDefinition(FormattedLength, Messages.BeRijksregisternummerFormattedLength),
+         ]);
+
+   private static InvalidSeparator GetInvalidSeparatorResult(
+      ReadOnlySpan<Char> value,
+      Int32 position)
+      => new(
+         Messages.BeRijksregisternummerInvalidSeparator,
          value[position],
          position);
 
-   private static String GetRawValue(String value)
-   {
-      if (value.Length == UnformattedLength)
-      {
-         return value;
-      }
-
-      var buffer = ArrayPool<Char>.Shared.Rent(UnformattedLength);
-      try
-      {
-         ReadOnlySpan<Char> source = value.AsSpan();
-         var span = new Span<Char>(buffer);
-
-         ReadOnlySpan<Int32> segmentLengths = [2, 2, 2, 3, 2];
-         var sourceOffset = 0;
-         var targetOffset = 0;
-         foreach (var length in segmentLengths)
-         {
-            ReadOnlySpan<Char> sourceSpan = source[sourceOffset..(sourceOffset + length)];
-            Span<Char> targetSpan = span[targetOffset..(targetOffset + length)];
-
-            sourceSpan.CopyTo(targetSpan);
-
-            sourceOffset += length + 1;
-            targetOffset += length;
-         }
-
-         return span[..UnformattedLength].ToString();
-      }
-      finally
-      {
-         ArrayPool<Char>.Shared.Return(buffer);
-      }
-   }
-
-   private static (Int32 Year, Int32 Month, Int32 Day) GetYearMonthDay(ReadOnlySpan<Char> value)
-   {
-      var fieldWidth = value.Length == UnformattedLength ? 2 : 3;
-      var year = value.ParseTwoDigits();
-
-      var fieldStart = fieldWidth;
-      var month = value[fieldStart..].ParseTwoDigits();
-
-      fieldStart += fieldWidth;
-      var day = value[fieldStart..].ParseTwoDigits();
-
-      fieldStart += fieldWidth;
-      var sequenceNumber = value[fieldStart..].ParseThreeDigits();
-
-      // Apply BIS-nummer offsets if necessary.
-      var effectiveMonth = month switch
-      {
-         >= BisNummerMonthOffset => month - BisNummerMonthOffset,
-         >= BisNummerUnknownGenderMonthOffset => month - BisNummerUnknownGenderMonthOffset,
-         _ => month,
-      };
-
-      // Add the century to the year if the date is not incomplete.
-      if (year > 0 || effectiveMonth > 0)
-      {
-         // Already parsed the individual elements, combine to use in checksum calculation.
-         var total = sequenceNumber + (day * 1000) + (month * 100000) + (year * 10000000);
-         var checksum = value[^2..].ParseTwoDigits();
-         var century = (97 - (total % 97)) == checksum
-            ? 1900
-            : 2000;
-
-         year += century;
-      }
-
-      return (year, effectiveMonth, day);
-   }
-
-   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-   private static Boolean IsFormatted(ReadOnlySpan<Char> value)
-      => value.Length == FormattedLength;
-
-   private static ValidationResult ValidateCheckDigits(ReadOnlySpan<Char> value)
-   {
-      var processLength = value.Length - 2;      // Exclude check digits from main loop
-      var isFormatted = IsFormatted(value);
-
-      var sum = 0;
-      for (var index = 0; index < processLength; index++)
-      {
-         if (isFormatted &&
-             (index is Separator1Offset or Separator2Offset or Separator3Offset or Separator4Offset))
-         {
-            continue;
-         }
-
-         sum *= 10;
-         var num = value[index].ToSingleDigit();
-         if (!num.IsValidDigit())
-         {
-            return GetInvalidCharacterResult(value, index);
-         }
-
-         sum += num;
-      }
-
-      var c1 = value[^CheckDigit1Offset].ToSingleDigit();
-      if (!c1.IsValidDigit())
-      {
-         return GetInvalidCharacterResult(value, value.Length - CheckDigit1Offset);
-      }
-
-      var c2 = value[^CheckDigit2Offset].ToSingleDigit();
-      if (!c2.IsValidDigit())
-      {
-         return GetInvalidCharacterResult(value, value.Length - CheckDigit2Offset);
-      }
-
-      var checkSum = (c1 * 10) + c2;
-
-      // Check for persons born 1900-1999.
-      var remainder = 97 - (sum % 97);
-      if (remainder == checkSum)
-      {
-         return default(ValidValue);
-      }
-
-      // Then for persons born 2000-2099;
-      var longRemainder = 97 - ((2000000000L + sum) % 97);           // Long int to handle possible int overflow
-      return longRemainder == checkSum
-         ? default(ValidValue)
-         : new InvalidChecksum(
-            Messages.BeRijksregisternummerInvalidCheckDigits,
-            CheckDigitAlgorithmName);
-   }
-
-   private static Boolean ValidateDateOfBirth(ReadOnlySpan<Char> value)
-   {
-#pragma warning disable IDE0008 // Use explicit type
-      var (year, month, day) = GetYearMonthDay(value);
-#pragma warning restore IDE0008 // Use explicit type
-
-      // Allow zero for incomplete dates of birth.
-      if ((year > 0 && month == 0)                    // Incomplete date of birth
-         || (year == 0 && month == 0 && day > 0))     // Unknown date of birth
-      {
-         return true;
-      }
-
-      if (year is < MinimumValidYearOfBirth or > MaximumValidYearOfBirth)
-      {
-         // Should be impossible to ever reach this point because of the check
-         // digit calcuations, but return false out of abundance of caution and
-         // to avoid throwing an exception.
-         return false;
-      }
-
-      if (month is < 1 or > 12)
-      {
-         return false;
-      }
-
-      return day >= 1 && day <= DateTime.DaysInMonth(year, month);
-   }
-
-   private static Boolean ValidateSeparators(
-      ReadOnlySpan<Char> value,
-      out Int32 invalidSeparatorPosition)
-   {
-      invalidSeparatorPosition = -1;
-      if (value.Length == UnformattedLength)
-      {
-         return true;
-      }
-
-      foreach (var offset in _separatorOffsets)
-      {
-         if (value[offset].IsAsciiDigit())
-         {
-            invalidSeparatorPosition = offset;
-            return false;
-         }
-      }
-
-      return true;
-   }
-
-   private static Boolean ValidateSequenceNumber(ReadOnlySpan<Char> value)
-   {
-      var offsetFromEnd = IsFormatted(value) ? 6 : 5;
-      var sequenceNumber = value[^offsetFromEnd..].ParseThreeDigits();
-
-      return sequenceNumber is not 0 and not 999;
-   }
+   private static InvalidSequenceNumber GetInvalidSequenceNumberResult(ReadOnlySpan<Char> value)
+      => new(
+         Messages.BeRijksregisternummerInvalidSequenceNumber,
+         IsFormatted(value) ? value[9..12].ToString() : value[6..9].ToString());
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

@@ -623,4 +623,30 @@ public class BeIdentityNumberBaseTests
       { 2004, 31, 31, true },       // Invalid day of for November, any year
       { 2004, 32, 32, true },       // Invalid day of for December, any year
    };
+
+   #region Constants Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void BeIdentityNumberBase_BisNummerMonthOffset_ShouldHaveExpectedValue()
+      => BeIdentityNumberBase.BisNummerMonthOffset.Should().Be(40);
+
+   [Fact]
+   public void BeIdentityNumberBase_BisNummerUnknownGenderMonthOffset_ShouldHaveExpectedValue()
+      => BeIdentityNumberBase.BisNummerUnknownGenderMonthOffset.Should().Be(20);
+
+   [Fact]
+   public void BeIdentityNumberBase_CheckDigitAlgorithmName_ShouldHaveExpectedValue()
+      => BeIdentityNumberBase.CheckDigitAlgorithmName.Should().Be("Modulus 97");
+
+   [Fact]
+   public void BeIdentityNumberBase_MinimumValidYearOfBirth_ShouldHaveExpectedValue()
+      => BeIdentityNumberBase.MinimumValidYearOfBirth.Should().Be(1900);
+
+   [Fact]
+   public void BeIdentityNumberBase_MaximumValidYearOfBirth_ShouldHaveExpectedValue()
+      => BeIdentityNumberBase.MaximumValidYearOfBirth.Should().Be(2099);
+
+   #endregion
 }

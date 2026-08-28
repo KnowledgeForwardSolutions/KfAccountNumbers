@@ -393,8 +393,7 @@ public record BeBisnummer : BeIdentityNumberBase
    /// <returns>
    ///   A <see cref="BeIdentityNumberBase.ValidationResult"/> union that
    ///   indicates if the <paramref name="value"/> passed validation or what
-   ///   validation error was
-   ///   encountered.
+   ///   validation error was encountered.
    /// </returns>
    public static ValidationResult Validate(String? value)
    {

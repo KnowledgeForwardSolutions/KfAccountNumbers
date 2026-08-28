@@ -1526,7 +1526,7 @@ public class BeIdentityNumberTests : BeIdentityNumberBaseTests
    }
 
    [Fact]
-   public void BeIdentityNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenIdentityNumberIsInvalid()
+   public void BeIdentityNumber_JsonDeserialization_ShouldThrowKfValidationException_WhenValueIsInvalid()
    {
       // Arrange.
       var json = "{\"IdentityNumber\":\"85072003328\"}";  // Invalid checksum

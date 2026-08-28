@@ -1501,7 +1501,7 @@ public class BeBisnummerTests : BeIdentityNumberBaseTests
    }
 
    [Fact]
-   public void BeBisnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenBisnummerIsInvalid()
+   public void BeBisnummer_JsonDeserialization_ShouldThrowKfValidationException_WhenValueIsInvalid()
    {
       // Arrange.
       var json = "{\"Bisnummer\":\"85072003328\"}";  // Invalid checksum
