@@ -477,11 +477,11 @@ public record BeBisnummer : BeIdentityNumberBase
 #pragma warning disable SA1600 // Elements should be documented
 public class BeBisnummerJsonConverter : JsonConverter<BeBisnummer>
 {
-   public override BeBisnummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   public override BeBisnummer? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
       if (reader.TokenType == JsonTokenType.Null)
       {
-         return null!;
+         return null;
       }
 
       var str = reader.GetString();

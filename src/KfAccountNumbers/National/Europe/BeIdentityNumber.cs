@@ -431,7 +431,19 @@ public record BeIdentityNumber : BeIdentityNumberBase
          ? new BeBisnummer(Value, ValidationMode.BypassValidation)
          : default(None);
 
-   // TODO: Add ToRijksregisternummer method when BeRijksregisternummer is updated
+   /// <summary>
+   ///   Convert this instance to a <see cref="BeBisnummer"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{BeBisnummer}"/> instance that will contain
+   ///   the <see cref="BeBisnummer"/> if this value is a BIS-nummer;
+   ///   otherwise <see cref="None"/> to indicate that this is not a
+   ///   BIS-nummer.
+   /// </returns>
+   public KfOption<BeRijksregisternummer> ToRijksregisternummer()
+      => IdentifierType is BeIdentifierType.Rijksregisternummer
+         ? new BeRijksregisternummer(Value, ValidationMode.BypassValidation)
+         : default(None);
 
    /// <summary>
    ///   Get a string representation of the Belgian identity number.

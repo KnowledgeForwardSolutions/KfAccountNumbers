@@ -135,12 +135,6 @@ namespace KfAccountNumbers.National.Europe;
 ///      </list>
 ///   </para>
 ///   <para>
-///      For cases of a BIS number for a person with an incomplete or unknown
-///      date of birth, <see cref="BeRijksregisternummer"/> stacks the
-///      appropriate rules. For example, 87.40.00-023.47 would be the BIS number
-///      for a person with an incomplete date of birth born in 1987.
-///   </para>
-///   <para>
 ///      Example values:
 ///      <list type="bullet">
 ///         <item>
@@ -182,7 +176,7 @@ public record BeRijksregisternummer : BeIdentityNumberBase
    ///   class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a BIS-nummer.
+   ///   String representation of a Belgian rijksregisternummer.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
@@ -212,7 +206,7 @@ public record BeRijksregisternummer : BeIdentityNumberBase
    ///   Initializes a new instance of the <see cref="BeRijksregisternummer"/> class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a BIS-nummer.
+   ///   String representation of a Belgian rijksregisternummer.
    /// </param>
    /// <param name="validationMode">
    ///   Indicates whether the <paramref name="value"/> requires validation.
@@ -269,11 +263,15 @@ public record BeRijksregisternummer : BeIdentityNumberBase
    /// <summary>
    ///   Gets the person's gender, as indicated by the sequence number.
    /// </summary>
+   /// <remarks>
+   ///   Note that gender is always known for rijksregisternummers. (Unlike
+   ///   BIS-nummers which allow gender to be unknown.)
+   /// </remarks>
    public Gender.BinaryGender Gender
       => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
 
    /// <summary>
-   ///   Gets the normalized rijksregiseternummer value (without separator
+   ///   Gets the normalized rijksregisternummer value (without separator
    ///   characters).
    /// </summary>
    public String Value { get; private init; }
@@ -326,7 +324,7 @@ public record BeRijksregisternummer : BeIdentityNumberBase
       };
 
    /// <summary>
-   ///   Format the rijksregiseternummer using the supplied
+   ///   Format the rijksregisternummer using the supplied
    ///   <paramref name="mask"/>.
    /// </summary>
    /// <param name="mask">
@@ -335,7 +333,7 @@ public record BeRijksregisternummer : BeIdentityNumberBase
    ///   instead.
    /// </param>
    /// <returns>
-   ///   A formatted Belgian rijksregiseternummer.
+   ///   A formatted Belgian rijksregisternummer.
    /// </returns>
    /// <exception cref="ArgumentNullException">
    ///   <paramref name="mask"/> is <see langword="null"/>.
@@ -346,15 +344,15 @@ public record BeRijksregisternummer : BeIdentityNumberBase
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the rijksregiseternummer.
+   ///   details on creating a mask to format the rijksregisternummer.
    /// </remarks>
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
-   ///   Get a string representation of the rijksregiseternummer.
+   ///   Get a string representation of the rijksregisternummer.
    /// </summary>
    /// <returns>
-   ///   The normalized rijksregiseternummer, without separator characters.
+   ///   The normalized rijksregisternummer, without separator characters.
    /// </returns>
    public override String ToString() => Value;
 
@@ -452,11 +450,11 @@ public record BeRijksregisternummer : BeIdentityNumberBase
 #pragma warning disable SA1600 // Elements should be documented
 public class BeRijksregisternummerJsonConverter : JsonConverter<BeRijksregisternummer>
 {
-   public override BeRijksregisternummer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   public override BeRijksregisternummer? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
       if (reader.TokenType == JsonTokenType.Null)
       {
-         return null!;
+         return null;
       }
 
       var str = reader.GetString();

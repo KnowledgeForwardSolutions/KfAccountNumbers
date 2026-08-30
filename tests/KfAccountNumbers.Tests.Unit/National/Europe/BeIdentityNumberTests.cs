@@ -1248,6 +1248,42 @@ public class BeIdentityNumberTests : BeIdentityNumberBaseTests
 
    #endregion
 
+   #region ToRijksregisternummer Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidRijksregisternummerValues))]
+   public void BeIdentityNumber_ToRijksregisternummer_ShouldReturnExpectedResult_WhenValueIsRijksregisternummer(String value)
+   {
+      // Arrange.
+      var sut = new BeIdentityNumber(value);
+      var expected = new BeRijksregisternummer(value);
+
+      // Act.
+      KfOption<BeRijksregisternummer> result = sut.ToRijksregisternummer();
+
+      // Assert.
+      result.Value.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidBisnummerValues))]
+   public void BeIdentityNumber_ToRijksregisternummer_ShouldReturnExpectedResult_WhenValueIsNotRijksregisternummer(String value)
+   {
+      // Arrange.
+      var sut = new BeIdentityNumber(value);
+      var expected = default(None);
+
+      // Act.
+      KfOption<BeRijksregisternummer> result = sut.ToRijksregisternummer();
+
+      // Assert.
+      result.Value.Should().Be(expected);
+   }
+
+   #endregion
+
    #region ToString Method Tests
    // ==========================================================================
    // ==========================================================================

@@ -259,12 +259,6 @@ public class BeRijksregisternummerTests : BeIdentityNumberBaseTests
       var sut = new BeRijksregisternummer(value);
 
       year = year == 0 ? 1900 : year;
-      month = month switch
-      {
-         >= 20 and <= 32 => month - BeIdentityNumberBase.BisNummerUnknownGenderMonthOffset,
-         >= 40 and <= 52 => month - BeIdentityNumberBase.BisNummerMonthOffset,
-         _ => month,
-      };
       var expected = new DateResult(
          year > 0 ? year : null,
          month > 0 ? month : null,
@@ -330,7 +324,7 @@ public class BeRijksregisternummerTests : BeIdentityNumberBaseTests
 
    [Theory]
    [MemberData(nameof(ValidRijksregisternummerValues))]
-   public void BeRijksregisternummer_Value_ShouldReturnValidatedBisnummer(String value)
+   public void BeRijksregisternummer_Value_ShouldReturnValidatedRijksregisternummer(String value)
    {
       // Arrange.
       var sut = new BeRijksregisternummer(value);
@@ -1477,7 +1471,7 @@ public class BeRijksregisternummerTests : BeIdentityNumberBaseTests
    }
 
    [Fact]
-   public void BeRijksregisternummer_JsonDeserialization_ShouldThrowKfValidationException_WhenRValidIsInvalid()
+   public void BeRijksregisternummer_JsonDeserialization_ShouldThrowKfValidationException_WhenValidIsInvalid()
    {
       // Arrange.
       var json = "{\"Rijksregisternummer\":\"85072003328\"}";  // Invalid checksum
