@@ -518,7 +518,7 @@ public class BeIdentityNumberBaseTests
       { 1904,  1, 32, false },      // Invalid day of month for January, any year
       { 1901,  2, 29, false },      // Invalid day of for February, non-leap year
       { 1904,  2, 30, false },      // Invalid day of for February, leap year
-      { 1904,  2, 30, false },      // Invalid day of for February, leap year (2000 is leap-year)
+      { 2000,  2, 30, false },      // Invalid day of for February, leap year (2000 is leap-year)
       { 1904,  3, 32, false },      // Invalid day of for March, any year
       { 1904,  4, 31, false },      // Invalid day of for April, any year
       { 1904,  5, 32, false },      // Invalid day of for May, any year
@@ -536,7 +536,7 @@ public class BeIdentityNumberBaseTests
       { 1904,  1, 32, true },       // Invalid day of month for January, any year
       { 1901,  2, 29, true },       // Invalid day of for February, non-leap year
       { 1904,  2, 30, true },       // Invalid day of for February, leap year
-      { 1904,  2, 30, true },       // Invalid day of for February, leap year (2000 is leap-year)
+      { 2000,  2, 30, true },       // Invalid day of for February, leap year (2000 is leap-year)
       { 1904,  3, 32, true },       // Invalid day of for March, any year
       { 1904,  4, 31, true },       // Invalid day of for April, any year
       { 1904,  5, 32, true },       // Invalid day of for May, any year

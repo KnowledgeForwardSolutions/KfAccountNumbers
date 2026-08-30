@@ -135,7 +135,7 @@ public abstract record BeIdentityNumberBase
       Rijksregisternummer = 0,
 
       /// <summary>
-      ///   Bisnummers adjust the day by removing the +20/+40 month offset.
+      ///   Bisnummers adjust the month by removing the +20/+40 month offset.
       /// </summary>
       Bisnummer,
 

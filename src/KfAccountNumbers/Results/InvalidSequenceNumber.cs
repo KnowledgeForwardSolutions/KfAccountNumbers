@@ -3,7 +3,7 @@ namespace KfAccountNumbers.Results;
 /// <summary>
 ///   Represents a validation error indicating that value includes a sequence
 ///   number element (such as a number to distinguish between persons born on
-///   same date) contains an invalid sequence number.
+///   same date) which is invalid.
 /// </summary>
 /// <param name="Description">
 ///   Message describing the validation error, indicating that an invalid

@@ -154,7 +154,7 @@ namespace KfAccountNumbers.National.Europe;
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>455000007612</term>
+///            <term>55000007612</term>
 ///            <description>
 ///               unformatted, date of birth 1955, day/month unknown,
 ///               gender = female, check digit calculation

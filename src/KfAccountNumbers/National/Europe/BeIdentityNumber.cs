@@ -177,7 +177,7 @@ namespace KfAccountNumbers.National.Europe;
 ///            </description>
 ///         </item>
 ///         <item>
-///            <term>455000007612</term>
+///            <term>55000007612</term>
 ///            <description>
 ///               rijksregisternummer, unformatted, date of birth 1955,
 ///               day/month unknown, gender = female, check digit calculation
@@ -432,13 +432,13 @@ public record BeIdentityNumber : BeIdentityNumberBase
          : default(None);
 
    /// <summary>
-   ///   Convert this instance to a <see cref="BeBisnummer"/>.
+   ///   Convert this instance to a <see cref="BeRijksregisternummer"/>.
    /// </summary>
    /// <returns>
-   ///   An <see cref="KfOption{BeBisnummer}"/> instance that will contain
-   ///   the <see cref="BeBisnummer"/> if this value is a BIS-nummer;
-   ///   otherwise <see cref="None"/> to indicate that this is not a
-   ///   BIS-nummer.
+   ///   An <see cref="KfOption{BeRijksregisternummer}"/> instance that will
+   ///   contain the <see cref="BeRijksregisternummer"/> if this value is a
+   ///   rijksregisternummer; otherwise <see cref="None"/> to indicate that this
+   ///   is not a rijksregisternummer.
    /// </returns>
    public KfOption<BeRijksregisternummer> ToRijksregisternummer()
       => IdentifierType is BeIdentifierType.Rijksregisternummer
