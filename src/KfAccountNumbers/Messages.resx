@@ -790,7 +790,7 @@
     <value>CH Sozialversicherungsnummer must start with "756"</value>
   </data>
   <data name="BeBisnummerFormattedLength" xml:space="preserve">
-    <value>BE BIS-rnummer formatted as YY.MM.DD-XXX.CC</value>
+    <value>BE BIS-nummer formatted as YY.MM.DD-XXX.CC</value>
   </data>
   <data name="BeBisnummerInvalidCharacter" xml:space="preserve">
     <value>BE BIS-nummer contains a non-digit character where a digit was expected</value>

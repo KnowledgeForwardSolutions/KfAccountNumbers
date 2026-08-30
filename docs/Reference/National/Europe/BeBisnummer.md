@@ -12,7 +12,7 @@ BIS-nummers apply an offset to the month portion of the date of birth element to
 | Length: | 11 (unformatted), 15 (formatted for readability) |
 | Check digit algorithm: | Modulus 97 |
 | Allowed characters: | Digits ('0'-'9') |
-| Allowed separator characters: | Typically a period ('.') and a dash ('-'), though any non digit character is allowed |
+| Allowed separator characters: | Typically a period ('.') and a dash ('-'), though any non-digit character is allowed |
 | Structure: | ***YYMMDDXXXCC*** (unformatted) or ***YY.MM.DD-XXX.CC*** (formatted), where: <dl><dt>YYMMDD</dt><dd>6-digit date of birth in YYMMDD format. Note that the <b>MM</b> portion of the date of birth will be 21-32 or 41-52 because BIS-nummers offset the month of birth by either +20 or +40 to distinguish from rijksregisternummer values. The date of birth may be unknown/incomplete and in that case zeros are used in place of the unknown elements.</dd><dt>XXX</dt><dd>3-digit sequence number used to distinguish between persons born on the same date. The last digit indicates the person's gender, with odd numbers = male and even numbers = female. (See below for exception when gender is unknown.)</dd><dt>CC</dt><dd>Two digit modulus 97 check sum calculated for the YYMMDD and XXX elements. The check sum is also used to indicate century of birth. If CC is equal to the normal modulus 97 check sum then the person's century of birth is 1900-1999. If CC is equal to the modulus 97 check sum calculated by first prefixing YYMMDDXXX with the digit 2 (i.e. 2YYMMDDXXX) then the person's century of birth is 2000-2099.</dd></dl> |
 | Example values: | <dl><dt>17.51.08-046.40</dt><dd>formatted, date of birth November 8, 1917, gender = female, check digit calculation 97 - (175108046 mod 97) = 97 - 57 = 40</dd><dt>09200000265</dt><dd>unformatted, date of birth incomplete, year of birth 2009, gender unknown, check digit calculation 97 - (2092000002 mod 97) = 97 - 32 = 65</dd></dl> |
 
@@ -25,7 +25,7 @@ BIS-nummers apply an offset to the month portion of the date of birth element to
 | 4. | The two trailing (right-most) characters must be a valid modulus 97 check sum (taking into account the possibility of a person born in the year 2000 or later). | InvalidChecksum |
 | 5. | If the value has length 15, then the characters at positions 2, 5, 8 and 12 (zero-based) must not be ASCII digits ('0'-'9') | InvalidSeparator |
 | 6. | The date of birth, after deriving the century of birth from the check sum and taking into account the BIS number offset, must be a valid date between January 1, 1900 and December 31, 2099. <br><b>OR</b><br> The date of birth may use zeros to indicate that some or all of the person's date of birth is unknown (see below for more details). | InvalidDateOfBirth |
-| 7. | The sequence number may not be 000 or 999. | InvaliSequenceNumber |
+| 7. | The sequence number may not be 000 or 999. | InvalidSequenceNumber |
 
 ### Additional Properties
 

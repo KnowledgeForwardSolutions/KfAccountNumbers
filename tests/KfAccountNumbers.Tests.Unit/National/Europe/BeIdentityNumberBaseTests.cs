@@ -364,7 +364,7 @@ public class BeIdentityNumberBaseTests
    public static TheoryData<String> InvalidLengthValues =>
    [
       "1711080468",           // Length 10
-      "171108046801",         // Length 11
+      "171108046801",         // Length 12
       "85.07.30-033.2",       // Length 14
       "85.07.30-033.289",     // Length 16
       new String('1', 100)    // Very long string

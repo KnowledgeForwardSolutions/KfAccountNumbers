@@ -61,7 +61,7 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BE BIS-rnummer formatted as YY.MM.DD-XXX.CC.
+        ///   Looks up a localized string similar to BE BIS-nummer formatted as YY.MM.DD-XXX.CC.
         /// </summary>
         internal static string BeBisnummerFormattedLength {
             get {
