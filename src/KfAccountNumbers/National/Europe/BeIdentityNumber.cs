@@ -3,32 +3,40 @@
 namespace KfAccountNumbers.National.Europe;
 
 /// <summary>
-///   Strongly typed business object that represents a Belgian National Register
-///   Number (Rijksregisternummer in Dutch, Numéro de registre national in
-///   French), a unique identifier assigned to all persons (Belgian citizens and
-///   foreign residents) who are registered in Belgium's National Register
-///   (Rijksregister/Registre national).
+///   <para>
+///      Strongly typed business object that represents a Belgian
+///      rijksregisternummer or a Belgian BIS-nummer (for non-residents).
+///   </para>
+///   <para>
+///      BIS-nummers apply an offset to the month portion of the date of birth
+///      element to distinguish them from rijksregisternummers issued to Belgian
+///      citizens and permanent residents.
+///   </para>
 /// </summary>
 /// <remarks>
 ///   <para>
-///      A rijksregisternummer is an 11-digit number, structured as YYMMDDXXXCC,
-///      with the following elements:
+///      Rijksregisternummer and BIS-nummer both are 11-digit numbers,
+///      structured as YYMMDDXXXCC, with the following elements.
 ///      <list type="bullet">
 ///         <item>
 ///            <term>YYMMDD</term>
 ///            <description>
-///               The person's date of birth in YYMMDD format. The date of birth
-///               may be unknown/incomplete and in that case zeros are used in
-///               place of the unknown elements.
+///               6-digit date of birth in YYMMDD format. Note that for
+///               BIS-nummers, the MM portion of the date of birth will be
+///               either +20 (i.e. 21-32) or +40 (i.e. 41-52) to distinguish
+///               from rijksregisternummer values. The date of birth may be
+///               unknown/incomplete and in that case zeros are used in place of
+///               the unknown elements.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>XXX</term>
 ///            <description>
-///               Three digit sequence number used to differentiate between
-///               persons born on the same date. The sequence number also
-///               indicates gender with odd numbers for males and even numbers
-///               for females.
+///               3-digit sequence number used to distinguish between persons
+///               born on the same date. The last digit indicates the person's
+///               gender, with odd numbers = male and even numbers = female.
+///               (See below for exception when value is a BIS-nummer and gender
+///               is unknown.)
 ///            </description>
 ///         </item>
 ///         <item>
@@ -37,7 +45,7 @@ namespace KfAccountNumbers.National.Europe;
 ///               Two digit modulus 97 check sum calculated for the YYMMDD and
 ///               XXX elements. The check sum is also used to indicate century
 ///               of birth. If CC is equal to the normal modulus 97 check sum
-///               then the persons' century of birth is 1900-1999. If CC is
+///               then the person's century of birth is 1900-1999. If CC is
 ///               equal to the modulus 97 check sum calculated by first
 ///               prefixing YYMMDDXXX with the digit 2 (i.e. 2YYMMDDXXX) then
 ///               the person's century of birth is 2000-2099.
@@ -46,13 +54,13 @@ namespace KfAccountNumbers.National.Europe;
 ///      </list>
 ///   </para>
 ///   <para>
-///      A Belgian rijksregisternummer may be formatted as a string of 11
-///      consecutive digits (YYMMDDXXXCC) or as a 15 character string with
-///      characters separating the individual elements. YY.MM.DD-XXX.CC is the
-///      typical display format.
+///      A Belgian rijksregisternummer or BIS-nummer may be formatted as a
+///      string of 11 consecutive digits (YYMMDDXXXCC) or as a 15 character
+///      string with characters separating the individual elements.
+///      YY.MM.DD-XXX.CC is the typical display format.
 ///   </para>
 ///   <para>
-///      When creating a new <see cref="BeRijksregisternummer"/>, the following
+///      When creating a new <see cref="BeIdentityNumber"/>, the following
 ///      validation rules are applied:
 ///      <list type="bullet">
 ///         <item>
@@ -87,18 +95,18 @@ namespace KfAccountNumbers.National.Europe;
 ///         </item>
 ///         <item>
 ///            <description>
-///               The date of birth, after deriving the century of birth from
-///               the check sum, must be a valid date between January 1, 1900
-///               and December 31,
-///               2099.
-///               <b>OR</b> the date of birth may use zeros to indicate that
-///               some or all of the person's date of birth is unknown (see
-///               below for more details).
+///               The sequence number may not be 000 or 999.
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <description>
-///               The sequence number may not be 000 or 999.
+///               The date of birth, after deriving the century of birth from
+///               the check sum and taking into account the BIS number offset,
+///               must be a valid date between January 1, 1900 and December 31,
+///               2099.
+///               <b>OR</b> the date of birth may use zeros to indicate that
+///               some or all of the person's date of birth is unknown (see
+///               below for more details).
 ///            </description>
 ///         </item>
 ///      </list>
@@ -121,7 +129,7 @@ namespace KfAccountNumbers.National.Europe;
 ///               dates of birth for the year 1940), then 01 is used for the day
 ///               of birth and the sequence number rolls over to 001
 ///               (ex. 40.00.01-001.33). (Note that
-///               <see cref="BeRijksregisternummer"/> does not enforce an upper
+///               <see cref="BeIdentityNumber"/> does not enforce an upper
 ///               limit on the day component in cases of rollover, though
 ///               multiple rollovers in a single year should be rare.)
 ///            </description>
@@ -132,7 +140,22 @@ namespace KfAccountNumbers.National.Europe;
 ///               00.00.01 is used.
 ///            </description>
 ///         </item>
+///         <item>
+///            <description>
+///               As noted above, BIS-nummers apply an offset to the month
+///               component of the date of birth to distinguish them from
+///               rijksregisternummers. If the person's gender is known when the
+///               BIS-nummer is issued, then <b>40</b> is added to the month;
+///               Otherwise <b>20</b> is added to the month.
+///            </description>
+///         </item>
 ///      </list>
+///   </para>
+///   <para>
+///      For cases of a BIS-nummer for a person with an incomplete or unknown
+///      date of birth, <see cref="BeIdentityNumber"/> stacks the appropriate
+///      rules. For example, 87.40.00-023.47 would be the BIS number for a
+///      person with an incomplete date of birth born in 1987.
 ///   </para>
 ///   <para>
 ///      Example values:
@@ -140,15 +163,15 @@ namespace KfAccountNumbers.National.Europe;
 ///         <item>
 ///            <term>87092100294</term>
 ///            <description>
-///               unformatted, date of birth September 21, 1987,
-///               gender = female, check digit calculation
+///               rijksregisternummer, unformatted, date of birth
+///               September 21, 1987, gender = female, check digit calculation
 ///               97 - (870921002 mod 97) = 97 - 3 = 94
 ///            </description>
 ///         </item>
 ///         <item>
 ///            <term>05.03.11-017.02</term>
 ///            <description>
-///               formatted, date of birth March 11, 2005,
+///               rijksregisternummer, formatted, date of birth March 11, 2005,
 ///               gender = male, check digit calculation 97 - (050311017 mod 97)
 ///               = 97 - 95 = 2
 ///            </description>
@@ -156,9 +179,33 @@ namespace KfAccountNumbers.National.Europe;
 ///         <item>
 ///            <term>55000007612</term>
 ///            <description>
-///               unformatted, date of birth 1955, day/month unknown,
-///               gender = female, check digit calculation
+///               rijksregisternummer, unformatted, date of birth 1955,
+///               day/month unknown, gender = female, check digit calculation
 ///               97 - (550000076 mod 97) = 97 - 85 = 12
+///            </description>
+///         </item>
+///         <item>
+///            <term>17.51.08-046.40</term>
+///            <description>
+///               BIS-nummer, formatted, date of birth November 8, 1917,
+///               gender = female, check digit calculation
+///               97 - (175108046 mod 97) = 97 - 57 = 40
+///            </description>
+///         </item>
+///         <item>
+///            <term>09200000265</term>
+///            <description>
+///               BIS-nummer, unformatted, date of birth 2009, day/month
+///               unknown, year of birth 2009, gender unknown, check digit
+///               calculation 97 - (2092000002 mod 97) = 97 - 32 = 65
+///            </description>
+///         </item>
+///         <item>
+///            <term>20.47.00-033.66</term>
+///            <description>
+///              BIS-nummer, formatted, date of birth July 2020, day unknown,
+///              gender = male, check digit calculation 97 - (204700033 mod 97)
+///              = 97 - 31 = 66
 ///            </description>
 ///         </item>
 ///      </list>
@@ -168,15 +215,15 @@ namespace KfAccountNumbers.National.Europe;
 ///      for more info.
 ///   </para>
 /// </remarks>
-[JsonConverter(typeof(BeRijksregisternummerJsonConverter))]
-public record BeRijksregisternummer : BeIdentityNumberBase
+[JsonConverter(typeof(BeIdentityNumberJsonConverter))]
+public record BeIdentityNumber : BeIdentityNumberBase
 {
    /// <summary>
-   ///   Initializes a new instance of the <see cref="BeRijksregisternummer"/>
+   ///   Initializes a new instance of the <see cref="BeIdentityNumber"/>
    ///   class.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Belgian rijksregisternummer.
+   ///   String representation of a Belgian identity number.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
    ///   <paramref name="value"/> is <see langword="null"/>, empty or all
@@ -199,24 +246,19 @@ public record BeRijksregisternummer : BeIdentityNumberBase
    ///   <paramref name="value"/> contains an invalid date of birth in
    ///   the leading (left-most) six digits.
    /// </exception>
-   public BeRijksregisternummer(String? value)
+   public BeIdentityNumber(String? value)
       : this(value, ValidationMode.ValidationRequired) { }
 
    /// <summary>
-   ///   Initializes a new instance of the <see cref="BeRijksregisternummer"/> class.
+   ///   Initializes a new instance of the <see cref="BeIdentityNumber"/>
+   ///   class.
    /// </summary>
-   /// <param name="value">
-   ///   String representation of a Belgian rijksregisternummer.
-   /// </param>
-   /// <param name="validationMode">
-   ///   Indicates whether the <paramref name="value"/> requires validation.
-   /// </param>
    /// <remarks>
    ///   Private constructor that actually does the work. Supports bypassing
    ///   validation when creating a new instance from a value that has
    ///   already been validated.
    /// </remarks>
-   internal BeRijksregisternummer(String? value, ValidationMode validationMode)
+   private BeIdentityNumber(String? value, ValidationMode validationMode)
    {
       if (validationMode == ValidationMode.ValidationRequired)
       {
@@ -250,8 +292,8 @@ public record BeRijksregisternummer : BeIdentityNumberBase
       get
       {
 #pragma warning disable IDE0008 // Use explicit type
-         var (year, month, day) = GetYearMonthDay(Value, DateOffsetMode.Rijksregisternummer);
-         #pragma warning restore IDE0008 // Use explicit type
+         var (year, month, day) = GetYearMonthDay(Value, DateOffsetMode.Optional);
+#pragma warning restore IDE0008 // Use explicit type
 
          return new DateResult(
             year > 0 ? year : null,
@@ -261,58 +303,85 @@ public record BeRijksregisternummer : BeIdentityNumberBase
    }
 
    /// <summary>
-   ///   Gets the person's gender, as indicated by the sequence number.
+   ///   Gets an <see cref="KfOption{TS}"/> that indicates the
+   ///   person's gender, as indicated by the sequence number (and the month
+   ///   offset). May be <see cref="None"/> in the case of a BIS-nummer with an
+   ///   unknown gender.
    /// </summary>
-   /// <remarks>
-   ///   Note that gender is always known for rijksregisternummers. (Unlike
-   ///   BIS-nummers which allow gender to be unknown.)
-   /// </remarks>
-   public Gender.BinaryGender Gender
-      => Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
+   public KfOption<Gender.BinaryGender> Gender
+   {
+      get
+      {
+         ReadOnlySpan<Char> span = Value.AsSpan();
+
+         // Check for BIS-nummer with unknown gender.
+         var num = span[2..].ParseTwoDigits();
+         if (num is >= 20 and <= 32)
+         {
+            return default(None);
+         }
+
+         Gender.BinaryGender gender = Value[^GenderOffset] % 2 == 0 ? default(Gender.Female) : default(Gender.Male);   // This works because the ASCII character values for digits have the same odd/even pattern
+         return gender;
+      }
+   }
 
    /// <summary>
-   ///   Gets the normalized rijksregisternummer value (without separator
+   ///   Gets the type of Belgian identifier represented by the current value.
+   /// </summary>
+   /// <remarks>
+   ///   The month component of the date of birth determines the identifier
+   ///   type. BIS-nummers add an offset (either 20 or 40) to the month so month
+   ///   values greater than 12 indicate that the identifier is a BIS-nummer.
+   /// </remarks>
+   public IdentifierCategory IdentifierType
+      => Value.AsSpan(2..).ParseTwoDigits() > 12
+         ? default(BeIdentifierType.BisNummer)
+         : default(BeIdentifierType.Rijksregisternummer);
+
+   /// <summary>
+   ///   Gets the normalized Belgian identity number (without separator
    ///   characters).
    /// </summary>
    public String Value { get; private init; }
 
    /// <summary>
-   ///   Implicitly converts a <see cref="BeRijksregisternummer"/> to a
+   ///   Implicitly converts a <see cref="BeIdentityNumber"/> to a
    ///   <see cref="String"/>, returning an empty string if the source is null.
    /// </summary>
    /// <param name="source">
-   ///   The <see cref="BeRijksregisternummer"/> to convert.
+   ///   The <see cref="BeIdentityNumber"/> to convert.
    /// </param>
-   public static implicit operator String(BeRijksregisternummer source)
+   public static implicit operator String(BeIdentityNumber source)
       => source?.Value ?? String.Empty;      // Handle null object gracefully by returning empty string
 
    /// <summary>
-   ///   Defines an explicit conversion of a string to a <see cref="BeRijksregisternummer"/>.
+   ///   Defines an explicit conversion of a string to a <see cref="BeIdentityNumber"/>.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Belgian rijksregisternummer.
+   ///   String representation of a Belgian identity number.
    /// </param>
    /// <exception cref="UKfValidationException{ValidationError}">
-   ///   <paramref name="value"/> is not a valid rijksregisternummer.
+   ///   <paramref name="value"/> is not a valid Belgian identity number.
    /// </exception>
-   public static explicit operator BeRijksregisternummer(String? value) => new(value);
+   public static explicit operator BeIdentityNumber(String? value) => new(value);
 
    /// <summary>
-   ///   Create a new <see cref="BeRijksregisternummer"/> using the Result pattern.
+   ///   Create a new <see cref="BeIdentityNumber"/> using the Result pattern.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Belgian rijksregisternummer.
+   ///   String representation of a Belgian identity number.
    /// </param>
    /// <returns>
-   ///   A <see cref="CreateResult{BeRijksregisternummer, ValidationError}"/>. Will
-   ///   contain the new <see cref="BeRijksregisternummer"/> if <paramref name="value"/>
+   ///   A <see cref="CreateResult{BeIdentityNumber, ValidationError}"/>. Will
+   ///   contain the new <see cref="BeIdentityNumber"/> if <paramref name="value"/>
    ///   is valid or a <see cref="BeIdentityNumberBase.ValidationError"/> that identifies the
    ///   validation rule that was failed if <paramref name="value"/> is invalid.
    /// </returns>
-   public static CreateResult<BeRijksregisternummer, ValidationError> Create(String? value)
+   public static CreateResult<BeIdentityNumber, ValidationError> Create(String? value)
       => Validate(value) switch
       {
-         ValidValue => new BeRijksregisternummer(value, ValidationMode.BypassValidation),
+         ValidValue => new BeIdentityNumber(value, ValidationMode.BypassValidation),
          EmptyValue emptyValue => (ValidationError)emptyValue,
          InvalidLength invalidLength => (ValidationError)invalidLength,
          InvalidCharacter invalidCharacter => (ValidationError)invalidCharacter,
@@ -324,7 +393,7 @@ public record BeRijksregisternummer : BeIdentityNumberBase
       };
 
    /// <summary>
-   ///   Format the rijksregisternummer using the supplied
+   ///   Format the Belgian identity number using the supplied
    ///   <paramref name="mask"/>.
    /// </summary>
    /// <param name="mask">
@@ -333,7 +402,7 @@ public record BeRijksregisternummer : BeIdentityNumberBase
    ///   instead.
    /// </param>
    /// <returns>
-   ///   A formatted Belgian rijksregisternummer.
+   ///   A formatted Belgian identity number.
    /// </returns>
    /// <exception cref="ArgumentNullException">
    ///   <paramref name="mask"/> is <see langword="null"/>.
@@ -344,29 +413,58 @@ public record BeRijksregisternummer : BeIdentityNumberBase
    /// </exception>
    /// <remarks>
    ///   <see cref="ExtensionMethods.FormatWithMask(String, String)"/> for more
-   ///   details on creating a mask to format the rijksregisternummer.
+   ///   details on creating a mask to format the identity number.
    /// </remarks>
    public String Format(String mask = DefaultFormatMask) => Value.FormatWithMask(mask);
 
    /// <summary>
-   ///   Get a string representation of the rijksregisternummer.
+   ///   Convert this instance to a <see cref="BeBisnummer"/>.
    /// </summary>
    /// <returns>
-   ///   The normalized rijksregisternummer, without separator characters.
+   ///   An <see cref="KfOption{BeBisnummer}"/> instance that will contain
+   ///   the <see cref="BeBisnummer"/> if this value is a BIS-nummer;
+   ///   otherwise <see cref="None"/> to indicate that this is not a
+   ///   BIS-nummer.
+   /// </returns>
+   public KfOption<BeBisnummer> ToBisnummer()
+      => IdentifierType is BeIdentifierType.BisNummer
+         ? new BeBisnummer(Value, ValidationMode.BypassValidation)
+         : default(None);
+
+   /// <summary>
+   ///   Convert this instance to a <see cref="BeRijksregisternummer"/>.
+   /// </summary>
+   /// <returns>
+   ///   An <see cref="KfOption{BeRijksregisternummer}"/> instance that will
+   ///   contain the <see cref="BeRijksregisternummer"/> if this value is a
+   ///   rijksregisternummer; otherwise <see cref="None"/> to indicate that this
+   ///   is not a rijksregisternummer.
+   /// </returns>
+   public KfOption<BeRijksregisternummer> ToRijksregisternummer()
+      => IdentifierType is BeIdentifierType.Rijksregisternummer
+         ? new BeRijksregisternummer(Value, ValidationMode.BypassValidation)
+         : default(None);
+
+   /// <summary>
+   ///   Get a string representation of the Belgian identity number.
+   /// </summary>
+   /// <returns>
+   ///   The normalized Belgian identity number, without separator characters.
    /// </returns>
    public override String ToString() => Value;
 
    /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a
-   ///   valid Belgian rijksregisternummer.
+   ///   valid Belgian identity number.
    /// </summary>
    /// <param name="value">
-   ///   String representation of a Belgian rijksregisternummer.
+   ///   String representation of a Belgian identity number.
    /// </param>
    /// <returns>
    ///   A <see cref="BeIdentityNumberBase.ValidationResult"/> union that
    ///   indicates if the <paramref name="value"/> passed validation or what
-   ///   validation error was encountered.
+   ///   validation error was
+   ///   encountered.
    /// </returns>
    public static ValidationResult Validate(String? value)
    {
@@ -401,7 +499,7 @@ public record BeRijksregisternummer : BeIdentityNumberBase
          return GetInvalidSequenceNumberResult(value);
       }
 
-      if (!ValidateDateOfBirth(value, DateOffsetMode.Rijksregisternummer))
+      if (!ValidateDateOfBirth(value, DateOffsetMode.Optional))
       {
          return GetInvalidDateOfBirthResult(value);
       }
@@ -412,45 +510,45 @@ public record BeRijksregisternummer : BeIdentityNumberBase
    private static InvalidCharacter GetInvalidCharacterResult(
       ReadOnlySpan<Char> value,
       Int32 position)
-      => new(Messages.BeRijksregisternummerInvalidCharacter, value[position], position);
+      => new(Messages.BeIdentityNumberInvalidCharacter, value[position], position);
 
    private static InvalidChecksum GetInvalidChecksumResult()
-      => new(Messages.BeRijksregisternummerInvalidCheckDigits, CheckDigitAlgorithmName);
+      => new(Messages.BeIdentityNumberInvalidCheckDigits, CheckDigitAlgorithmName);
 
    private static InvalidDateOfBirth GetInvalidDateOfBirthResult(ReadOnlySpan<Char> value)
       => new(
-         Messages.BeRijksregisternummerInvalidDateOfBirth,
+         Messages.BeIdentityNumberInvalidDateOfBirth,
          IsFormatted(value) ? value[..8].ToString() : value[..6].ToString(),
          DateFormatName.YYMMDD);
 
    private static InvalidLength GetInvalidLengthResult(ReadOnlySpan<Char> value)
       => new(
-         Messages.BeRijksregisternummerInvalidLength,
+         Messages.BeIdentityNumberInvalidLength,
          value.Length,
          [
-            new ValidLengthDefinition(UnformattedLength, Messages.BeRijksregisternummerUnformattedLength),
-            new ValidLengthDefinition(FormattedLength, Messages.BeRijksregisternummerFormattedLength),
+            new ValidLengthDefinition(UnformattedLength, Messages.BeIdentityNumberUnformattedLength),
+            new ValidLengthDefinition(FormattedLength, Messages.BeIdentityNumberFormattedLength),
          ]);
 
    private static InvalidSeparator GetInvalidSeparatorResult(
       ReadOnlySpan<Char> value,
       Int32 position)
       => new(
-         Messages.BeRijksregisternummerInvalidSeparator,
+         Messages.BeIdentityNumberInvalidSeparator,
          value[position],
          position);
 
    private static InvalidSequenceNumber GetInvalidSequenceNumberResult(ReadOnlySpan<Char> value)
       => new(
-         Messages.BeRijksregisternummerInvalidSequenceNumber,
+         Messages.BeIdentityNumberInvalidSequenceNumber,
          IsFormatted(value) ? value[9..12].ToString() : value[6..9].ToString());
 }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable SA1600 // Elements should be documented
-public class BeRijksregisternummerJsonConverter : JsonConverter<BeRijksregisternummer>
+public class BeIdentityNumberJsonConverter : JsonConverter<BeIdentityNumber>
 {
-   public override BeRijksregisternummer? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+   public override BeIdentityNumber? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
    {
       if (reader.TokenType == JsonTokenType.Null)
       {
@@ -458,9 +556,9 @@ public class BeRijksregisternummerJsonConverter : JsonConverter<BeRijksregistern
       }
 
       var str = reader.GetString();
-      return new BeRijksregisternummer(str);
+      return new BeIdentityNumber(str);
    }
 
-   public override void Write(Utf8JsonWriter writer, BeRijksregisternummer value, JsonSerializerOptions options)
+   public override void Write(Utf8JsonWriter writer, BeIdentityNumber value, JsonSerializerOptions options)
       => writer.WriteStringValue(value.Value);
 }

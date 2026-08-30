@@ -6,6 +6,7 @@ Coordination number (samordningsnummer) issued by the Swedish tax agency to pers
 | :------ | :---------- |
 | Class name: | KfAccountNumbers.National.Europe.SeSamordningsnummer |
 | Is composite: | No |
+| Composite parent: | [SeIdentityNumber](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/SeIdentityNumber.md) |
 | Length: | 11 (short format with 2-digit year), 13 (long format with 4-digit year) |
 | Check digit algorithm: | Luhn |
 | Allowed characters: | Digits ('0'-'9') |

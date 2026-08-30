@@ -61,11 +61,146 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BE Rijksregisternummer may not be null, empty or all whitespace characters.
+        ///   Looks up a localized string similar to BE BIS-nummer formatted as YY.MM.DD-XXX.CC.
         /// </summary>
-        internal static string BeRijksregisternummerEmpty {
+        internal static string BeBisnummerFormattedLength {
             get {
-                return ResourceManager.GetString("BeRijksregisternummerEmpty", resourceCulture);
+                return ResourceManager.GetString("BeBisnummerFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE BIS-nummer contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string BeBisnummerInvalidCharacter {
+            get {
+                return ResourceManager.GetString("BeBisnummerInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE BIS-nummer must have a valid modulus 97 check sum in the two trailing (right-most) character positions.
+        /// </summary>
+        internal static string BeBisnummerInvalidCheckDigits {
+            get {
+                return ResourceManager.GetString("BeBisnummerInvalidCheckDigits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE BIS-nummer must have a valid date of birth in YYMMDD format as the leading (left-most) digits.
+        /// </summary>
+        internal static string BeBisnummerInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("BeBisnummerInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE BIS-nummer must have length 11 (without separator characters) or 15 (with separator characters).
+        /// </summary>
+        internal static string BeBisnummerInvalidLength {
+            get {
+                return ResourceManager.GetString("BeBisnummerInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE BIS-nummer with length 15 may not have digit characters (0-9) in character positions 2, 5, 8 or 12 (zero-based).
+        /// </summary>
+        internal static string BeBisnummerInvalidSeparator {
+            get {
+                return ResourceManager.GetString("BeBisnummerInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE BIS-nummer sequence number may not be &apos;000&apos; or &apos;999&apos;.
+        /// </summary>
+        internal static string BeBisnummerInvalidSequenceNumber {
+            get {
+                return ResourceManager.GetString("BeBisnummerInvalidSequenceNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE BIS-rnummer without separator characters (YYMMDDXXXCC).
+        /// </summary>
+        internal static string BeBisnummerUnformattedLength {
+            get {
+                return ResourceManager.GetString("BeBisnummerUnformattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Identity Number formatted as YY.MM.DD-XXX.CC.
+        /// </summary>
+        internal static string BeIdentityNumberFormattedLength {
+            get {
+                return ResourceManager.GetString("BeIdentityNumberFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Identity Number contains a non-digit character where a digit was expected.
+        /// </summary>
+        internal static string BeIdentityNumberInvalidCharacter {
+            get {
+                return ResourceManager.GetString("BeIdentityNumberInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Identity Number must have a valid modulus 97 check sum in the two trailing (right-most) character positions.
+        /// </summary>
+        internal static string BeIdentityNumberInvalidCheckDigits {
+            get {
+                return ResourceManager.GetString("BeIdentityNumberInvalidCheckDigits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Identity Number must have a valid date of birth in YYMMDD format as the leading (left-most) digits.
+        /// </summary>
+        internal static string BeIdentityNumberInvalidDateOfBirth {
+            get {
+                return ResourceManager.GetString("BeIdentityNumberInvalidDateOfBirth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Identity Number must have length 11 (without separator characters) or 15 (with separator characters).
+        /// </summary>
+        internal static string BeIdentityNumberInvalidLength {
+            get {
+                return ResourceManager.GetString("BeIdentityNumberInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Identity Number with length 15 may not have digit characters (0-9) in character positions 2, 5, 8 or 12 (zero-based).
+        /// </summary>
+        internal static string BeIdentityNumberInvalidSeparator {
+            get {
+                return ResourceManager.GetString("BeIdentityNumberInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Identity Number sequence number may not be &apos;000&apos; or &apos;999&apos;.
+        /// </summary>
+        internal static string BeIdentityNumberInvalidSequenceNumber {
+            get {
+                return ResourceManager.GetString("BeIdentityNumberInvalidSequenceNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BE Identity Number without separator characters (YYMMDDXXXCC).
+        /// </summary>
+        internal static string BeIdentityNumberUnformattedLength {
+            get {
+                return ResourceManager.GetString("BeIdentityNumberUnformattedLength", resourceCulture);
             }
         }
         

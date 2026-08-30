@@ -14,7 +14,7 @@ A Fh-nummer (Felles Hjelpenummer or Common Help Number) is similar to a H-nummer
 | :------ | :---------- |
 | Class name: | KfAccountNumbers.National.Europe.NoIdentityNumber |
 | Is composite: | Yes |
-| Composite subtypes: | NoFoedselsnummer, NoDnummer, NoHnummer, NoFhnummer |
+| Composite subtypes: | [NoFoedselsnummer](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/NoFoedselsnummer.md), [NoDnummer](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/NoDnummer.md), [NoHnummer](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/NoHnummer.md), [NoFhnummer](https://github.com/KnowledgeForwardSolutions/KfAccountNumbers/blob/main/docs/Reference/National/Europe/NoFhnummer.md) |
 | Length: | 11 (unformatted), 12 (formatted for readability) |
 | Check digit algorithm: | Weighted modulus 11, with two different sets of weights |
 | Allowed characters: | Digits ('0'-'9') |
