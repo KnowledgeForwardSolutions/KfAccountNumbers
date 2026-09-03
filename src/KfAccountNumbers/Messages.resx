@@ -837,4 +837,22 @@
   <data name="BeIdentityNumberInvalidLength" xml:space="preserve">
     <value>BE Identity Number must have length 11 (without separator characters) or 15 (with separator characters)</value>
   </data>
+  <data name="EsDniUnformattedLength" xml:space="preserve">
+    <value>ES DNI without separator characters</value>
+  </data>
+  <data name="EsDniEmpty" xml:space="preserve">
+    <value>ES Dni may not be null, empty or all whitespace characters</value>
+  </data>
+  <data name="EsDniInvalidCharacter" xml:space="preserve">
+    <value>ES DNI contains a character that was not expected. For DNI, the leading (left-most) eight characters must be ASCII digits ('0'-'9') and the trailing character must be a an upper-case or lower-case Modulus 23 character (TRWAGMYFPDXBNJZSQVHLCKE)</value>
+  </data>
+  <data name="EsDniInvalidCheckDigit" xml:space="preserve">
+    <value>ES DNI must have a valid modulus 23 check character in the trailing (right-most) position</value>
+  </data>
+  <data name="EsDniInvalidLength" xml:space="preserve">
+    <value>ES DNI must have length 9 (without separator) or 10 (with separator)</value>
+  </data>
+  <data name="EsDniInvalidSeparator" xml:space="preserve">
+    <value>ES DNI separator character may not be an ASCII digit ('0'-'9') or an upper-case or lower-case alphabetic character ('A'-'Z', 'a'-'z')</value>
+  </data>
 </root>

@@ -601,11 +601,65 @@ namespace KfAccountNumbers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ES Dni may not be null, empty or all whitespace characters.
+        /// </summary>
+        internal static string EsDniEmpty {
+            get {
+                return ResourceManager.GetString("EsDniEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ES DNI formatted as DDDDDDDD-C.
         /// </summary>
         internal static string EsDniFormattedLength {
             get {
                 return ResourceManager.GetString("EsDniFormattedLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES DNI contains a character that was not expected. For DNI, the leading (left-most) eight characters must be ASCII digits (&apos;0&apos;-&apos;9&apos;) and the trailing character must be a an upper-case or lower-case Modulus 23 character (TRWAGMYFPDXBNJZSQVHLCKE).
+        /// </summary>
+        internal static string EsDniInvalidCharacter {
+            get {
+                return ResourceManager.GetString("EsDniInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES DNI must have a valid modulus 23 check character in the trailing (right-most) position.
+        /// </summary>
+        internal static string EsDniInvalidCheckDigit {
+            get {
+                return ResourceManager.GetString("EsDniInvalidCheckDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES DNI must have length 9 (without separator) or 10 (with separator).
+        /// </summary>
+        internal static string EsDniInvalidLength {
+            get {
+                return ResourceManager.GetString("EsDniInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES DNI separator character may not be an ASCII digit (&apos;0&apos;-&apos;9&apos;) or an upper-case or lower-case alphabetic character (&apos;A&apos;-&apos;Z&apos;, &apos;a&apos;-&apos;z&apos;).
+        /// </summary>
+        internal static string EsDniInvalidSeparator {
+            get {
+                return ResourceManager.GetString("EsDniInvalidSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ES DNI without separator characters.
+        /// </summary>
+        internal static string EsDniUnformattedLength {
+            get {
+                return ResourceManager.GetString("EsDniUnformattedLength", resourceCulture);
             }
         }
         

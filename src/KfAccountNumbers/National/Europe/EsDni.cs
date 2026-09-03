@@ -102,4 +102,78 @@ namespace KfAccountNumbers.National.Europe;
 /// </remarks>
 public record EsDni : EsIdentityNumberBase
 {
+   /// <summary>
+   ///   Check the <paramref name="value"/> to determine if it contains a
+   ///   valid Documento Nacional de Identidad (DNI).
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Spanish NDocumento Nacional de Identidad
+   ///   (DNI).
+   /// </param>
+   /// <returns>
+   ///   A <see cref="EsIdentityNumberBase.ValidationResult"/> union that
+   ///   indicates if the <paramref name="value"/> passed validation or what
+   ///   validation error was encountered.
+   /// </returns>
+   public static ValidationResult Validate(String? value)
+   {
+      if (String.IsNullOrWhiteSpace(value))
+      {
+         return default(EmptyValue);
+      }
+
+      if (!ValidateLength(value))
+      {
+         return GetInvalidLengthResult(value);
+      }
+
+      // After performing basic checks, validate the check digit because the
+      // most common source of errors will be data entry errors. Then validate
+      // the subcomponents of the value.
+      if (!ValidateCheckDigit(
+         value,
+         AllowedIdentifierType.Dni,
+         out var invalidCharacterPosition))
+      {
+         return invalidCharacterPosition == -1
+            ? GetInvalidChecksumResult()
+            : GetInvalidCharacterResult(value, invalidCharacterPosition);
+      }
+
+      if (!ValidateSeparators(value, out var invalidSeparatorPosition))
+      {
+         return GetInvalidSeparatorResult(value, invalidSeparatorPosition);
+      }
+
+      return default(ValidValue);
+   }
+
+   private static InvalidCharacter GetInvalidCharacterResult(
+      ReadOnlySpan<Char> value,
+      Int32 position)
+      => new(Messages.EsDniInvalidCharacter, value[position], position);
+
+   private static InvalidChecksum GetInvalidChecksumResult()
+      => new(Messages.EsDniInvalidCheckDigit, EsIdentityNumberBase.CheckDigitAlgorithmName);
+
+   private static InvalidLength GetInvalidLengthResult(ReadOnlySpan<Char> value)
+      => new(
+         Messages.EsDniInvalidLength,
+         value.Length,
+         [
+            new ValidLengthDefinition(UnformattedLength, Messages.EsDniUnformattedLength),
+            new ValidLengthDefinition(DniFormattedLength, Messages.EsDniFormattedLength),
+         ]);
+
+   private static InvalidSeparator GetInvalidSeparatorResult(
+      ReadOnlySpan<Char> value,
+      Int32 invalidSeparatorOffset)
+      => new(
+         Messages.EsDniInvalidSeparator,
+         value[invalidSeparatorOffset],
+         invalidSeparatorOffset);
+
+   [MethodImpl(MethodImplOptions.AggressiveInlining)]
+   private static Boolean ValidateLength(ReadOnlySpan<Char> value)
+      => value.Length is UnformattedLength or DniFormattedLength;
 }
