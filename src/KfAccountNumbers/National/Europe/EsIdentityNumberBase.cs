@@ -140,45 +140,17 @@ public abstract record EsIdentityNumberBase
 
       // Process leading character outside main loop.
       var leadingCharacter = Char.ToUpperInvariant(value[0]);
-      var num = 0;
-      switch (allowedIdentifierType)
+      var sum = allowedIdentifierType switch
       {
-         case AllowedIdentifierType.Any:
-            num = leadingCharacter.ToSingleDigit();
-            if (!num.IsValidDigit())
-            {
-               // Handle possible NIE.
-               num = leadingCharacter - Chars.UpperCaseX;
-               if (num is < 0 or > 2) // X = 0, Y = 1, Z = 2
-               {
-                  invalidCharacterPosition = 0;
-                  return false;
-               }
-            }
-            break;
-         case AllowedIdentifierType.Dni:
-            num = leadingCharacter.ToSingleDigit();
-            if (!num.IsValidDigit())
-            {
-               invalidCharacterPosition = 0;
-               return false;
-            }
-            break;
-
-         case AllowedIdentifierType.Nie:
-            num = leadingCharacter - Chars.UpperCaseX;
-            if (num is < 0 or > 2) // X = 0, Y = 1, Z = 2
-            {
-               invalidCharacterPosition = 0;
-               return false;
-            }
-            break;
-
-         default:
-            throw new UnreachableException("This branch should never be reached");
+         AllowedIdentifierType.Dni => leadingCharacter.ToSingleDigit(),
+         AllowedIdentifierType.Nie => ParseNieInitialDigit(leadingCharacter),
+         _ => ParseDniOrNieInitialDigit(leadingCharacter)
+      };
+      if (!sum.IsValidDigit())
+      {
+         invalidCharacterPosition = 0;
+         return false;
       }
-
-      var sum = num;
 
       // Handle inner digits.
       var start = value.Length == NieFormattedLength ? 2 : 1;
@@ -186,7 +158,7 @@ public abstract record EsIdentityNumberBase
       for (var index = start; index < end; index++)
       {
          sum *= 10;
-         num = value[index].ToSingleDigit();
+         var num = value[index].ToSingleDigit();
          if (!num.IsValidDigit())
          {
             invalidCharacterPosition = index;
@@ -273,5 +245,28 @@ public abstract record EsIdentityNumberBase
       }
 
       return true;
+   }
+
+   private static Int32 ParseDniOrNieInitialDigit(Char ch)
+   {
+      // Handle digits first (DNI). If invalid, check for possible NIE leading
+      // character.
+      var num = ch.ToSingleDigit();
+      if (!num.IsValidDigit())
+      {
+         num = ParseNieInitialDigit(ch);
+      }
+
+      return num;
+   }
+
+   private static Int32 ParseNieInitialDigit(Char ch)
+   {
+      // Assumes that ch is already upper-case.
+      var num = ch - Chars.UpperCaseX;
+
+      return num is < 0 or > 2 // X = 0, Y = 1, Z = 2
+         ? -1
+         : num;
    }
 }
