@@ -15,6 +15,15 @@ public class EsIdentityNumberBaseTests
    private const String ValidFormattedLowercaseNie = "x-1234567-l";
    private const String AltValidFormattedNie = "Y 7654321 G";
 
+   protected static String GetNormalizedIdentifier(String value)
+      => value.Length switch
+      {
+         9 => value.ToUpperInvariant(),
+         10 => (value[..8] + value[^1]).ToUpperInvariant(),
+         11 => (value[0] + value[2..9] + value[^1]).ToUpperInvariant(),
+         _ => throw new InvalidOperationException(),
+      };
+
    public static TheoryData<String> ValidDniValues =>
    [
       ValidUnformattedDni,

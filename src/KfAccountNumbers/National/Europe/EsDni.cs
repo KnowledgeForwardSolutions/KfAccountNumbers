@@ -103,6 +103,72 @@ namespace KfAccountNumbers.National.Europe;
 public record EsDni : EsIdentityNumberBase
 {
    /// <summary>
+   ///   Initializes a new instance of the <see cref="EsDni"/> class.
+   /// </summary>
+   /// <param name="value">
+   ///   String representation of a Spanish NDocumento Nacional de Identidad
+   ///   (DNI).
+   /// </param>
+   /// <exception cref="UKfValidationException{ValidationError}">
+   ///   <paramref name="value"/> is <see langword="null"/>, empty or all
+   ///   whitespace characters.
+   ///   - or -
+   ///   <paramref name="value"/> is not length 9 (without separator)
+   ///   or 10 (with separator).
+   ///   - or -
+   ///   <paramref name="value"/> contains an invalid character. Leading eight
+   ///   characters must be ASCII digits ('0'-'9'). Trailing (right-most)
+   ///   character must be an alphabetic character from the subset used by
+   ///   modulus 23.
+   ///   - or -
+   ///   <paramref name="value"/> has invalid modulus 23 check character
+   ///   in the trailing (right-most) character position. Valid characters are
+   ///   "TRWAGMYFPDXBNJZSQVHLCKE" (where T represents a remainder of 0 and E
+   ///   represents a remainder of 22).
+   ///   - or -
+   ///   <paramref name="value"/> is greater than 9 characters in length and has
+   ///   an ASCII digit ('0'-'9') or an upper-case or lower-case letter ('A'-Z')
+   ///   in a separator location.
+   /// </exception>
+   public EsDni(String? value)
+      : this(value, ValidationMode.ValidationRequired) { }
+
+   /// <summary>
+   ///   Initializes a new instance of the <see cref="EsDni"/> class.
+   /// </summary>
+   /// <remarks>
+   ///   Private constructor that actually does the work. Supports bypassing
+   ///   validation when creating a new instance from a value that has
+   ///   already been validated.
+   /// </remarks>
+   private EsDni(String? value, ValidationMode validationMode)
+   {
+      if (validationMode == ValidationMode.ValidationRequired)
+      {
+         ValidationResult validationResult = Validate(value);
+         if (validationResult.Value is not ValidValue)
+         {
+            throw validationResult switch
+            {
+               EmptyValue emptyValue => new UKfValidationException<ValidationError>(emptyValue),
+               InvalidLength invalidLength => new UKfValidationException<ValidationError>(invalidLength),
+               InvalidCharacter invalidCharacter => new UKfValidationException<ValidationError>(invalidCharacter),
+               InvalidChecksum invalidChecksum => new UKfValidationException<ValidationError>(invalidChecksum),
+               InvalidSeparator invalidSeparator => new UKfValidationException<ValidationError>(invalidSeparator),
+               _ => new UnreachableException("This branch should never be reached"),
+            };
+         }
+      }
+
+      Value = GetNormalizedValue(value!);
+   }
+
+   /// <summary>
+   ///   Gets the raw Documento Nacional de Identidad value.
+   /// </summary>
+   public String Value { get; private init; }
+
+   /// <summary>
    ///   Check the <paramref name="value"/> to determine if it contains a
    ///   valid Documento Nacional de Identidad (DNI).
    /// </summary>

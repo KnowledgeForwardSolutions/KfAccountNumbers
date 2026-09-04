@@ -110,6 +110,30 @@ public abstract record EsIdentityNumberBase
    };
 
    /// <summary>
+   ///   Get the normalized identifier value, stripped of separator characters
+   ///   and with any lower-case characters converted to upper-case.
+   /// </summary>
+   /// <param name="value">
+   ///   The original identifier value.
+   /// </param>
+   /// <returns>
+   ///   The normalized identifier value.
+   /// </returns>
+   protected static String GetNormalizedValue(String value)
+   {
+      var rawValue = value.Length switch
+      {
+         UnformattedLength => value,
+         DniFormattedLength => String.Concat(value.AsSpan(..8), value.AsSpan(^1..)),
+         NieFormattedLength => String.Concat(value.AsSpan(..1), value.AsSpan(2..^2), value.AsSpan(^1..)),
+         _ => throw new UnreachableException("This branch should never be reached"),
+      };
+
+      return rawValue.ToUpperInvariant();
+   }
+
+
+   /// <summary>
    ///   Validate that the supplied <paramref name="value"/> contains a valid
    ///   Modulus 32 check character.
    /// </summary>
@@ -217,20 +241,20 @@ public abstract record EsIdentityNumberBase
 
       var trailingSeparator = value[^TrailingSeparatorOffset];
 
-      // Separator must not be a digit
+      // Separator must not be a digit.
       if (trailingSeparator.IsAsciiDigit() || trailingSeparator.IsAsciiLetter())
       {
          invalidSeparatorPosition = value.Length - TrailingSeparatorOffset;
          return false;
       }
 
-      // DNI has only trailing separator
+      // DNI has only trailing separator.
       if (value.Length == DniFormattedLength)
       {
          return true;
       }
 
-      // NIE has leading and trailing separators - must match.
+      // NIE has leading and trailing separators - which must match.
       var leadingSeparator = value[LeadingSeparatorOffset];
       if (leadingSeparator.IsAsciiDigit() || leadingSeparator.IsAsciiLetter())
       {

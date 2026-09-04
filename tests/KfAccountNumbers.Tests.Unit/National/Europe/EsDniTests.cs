@@ -42,6 +42,123 @@ public class EsDniTests : EsIdentityNumberBaseTests
          value[position],
          position);
 
+   #region Constructor Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Theory]
+   [MemberData(nameof(ValidDniValues))]
+   public void EsDni_Constructor_ShouldCreateInstance_WhenValueIsValid(String value)
+   {
+      // Arrange.
+      var expected = GetNormalizedIdentifier(value);
+
+      // Act.
+      var sut = new EsDni(value);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(expected);
+   }
+
+   [Theory]
+   [ClassData(typeof(StringNullEmptyWhitespaceValues))]
+   public void EsDni_Constructor_ShouldThrowKfValidationException_WhenValueIsNullOrEmpty(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = default(EmptyValue);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new EsDni(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDniLengthValues))]
+   public void EsDni_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidLength(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new EsDni(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDniCharacterValues))]
+   public void EsDni_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCharacter(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidCharacterResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new EsDni(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDniCheckDigitValues))]
+   public void EsDni_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidCheckDigit(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidChecksumResult();
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new EsDni(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(InvalidDniSeparatorValues))]
+   public void EsDni_Constructor_ShouldThrowKfValidationException_WhenValueHasInvalidSeparator(
+      String value,
+      Int32 position)
+   {
+      // Arrange.
+      LocalValidationError expected = GetInvalidSeparatorResult(value, position);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new EsDni(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected);
+   }
+
+   [Theory]
+   [MemberData(nameof(ValidNieValues))]
+   public void EsDni_Constructor_ShouldThrowKfValidationException_WhenValueIsValidNie(String value)
+   {
+      // Arrange.
+      LocalValidationError expected = value.Length == EsIdentityNumberBase.UnformattedLength
+         ? GetInvalidCharacterResult(value, 0)
+         : GetInvalidLengthResult(value);
+
+      // Act/assert.
+      FluentActions
+         .Invoking(() => new EsDni(value))
+         .Should().ThrowExactly<LocalValidationException>()
+         .And.ValidationError.Should().BeEquivalentTo(expected, options => options        // Options necessary because FluentAssertions gets lost comparing the ValidLengthDefinition array in InvalidLength type
+            .ComparingByMembers<LocalValidationError>()
+            .ComparingByMembers<ValidLengthDefinition>()
+            .WithoutStrictOrdering());
+   }
+
+   #endregion
+
    #region Validate Method Tests
    // ==========================================================================
    // ==========================================================================
