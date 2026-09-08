@@ -2,9 +2,9 @@ global using System.Collections;
 global using System.Globalization;
 global using System.Text.Json;
 
-global using CheckDigits.Net;
+global using AwesomeAssertions;
 
-global using FluentAssertions;
+global using CheckDigits.Net;
 
 global using KfAccountNumbers.National.Europe;
 global using KfAccountNumbers.National.NorthAmerica;
